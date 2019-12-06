@@ -33,14 +33,19 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
 		RequestHandler requestHandler = requestHandlerManager.getHandler(requestURI);
+		String responseContentType = requestHandler.getResponseContentType();
 		RequestArguments arguments = newRequestArguments(request, response);
 		try {
 			Object responseData = requestHandler.handle(arguments);
 			String responseString = objectMapper.writeValueAsString(responseData);
-			String responseContentType = requestHandler.getResponseContentType();
 			response.setContentType(responseContentType);
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.getWriter().println(responseString);
+		}
+		catch (Exception e) {
+			response.setContentType(responseContentType);
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.getWriter().println("error");
 		}
 		finally {
 			arguments.release();

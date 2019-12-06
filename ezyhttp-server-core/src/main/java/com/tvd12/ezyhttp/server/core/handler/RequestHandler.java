@@ -6,7 +6,7 @@ public interface RequestHandler {
 
 	void setController(Object controller);
 	
-	Object handle(RequestArguments arguments);
+	Object handle(RequestArguments arguments) throws Exception;
 	
 	String getResponseContentType();
 }

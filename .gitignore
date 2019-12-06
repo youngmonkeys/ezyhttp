@@ -8,3 +8,5 @@ target/
 */target/
 logs/
 */logs
+test-output
+*/test-output/
