@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core;
+package com.tvd12.ezyhttp.server.core.constant;
 
 public final class ContentTypes {
 

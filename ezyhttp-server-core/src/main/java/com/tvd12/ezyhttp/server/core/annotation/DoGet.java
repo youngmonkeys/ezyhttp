@@ -8,8 +8,6 @@ import java.lang.annotation.Target;
 
 /**
  * 
- * Indicates that a class listener a request from client and process that request
- * 
  * @author tavandung12
  *
  */

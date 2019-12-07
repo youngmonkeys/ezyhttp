@@ -8,18 +8,12 @@ import java.lang.annotation.Target;
 
 /**
  * 
+ * 
  * @author tavandung12
  *
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
-public @interface RequestParam {
-    
-	/**
-	 * Command of request
-	 * 
-	 * @return the command
-	 */
-	public String value() default "";
+@Target({ ElementType.TYPE })
+public @interface ApplicationBootstrap {
 }

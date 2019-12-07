@@ -11,15 +11,15 @@
 	<name>ezyhttp-server-core</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<ezy.util.version>1.1.0</ezy.util.version>
+		<ezy.bean.version>1.1.0</ezy.bean.version>
 		<jackson.version>2.10.0</jackson.version>
 		<jetty.version>9.4.24.v20191120</jetty.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>
-			<artifactId>ezyfox-util</artifactId>
-			<version>${ezy.util.version}</version>
+			<artifactId>ezyfox-bean</artifactId>
+			<version>${ezy.bean.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>

@@ -8,8 +8,6 @@ import java.lang.annotation.Target;
 
 /**
  * 
- * Indicates that a class listener a request from client and process that request
- * 
  * @author tavandung12
  *
  */
@@ -19,9 +17,18 @@ import java.lang.annotation.Target;
 public @interface Controller {
     
 	/**
-	 * Command of request
+	 * the request uri
 	 * 
 	 * @return the command
 	 */
 	public String value() default "";
+	
+	/**
+	 * the request uri
+	 * 
+	 * @return the command
+	 */
+	public String uri() default "";
+	
+	
 }

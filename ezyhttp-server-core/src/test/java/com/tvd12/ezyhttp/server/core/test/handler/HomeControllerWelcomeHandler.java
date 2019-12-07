@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core.test.handler;
 
-import com.tvd12.ezyhttp.server.core.ContentTypes;
+import com.tvd12.ezyhttp.server.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
