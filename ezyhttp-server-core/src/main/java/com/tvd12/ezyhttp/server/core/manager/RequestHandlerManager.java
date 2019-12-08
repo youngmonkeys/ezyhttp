@@ -17,6 +17,10 @@ public class RequestHandlerManager {
 		this.handlers.put(uri, handler);
 	}
 	
+	public void addHandlers(Map<String, RequestHandler> handlers) {
+		this.handlers.putAll(handlers);
+	}
+	
 	public RequestHandler getHandler(String uri) {
 		RequestHandler handler = handlers.get(uri);
 		return handler;

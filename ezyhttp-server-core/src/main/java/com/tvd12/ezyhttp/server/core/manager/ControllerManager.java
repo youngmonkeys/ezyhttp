@@ -1,7 +1,9 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
@@ -34,6 +36,10 @@ public class ControllerManager {
 	public Object getController(String uri) {
 		Object controller = controllers.get(uri);
 		return controller;
+	}
+	
+	public List<Object> getControllerList() {
+		return new ArrayList<>(controllers.values());
 	}
 	
 }

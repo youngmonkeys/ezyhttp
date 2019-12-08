@@ -2,22 +2,33 @@ package com.tvd12.ezyhttp.server.core;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
+import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
+import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
+import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
-	protected Set<String> packageToScans;
+	protected final Set<String> packageToScans;
+	protected final ComponentManager componentManager;
+	protected final ControllerManager controllerManager;
+	protected final RequestHandlerManager requestHandlerManager;
 	
 	public ApplicationContextBuilder() {
 		this.packageToScans = new HashSet<>();
+		this.componentManager = ComponentManager.getInstance();
+		this.controllerManager = componentManager.getControllerManager();
+		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 	}
 	
 	public ApplicationContextBuilder scan(String packageName) {
@@ -37,19 +48,31 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected EzyBeanContext createBeanContext(EzyReflection reflection) {
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
+		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		EzyBeanContext beanContext = EzyBeanContext.builder()
 				.addAllClasses(reflection)
 				.addSingletonClasses(controllerClasses)
+				.addSingletonClasses(bootstrapClasses)
 				.build();
 		registerComponents(beanContext);
+		addRequestHandlers();
 		return beanContext;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	protected void registerComponents(EzyBeanContext beanContext) {
-		ComponentManager componentManager = ComponentManager.getInstance();
-		ControllerManager controllerManager = componentManager.getControllerManager();
 		List controllers = beanContext.getSingletons(Controller.class);
 		controllerManager.addControllers(controllers);
+	}
+	
+	protected void addRequestHandlers() {
+		List<Object> controllerList = controllerManager.getControllerList();
+		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
+		Map<String, RequestHandler> requestHandlers = implementer.implement(controllerList);
+		requestHandlerManager.addHandlers(requestHandlers);
+	}
+	
+	protected RequestHandlersImplementer newRequestHandlersImplementer() {
+		return new RequestHandlersImplementer();
 	}
 }

@@ -5,6 +5,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletHandler;
 
+import com.tvd12.ezyhttp.server.core.ApplicationEntry;
+import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
+import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
@@ -13,7 +16,8 @@ import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
 import com.tvd12.ezyhttp.server.core.test.handler.HomeControllerWelcomeHandler;
 
-public class App {
+@ApplicationBootstrap
+public class App implements ApplicationEntry {
 	
 	protected Server server;
 	 
@@ -42,7 +46,6 @@ public class App {
     }
     
 	public static void main(String[] args) throws Exception {
-		App app = new App();
-		app.start();
+		EzyHttpApplication.start(App.class);
 	}
 }

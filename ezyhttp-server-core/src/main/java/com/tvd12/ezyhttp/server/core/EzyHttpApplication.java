@@ -17,6 +17,24 @@ public class EzyHttpApplication
 		this.applicationContext = applicationContext;
 	}
 	
+	public static EzyHttpApplication start(Class<?> bootstrapClass) throws Exception {
+		String basePackage = bootstrapClass.getPackage().getName();
+		return start(basePackage);
+	}
+	
+	public static EzyHttpApplication start(String basePackage) throws Exception {
+		ApplicationContext applicationContext = createApplicationContext(basePackage);
+		EzyHttpApplication application = new EzyHttpApplication(applicationContext);
+		application.start();
+		return application;
+	}
+	
+	protected static ApplicationContext createApplicationContext(String basePackage) {
+		return new ApplicationContextBuilder()
+				.scan(basePackage)
+				.build();
+	}
+	
 	@Override
 	public void start() throws Exception {
 		ApplicationEntry entry = applicationContext.getSingleton(ApplicationBootstrap.class);

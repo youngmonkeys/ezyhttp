@@ -39,7 +39,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		this.handlerMethod = handlerMethod;
 	}
 	
-	public Object implement() {
+	public RequestHandler implement() {
 		try {
 			return doimplement();
 		}
@@ -49,7 +49,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 	}
 
 	@SuppressWarnings("rawtypes")
-	protected Object doimplement() throws Exception {
+	protected RequestHandler doimplement() throws Exception {
 		ClassPool pool = ClassPool.getDefault();
 		String implClassName = getImplClassName();
 		CtClass implClass = pool.makeClass(implClassName);
