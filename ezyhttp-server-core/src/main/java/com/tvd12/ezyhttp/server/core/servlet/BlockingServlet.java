@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
@@ -37,19 +39,37 @@ public class BlockingServlet extends HttpServlet {
 		RequestArguments arguments = newRequestArguments(request, response);
 		try {
 			Object responseData = requestHandler.handle(arguments);
-			String responseString = objectMapper.writeValueAsString(responseData);
 			response.setContentType(responseContentType);
 			response.setStatus(HttpServletResponse.SC_OK);
-			response.getWriter().println(responseString);
+			responseData(response, responseData);
 		}
 		catch (Exception e) {
 			response.setContentType(responseContentType);
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.getWriter().println("error");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			responseString(response, "Internal Server Error");
 		}
 		finally {
 			arguments.release();
 		}
+	}
+	
+	protected void responseData(
+			HttpServletResponse response, Object data) throws IOException {
+		byte[] bytes = objectMapper.writeValueAsBytes(data);
+		responseBytes(response, bytes);
+	}
+	
+	protected void responseString(
+			HttpServletResponse response, String str) throws IOException {
+		byte[] bytes = EzyStrings.getUtfBytes(str);
+		responseBytes(response, bytes);
+	}
+	
+	protected void responseBytes(
+			HttpServletResponse response, byte[] bytes) throws IOException {
+		response.setContentLength(bytes.length);
+		ServletOutputStream outputStream = response.getOutputStream();
+		outputStream.write(bytes);
 	}
 	
 	protected RequestArguments newRequestArguments(

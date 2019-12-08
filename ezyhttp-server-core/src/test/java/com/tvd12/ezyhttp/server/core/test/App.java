@@ -8,13 +8,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
-import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
-import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
-import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
-import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
-import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
-import com.tvd12.ezyhttp.server.core.test.handler.HomeControllerWelcomeHandler;
 
 @ApplicationBootstrap
 public class App implements ApplicationEntry {
@@ -32,13 +26,8 @@ public class App implements ApplicationEntry {
     }
 	
     protected ServletHandler newServletHandler() {
-    	ComponentManager componentManager = ComponentManager.getInstance();
-    	ControllerManager controllerManager = componentManager.getControllerManager();
-    	controllerManager.addController("/", new HomeController());
-    	RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
-    	RequestHandler handler = new HomeControllerWelcomeHandler();
-    	handler.setController(controllerManager.getController("/"));
-    	requestHandlerManager.addHandler("/", handler);
+//    	ComponentManager componentManager = ComponentManager.getInstance();
+//    	RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
     	
     	ServletHandler servletHandler = new ServletHandler();
         servletHandler.addServletWithMapping(BlockingServlet.class, "/");

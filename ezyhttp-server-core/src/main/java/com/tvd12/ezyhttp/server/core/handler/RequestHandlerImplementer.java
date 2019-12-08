@@ -58,15 +58,18 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		String setControllerMethodContent = makeSetControllerMethodContent();
 		String handleRequestMethodContent = makeHandleRequestMethodContent();
 		String handleExceptionMethodContent = makeHandleExceptionMethodContent();
+		String getResponseContentTypeMethodContent = makeGetResponseContentTypeMethodContent();
 		printComponentContent(controllerFieldContent);
 		printComponentContent(setControllerMethodContent);
 		printComponentContent(handleRequestMethodContent);
 		printComponentContent(handleExceptionMethodContent);
+		printComponentContent(getResponseContentTypeMethodContent);
 		implClass.setSuperclass(pool.get(superClass.getName()));
 		implClass.addField(CtField.make(controllerFieldContent, implClass));
 		implClass.addMethod(CtNewMethod.make(setControllerMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(handleRequestMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(handleExceptionMethodContent, implClass));
+		implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
 		Class answerClass = implClass.toClass();
 		implClass.detach();
 		RequestHandler handler = (RequestHandler) answerClass.newInstance();
@@ -134,6 +137,16 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		return body.append(instruction).function().toString();
 	}
 	
+	protected String makeGetResponseContentTypeMethodContent() {
+		return new EzyFunction(getGetResponseContentTypeMethod())
+				.body()
+					.append(new EzyInstruction("\t", "\n")
+							.answer()
+							.string(handlerMethod.getResponseType()))
+					.function()
+				.toString();
+	}
+	
 	protected String makeHandleExceptionMethodContent() {
 		EzyMethod method = getHandleExceptionMethod();
 		EzyFunction function = new EzyFunction(method);
@@ -164,6 +177,12 @@ public class RequestHandlerImplementer extends EzyLoggable {
 	protected EzyMethod getHandleExceptionMethod() {
 		Method method = EzyMethods.getMethod(
 				AbstractRequestHandler.class, "handleException", Exception.class);
+		return new EzyMethod(method);
+	}
+	
+	protected EzyMethod getGetResponseContentTypeMethod() {
+		Method method = EzyMethods.getMethod(
+				AbstractRequestHandler.class, "getResponseContentType");
 		return new EzyMethod(method);
 	}
 	

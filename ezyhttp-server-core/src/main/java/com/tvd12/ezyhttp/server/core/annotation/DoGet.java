@@ -22,4 +22,18 @@ public @interface DoGet {
 	 * @return the command
 	 */
 	public String value() default "";
+	
+	/**
+	 * request uri
+	 * 
+	 * @return the command
+	 */
+	public String uri() default "";
+	
+	/**
+	 * request uri
+	 * 
+	 * @return the command
+	 */
+	public String responseType() default "";
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Parameter;
 
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.util.DoGetAnnotations;
 
 import lombok.Getter;
 
@@ -12,21 +13,30 @@ public class RequestHandlerMethod {
 	
 	protected final EzyMethod method;
 	protected final String requestURI;
+	protected final String responseType;
 	
 	public RequestHandlerMethod(String rootURI, EzyMethod method) {
 		this.method = method;
-		this.requestURI = getRequestURI(rootURI);
+		this.requestURI = fetchRequestURI(rootURI);
+		this.responseType = fetchResponseType();
 	}
 	
-	protected String getRequestURI(String rootURI) {
-		return rootURI + getRequestURIFragment();
+	protected String fetchRequestURI(String rootURI) {
+		return rootURI + fetchRequestURIFragment();
 	}
 	
-	protected String getRequestURIFragment() {
+	protected String fetchRequestURIFragment() {
 		String uri = "";
 		DoGet doGet = method.getAnnotation(DoGet.class);
-		uri = doGet.value();
+		uri = DoGetAnnotations.getURI(doGet);
 		return uri;
+	}
+	
+	protected String fetchResponseType() {
+		String responseType = "";
+		DoGet doGet = method.getAnnotation(DoGet.class);
+		responseType = DoGetAnnotations.getResponseType(doGet);
+		return responseType;
 	}
 	
 	public String getName() {

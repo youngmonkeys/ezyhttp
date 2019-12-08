@@ -10,7 +10,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	@Override
 	public Object handle(RequestArguments arguments) throws Exception {
 		try {
-			return handle(arguments);
+			return handleRequest(arguments);
 		}
 		catch (Exception e) {
 			return handleException(e);
