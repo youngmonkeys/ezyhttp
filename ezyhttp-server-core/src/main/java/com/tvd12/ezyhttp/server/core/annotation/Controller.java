@@ -19,14 +19,14 @@ public @interface Controller {
 	/**
 	 * the request uri
 	 * 
-	 * @return the command
+	 * @return the uri
 	 */
 	public String value() default "";
 	
 	/**
 	 * the request uri
 	 * 
-	 * @return the command
+	 * @return the uri
 	 */
 	public String uri() default "";
 	

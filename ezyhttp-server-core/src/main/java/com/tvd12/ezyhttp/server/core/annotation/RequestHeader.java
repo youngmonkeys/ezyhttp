@@ -13,27 +13,13 @@ import java.lang.annotation.Target;
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface DoGet {
+@Target({ ElementType.PARAMETER })
+public @interface RequestHeader {
     
 	/**
-	 * request uri
+	 * name of header
 	 * 
-	 * @return the uri
+	 * @return the header's name
 	 */
 	public String value() default "";
-	
-	/**
-	 * request uri
-	 * 
-	 * @return the uri
-	 */
-	public String uri() default "";
-	
-	/**
-	 * request uri
-	 * 
-	 * @return the response body type
-	 */
-	public String responseType() default "";
 }

@@ -21,6 +21,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	
 	protected abstract Object handleException(Exception e) throws Exception;
 	
+	protected <T> T deserializeHeader(String header, Class<T> type) {
+		return (T)header;
+	}
+	
 	protected <T> T deserializeParameter(String parameter, Class<T> type) {
 		return (T)parameter;
 	}

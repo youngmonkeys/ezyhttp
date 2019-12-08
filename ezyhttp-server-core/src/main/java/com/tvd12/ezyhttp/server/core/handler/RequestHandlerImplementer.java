@@ -12,10 +12,14 @@ import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyfox.reflect.EzyReflections;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
+import com.tvd12.ezyhttp.server.core.reflect.RequestParameters;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.core.util.RequestHeaderAnnotations;
+import com.tvd12.ezyhttp.server.core.util.RequestParamAnnotations;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -95,30 +99,57 @@ public class RequestHandlerImplementer extends EzyLoggable {
 					.append(new EzyInstruction("\t", "\n")
 							.append("this.controller")
 							.equal()
-							.cast(controller.getClazz().getClazz(), "arg0"))
+							.brackets(controller.getClazz().getClazz())
+							.append("arg0"))
 					.function()
 				.toString();
 	}
 	
 	protected String makeHandleRequestMethodContent() {
-		EzyBody body = new EzyFunction(getHandleRequestMethod())
-				.body();
+		EzyMethod method = getHandleRequestMethod();
+		EzyFunction function = new EzyFunction(method);
+		EzyBody body = function.body();
 		int paramCount = 0;
+		int headerCount = 0;
 		int parameterCount = 0;
 		Parameter[] parameters = handlerMethod.getParameters();
 		for(Parameter parameter : parameters) {
-			EzyInstruction instruction = new EzyInstruction("\t", "\n");
-			RequestParam requestParamAnno = parameter.getAnnotation(RequestParam.class);
-			if(requestParamAnno != null) {
-				instruction.clazz(parameter.getType())
+			Class<?> parameterType = parameter.getType();
+			EzyInstruction instruction = new EzyInstruction("\t", "\n")
+					.clazz(parameterType)
 					.append(" ").append(PARAMETER_PREFIX).append(paramCount)
 					.equal();
+			boolean hasAnnotation = false;
+			RequestParam requestParamAnno = parameter.getAnnotation(RequestParam.class);
+			if(requestParamAnno != null) {
+				String paramKey = RequestParamAnnotations
+						.getParamKeyString(requestParamAnno, parameterCount);
 				instruction
 					.append("(java.lang.String)this.deserializeParameter(")
-						.append("arg0.getParameter(").append(parameterCount).append(")")
-						.append(", ").clazz(parameter.getType(), true)
+						.append("arg0.getParameter(").append(paramKey).append(")")
+						.append(", ").clazz(parameterType, true)
 					.append(")");
 				++ parameterCount;
+				hasAnnotation = true;
+			}
+			RequestHeader requestHeaderAnno = parameter.getAnnotation(RequestHeader.class);
+			if(requestHeaderAnno != null) {
+				String headerKey = RequestHeaderAnnotations
+						.getHeaderKeyString(requestHeaderAnno, headerCount);
+				instruction
+					.append("(java.lang.String)this.deserializeHeader(")
+						.append("arg0.getHeader(").append(headerKey).append(")")
+						.append(", ").clazz(parameterType, true)
+					.append(")");
+				++ headerCount;
+				hasAnnotation = true;
+			}
+			if(!hasAnnotation) {
+				String argumentKey = RequestParameters.getArgumentKeyString(parameter);
+				instruction
+					.brackets(parameterType)
+					.append("arg0.getArgument(").append(argumentKey)
+				.append(")");
 			}
 			body.append(instruction);
 			++ paramCount;
@@ -134,7 +165,18 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				instruction.append(", ");
 		}
 		instruction.append(")");
-		return body.append(instruction).function().toString();
+		body.append(instruction);
+		return toThrowExceptionFunction(method, function);
+	}
+	
+	protected String makeHandleExceptionMethodContent() {
+		EzyMethod method = getHandleExceptionMethod();
+		EzyFunction function = new EzyFunction(method);
+		EzyBody body = function.body();
+		body.append(new EzyInstruction("\t", "\n")
+				.answer()
+				.string("hello"));
+		return toThrowExceptionFunction(method, function);
 	}
 	
 	protected String makeGetResponseContentTypeMethodContent() {
@@ -147,17 +189,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				.toString();
 	}
 	
-	protected String makeHandleExceptionMethodContent() {
-		EzyMethod method = getHandleExceptionMethod();
-		EzyFunction function = new EzyFunction(method);
-		EzyBody body = function.body();
-		body.append(new EzyInstruction("\t", "\n")
-				.answer()
-				.string("hello"));
+	protected String toThrowExceptionFunction(EzyMethod method, EzyFunction function) {
 		return new StringBuilder()
 				.append(method.getDeclaration(EzyReflections.MODIFIER_PUBLIC))
 				.append(" throws Exception {\n")
-				.append(body)
+				.append(function.body())
 				.append("}")
 				.toString();
 	}
@@ -195,9 +231,9 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				+ "$" + handlerMethod.getName() + "$AutoImpl$" + COUNT.incrementAndGet();
 	}
 	
-	private void printComponentContent(String componentContent) {
+	protected void printComponentContent(String componentContent) {
 		if(debug) 
-			logger.debug("reader: method content \n{}", componentContent);
+			logger.debug("component content: \n{}", componentContent);
 	}
 	
 }
