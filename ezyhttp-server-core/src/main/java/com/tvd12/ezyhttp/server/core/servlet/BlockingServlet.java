@@ -33,6 +33,19 @@ public class BlockingServlet extends HttpServlet {
 	protected void doGet(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
+		handleRequest(request, response);
+	}
+	
+	@Override
+	protected void doPost(
+			HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException {
+		handleRequest(request, response);
+	}
+	
+	protected void handleRequest(
+			HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
 		RequestHandler requestHandler = requestHandlerManager.getHandler(requestURI);
 		String responseContentType = requestHandler.getResponseContentType();
@@ -47,6 +60,7 @@ public class BlockingServlet extends HttpServlet {
 			response.setContentType(responseContentType);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			responseString(response, "Internal Server Error");
+			log("handle request uri: " + requestURI + " error", e);
 		}
 		finally {
 			arguments.release();
@@ -76,8 +90,8 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletRequest request, 
 			HttpServletResponse response) {
 		RequestArguments arguments = new RequestArguments();
-		arguments.setArgument(HttpServletRequest.class, request);
-		arguments.setArgument(HttpServletResponse.class, response);
+		arguments.setRequest(request);
+		arguments.setResponse(response);
 		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {

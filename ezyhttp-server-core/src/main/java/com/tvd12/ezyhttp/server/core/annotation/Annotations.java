@@ -14,6 +14,7 @@ public final class Annotations {
 	private static Set<Class<?>> requestHandlerAnnotations() {
 		Set<Class<?>> set = new HashSet<>();
 		set.add(DoGet.class);
+		set.add(DoPost.class);
 		return Collections.unmodifiableSet(set);
 	}
 	

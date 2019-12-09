@@ -5,11 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.tvd12.ezyfox.util.EzyReleasable;
+
+import lombok.Getter;
 
 @SuppressWarnings("unchecked")
 public class RequestArguments implements EzyReleasable {
 
+	@Getter
+	protected HttpServletRequest request;
+	@Getter
+	protected HttpServletResponse response;
 	protected Map<Object, Object> arguments;
 	protected List<String> headerList;
 	protected Map<String, String> headerMap;
@@ -77,6 +86,16 @@ public class RequestArguments implements EzyReleasable {
 			headerMap = new HashMap<>();
 		headerList.add(value);
 		headerMap.put(name, value);
+	}
+	
+	public void setRequest(HttpServletRequest request) {
+		this.request = request;
+		this.setArgument(HttpServletRequest.class, request);
+	}
+	
+	public void setResponse(HttpServletResponse response) {
+		this.response = response;
+		this.setArgument(HttpServletResponse.class, response);
 	}
 	
 	@Override

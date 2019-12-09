@@ -26,11 +26,8 @@ public class App implements ApplicationEntry {
     }
 	
     protected ServletHandler newServletHandler() {
-//    	ComponentManager componentManager = ComponentManager.getInstance();
-//    	RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
-    	
     	ServletHandler servletHandler = new ServletHandler();
-        servletHandler.addServletWithMapping(BlockingServlet.class, "/");
+        servletHandler.addServletWithMapping(BlockingServlet.class, "/*");
         return servletHandler;
     }
     

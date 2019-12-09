@@ -5,10 +5,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
+import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
+import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 
 @Controller("/")
 public class HomeController {
@@ -25,6 +28,12 @@ public class HomeController {
 			@NickName String nickName) {
 		System.out.println("request uri: " + request.getRequestURI());
 		return "welcome " + who;
+	}
+	
+	@DoPost("hello")
+	public String hello(
+			@RequestBody HelloRequest body) {
+		return "hello " + body.getWho();
 	}
 	
 }

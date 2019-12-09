@@ -12,6 +12,7 @@ import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyfox.reflect.EzyReflections;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
@@ -144,6 +145,15 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				++ headerCount;
 				hasAnnotation = true;
 			}
+			RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);
+			if(requestBodyAnno != null) {
+				instruction
+					.brackets(parameterType)
+					.append("this.deserializeBody(")
+						.append("arg0.getRequest(), ").clazz(parameterType, true)
+					.append(")");
+				hasAnnotation = true;
+			}
 			if(!hasAnnotation) {
 				String argumentKey = RequestParameters.getArgumentKeyString(parameter);
 				instruction
@@ -174,8 +184,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		EzyFunction function = new EzyFunction(method);
 		EzyBody body = function.body();
 		body.append(new EzyInstruction("\t", "\n")
-				.answer()
-				.string("hello"));
+				.append("throw arg0"));
 		return toThrowExceptionFunction(method, function);
 	}
 	
