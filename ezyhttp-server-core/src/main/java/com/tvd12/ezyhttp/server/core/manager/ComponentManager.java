@@ -12,6 +12,8 @@ public final class ComponentManager {
 	private ControllerManager controllerManager;
 	@Getter
 	private RequestHandlerManager requestHandlerManager;
+	@Getter
+	private ExceptionHandlerManager exceptionHandlerManager;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
@@ -19,6 +21,7 @@ public final class ComponentManager {
 		this.dataConverters = new DataConverters();
 		this.controllerManager = new ControllerManager();
 		this.requestHandlerManager = new RequestHandlerManager();
+		this.exceptionHandlerManager = new ExceptionHandlerManager();
 	}
 	
 	public static ComponentManager getInstance() {

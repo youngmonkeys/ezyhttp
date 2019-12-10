@@ -12,14 +12,19 @@ import lombok.Setter;
 public class DataConverters {
 
 	@Getter
-	protected BodySerializer bodySerializer;
-	@Getter
 	protected StringDeserializer stringDeserializer;
+	protected final Map<String, BodySerializer> bodySerializers;
 	protected final Map<String, BodyDeserializer> bodyDeserializers;
 	
 	public DataConverters() {
+		this.bodySerializers = new HashMap<>();
 		this.bodyDeserializers = new HashMap<>();
 		this.addDefaultConverter();
+	}
+	
+	public BodySerializer getBodySerializer(String contentType) {
+		BodySerializer serializer = bodySerializers.get(contentType);
+		return serializer;
 	}
 	
 	public BodyDeserializer getBodyDeserializer(String contentType) {
@@ -29,7 +34,7 @@ public class DataConverters {
 	
 	protected void addDefaultConverter() {
 		JacksonBodyConverter bodyConverter = new JacksonBodyConverter();
-		this.bodySerializer = bodyConverter;
+		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
 		this.stringDeserializer = new StringDefaultDeserializer();
 	}

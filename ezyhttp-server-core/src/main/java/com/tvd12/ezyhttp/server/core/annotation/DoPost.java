@@ -31,6 +31,13 @@ public @interface DoPost {
 	public String uri() default "";
 	
 	/**
+	 * accepted request body types
+	 * 
+	 * @return the accepted request body types
+	 */
+	public String[] accept() default {};
+	
+	/**
 	 * request uri
 	 * 
 	 * @return the response body type

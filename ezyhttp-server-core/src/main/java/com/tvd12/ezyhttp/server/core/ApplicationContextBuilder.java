@@ -11,11 +11,12 @@ import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
+import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
-import com.tvd12.ezyhttp.server.core.handler.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
+import com.tvd12.ezyhttp.server.core.request.RequestURI;
 
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
@@ -68,7 +69,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected void addRequestHandlers() {
 		List<Object> controllerList = controllerManager.getControllerList();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
-		Map<String, RequestHandler> requestHandlers = implementer.implement(controllerList);
+		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
 		requestHandlerManager.addHandlers(requestHandlers);
 	}
 	

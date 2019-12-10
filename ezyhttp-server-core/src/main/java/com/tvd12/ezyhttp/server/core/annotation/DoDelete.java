@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
-public @interface DoGet {
+public @interface DoDelete {
     
 	/**
 	 * request uri
@@ -29,7 +29,7 @@ public @interface DoGet {
 	 * @return the uri
 	 */
 	public String uri() default "";
-
+	
 	/**
 	 * accepted request body types
 	 * 
@@ -43,5 +43,4 @@ public @interface DoGet {
 	 * @return the response body type
 	 */
 	public String responseType() default "";
-
 }

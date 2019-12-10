@@ -6,7 +6,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 
 import com.tvd12.ezyhttp.server.core.codec.BodyDeserializer;
-import com.tvd12.ezyhttp.server.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.server.core.codec.DataConverters;
 import com.tvd12.ezyhttp.server.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
@@ -15,13 +14,11 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 public abstract class AbstractRequestHandler implements RequestHandler {
 
 	protected final DataConverters dataConverters;
-	protected final BodySerializer bodySerializer;
 	protected final ComponentManager componentManager;
 	
 	public AbstractRequestHandler() {
 		this.componentManager = ComponentManager.getInstance();
 		this.dataConverters = componentManager.getDataConverters();
-		this.bodySerializer = dataConverters.getBodySerializer();
 	}
 	
 	@Override
@@ -54,7 +51,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		String contentType = request.getContentType();
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)
-			throw new IOException("has no body deserializer for: " + type.getName());
+			throw new IOException("has no body deserializer for: " + contentType);
 		ServletInputStream inputStream = request.getInputStream();
 		T body = deserializer.deserialize(inputStream, type);
 		return body;

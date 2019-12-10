@@ -25,12 +25,13 @@ public class HomeController {
 			@RequestHeader("key") String key,
 			@RequestHeader String token,
 			@RequestArgument("name") String name,
+			@RequestBody HelloRequest body,
 			@NickName String nickName) {
 		System.out.println("request uri: " + request.getRequestURI());
-		return "welcome " + who;
+		return "welcome " + who + " " + body.getWho();
 	}
 	
-	@DoPost("hello")
+	@DoPost
 	public String hello(
 			@RequestBody HelloRequest body) {
 		return "hello " + body.getWho();

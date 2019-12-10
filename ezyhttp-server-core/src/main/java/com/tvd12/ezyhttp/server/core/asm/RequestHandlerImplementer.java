@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.handler;
+package com.tvd12.ezyhttp.server.core.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -15,6 +15,9 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.server.core.handler.AbstractRequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestParameters;
@@ -63,17 +66,20 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		String setControllerMethodContent = makeSetControllerMethodContent();
 		String handleRequestMethodContent = makeHandleRequestMethodContent();
 		String handleExceptionMethodContent = makeHandleExceptionMethodContent();
+		String getHttpMethodMethodContent = makeGetHttpMethodMethodContent();
 		String getResponseContentTypeMethodContent = makeGetResponseContentTypeMethodContent();
 		printComponentContent(controllerFieldContent);
 		printComponentContent(setControllerMethodContent);
 		printComponentContent(handleRequestMethodContent);
 		printComponentContent(handleExceptionMethodContent);
+		printComponentContent(getHttpMethodMethodContent);
 		printComponentContent(getResponseContentTypeMethodContent);
 		implClass.setSuperclass(pool.get(superClass.getName()));
 		implClass.addField(CtField.make(controllerFieldContent, implClass));
 		implClass.addMethod(CtNewMethod.make(setControllerMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(handleRequestMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(handleExceptionMethodContent, implClass));
+		implClass.addMethod(CtNewMethod.make(getHttpMethodMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
 		Class answerClass = implClass.toClass();
 		implClass.detach();
@@ -188,6 +194,19 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		return toThrowExceptionFunction(method, function);
 	}
 	
+	protected String makeGetHttpMethodMethodContent() {
+		HttpMethod httpMethod = handlerMethod.getHttpMethod();
+		return new EzyFunction(getGetHttpMethodMethod())
+				.body()
+					.append(new EzyInstruction("\t", "\n")
+							.answer()
+							.append(httpMethod.getDeclaringClass().getName())
+							.dot()
+							.append(httpMethod))
+					.function()
+				.toString();
+	}
+	
 	protected String makeGetResponseContentTypeMethodContent() {
 		return new EzyFunction(getGetResponseContentTypeMethod())
 				.body()
@@ -222,6 +241,12 @@ public class RequestHandlerImplementer extends EzyLoggable {
 	protected EzyMethod getHandleExceptionMethod() {
 		Method method = EzyMethods.getMethod(
 				AbstractRequestHandler.class, "handleException", Exception.class);
+		return new EzyMethod(method);
+	}
+	
+	protected EzyMethod getGetHttpMethodMethod() {
+		Method method = EzyMethods.getMethod(
+				AbstractRequestHandler.class, "getMethod");
 		return new EzyMethod(method);
 	}
 	

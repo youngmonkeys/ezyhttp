@@ -2,7 +2,7 @@ package com.tvd12.ezyhttp.server.core.test.reflect;
 
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyhttp.server.core.handler.RequestHandlerImplementer;
+import com.tvd12.ezyhttp.server.core.asm.RequestHandlerImplementer;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
