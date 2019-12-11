@@ -11,18 +11,25 @@ import lombok.Getter;
 public class ExceptionHandlerMethod {
 
 	protected final EzyMethod method;
+	protected final String responseType;
 	protected final Class<?>[] exceptionClasses;
 	
 	public ExceptionHandlerMethod(EzyMethod method) {
 		this.method = method;
+		this.responseType = fetchResponseType();
 		this.exceptionClasses = fetchExceptionClasses();
 		
 	}
 	
 	protected Class<?>[] fetchExceptionClasses() {
-		TryCatch tryCatch = method.getAnnotation(TryCatch.class);
-		Class<?>[] classes = TryCatchAnnotations.getExceptionClasses(tryCatch);
+		TryCatch annotation = method.getAnnotation(TryCatch.class);
+		Class<?>[] classes = TryCatchAnnotations.getExceptionClasses(annotation);
 		return classes;
+	}
+	
+	protected String fetchResponseType() {
+		TryCatch annotation = method.getAnnotation(TryCatch.class);
+		return TryCatchAnnotations.getResponseType(annotation);
 	}
 	
 	public String getName() {

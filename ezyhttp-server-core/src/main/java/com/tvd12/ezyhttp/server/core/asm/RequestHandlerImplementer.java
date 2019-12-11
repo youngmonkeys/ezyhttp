@@ -209,7 +209,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				if(returnType != void.class)
 					instructionHandle.answer();
 				instructionHandle
-						.append("controller.").append(m.getName())
+						.append("this.controller.").append(m.getName())
 						.bracketopen()
 							.brackets(exceptionClass).append("arg0")
 						.bracketclose();

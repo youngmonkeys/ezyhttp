@@ -15,20 +15,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface ExceptionHandler {
-    
-	/**
-	 * the request uri
-	 * 
-	 * @return the uri
-	 */
-	public String value() default "";
-	
-	/**
-	 * the request uri
-	 * 
-	 * @return the uri
-	 */
-	public String uri() default "";
-	
-	
 }

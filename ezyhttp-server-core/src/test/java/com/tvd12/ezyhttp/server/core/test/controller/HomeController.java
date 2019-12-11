@@ -45,11 +45,6 @@ public class HomeController {
 	public void doNothing() {
 	}
 	
-	@TryCatch(IllegalArgumentException.class)
-	public String handleException(Exception e) {
-		return e.getMessage();
-	}
-	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {
 		return e.getMessage();

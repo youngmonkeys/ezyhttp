@@ -75,7 +75,8 @@ public class ControllerProxy {
 				.append(clazz.getName())
 				.append("(\n")
 					.append("\tinstance: ").append(instance).append(",\n")
-					.append("\trequestHandlerMethods: ").append(requestHandlerMethods).append("\n")
+					.append("\trequestHandlerMethods: ").append(requestHandlerMethods).append(",\n")
+					.append("\texceptionHandlerMethods: ").append(exceptionHandlerMethods).append("\n")
 				.append(")")
 				.toString();
 	}
