@@ -4,4 +4,5 @@ public interface UncaughtExceptionHandler {
 
 	Object handleException(Exception exception) throws Exception;
 	
+	String getResponseContentType();
 }

@@ -2,7 +2,6 @@ package com.tvd12.ezyhttp.server.core.servlet;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -70,48 +69,66 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response,
 			HttpMethod method) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
+		boolean hasHandler = requestHandlerManager.hasHandler(requestURI);
+		if(!hasHandler) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			responseString(response, "uri " + requestURI + " not found");
+			return;
+		}
 		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
 		if(requestHandler == null) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			responseString(response, "method " + method + " not allowed");
 			return;
 		}
-		String responseContentType = requestHandler.getResponseContentType();
 		RequestArguments arguments = newRequestArguments(request, response);
 		try {
 			Object responseData = requestHandler.handle(arguments);
-			response.setContentType(responseContentType);
-			response.setStatus(HttpServletResponse.SC_OK);
-			responseData(response, responseData);
+			if(responseData != null) {
+				String responseContentType = requestHandler.getResponseContentType();
+				handleResponseData(response, responseContentType, responseData);
+			}
 		}
 		catch (Exception e) {
-			response.setContentType(responseContentType);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			responseString(response, "Internal Server Error");
-			log("handle request uri: " + requestURI + " error", e);
+			handleException(request, response, e);
 		}
 		finally {
 			arguments.release();
 		}
 	}
 	
-	protected void handleException(Exception e) throws Exception {
-		Exception ex = e;
-		List<UncaughtExceptionHandler> handlers 
-				= exceptionHandlerManager.getUncaughtExceptionHandlers();
-		for(UncaughtExceptionHandler handler : handlers) {
+	protected void handleException(
+			HttpServletRequest request,
+			HttpServletResponse response, Exception e) throws IOException {
+		Class<?> exceptionClass = e.getClass();
+		UncaughtExceptionHandler handler = 
+				exceptionHandlerManager.getUncaughtExceptionHandler(exceptionClass);
+		Exception exception = e;
+		if(handler != null) {
 			try {
-				if(ex != null) {
-					handler.handleException(ex);
+				Object result = handler.handleException(e);
+				if(result != null) {
+					String responseContentType = handler.getResponseContentType();
+					handleResponseData(response, responseContentType, result);
 				}
-				ex = null;
+				exception = null;
 			}
-			catch (Exception exception) {
-				ex = exception;
+			catch (Exception ex) {
+				exception = ex;
 			}
 		}
-		if(ex != null)
-			throw ex;
+		if(exception != null) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			log("handle request uri: " + request.getRequestURI() + " error", exception);
+		}
+	}
+	
+	protected void handleResponseData(
+			HttpServletResponse response, 
+			String contentType, Object data) throws Exception {
+		response.setContentType(contentType);
+		response.setStatus(HttpServletResponse.SC_OK);
+		responseData(response, data);
 	}
 	
 	protected void responseData(

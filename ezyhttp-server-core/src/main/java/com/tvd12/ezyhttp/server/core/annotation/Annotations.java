@@ -15,6 +15,8 @@ public final class Annotations {
 		Set<Class<?>> set = new HashSet<>();
 		set.add(DoGet.class);
 		set.add(DoPost.class);
+		set.add(DoPut.class);
+		set.add(DoDelete.class);
 		return Collections.unmodifiableSet(set);
 	}
 	

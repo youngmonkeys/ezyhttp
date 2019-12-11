@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.tvd12.ezyfox.asm.EzyFunction;
@@ -19,6 +20,7 @@ import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.AbstractRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
+import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestParameters;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
@@ -171,9 +173,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			++ paramCount;
 			
 		}
-		EzyInstruction instruction = new EzyInstruction("\t", "\n")
-				.answer()
-				.append("this.controller.").append(handlerMethod.getName())
+		EzyInstruction instruction = new EzyInstruction("\t", "\n");
+		Class<?> returnType = handlerMethod.getReturnType();
+		if(returnType != void.class)
+			instruction.answer();
+		instruction.append("this.controller.").append(handlerMethod.getName())
 				.append("(");
 		for(int i = 0 ; i < paramCount ; ++i) {
 			instruction.append(PARAMETER_PREFIX).append(i);
@@ -182,6 +186,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		}
 		instruction.append(")");
 		body.append(instruction);
+		if(returnType == void.class)
+			body.append(new EzyInstruction("\t", "\n").append("return null"));
 		return toThrowExceptionFunction(method, function);
 	}
 	
@@ -189,8 +195,31 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		EzyMethod method = getHandleExceptionMethod();
 		EzyFunction function = new EzyFunction(method);
 		EzyBody body = function.body();
-		body.append(new EzyInstruction("\t", "\n")
-				.append("throw arg0"));
+		List<ExceptionHandlerMethod> exceptionHandlerMethods 
+				= controller.getExceptionHandlerMethods();
+		for(ExceptionHandlerMethod m : exceptionHandlerMethods) {
+			for(Class<?> exceptionClass : m.getExceptionClasses()) {
+				EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
+						.append("if(arg0 instanceof ")
+							.append(exceptionClass.getName())
+						.append(") {");
+				body.append(instructionIf);
+				EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
+				Class<?> returnType = m.getReturnType();
+				if(returnType != void.class)
+					instructionHandle.answer();
+				instructionHandle
+						.append("controller.").append(m.getName())
+						.bracketopen()
+							.brackets(exceptionClass).append("arg0")
+						.bracketclose();
+				body.append(instructionHandle);
+				if(returnType == void.class)
+					body.append(new EzyInstruction("\t\t", "\n").append("return null"));
+				body.append(new EzyInstruction("\t", "\n", false).append("}"));
+			}
+		}
+		body.append(new EzyInstruction("\t", "\n").append("throw arg0"));
 		return toThrowExceptionFunction(method, function);
 	}
 	
@@ -262,7 +291,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 	
 	protected String getImplClassName() {
 		return controller.getControllerName()
-				+ "$" + handlerMethod.getName() + "$AutoImpl$" + COUNT.incrementAndGet();
+				+ "$" + handlerMethod.getName() + "$Handler$AutoImpl$" + COUNT.incrementAndGet();
 	}
 	
 	protected void printComponentContent(String componentContent) {
