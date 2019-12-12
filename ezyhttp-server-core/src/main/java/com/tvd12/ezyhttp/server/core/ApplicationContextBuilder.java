@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
@@ -10,13 +11,16 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
+import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
+import com.tvd12.ezyhttp.server.core.annotation.PropertiesSources;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
+import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
@@ -26,12 +30,15 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
+import com.tvd12.properties.file.reader.BaseFileReader;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
+	protected final Properties properties;
 	protected final Set<String> packageToScans;
 	protected final Set<Class> componentClasses;
+	protected final Set<String> propertiesSources;
 	protected final ComponentManager componentManager;
 	protected final ControllerManager controllerManager;
 	protected final InterceptorManager interceptorManager;
@@ -39,13 +46,27 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected final ExceptionHandlerManager exceptionHandlerManager;
 	
 	public ApplicationContextBuilder() {
+		this.properties = defaultProperties();
 		this.packageToScans = new HashSet<>();
 		this.componentClasses = new HashSet<>();
+		this.propertiesSources = defaultPropertiesSources();
 		this.componentManager = ComponentManager.getInstance();
 		this.controllerManager = componentManager.getControllerManager();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
+	}
+	
+	public Properties defaultProperties() {
+		Properties props = new Properties();
+		props.put(PropertyNames.SERVER_PORT, 8080);
+		return props;
+	}
+	
+	public Set<String> defaultPropertiesSources() {
+		Set<String> sources = new HashSet<>();
+		sources.add(Constants.DEFAULT_PROPERTIES_FILE);
+		return sources;
 	}
 	
 	public ApplicationContextBuilder scan(String packageName) {
@@ -72,6 +93,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
 		if(componentClasses != null)
 			addComponentClasses(componentClasses.value());
+		PropertiesSources propertiesSources = componentClass.getAnnotation(PropertiesSources.class);
+		if(propertiesSources != null)
+			addPropertiesSources(propertiesSources.value());
 		this.componentClasses.add(componentClass);
 		return this;
 	}
@@ -85,6 +109,38 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	public ApplicationContextBuilder addComponentClasses(Iterable<Class<?>> componentClasses) {
 		for(Class<?> clazz : componentClasses)
 			addComponentClass(clazz);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addPropertiesSource(String source) {
+		this.propertiesSources.add(source);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addPropertiesSources(String... sources) {
+		for(String source : sources)
+			addPropertiesSource(source);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addPropertiesSources(Iterable<String> sources) {
+		for(String source : sources)
+			addPropertiesSource(source);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addProperty(String name, String value) {
+		this.properties.put(name, value);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addProperties(Properties properties) {
+		this.properties.putAll(properties);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addProperties(Map<String, String> properties) {
+		this.properties.putAll(properties);
 		return this;
 	}
 	
@@ -102,7 +158,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
+		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
+				.addProperties(properties)
 				.addAllClasses(reflection)
 				.addSingletonClasses(componentClasses)
 				.addSingletonClasses(controllerClasses)
@@ -114,6 +172,19 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		addRequestHandlers();
 		addExceptionHandlers();
 		return beanContext;
+	}
+	
+	protected Properties readPropertiesSources() {
+		Properties props = new Properties();
+		for(String source : propertiesSources)
+			props.putAll(readPropertiesSource(source));
+		return props;
+	}
+	
+	protected Properties readPropertiesSource(String source) {
+		BaseFileReader reader = new BaseFileReader();
+		Properties props = reader.read(source);
+		return props;
 	}
 	
 	protected void registerComponents(EzyBeanContext beanContext) {
@@ -146,4 +217,5 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected ExceptionHandlersImplementer newExceptionHandlersImplementer() {
 		return new ExceptionHandlersImplementer();
 	}
+	
 }

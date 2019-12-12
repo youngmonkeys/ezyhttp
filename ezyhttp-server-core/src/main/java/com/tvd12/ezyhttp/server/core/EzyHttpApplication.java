@@ -1,5 +1,9 @@
 package com.tvd12.ezyhttp.server.core;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
@@ -20,6 +24,16 @@ public class EzyHttpApplication
 	public static EzyHttpApplication start(Class<?> bootstrapClass) throws Exception {
 		String basePackage = bootstrapClass.getPackage().getName();
 		return start(basePackage, bootstrapClass);
+	}
+	
+	public static EzyHttpApplication start(
+			Class<?> bootstrapClass, Class<?>... componentClasses) throws Exception {
+		String basePackage = bootstrapClass.getPackage().getName();
+		Set<Class<?>> classSet = new HashSet<>();
+		classSet.add(bootstrapClass);
+		classSet.addAll(Arrays.asList(componentClasses));
+		Class<?>[] classArray = classSet.toArray(new Class[classSet.size()]);
+		return start(basePackage, classArray);
 	}
 	
 	public static EzyHttpApplication start(
