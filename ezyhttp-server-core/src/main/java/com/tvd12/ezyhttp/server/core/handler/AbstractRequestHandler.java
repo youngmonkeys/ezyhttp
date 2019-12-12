@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.handler;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
@@ -11,8 +12,14 @@ import com.tvd12.ezyhttp.server.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public abstract class AbstractRequestHandler implements RequestHandler {
 
+	@Setter
+	@Getter
+	protected Method handlerMethod;
 	protected final DataConverters dataConverters;
 	protected final ComponentManager componentManager;
 	

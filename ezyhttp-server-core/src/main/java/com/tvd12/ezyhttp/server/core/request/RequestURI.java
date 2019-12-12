@@ -40,4 +40,11 @@ public class RequestURI {
 		return result;
 	}
 	
+	@Override
+	public String toString() {
+		return new StringBuilder()
+				.append(uri).append(" - ").append(method)
+				.toString();
+	}
+	
 }

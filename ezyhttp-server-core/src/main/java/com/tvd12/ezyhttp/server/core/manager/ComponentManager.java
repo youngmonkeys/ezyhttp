@@ -11,6 +11,8 @@ public final class ComponentManager {
 	@Getter
 	private ControllerManager controllerManager;
 	@Getter
+	private InterceptorManager interceptorManager;
+	@Getter
 	private RequestHandlerManager requestHandlerManager;
 	@Getter
 	private ExceptionHandlerManager exceptionHandlerManager;
@@ -20,6 +22,7 @@ public final class ComponentManager {
 	private ComponentManager() {
 		this.dataConverters = new DataConverters();
 		this.controllerManager = new ControllerManager();
+		this.interceptorManager = new InterceptorManager();
 		this.requestHandlerManager = new RequestHandlerManager();
 		this.exceptionHandlerManager = new ExceptionHandlerManager();
 	}

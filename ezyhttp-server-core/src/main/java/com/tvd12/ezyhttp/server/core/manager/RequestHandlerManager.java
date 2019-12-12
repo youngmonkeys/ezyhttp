@@ -5,11 +5,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 
-public class RequestHandlerManager {
+public class RequestHandlerManager extends EzyLoggable {
 
 	protected final Set<String> handledURIs;
 	protected final Map<RequestURI, RequestHandler> handlers;
@@ -36,6 +37,7 @@ public class RequestHandlerManager {
 	public void addHandler(RequestURI uri, RequestHandler handler) {
 		this.handlers.put(uri, handler);
 		this.handledURIs.add(uri.getUri());
+		this.logger.info("add mapping uri: {}", uri);
 	}
 	
 	public void addHandlers(Map<RequestURI, RequestHandler> handlers) {

@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.servlet;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -15,8 +16,10 @@ import com.tvd12.ezyhttp.server.core.codec.DataConverters;
 import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
+import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
@@ -25,6 +28,7 @@ public class BlockingServlet extends HttpServlet {
 
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
+	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
 	
@@ -32,6 +36,7 @@ public class BlockingServlet extends HttpServlet {
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
 		this.dataConverters = componentManager.getDataConverters();
+		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
 	}
@@ -40,34 +45,34 @@ public class BlockingServlet extends HttpServlet {
 	protected void doGet(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(request, response, HttpMethod.GET);
+		handleRequest(HttpMethod.GET, request, response);
 	}
 	
 	@Override
 	protected void doPost(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(request, response, HttpMethod.POST);
+		handleRequest(HttpMethod.POST, request, response);
 	}
 	
 	@Override
 	protected void doPut(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(request, response, HttpMethod.PUT);
+		handleRequest(HttpMethod.PUT, request, response);
 	}
 	
 	@Override
 	protected void doDelete(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(request, response, HttpMethod.DELETE);
+		handleRequest(HttpMethod.DELETE, request, response);
 	}
 	
 	protected void handleRequest(
+			HttpMethod method,
 			HttpServletRequest request, 
-			HttpServletResponse response,
-			HttpMethod method) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
 		boolean hasHandler = requestHandlerManager.hasHandler(requestURI);
 		if(!hasHandler) {
@@ -81,12 +86,15 @@ public class BlockingServlet extends HttpServlet {
 			responseString(response, "method " + method + " not allowed");
 			return;
 		}
-		RequestArguments arguments = newRequestArguments(request, response);
+		RequestArguments arguments = newRequestArguments(method, request, response);
 		try {
-			Object responseData = requestHandler.handle(arguments);
-			if(responseData != null) {
-				String responseContentType = requestHandler.getResponseContentType();
-				handleResponseData(response, responseContentType, responseData);
+			boolean passed = preHandleRequest(arguments, requestHandler);
+			if(passed) {
+				Object responseData = requestHandler.handle(arguments);
+				if(responseData != null) {
+					String responseContentType = requestHandler.getResponseContentType();
+					handleResponseData(response, responseContentType, responseData);
+				}
 			}
 		}
 		catch (Exception e) {
@@ -95,6 +103,7 @@ public class BlockingServlet extends HttpServlet {
 		finally {
 			arguments.release();
 		}
+		postHandleRequest(arguments, requestHandler);
 	}
 	
 	protected void handleException(
@@ -121,6 +130,25 @@ public class BlockingServlet extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			log("handle request uri: " + request.getRequestURI() + " error", exception);
 		}
+	}
+	
+	protected boolean preHandleRequest(
+			RequestArguments arguments, 
+			RequestHandler requestHandler) throws Exception {
+		Method handler = requestHandler.getHandlerMethod();
+		for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
+			boolean passed = interceptor.preHandle(arguments, handler);
+			if(!passed)
+				return false;
+		}
+		return true;
+	}
+	
+	protected void postHandleRequest(
+			RequestArguments arguments, RequestHandler requestHandler) {
+		Method handler = requestHandler.getHandlerMethod();
+		for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors())
+			interceptor.postHandle(arguments, handler);
 	}
 	
 	protected void handleResponseData(
@@ -155,9 +183,11 @@ public class BlockingServlet extends HttpServlet {
 	}
 	
 	protected RequestArguments newRequestArguments(
+			HttpMethod method,
 			HttpServletRequest request, 
 			HttpServletResponse response) {
 		RequestArguments arguments = new RequestArguments();
+		arguments.setMethod(method);
 		arguments.setRequest(request);
 		arguments.setResponse(response);
 		

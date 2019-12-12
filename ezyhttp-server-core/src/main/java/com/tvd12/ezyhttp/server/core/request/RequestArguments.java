@@ -9,12 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyfox.util.EzyReleasable;
+import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @SuppressWarnings("unchecked")
 public class RequestArguments implements EzyReleasable {
 
+	@Setter
+	@Getter
+	protected HttpMethod method;
 	@Getter
 	protected HttpServletRequest request;
 	@Getter

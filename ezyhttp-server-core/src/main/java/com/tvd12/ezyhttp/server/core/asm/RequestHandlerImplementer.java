@@ -86,6 +86,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		Class answerClass = implClass.toClass();
 		implClass.detach();
 		RequestHandler handler = (RequestHandler) answerClass.newInstance();
+		handler.setHandlerMethod(handlerMethod.getMethod().getMethod());
 		setRepoComponent(handler);
 		return handler;
 	}
