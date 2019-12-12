@@ -52,7 +52,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	public ApplicationContext build() {
 		EzyReflection reflection = new EzyReflectionProxy(packageToScans);
 		EzyBeanContext beanContext = createBeanContext(reflection);
-		ApplicationContext context = new ApplicationContext();
+		SimpleApplicationContext context = new SimpleApplicationContext();
 		context.setBeanContext(beanContext);
 		return context;
 	}

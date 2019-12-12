@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.servlet;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -22,6 +23,7 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.core.response.ResponseEntity;
 
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
@@ -151,15 +153,32 @@ public class BlockingServlet extends HttpServlet {
 			interceptor.postHandle(arguments, handler);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void handleResponseData(
 			HttpServletResponse response, 
 			String contentType, Object data) throws Exception {
 		response.setContentType(contentType);
-		response.setStatus(HttpServletResponse.SC_OK);
-		responseData(response, data);
+		Object body = data;
+		if(body instanceof ResponseEntity) {
+			ResponseEntity entity = (ResponseEntity)body;
+			body = entity.getBody();
+			response.setStatus(entity.getStatus());
+			Map<String, String> headers = entity.getHeaders();
+			if(headers != null) {
+				for(String name : headers.keySet()) {
+					String value = headers.get(name);
+					response.addHeader(name, value);
+				}
+			}
+		}
+		else {
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+		if(body != null)
+			responseBody(response, body);
 	}
 	
-	protected void responseData(
+	protected void responseBody(
 			HttpServletResponse response, Object data) throws IOException {
 		String contentType = response.getContentType();
 		BodySerializer bodySerializer = dataConverters.getBodySerializer(contentType);
