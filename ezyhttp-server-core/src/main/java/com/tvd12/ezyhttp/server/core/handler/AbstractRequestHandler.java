@@ -6,9 +6,9 @@ import java.lang.reflect.Method;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 
-import com.tvd12.ezyhttp.server.core.codec.BodyDeserializer;
-import com.tvd12.ezyhttp.server.core.codec.DataConverters;
-import com.tvd12.ezyhttp.server.core.codec.StringDeserializer;
+import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 

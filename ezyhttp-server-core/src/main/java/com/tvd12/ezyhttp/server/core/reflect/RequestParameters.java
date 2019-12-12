@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 
 import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
-import com.tvd12.ezyhttp.server.core.constant.Constants;
 
 public final class RequestParameters {
 

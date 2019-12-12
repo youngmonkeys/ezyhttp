@@ -12,35 +12,24 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<ezy.bean.version>1.1.0</ezy.bean.version>
-		<ezy.json.version>1.1.0</ezy.json.version>
-		<jackson.version>2.10.0</jackson.version>
-		<jetty.version>9.4.24.v20191120</jetty.version>
+		<javax.servlet.version>4.0.1</javax.servlet.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>com.tvd12</groupId>
+			<artifactId>ezyhttp-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.tvd12</groupId>
 			<artifactId>ezyfox-bean</artifactId>
 			<version>${ezy.bean.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyfox-json</artifactId>
-			<version>${ezy.json.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
-			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javax.servlet.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

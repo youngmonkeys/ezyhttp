@@ -19,19 +19,24 @@ public class EzyHttpApplication
 	
 	public static EzyHttpApplication start(Class<?> bootstrapClass) throws Exception {
 		String basePackage = bootstrapClass.getPackage().getName();
-		return start(basePackage);
+		return start(basePackage, bootstrapClass);
 	}
 	
-	public static EzyHttpApplication start(String basePackage) throws Exception {
-		ApplicationContext applicationContext = createApplicationContext(basePackage);
+	public static EzyHttpApplication start(
+			String basePackage, 
+			Class<?>... componentClasses) throws Exception {
+		ApplicationContext applicationContext 
+				= createApplicationContext(basePackage, componentClasses);
 		EzyHttpApplication application = new EzyHttpApplication(applicationContext);
 		application.start();
 		return application;
 	}
 	
-	protected static ApplicationContext createApplicationContext(String basePackage) {
+	protected static ApplicationContext 
+			createApplicationContext(String basePackage, Class<?>... componentClasses) {
 		return new ApplicationContextBuilder()
 				.scan(basePackage)
+				.addComponentClasses(componentClasses)
 				.build();
 	}
 	

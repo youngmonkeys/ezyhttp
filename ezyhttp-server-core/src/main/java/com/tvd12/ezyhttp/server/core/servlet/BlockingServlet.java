@@ -12,9 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyfox.io.EzyStrings;
-import com.tvd12.ezyhttp.server.core.codec.BodySerializer;
-import com.tvd12.ezyhttp.server.core.codec.DataConverters;
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.codec.BodySerializer;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
@@ -23,7 +24,6 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import com.tvd12.ezyhttp.server.core.response.ResponseEntity;
 
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;

@@ -1,9 +1,9 @@
 package com.tvd12.ezyhttp.server.core.util;
 
 import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyhttp.core.constant.Constants;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
-import com.tvd12.ezyhttp.server.core.constant.Constants;
-import com.tvd12.ezyhttp.server.core.constant.ContentTypes;
 
 public final class DoPostAnnotations {
 

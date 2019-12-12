@@ -1,7 +1,7 @@
 package com.tvd12.ezyhttp.server.core.util;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
-import com.tvd12.ezyhttp.server.core.constant.ContentTypes;
 
 public final class TryCatchAnnotations {
 

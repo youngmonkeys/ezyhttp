@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 

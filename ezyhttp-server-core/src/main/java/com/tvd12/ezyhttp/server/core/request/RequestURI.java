@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core.request;
 
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
 import lombok.Getter;
 import lombok.Setter;

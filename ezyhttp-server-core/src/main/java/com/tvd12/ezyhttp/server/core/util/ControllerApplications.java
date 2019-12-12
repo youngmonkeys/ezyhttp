@@ -1,8 +1,8 @@
 package com.tvd12.ezyhttp.server.core.util;
 
 import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
-import com.tvd12.ezyhttp.server.core.constant.Constants;
 
 public final class ControllerApplications {
 

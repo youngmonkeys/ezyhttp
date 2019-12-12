@@ -3,11 +3,11 @@ package com.tvd12.ezyhttp.server.core.reflect;
 import java.lang.reflect.Parameter;
 
 import com.tvd12.ezyfox.reflect.EzyMethod;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.DoPut;
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.util.DoDeleteAnnotations;
 import com.tvd12.ezyhttp.server.core.util.DoGetAnnotations;
 import com.tvd12.ezyhttp.server.core.util.DoPostAnnotations;

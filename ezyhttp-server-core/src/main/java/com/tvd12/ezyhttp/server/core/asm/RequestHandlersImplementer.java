@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;

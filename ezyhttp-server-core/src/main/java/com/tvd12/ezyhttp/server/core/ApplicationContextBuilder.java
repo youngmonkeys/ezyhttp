@@ -9,10 +9,12 @@ import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
+import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
+import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
-import com.tvd12.ezyhttp.server.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
@@ -25,9 +27,11 @@ import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
 	protected final Set<String> packageToScans;
+	protected final Set<Class> componentClasses;
 	protected final ComponentManager componentManager;
 	protected final ControllerManager controllerManager;
 	protected final InterceptorManager interceptorManager;
@@ -36,6 +40,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	public ApplicationContextBuilder() {
 		this.packageToScans = new HashSet<>();
+		this.componentClasses = new HashSet<>();
 		this.componentManager = ComponentManager.getInstance();
 		this.controllerManager = componentManager.getControllerManager();
 		this.interceptorManager = componentManager.getInterceptorManager();
@@ -48,6 +53,41 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return this;
 	}
 	
+	public ApplicationContextBuilder scan(String... packageNames) {
+		for(String packageName : packageNames)
+			scan(packageName);
+		return this;
+	}
+	
+	public ApplicationContextBuilder scan(Iterable<String> packageNames) {
+		for(String packageName : packageNames)
+			scan(packageName);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addComponentClass(Class<?> componentClass) {
+		ComponentsScan componentsScan = componentClass.getAnnotation(ComponentsScan.class);
+		if(componentsScan != null)
+			scan(componentsScan.value());
+		ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
+		if(componentClasses != null)
+			addComponentClasses(componentClasses.value());
+		this.componentClasses.add(componentClass);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addComponentClasses(Class<?>... componentClasses) {
+		for(Class<?> clazz : componentClasses)
+			addComponentClass(clazz);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addComponentClasses(Iterable<Class<?>> componentClasses) {
+		for(Class<?> clazz : componentClasses)
+			addComponentClass(clazz);
+		return this;
+	}
+	
 	@Override
 	public ApplicationContext build() {
 		EzyReflection reflection = new EzyReflectionProxy(packageToScans);
@@ -57,7 +97,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return context;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected EzyBeanContext createBeanContext(EzyReflection reflection) {
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
@@ -65,6 +104,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		EzyBeanContext beanContext = EzyBeanContext.builder()
 				.addAllClasses(reflection)
+				.addSingletonClasses(componentClasses)
 				.addSingletonClasses(controllerClasses)
 				.addSingletonClasses(interceptorClases)
 				.addSingletonClasses(exceptionHandlerClasses)
@@ -76,7 +116,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return beanContext;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void registerComponents(EzyBeanContext beanContext) {
 		List controllers = beanContext.getSingletons(Controller.class);
 		controllerManager.addControllers(controllers);

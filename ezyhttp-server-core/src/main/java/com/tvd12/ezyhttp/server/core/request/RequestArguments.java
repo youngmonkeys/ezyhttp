@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyfox.util.EzyReleasable;
-import com.tvd12.ezyhttp.server.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
 import lombok.Getter;
 import lombok.Setter;

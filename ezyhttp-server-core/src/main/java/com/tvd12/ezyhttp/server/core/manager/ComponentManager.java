@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
-import com.tvd12.ezyhttp.server.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
 
 import lombok.Getter;
 
