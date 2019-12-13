@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core;
 
+import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILE;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,6 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
-import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
@@ -49,7 +50,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		this.properties = defaultProperties();
 		this.packageToScans = new HashSet<>();
 		this.componentClasses = new HashSet<>();
-		this.propertiesSources = defaultPropertiesSources();
+		this.propertiesSources = new HashSet<>();
 		this.componentManager = ComponentManager.getInstance();
 		this.controllerManager = componentManager.getControllerManager();
 		this.interceptorManager = componentManager.getInterceptorManager();
@@ -61,12 +62,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Properties props = new Properties();
 		props.put(PropertyNames.SERVER_PORT, 8080);
 		return props;
-	}
-	
-	public Set<String> defaultPropertiesSources() {
-		Set<String> sources = new HashSet<>();
-		sources.add(Constants.DEFAULT_PROPERTIES_FILE);
-		return sources;
 	}
 	
 	public ApplicationContextBuilder scan(String packageName) {
@@ -176,8 +171,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected Properties readPropertiesSources() {
 		Properties props = new Properties();
-		for(String source : propertiesSources)
-			props.putAll(readPropertiesSource(source));
+		if(propertiesSources.size() > 0) {
+			for(String source : propertiesSources)
+				props.putAll(readPropertiesSource(source));
+		}
+		else {
+			try {
+				props.putAll(readPropertiesSource(DEFAULT_PROPERTIES_FILE));
+			}
+			catch (Exception e) {}
+		}
 		return props;
 	}
 	
