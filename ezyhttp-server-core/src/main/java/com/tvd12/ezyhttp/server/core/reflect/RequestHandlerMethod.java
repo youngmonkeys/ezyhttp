@@ -4,6 +4,7 @@ import java.lang.reflect.Parameter;
 
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.net.URIBuilder;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -31,7 +32,8 @@ public class RequestHandlerMethod {
 	}
 	
 	protected String fetchRequestURI(String rootURI) {
-		return rootURI + fetchRequestURIFragment();
+		String uri = rootURI + fetchRequestURIFragment();
+		return URIBuilder.normalizePath(uri);
 	}
 	
 	protected String fetchRequestURIFragment() {
