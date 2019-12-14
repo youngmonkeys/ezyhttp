@@ -38,7 +38,7 @@ public class ControllerProxy {
 	
 	protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {
 		List<RequestHandlerMethod> list = new ArrayList<>();
-		List<EzyMethod> methods = clazz.getMethods(m -> isRequestHandlerMethod(m));
+		List<EzyMethod> methods = clazz.getPublicMethods(m -> isRequestHandlerMethod(m));
 		for(EzyMethod method : methods) {
 			RequestHandlerMethod m = new RequestHandlerMethod(requestURI, method);
 			list.add(m);

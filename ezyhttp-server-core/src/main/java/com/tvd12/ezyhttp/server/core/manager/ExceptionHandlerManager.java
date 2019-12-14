@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 
-public class ExceptionHandlerManager {
+public class ExceptionHandlerManager extends EzyLoggable {
 
 	protected final List<Object> exceptionHandlers;
 	protected final Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
@@ -38,10 +39,12 @@ public class ExceptionHandlerManager {
 	public void addUncaughtExceptionHandler(
 			Class<?> exceptionClass, UncaughtExceptionHandler handler) {
 		this.uncaughtExceptionHandlers.put(exceptionClass, handler);
+		this.logger.info("add exception handler for: " + exceptionClass.getName());
 	}
 	
 	public void addUncaughtExceptionHandlers(
 			Map<Class<?>, UncaughtExceptionHandler> handlers) {
-		this.uncaughtExceptionHandlers.putAll(handlers);
+		for(Class<?> exceptionClass : handlers.keySet())
+			addUncaughtExceptionHandler(exceptionClass, handlers.get(exceptionClass));
 	}
 }
