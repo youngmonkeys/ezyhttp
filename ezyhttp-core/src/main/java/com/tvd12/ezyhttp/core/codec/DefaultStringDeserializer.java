@@ -6,19 +6,21 @@ import java.util.Map;
 
 import com.tvd12.ezyfox.io.EzyDataConverter;
 
-public class StringDefaultDeserializer implements StringDeserializer {
+public class DefaultStringDeserializer implements StringDeserializer {
 
 	protected final Map<Class<?>, StringMapper> mappers; 
 	
-	public StringDefaultDeserializer() {
+	public DefaultStringDeserializer() {
 		this.mappers = defaultMappers();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
+		StringMapper mapper = mappers.get(outType);
+		if(mapper == null)
+			throw new IOException("has no deserializer for: " + outType.getName());
 		try {
-			StringMapper mapper = mappers.get(outType);
 			T answer = (T) mapper.apply(value);
 			return answer;
 		}

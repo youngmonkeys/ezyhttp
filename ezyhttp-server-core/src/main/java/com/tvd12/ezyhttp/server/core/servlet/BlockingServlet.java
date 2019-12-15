@@ -24,6 +24,7 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
@@ -205,7 +206,7 @@ public class BlockingServlet extends HttpServlet {
 			HttpMethod method,
 			HttpServletRequest request, 
 			HttpServletResponse response) {
-		RequestArguments arguments = new RequestArguments();
+		SimpleRequestArguments arguments = new SimpleRequestArguments();
 		arguments.setMethod(method);
 		arguments.setRequest(request);
 		arguments.setResponse(response);

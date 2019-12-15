@@ -3,12 +3,10 @@ package com.tvd12.ezyhttp.server.core.handler;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.codec.StringDeserializer;
+import com.tvd12.ezyhttp.core.data.BodyData;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
@@ -54,16 +52,15 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		return answer;
 	}
 	
-	protected <T> T deserializeBody(ServletRequest request, Class<T> type) throws IOException {
-		int contentLength = request.getContentLength();
+	protected <T> T deserializeBody(BodyData bodyData, Class<T> type) throws IOException {
+		int contentLength = bodyData.getContentLength();
 		if(contentLength <= 0)
 			return (T)null;
-		String contentType = request.getContentType();
+		String contentType = bodyData.getContentType();
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)
 			throw new IOException("has no body deserializer for: " + contentType);
-		ServletInputStream inputStream = request.getInputStream();
-		T body = deserializer.deserialize(inputStream, type);
+		T body = deserializer.deserialize(bodyData, type);
 		return body;
 	}
 	

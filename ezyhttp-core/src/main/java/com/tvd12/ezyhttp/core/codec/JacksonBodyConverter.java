@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
+import com.tvd12.ezyhttp.core.data.BodyData;
 
 public class JacksonBodyConverter implements BodyConverter {
 
@@ -25,13 +26,8 @@ public class JacksonBodyConverter implements BodyConverter {
 	}
 	
 	@Override
-	public <T> T deserialize(byte[] bytes, Class<T> bodyType) throws IOException {
-		T body = objectMapper.readValue(bytes, bodyType);
-		return body;
-	}
-	
-	@Override
-	public <T> T deserialize(InputStream inputStream, Class<T> bodyType) throws IOException {
+	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
+		InputStream inputStream = data.getInputStream();
 		T body = objectMapper.readValue(inputStream, bodyType);
 		return body;
 	}

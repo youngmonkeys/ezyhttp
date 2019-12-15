@@ -1,16 +1,18 @@
 package com.tvd12.ezyhttp.core.codec;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.core.util.BodyConvertAnnotations;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 public class DataConverters {
 
+	@Setter
 	@Getter
 	protected StringDeserializer stringDeserializer;
 	protected final Map<String, BodySerializer> bodySerializers;
@@ -32,10 +34,36 @@ public class DataConverters {
 		return deserializer;
 	}
 	
+	public void addBodyConverters(List<?> converters) {
+		for(Object converter : converters)
+			addBodyConverter(converter);
+	}
+	
+	public void addBodyConverter(Object converter) {
+		if(converter instanceof BodySerializer) {
+			String contentType = BodyConvertAnnotations.getContentType(converter);
+			this.bodySerializers.put(contentType, (BodySerializer) converter);
+		}
+		else if(converter instanceof BodyDeserializer) {
+			String contentType = BodyConvertAnnotations.getContentType(converter);
+			this.bodyDeserializers.put(contentType, (BodyDeserializer) converter);
+		}
+	}
+	
+	public void setStringConverter(Object converter) {
+		if(converter instanceof StringDeserializer)
+			this.stringDeserializer = (StringDeserializer) converter;
+	}
+	
+	public void setStringConverters(List<?> converters) {
+		for(Object converter : converters)
+			setStringConverter(converter);
+	}
+	
 	protected void addDefaultConverter() {
 		JacksonBodyConverter bodyConverter = new JacksonBodyConverter();
 		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
-		this.stringDeserializer = new StringDefaultDeserializer();
+		this.stringDeserializer = new DefaultStringDeserializer();
 	}
 }

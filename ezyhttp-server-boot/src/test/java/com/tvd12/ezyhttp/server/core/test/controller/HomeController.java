@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +16,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
+import com.tvd12.ezyhttp.server.core.test.request.LoveRequest;
 
 @Controller("/")
 public class HomeController {
@@ -43,6 +46,16 @@ public class HomeController {
 	
 	@DoPut
 	public void doNothing() {
+	}
+	
+	@DoGet("bye")
+	public String bye(@RequestParam List<String> messages) {
+		return "bye: " + messages;
+	}
+	
+	@DoPost("love")
+	public String love(@RequestBody LoveRequest request) {
+		return "love: " + request.getWho() + ", age: " + request.getAge();
 	}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})

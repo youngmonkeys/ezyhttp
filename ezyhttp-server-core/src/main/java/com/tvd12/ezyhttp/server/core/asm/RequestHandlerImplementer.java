@@ -135,7 +135,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
 				instruction
-					.append("(java.lang.String)this.deserializeParameter(")
+					.brackets(parameterType)
+					.append("this.deserializeParameter(")
 						.append("arg0.getParameter(").append(paramKey).append(")")
 						.append(", ").clazz(parameterType, true)
 					.append(")");
@@ -159,7 +160,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				instruction
 					.brackets(parameterType)
 					.append("this.deserializeBody(")
-						.append("arg0.getRequest(), ").clazz(parameterType, true)
+						.append("arg0, ").clazz(parameterType, true)
 					.append(")");
 				hasAnnotation = true;
 			}

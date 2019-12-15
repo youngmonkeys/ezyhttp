@@ -12,7 +12,10 @@ import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
+import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
+import com.tvd12.ezyhttp.core.annotation.StringConvert;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
@@ -40,6 +43,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected final Set<String> packageToScans;
 	protected final Set<Class> componentClasses;
 	protected final Set<String> propertiesSources;
+	protected final DataConverters dataConverters;
 	protected final ComponentManager componentManager;
 	protected final ControllerManager controllerManager;
 	protected final InterceptorManager interceptorManager;
@@ -52,6 +56,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		this.componentClasses = new HashSet<>();
 		this.propertiesSources = new HashSet<>();
 		this.componentManager = ComponentManager.getInstance();
+		this.dataConverters = componentManager.getDataConverters();
 		this.controllerManager = componentManager.getControllerManager();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -152,6 +157,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
+		Set bodyConverterClasses = reflection.getAnnotatedClasses(BodyConvert.class);
+		Set stringConverterClasses = reflection.getAnnotatedClasses(StringConvert.class);
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
@@ -161,6 +168,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(controllerClasses)
 				.addSingletonClasses(interceptorClases)
 				.addSingletonClasses(exceptionHandlerClasses)
+				.addSingletonClasses(bodyConverterClasses)
+				.addSingletonClasses(stringConverterClasses)
 				.addSingletonClasses(bootstrapClasses)
 				.build();
 		registerComponents(beanContext);
@@ -197,6 +206,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		exceptionHandlerManager.addExceptionHandlers(exceptionHandlers);
 		List<RequestInterceptor> requestInterceptors = beanContext.getSingletons(Interceptor.class);
 		interceptorManager.addRequestInterceptors(requestInterceptors);
+		List bodyConverters = beanContext.getSingletons(BodyConvert.class);
+		dataConverters.addBodyConverters(bodyConverters);
+		List stringConverters = beanContext.getSingletons(StringConvert.class);
+		dataConverters.setStringConverters(stringConverters);
 	}
 	
 	protected void addRequestHandlers() {

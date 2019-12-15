@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,6 +45,11 @@ public class HomeController {
 	
 	@DoPut
 	public void doNothing() {
+	}
+	
+	@DoGet("bye")
+	public String bye(@RequestParam List<String> messages) {
+		return "bye: " + messages;
 	}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
