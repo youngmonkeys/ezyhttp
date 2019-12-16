@@ -64,5 +64,6 @@
     <module>ezyhttp-core</module>
     <module>ezyhttp-server-jetty</module>
     <module>ezyhttp-server-boot</module>
+    <module>ezyhttp-client</module>
   </modules>
 </project>
