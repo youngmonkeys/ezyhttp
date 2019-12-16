@@ -61,9 +61,12 @@ public class DataConverters {
 	}
 	
 	protected void addDefaultConverter() {
-		JacksonBodyConverter bodyConverter = new JacksonBodyConverter();
-		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
-		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, bodyConverter);
+		JsonBodyConverter jsonBodyConverter = new JsonBodyConverter();
+		FormBodyConverter formBodyConverter = new FormBodyConverter();
+		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
+		this.bodySerializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
 		this.stringDeserializer = new DefaultStringDeserializer();
 	}
 }

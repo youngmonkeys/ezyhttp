@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core.test.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,8 +50,10 @@ public class HomeController {
 	}
 	
 	@DoGet("bye")
-	public String bye(@RequestParam List<String> messages) {
-		return "bye: " + messages;
+	public String bye(
+			@RequestParam("messages") List<String> messages,
+			@RequestParam("numbers") int[] numbers) {
+		return "bye: " + messages + " : " + Arrays.toString(numbers);
 	}
 	
 	@DoPost("love")

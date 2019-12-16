@@ -7,15 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.data.BodyData;
 
-public class JacksonBodyConverter implements BodyConverter {
+public class JsonBodyConverter implements BodyConverter {
 
 	protected final ObjectMapper objectMapper;
 	
-	public JacksonBodyConverter() {
+	public JsonBodyConverter() {
 		this(JacksonObjectMapperBuilder.newInstance().build());
 	}
 	
-	public JacksonBodyConverter(ObjectMapper objectMapper) {
+	public JsonBodyConverter(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 	
