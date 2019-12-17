@@ -1,11 +1,15 @@
 package com.tvd12.ezyhttp.client.request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.Headers;
+import com.tvd12.ezyhttp.core.data.MultiValueMap;
 
 import lombok.Getter;
 
@@ -13,11 +17,15 @@ import lombok.Getter;
 public class RequestEntity {
 
 	protected final Object body;
-	protected final Map<String, String> headers;
+	protected final MultiValueMap headers;
 	
-	public RequestEntity(Map<String, String> headers, Object body) {
+	public RequestEntity(MultiValueMap headers, Object body) {
 		this.body = body;
 		this.headers = headers;
+	}
+	
+	public RequestEntity(Map<String, List<String>> headers, Object body) {
+		this(headers != null ? new MultiValueMap(headers) : null, body);
 	}
 	
 	public static Builder body(Object body) {
@@ -30,15 +38,27 @@ public class RequestEntity {
 	}
 	
 	public String getHeader(String name) {
-		String value = headers.get(name);
+		if(headers == null)
+			return null;
+		String value = headers.getValue(name);
 		return value;
 	}
 	
 	public String getContentType() {
 		if(headers == null)
 			return ContentTypes.APPLICATION_JSON;
-		String contentType = headers.getOrDefault(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+		String contentType = headers.getValue(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 		return contentType;
+	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder()
+				.append("RequestEntity(")
+				.append("headers: ").append(headers).append(", ")
+				.append("body: ").append(body != null ? body.getClass().getSimpleName() : "null")
+				.append(")")
+				.toString();
 	}
 	
 	public static Builder builder() {
@@ -48,7 +68,7 @@ public class RequestEntity {
 	public static class Builder implements EzyBuilder<RequestEntity> {
 
 		protected Object body;
-		protected Map<String, String> headers;
+		protected Map<String, List<String>> headers;
 		
 		public Builder body(Object body) {
 			this.body = body;
@@ -58,14 +78,18 @@ public class RequestEntity {
 		public Builder header(String name, String value) {
 			if(this.headers == null)
 				this.headers = new HashMap<>();
-			this.headers.put(name, value);
+			List<String> values = headers.get(name);
+			if(values == null) {
+				values = new ArrayList<>();
+				headers.put(name, values);
+			}
+			values.add(value);
 			return this;
 		}
 		
 		public Builder headers(Map<String, String> headers) {
-			if(this.headers == null)
-				this.headers = new HashMap<>();
-			this.headers.putAll(headers);
+			for(Entry<String, String> header : headers.entrySet())
+				header(header.getKey(), header.getValue());
 			return this;
 		}
 		

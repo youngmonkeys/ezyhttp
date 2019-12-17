@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.core.codec;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,14 @@ public class FormBodyConverter implements BodyConverter {
 	@Override
 	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
 		Map<String, String> parameters = data.getParameters();
+		T body = objectMapper.convertValue(parameters, bodyType);
+		return body;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T deserialize(InputStream inputStream, Class<T> bodyType) throws IOException {
+		Map<String, String> parameters = objectMapper.readValue(inputStream, Map.class);
 		T body = objectMapper.convertValue(parameters, bodyType);
 		return body;
 	}

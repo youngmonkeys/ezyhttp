@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -8,16 +9,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
+import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
+import com.tvd12.ezyhttp.core.codec.BodySerializer;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
 public class HttpClient {
 
+	protected final int defatReadTimeout;
+	protected final int defaultConnectTimeout;
+	protected final DataConverters dataConverters;
+	
+	public static final int NO_TIMEOUT = -1;
+	
+	protected HttpClient(Builder builder) {
+		this.defatReadTimeout = builder.readTimeout;
+		this.defaultConnectTimeout = builder.connectTimeout;
+		this.dataConverters = builder.dataConverters;
+	}
+	
 	public <T> ResponseEntity<T> request(
 			HttpMethod method, 
 			String url, 
@@ -25,35 +41,115 @@ public class HttpClient {
 			Class<T> responseType, 
 			int connectTimeout, int readTimeout) throws Exception {
 		URL requestURL = new URL(url);
-		HttpURLConnection connection = (HttpsURLConnection)requestURL.openConnection();
-		connection.setConnectTimeout(connectTimeout);
-		connection.setReadTimeout(readTimeout);
-		connection.setDoOutput(true);
-		Map<String, String> requestHeaders = entity.getHeaders();
-		if(requestHeaders != null) {
-			for(Entry<String, String> requestHeader : requestHeaders.entrySet())
-				connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+		HttpURLConnection connection = (HttpURLConnection)requestURL.openConnection();
+		try {
+			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
+			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
+			connection.setDoOutput(true);
+			connection.setRequestMethod(method.toString());
+			MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
+			if(requestHeaders != null) {
+				Map<String, String> encodedHeaders = requestHeaders.encode();
+				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
+					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+			}
+			Object requestBody = entity != null ? entity.getBody() : null;
+			if(requestBody != null) {
+				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
+				if(requestContentType == null)
+					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+				byte[] requestBytes = serializeRequestBody(requestContentType, entity);
+				OutputStream outputStream = connection.getOutputStream();
+				outputStream.write(requestBytes);
+				outputStream.flush();
+				outputStream.close();
+			}
+			
+			int responseCode = connection.getResponseCode();
+			Map<String, List<String>> headerFields = connection.getHeaderFields();
+			MultiValueMap responseHeaders = MultiValueMap.decode(headerFields);
+			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
+			if(responseContentType == null)
+				responseContentType = ContentTypes.APPLICATION_JSON;
+			InputStream inputStream = connection.getInputStream();
+			T responseBody = null;
+			try {
+				responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+			}
+			finally {
+				inputStream.close();
+			}
+			return new ResponseEntity<T>(responseCode, responseHeaders, responseBody);
 		}
-		String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
-		if(requestContentType == null)
-			connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-		byte[] requestBytes = serializeRequestBody(entity);
-		OutputStream outputStream = connection.getOutputStream();
-		outputStream.write(requestBytes);
+		finally {
+			connection.disconnect();
+		}
+	}
+	
+	protected byte[] serializeRequestBody(
+			String contentType, RequestEntity entity) throws IOException {
+		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
+		if(serializer == null)
+			throw new IOException("has no serializer for: " + contentType);
+		byte[] bytes = serializer.serialize(entity);
+		return bytes;
+	}
+	
+	protected <T> T deserializeResponseBody(
+			String contentType,
+			InputStream inputStream, Class<T> responseType) throws IOException {
+		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
+		if(deserializer == null)
+			throw new IOException("has no deserializer for: " + contentType);
+		T body = deserializer.deserialize(inputStream, responseType);
+		return body;
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder implements EzyBuilder<HttpClient> {
 		
-		int responseCode = connection.getResponseCode();
-		Map<String, List<String>> headerFields = connection.getHeaderFields();
-		InputStream inputStream = connection.getInputStream();
-		T responseBody = deserializeResponseBody(inputStream, responseType);
-		return new ResponseEntity<T>(responseCode, null, responseBody);
-	}
-	
-	protected byte[] serializeRequestBody(RequestEntity entity) {
-		return null;
-	}
-	
-	protected <T> T deserializeResponseBody(InputStream inputStream, Class<T> responseType) {
-		return null;
+		protected int readTimeout;
+		protected int connectTimeout;
+		protected DataConverters dataConverters;
+		
+		public Builder() {
+			this.readTimeout = 15 * 1000;
+			this.connectTimeout = 15 * 1000;
+			this.dataConverters = new DataConverters();
+		}
+		
+		public Builder readTimeout(int readTimeout) {
+			this.readTimeout = readTimeout;
+			return this;
+		}
+		
+		public Builder connectTimeout(int connectTimeout) {
+			this.connectTimeout = connectTimeout;
+			return this;
+		}
+		
+		public Builder setStringConverter(Object converter) {
+			this.dataConverters.setStringConverter(converter);
+			return this;
+		}
+		
+		public Builder addBodyConverter(Object converter) {
+			this.dataConverters.addBodyConverter(converter);
+			return this;
+		}
+		
+		public Builder addBodyConverters(List<?> converters) {
+			this.dataConverters.addBodyConverters(converters);
+			return this;
+		}
+		
+		@Override
+		public HttpClient build() {
+			return new HttpClient(this);
+		}
 	}
 	
 }

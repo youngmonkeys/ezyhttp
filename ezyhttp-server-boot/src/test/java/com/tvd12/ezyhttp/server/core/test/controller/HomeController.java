@@ -6,6 +6,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -49,11 +52,19 @@ public class HomeController {
 	public void doNothing() {
 	}
 	
+	@SuppressWarnings("unchecked")
 	@DoGet("bye")
-	public String bye(
+	public ResponseEntity<String> bye(
 			@RequestParam("messages") List<String> messages,
 			@RequestParam("numbers") int[] numbers) {
-		return "bye: " + messages + " : " + Arrays.toString(numbers);
+		String body = "bye: " + messages + " : " + Arrays.toString(numbers);
+		return ResponseEntity.builder()
+				.body(body)
+				.header("a;;;", "1")
+				.header("a;;;", "2")
+				.headers(EzyMapBuilder.mapBuilder().put("b", "3").build())
+				.status(StatusCodes.OK)
+				.build();
 	}
 	
 	@DoPost("love")
