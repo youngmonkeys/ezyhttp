@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
@@ -34,14 +35,49 @@ public class HttpClient {
 		this.dataConverters = builder.dataConverters;
 	}
 	
+	public <T> T call(Request request) throws Exception {
+		return call(
+				request.getMethod(),
+				request.getURL(),
+				request.getEntity(),
+				request.getResponseType(),
+				request.getConnectTimeout(),
+				request.getReadTimeout()
+		);
+	}
+	
+	public <T> T call(HttpMethod method, 
+			String url, 
+			RequestEntity entity, 
+			Class<T> responseType, 
+			int connectTimeout, int readTimeout) throws Exception {
+		ResponseEntity<T> responseEntity = request(
+				method, 
+				url, 
+				entity, 
+				responseType, 
+				connectTimeout, readTimeout);
+		return responseEntity.getBody();
+	}
+	
+	public <T> ResponseEntity<T> request(Request request) throws Exception {
+		return request(
+				request.getMethod(),
+				request.getURL(),
+				request.getEntity(),
+				request.getResponseType(),
+				request.getConnectTimeout(),
+				request.getReadTimeout()
+		);
+	}
+	
 	public <T> ResponseEntity<T> request(
 			HttpMethod method, 
 			String url, 
 			RequestEntity entity, 
 			Class<T> responseType, 
 			int connectTimeout, int readTimeout) throws Exception {
-		URL requestURL = new URL(url);
-		HttpURLConnection connection = (HttpURLConnection)requestURL.openConnection();
+		HttpURLConnection connection = connect(url);
 		try {
 			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
 			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
@@ -84,6 +120,12 @@ public class HttpClient {
 		finally {
 			connection.disconnect();
 		}
+	}
+	
+	public HttpURLConnection connect(String url) throws Exception {
+		URL requestURL = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection)requestURL.openConnection();
+		return connection;
 	}
 	
 	protected byte[] serializeRequestBody(
