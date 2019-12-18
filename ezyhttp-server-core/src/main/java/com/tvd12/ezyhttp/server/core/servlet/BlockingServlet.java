@@ -168,7 +168,7 @@ public class BlockingServlet extends HttpServlet {
 			response.setStatus(entity.getStatus());
 			MultiValueMap headers = entity.getHeaders();
 			if(headers != null) {
-				Map<String, String> encodedHeaders = headers.encode();
+				Map<String, String> encodedHeaders = headers.toMap();
 				for(Entry<String, String> entry : encodedHeaders.entrySet())
 					response.addHeader(entry.getKey(), entry.getValue());
 			}

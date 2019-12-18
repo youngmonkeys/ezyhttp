@@ -1,16 +1,10 @@
 package com.tvd12.ezyhttp.core.data;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import com.tvd12.ezyfox.io.EzyStrings;
 
 public class MultiValueMap {
 
@@ -18,6 +12,10 @@ public class MultiValueMap {
 	
 	public MultiValueMap(Map<String, List<String>> map) {
 		this.map = map;
+	}
+	
+	public static MultiValueMap of(Map<String, List<String>> map) {
+		return new MultiValueMap(map);
 	}
 	
 	public Set<String> keySets() {
@@ -47,39 +45,20 @@ public class MultiValueMap {
 		return map.toString();
 	}
 	
-	public Map<String, String> encode() throws IOException {
-		Map<String, String> encoded = new HashMap<>();
+	public Map<String, String> toMap() {
+		Map<String, String> answer = new HashMap<>();
 		for(Entry<String, List<String>> entry : map.entrySet()) {
 			String key = entry.getKey();
 			List<String> values = entry.getValue();
-			String encodedKey = URLEncoder.encode(key, EzyStrings.UTF_8);
-			StringBuilder encodedValues = new StringBuilder();
+			StringBuilder valueString = new StringBuilder();
 			for(int i = 0 ; i < values.size() ; ++i) {
 				if(i > 0) 
-					encodedValues.append(";");
-				encodedValues.append(URLEncoder.encode(values.get(i), EzyStrings.UTF_8));
+					valueString.append(";");
+				valueString.append(values.get(i));
 			}
-			encoded.put(encodedKey, encodedValues.toString());
+			answer.put(key, valueString.toString());
 		}
-		return encoded;
-	}
-	
-	public static MultiValueMap decode(
-			Map<String, List<String>> map) throws IOException {
-		Map<String, List<String>> decoded = new HashMap<>();
-		for(Entry<String, List<String>> entry : map.entrySet()) {
-			String encodedKey = entry.getKey();
-			if(encodedKey == null)
-				continue;
-			List<String> encodedValues = entry.getValue();
-			String key = URLDecoder.decode(encodedKey, EzyStrings.UTF_8);
-			List<String> values = new ArrayList<>();
-			for(String encodedValue : encodedValues) {
-				values.add(URLDecoder.decode(encodedValue, EzyStrings.UTF_8));
-			}
-			decoded.put(key, values);
-		}
-		return new MultiValueMap(decoded);
+		return answer;
 	}
 	
 }

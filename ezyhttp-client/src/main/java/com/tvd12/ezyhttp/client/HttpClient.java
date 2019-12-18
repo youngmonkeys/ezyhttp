@@ -85,16 +85,18 @@ public class HttpClient {
 			connection.setRequestMethod(method.toString());
 			MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
 			if(requestHeaders != null) {
-				Map<String, String> encodedHeaders = requestHeaders.encode();
+				Map<String, String> encodedHeaders = requestHeaders.toMap();
 				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
 					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
 			}
 			Object requestBody = entity != null ? entity.getBody() : null;
 			if(requestBody != null) {
 				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
-				if(requestContentType == null)
+				if(requestContentType == null) {
+					requestContentType = ContentTypes.APPLICATION_JSON;
 					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-				byte[] requestBytes = serializeRequestBody(requestContentType, entity);
+				}
+				byte[] requestBytes = serializeRequestBody(requestContentType, requestBody);
 				OutputStream outputStream = connection.getOutputStream();
 				outputStream.write(requestBytes);
 				outputStream.flush();
@@ -103,7 +105,7 @@ public class HttpClient {
 			
 			int responseCode = connection.getResponseCode();
 			Map<String, List<String>> headerFields = connection.getHeaderFields();
-			MultiValueMap responseHeaders = MultiValueMap.decode(headerFields);
+			MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
 			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
 			if(responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
@@ -129,11 +131,11 @@ public class HttpClient {
 	}
 	
 	protected byte[] serializeRequestBody(
-			String contentType, RequestEntity entity) throws IOException {
+			String contentType, Object requestBody) throws IOException {
 		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
 		if(serializer == null)
 			throw new IOException("has no serializer for: " + contentType);
-		byte[] bytes = serializer.serialize(entity);
+		byte[] bytes = serializer.serialize(requestBody);
 		return bytes;
 	}
 	

@@ -28,8 +28,8 @@ public class RequestEntity {
 		this(headers != null ? new MultiValueMap(headers) : null, body);
 	}
 	
-	public static Builder body(Object body) {
-		return builder().body(body);
+	public static RequestEntity body(Object body) {
+		return new RequestEntity((MultiValueMap)null, body);
 	}
 	
 	@SuppressWarnings("unchecked")
