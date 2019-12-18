@@ -54,7 +54,7 @@ public class HomeController {
 	
 	@SuppressWarnings("unchecked")
 	@DoGet("bye")
-	public ResponseEntity<String> bye(
+	public ResponseEntity bye(
 			@RequestParam("messages") List<String> messages,
 			@RequestParam("numbers") int[] numbers) {
 		String body = "bye: " + messages + " : " + Arrays.toString(numbers);

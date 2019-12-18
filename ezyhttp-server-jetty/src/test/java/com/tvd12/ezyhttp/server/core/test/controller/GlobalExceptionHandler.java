@@ -8,7 +8,7 @@ import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 public class GlobalExceptionHandler {
 
 	@TryCatch(IllegalArgumentException.class)
-	public ResponseEntity<String> handleException(Exception e) {
+	public ResponseEntity handleException(Exception e) {
 		return ResponseEntity.badRequest("global: " + e.getMessage());
 	}
 	

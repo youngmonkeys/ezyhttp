@@ -156,7 +156,6 @@ public class BlockingServlet extends HttpServlet {
 			interceptor.postHandle(arguments, handler);
 	}
 	
-	@SuppressWarnings({ "rawtypes" })
 	protected void handleResponseData(
 			HttpServletResponse response, 
 			String contentType, Object data) throws Exception {

@@ -13,19 +13,19 @@ import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import lombok.Getter;
 
 @Getter
-public class ResponseEntity<T> {
+public class ResponseEntity {
 
-	protected final T body;
+	protected final Object body;
 	protected final int status;
 	protected final MultiValueMap headers;
 	
-	public ResponseEntity(int status, MultiValueMap headers, T body) {
+	public ResponseEntity(int status, MultiValueMap headers, Object body) {
 		this.body = body;
 		this.status = status;
 		this.headers = headers;
 	}
 	
-	public ResponseEntity(int status, Map<String, List<String>> headers, T body) {
+	public ResponseEntity(int status, Map<String, List<String>> headers, Object body) {
 		this(status, headers != null ? new MultiValueMap(headers) : null, body);
 	}
 	
@@ -37,28 +37,33 @@ public class ResponseEntity<T> {
 		return status(status).body(body);
 	}
 
-	public static <T> ResponseEntity<T> ok() {
-		return new ResponseEntity<T>(StatusCodes.OK, (MultiValueMap)null, null);
+	public static ResponseEntity ok() {
+		return new ResponseEntity(StatusCodes.OK, (MultiValueMap)null, null);
 	}
 	
-	public static <T> ResponseEntity<T> ok(T body) {
-		return new ResponseEntity<T>(StatusCodes.OK, (MultiValueMap)null, body);
+	public static ResponseEntity ok(Object body) {
+		return new ResponseEntity(StatusCodes.OK, (MultiValueMap)null, body);
 	}
 	
-	public static <T> ResponseEntity<T> badRequest() {
-		return new ResponseEntity<T>(StatusCodes.BAD_REQUEST, (MultiValueMap)null, null);
+	public static ResponseEntity badRequest() {
+		return new ResponseEntity(StatusCodes.BAD_REQUEST, (MultiValueMap)null, null);
 	}
 	
-	public static <T> ResponseEntity<T> badRequest(T body) {
-		return new ResponseEntity<T>(StatusCodes.BAD_REQUEST, (MultiValueMap)null, body);
+	public static ResponseEntity badRequest(Object body) {
+		return new ResponseEntity(StatusCodes.BAD_REQUEST, (MultiValueMap)null, body);
 	}
 	
-	public static <T> ResponseEntity<T> notFound() {
-		return new ResponseEntity<T>(StatusCodes.NOT_FOUND, (MultiValueMap)null, null);
+	public static ResponseEntity notFound() {
+		return new ResponseEntity(StatusCodes.NOT_FOUND, (MultiValueMap)null, null);
 	}
 	
-	public static <T> ResponseEntity<T> notFound(T body) {
-		return new ResponseEntity<T>(StatusCodes.NOT_FOUND, (MultiValueMap)null, body);
+	public static ResponseEntity notFound(Object body) {
+		return new ResponseEntity(StatusCodes.NOT_FOUND, (MultiValueMap)null, body);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getBody() {
+		return (T)body;
 	}
 	
 	public String getHeader(String name) {
@@ -83,7 +88,6 @@ public class ResponseEntity<T> {
 		return new Builder();
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public static class Builder implements EzyBuilder<ResponseEntity> {
 
 		protected int status;
@@ -120,7 +124,7 @@ public class ResponseEntity<T> {
 		
 		@Override
 		public ResponseEntity build() {
-			return new ResponseEntity<>(status, headers, body);
+			return new ResponseEntity(status, headers, body);
 		}
 		
 	}

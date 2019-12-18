@@ -18,7 +18,11 @@ import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
 public class HttpClient {
@@ -36,46 +40,33 @@ public class HttpClient {
 	}
 	
 	public <T> T call(Request request) throws Exception {
-		return call(
+		ResponseEntity response = request(
 				request.getMethod(),
 				request.getURL(),
 				request.getEntity(),
-				request.getResponseType(),
+				request.getResponseTypes(),
 				request.getConnectTimeout(),
 				request.getReadTimeout()
 		);
+		return getResponseBody(response);
 	}
 	
-	public <T> T call(HttpMethod method, 
-			String url, 
-			RequestEntity entity, 
-			Class<T> responseType, 
-			int connectTimeout, int readTimeout) throws Exception {
-		ResponseEntity<T> responseEntity = request(
-				method, 
-				url, 
-				entity, 
-				responseType, 
-				connectTimeout, readTimeout);
-		return responseEntity.getBody();
-	}
-	
-	public <T> ResponseEntity<T> request(Request request) throws Exception {
+	public ResponseEntity request(Request request) throws Exception {
 		return request(
 				request.getMethod(),
 				request.getURL(),
 				request.getEntity(),
-				request.getResponseType(),
+				request.getResponseTypes(),
 				request.getConnectTimeout(),
 				request.getReadTimeout()
 		);
 	}
 	
-	public <T> ResponseEntity<T> request(
+	public ResponseEntity request(
 			HttpMethod method, 
 			String url, 
 			RequestEntity entity, 
-			Class<T> responseType, 
+			Map<Integer, Class<?>> responseTypes, 
 			int connectTimeout, int readTimeout) throws Exception {
 		HttpURLConnection connection = connect(url);
 		try {
@@ -110,14 +101,18 @@ public class HttpClient {
 			if(responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
 			InputStream inputStream = connection.getInputStream();
-			T responseBody = null;
+			Object responseBody = null;
 			try {
-				responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+				int responseConentLength = connection.getHeaderFieldInt(Headers.CONTENT_LENGTH, 0);
+				if(responseConentLength > 0) {
+					Class<?> responseType = responseTypes.get(responseCode);
+					responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+				}
 			}
 			finally {
 				inputStream.close();
 			}
-			return new ResponseEntity<T>(responseCode, responseHeaders, responseBody);
+			return new ResponseEntity(responseCode, responseHeaders, responseBody);
 		}
 		finally {
 			connection.disconnect();
@@ -139,14 +134,38 @@ public class HttpClient {
 		return bytes;
 	}
 	
-	protected <T> T deserializeResponseBody(
+	protected Object deserializeResponseBody(
 			String contentType,
-			InputStream inputStream, Class<T> responseType) throws IOException {
+			InputStream inputStream, Class<?> responseType) throws IOException {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)
 			throw new IOException("has no deserializer for: " + contentType);
-		T body = deserializer.deserialize(inputStream, responseType);
+		Object body = null;
+		if(responseType != null) {
+			body = deserializer.deserialize(inputStream, responseType);
+		}
+		else {
+			try {
+				body = deserializer.deserialize(inputStream, Map.class);
+			}
+			catch (Exception e) {
+				body = deserializer.deserialize(inputStream, String.class);
+			}
+		}
 		return body;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getResponseBody(ResponseEntity entity) throws Exception {
+		int statusCode = entity.getStatus();
+		Object body = entity.getBody();
+		if(statusCode >= 200 && statusCode < 300)
+			return (T)body;
+		if(statusCode == StatusCodes.BAD_REQUEST)
+			throw new HttpBadRequestException(body);
+		if(statusCode == StatusCodes.NOT_FOUND)
+			throw new HttpNotFoundException(body);
+		throw new HttpRequestException(statusCode, body);
 	}
 	
 	public static Builder builder() {

@@ -1,16 +1,25 @@
 package com.tvd12.ezyhttp.client.request;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
+
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public abstract class AbstractRequest<R extends AbstractRequest<R>> implements Request {
 
 	protected String url; 
 	protected int readTimeout;
 	protected int connectTimeout;
-	protected Class responseType;
 	protected RequestEntity entity;
+	protected final Map<Integer, Class<?>> responseTypes;
+	
+	public AbstractRequest() {
+		this.responseTypes = new HashMap<>();
+	}
 	
 	public String getURL() {
 		return this.url;
@@ -37,7 +46,11 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 	}
 	
 	public R setResponseType(Class<?> responseType) {
-		this.responseType = responseType;
+		return setResponseType(StatusCodes.OK, responseType);
+	}
+	
+	public R setResponseType(int statusCode, Class<?> responseType) {
+		this.responseTypes.put(statusCode, responseType);
 		return (R)this;
 	}
 	

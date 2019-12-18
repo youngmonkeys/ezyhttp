@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.client.request;
 
+import java.util.Map;
+
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
 public interface Request {
@@ -14,6 +16,6 @@ public interface Request {
 	
 	RequestEntity getEntity();
 	
-	<T> Class<T> getResponseType();
+	Map<Integer, Class<?>> getResponseTypes();
 	
 }
