@@ -13,8 +13,7 @@ public final class ControllerApplications {
 		if(EzyStrings.isNoContent(uri))
 			uri = annotation.uri();
 		if(EzyStrings.isNoContent(uri))
-			uri = "/";
-		uri = Constants.DEFAULT_URI;
+			uri = Constants.DEFAULT_URI;
 		return uri;
 	}
 	

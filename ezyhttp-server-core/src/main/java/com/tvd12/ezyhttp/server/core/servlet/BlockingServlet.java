@@ -17,6 +17,7 @@ import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
+import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
@@ -91,15 +92,19 @@ public class BlockingServlet extends HttpServlet {
 			responseString(response, "method " + method + " not allowed");
 			return;
 		}
+		boolean acceptableRequest = false;
 		RequestArguments arguments = newRequestArguments(method, request, response);
 		try {
-			boolean passed = preHandleRequest(arguments, requestHandler);
-			if(passed) {
+			acceptableRequest = preHandleRequest(arguments, requestHandler);
+			if(acceptableRequest) {
 				Object responseData = requestHandler.handle(arguments);
 				if(responseData != null) {
 					String responseContentType = requestHandler.getResponseContentType();
 					handleResponseData(response, responseContentType, responseData);
 				}
+			}
+			else {
+				response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
 			}
 		}
 		catch (Exception e) {
@@ -108,7 +113,8 @@ public class BlockingServlet extends HttpServlet {
 		finally {
 			arguments.release();
 		}
-		postHandleRequest(arguments, requestHandler);
+		if(acceptableRequest)
+			postHandleRequest(arguments, requestHandler);
 	}
 	
 	protected void handleException(
@@ -132,8 +138,13 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			log("handle request uri: " + request.getRequestURI() + " error", exception);
+			if(exception instanceof HttpUnauthorizedException) {
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			}
+			else {
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				log("handle request uri: " + request.getRequestURI() + " error", exception);
+			}
 		}
 	}
 	

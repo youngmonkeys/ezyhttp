@@ -21,8 +21,16 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpConflictException;
+import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
+import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
+import com.tvd12.ezyhttp.core.exception.HttpMethodNotAllowedException;
+import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
+import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
+import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
 public class HttpClient {
@@ -165,6 +173,22 @@ public class HttpClient {
 			throw new HttpBadRequestException(body);
 		if(statusCode == StatusCodes.NOT_FOUND)
 			throw new HttpNotFoundException(body);
+		if(statusCode == StatusCodes.UNAUTHORIZED)
+			throw new HttpUnauthorizedException(body);
+		if(statusCode == StatusCodes.FORBIDDEN)
+			throw new HttpForbiddenException(body);
+		if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
+			throw new HttpMethodNotAllowedException(body);
+		if(statusCode == StatusCodes.NOT_ACCEPTABLE)
+			throw new HttpNotAcceptableException(body);
+		if(statusCode == StatusCodes.REQUEST_TIMEOUT)
+			throw new HttpRequestTimeoutException(body);
+		if(statusCode == StatusCodes.CONFLICT)
+			throw new HttpConflictException(body);
+		if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
+			throw new HttpUnsupportedMediaTypeException(body);
+		if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
+			throw new HttpInternalServerErrorException(body);
 		throw new HttpRequestException(statusCode, body);
 	}
 	
