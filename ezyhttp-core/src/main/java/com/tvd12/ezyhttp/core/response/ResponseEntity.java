@@ -36,29 +36,33 @@ public class ResponseEntity {
 	public static Builder of(int status, Object body) {
 		return status(status).body(body);
 	}
+	
+	public static ResponseEntity create(int status, Object body) {
+		return new ResponseEntity(status, (MultiValueMap)null, body);
+	}
 
 	public static ResponseEntity ok() {
-		return new ResponseEntity(StatusCodes.OK, (MultiValueMap)null, null);
+		return create(StatusCodes.OK, null);
 	}
 	
 	public static ResponseEntity ok(Object body) {
-		return new ResponseEntity(StatusCodes.OK, (MultiValueMap)null, body);
+		return create(StatusCodes.OK, body);
 	}
 	
 	public static ResponseEntity badRequest() {
-		return new ResponseEntity(StatusCodes.BAD_REQUEST, (MultiValueMap)null, null);
+		return create(StatusCodes.BAD_REQUEST, null);
 	}
 	
 	public static ResponseEntity badRequest(Object body) {
-		return new ResponseEntity(StatusCodes.BAD_REQUEST, (MultiValueMap)null, body);
+		return create(StatusCodes.BAD_REQUEST, body);
 	}
 	
 	public static ResponseEntity notFound() {
-		return new ResponseEntity(StatusCodes.NOT_FOUND, (MultiValueMap)null, null);
+		return create(StatusCodes.NOT_FOUND, null);
 	}
 	
 	public static ResponseEntity notFound(Object body) {
-		return new ResponseEntity(StatusCodes.NOT_FOUND, (MultiValueMap)null, body);
+		return create(StatusCodes.NOT_FOUND, body);
 	}
 	
 	@SuppressWarnings("unchecked")

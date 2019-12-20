@@ -15,9 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
-import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
@@ -138,13 +139,25 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
-			if(exception instanceof HttpUnauthorizedException) {
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			if(exception instanceof HttpRequestException) {
+				HttpRequestException requestException = (HttpRequestException)exception;
+				int errorStatus = requestException.getCode();
+				Object errorData = requestException.getData();
+				ResponseEntity errorResponse = ResponseEntity.create(errorStatus, errorData);
+				if(errorData != null) {
+					try {
+						handleResponseData(response, ContentTypes.APPLICATION_JSON, errorResponse);
+						exception = null;
+					}
+					catch (Exception ex) {
+						exception = ex;
+					}
+				}
 			}
-			else {
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				log("handle request uri: " + request.getRequestURI() + " error", exception);
-			}
+		}
+		if(exception != null) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			log("handle request uri: " + request.getRequestURI() + " error", exception);
 		}
 	}
 	

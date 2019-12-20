@@ -88,13 +88,19 @@ public class HttpClient {
 				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
 					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
 			}
+			String requestContentType = null;
 			Object requestBody = entity != null ? entity.getBody() : null;
 			if(requestBody != null) {
-				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
+				requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
 				if(requestContentType == null) {
 					requestContentType = ContentTypes.APPLICATION_JSON;
 					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 				}
+			}
+			
+			connection.connect();
+			
+			if(requestBody != null) {
 				byte[] requestBytes = serializeRequestBody(requestContentType, requestBody);
 				OutputStream outputStream = connection.getOutputStream();
 				outputStream.write(requestBytes);
@@ -108,17 +114,23 @@ public class HttpClient {
 			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
 			if(responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
-			InputStream inputStream = connection.getInputStream();
+			InputStream inputStream = null;
+			if(responseCode < 400)
+				inputStream = connection.getInputStream();
+			else
+				inputStream = connection.getErrorStream();
 			Object responseBody = null;
-			try {
-				int responseConentLength = connection.getHeaderFieldInt(Headers.CONTENT_LENGTH, 0);
-				if(responseConentLength > 0) {
-					Class<?> responseType = responseTypes.get(responseCode);
-					responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+			if(inputStream != null) {
+				try {
+					int responseConentLength = connection.getHeaderFieldInt(Headers.CONTENT_LENGTH, 0);
+					if(responseConentLength > 0) {
+						Class<?> responseType = responseTypes.get(responseCode);
+						responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+					}
 				}
-			}
-			finally {
-				inputStream.close();
+				finally {
+					inputStream.close();
+				}
 			}
 			return new ResponseEntity(responseCode, responseHeaders, responseBody);
 		}
@@ -154,10 +166,18 @@ public class HttpClient {
 		}
 		else {
 			try {
-				body = deserializer.deserialize(inputStream, Map.class);
-			}
-			catch (Exception e) {
 				body = deserializer.deserialize(inputStream, String.class);
+			}
+			catch (IOException e) {
+				throw e;
+			}
+			if(body != null) {
+				try {
+					body = deserializer.deserialize((String)body, Map.class);
+				}
+				catch (Exception e) {
+					// do nothing
+				}
 			}
 		}
 		return body;
@@ -167,7 +187,7 @@ public class HttpClient {
 	public <T> T getResponseBody(ResponseEntity entity) throws Exception {
 		int statusCode = entity.getStatus();
 		Object body = entity.getBody();
-		if(statusCode >= 200 && statusCode < 300)
+		if(statusCode < 400)
 			return (T)body;
 		if(statusCode == StatusCodes.BAD_REQUEST)
 			throw new HttpBadRequestException(body);

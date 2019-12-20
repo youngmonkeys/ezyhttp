@@ -26,6 +26,12 @@ public class JsonBodyConverter implements BodyConverter {
 	}
 	
 	@Override
+	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
+		T body = objectMapper.readValue(data, bodyType);
+		return body;
+	}
+	
+	@Override
 	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
 		InputStream inputStream = data.getInputStream();
 		T body = objectMapper.readValue(inputStream, bodyType);
