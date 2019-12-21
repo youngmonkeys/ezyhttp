@@ -20,7 +20,7 @@ public class CustomerController {
 	@EzyAutoBind
 	protected CustomerService customerService;
 	
-	@DoGet
+	@DoGet("/{name}")
 	public Customer getCustomer(@RequestParam String name) {
 		Customer customer = customerService.getCustomer(name);
 		return customer;
