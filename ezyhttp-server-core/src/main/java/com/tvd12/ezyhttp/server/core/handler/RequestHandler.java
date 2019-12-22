@@ -14,8 +14,10 @@ public interface RequestHandler {
 	Object handle(RequestArguments arguments) throws Exception;
 	
 	Method getHandlerMethod();
-	
+
 	HttpMethod getMethod();
+	
+	String getRequestURI();
 	
 	String getResponseContentType();
 }

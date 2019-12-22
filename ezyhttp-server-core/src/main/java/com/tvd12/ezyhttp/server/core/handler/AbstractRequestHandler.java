@@ -52,6 +52,12 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		return answer;
 	}
 	
+	protected <T> T deserializePathVariable(String variableValue, Class<T> type) throws IOException {
+		StringDeserializer deserializer = dataConverters.getStringDeserializer();
+		T answer = deserializer.deserialize(variableValue, type);
+		return answer;
+	}
+	
 	protected <T> T deserializeBody(BodyData bodyData, Class<T> type) throws IOException {
 		int contentLength = bodyData.getContentLength();
 		if(contentLength <= 0)

@@ -27,4 +27,8 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	
 	String getHeader(String name);
 	
+	String getPathVariable(int index);
+	
+	String getPathVariable(String name);
+	
 }

@@ -94,7 +94,8 @@ public class BlockingServlet extends HttpServlet {
 			return;
 		}
 		boolean acceptableRequest = false;
-		RequestArguments arguments = newRequestArguments(method, request, response);
+		String uriTemplate = requestHandler.getRequestURI();
+		RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
 		try {
 			acceptableRequest = preHandleRequest(arguments, requestHandler);
 			if(acceptableRequest) {
@@ -228,12 +229,14 @@ public class BlockingServlet extends HttpServlet {
 	
 	protected RequestArguments newRequestArguments(
 			HttpMethod method,
+			String uriTemplate,
 			HttpServletRequest request, 
 			HttpServletResponse response) {
 		SimpleRequestArguments arguments = new SimpleRequestArguments();
 		arguments.setMethod(method);
 		arguments.setRequest(request);
 		arguments.setResponse(response);
+		arguments.setUriTemplate(uriTemplate);
 		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {

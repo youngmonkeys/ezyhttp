@@ -15,7 +15,7 @@ public class URITree {
 			if(lastChild.children == null)
 				lastChild.children = new HashMap<>();
 			String path = paths[i];
-			if(isPathVariable(path))
+			if(PathVariables.isPathVariable(path))
 				path = "{}";
 			URITree child = lastChild.children.get(path);
 			if(child == null) {
@@ -49,11 +49,6 @@ public class URITree {
 	public boolean containsURI(String uri) {
 		String matched = getMatchedURI(uri);
 		return matched != null;
-	}
-	
-	protected boolean isPathVariable(String path) {
-		boolean answer = path.startsWith("{") && path.endsWith("}");
-		return answer;
 	}
 	
 	@Override

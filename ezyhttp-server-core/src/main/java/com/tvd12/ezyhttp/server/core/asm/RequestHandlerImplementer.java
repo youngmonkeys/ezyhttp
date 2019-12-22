@@ -14,6 +14,7 @@ import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyfox.reflect.EzyReflections;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
@@ -24,6 +25,7 @@ import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestParameters;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.core.util.PathVariableAnnotations;
 import com.tvd12.ezyhttp.server.core.util.RequestHeaderAnnotations;
 import com.tvd12.ezyhttp.server.core.util.RequestParamAnnotations;
 
@@ -69,12 +71,14 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		String handleRequestMethodContent = makeHandleRequestMethodContent();
 		String handleExceptionMethodContent = makeHandleExceptionMethodContent();
 		String getHttpMethodMethodContent = makeGetHttpMethodMethodContent();
+		String getRequestURIMethodContent = makeGetRequestURIMethodContent();
 		String getResponseContentTypeMethodContent = makeGetResponseContentTypeMethodContent();
 		printComponentContent(controllerFieldContent);
 		printComponentContent(setControllerMethodContent);
 		printComponentContent(handleRequestMethodContent);
 		printComponentContent(handleExceptionMethodContent);
 		printComponentContent(getHttpMethodMethodContent);
+		printComponentContent(getRequestURIMethodContent);
 		printComponentContent(getResponseContentTypeMethodContent);
 		implClass.setSuperclass(pool.get(superClass.getName()));
 		implClass.addField(CtField.make(controllerFieldContent, implClass));
@@ -82,6 +86,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		implClass.addMethod(CtNewMethod.make(handleRequestMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(handleExceptionMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(getHttpMethodMethodContent, implClass));
+		implClass.addMethod(CtNewMethod.make(getRequestURIMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
 		Class answerClass = implClass.toClass();
 		implClass.detach();
@@ -122,6 +127,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		int paramCount = 0;
 		int headerCount = 0;
 		int parameterCount = 0;
+		int pathVariableCount = 0;
 		Parameter[] parameters = handlerMethod.getParameters();
 		for(Parameter parameter : parameters) {
 			Class<?> parameterType = parameter.getType();
@@ -148,11 +154,24 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
 				instruction
-					.append("(java.lang.String)this.deserializeHeader(")
+					.brackets(parameterType)
+					.append("this.deserializeHeader(")
 						.append("arg0.getHeader(").append(headerKey).append(")")
 						.append(", ").clazz(parameterType, true)
 					.append(")");
 				++ headerCount;
+				hasAnnotation = true;
+			}
+			PathVariable pathVariableAnno = parameter.getAnnotation(PathVariable.class);
+			if(pathVariableAnno != null) {
+				String varNameKey = PathVariableAnnotations
+						.getVariableNameKeyString(pathVariableAnno, pathVariableCount);
+				instruction
+					.append("(java.lang.String)this.deserializePathVariable(")
+						.append("arg0.getPathVariable(").append(varNameKey).append(")")
+						.append(", ").clazz(parameterType, true)
+					.append(")");
+				++ pathVariableCount;
 				hasAnnotation = true;
 			}
 			RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);
@@ -238,6 +257,17 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				.toString();
 	}
 	
+	protected String makeGetRequestURIMethodContent() {
+		String requestURI = handlerMethod.getRequestURI();
+		return new EzyFunction(getGetRequestURIMethod())
+				.body()
+					.append(new EzyInstruction("\t", "\n")
+							.answer()
+							.string(requestURI))
+					.function()
+				.toString();
+	}
+	
 	protected String makeGetResponseContentTypeMethodContent() {
 		return new EzyFunction(getGetResponseContentTypeMethod())
 				.body()
@@ -278,6 +308,12 @@ public class RequestHandlerImplementer extends EzyLoggable {
 	protected EzyMethod getGetHttpMethodMethod() {
 		Method method = EzyMethods.getMethod(
 				AbstractRequestHandler.class, "getMethod");
+		return new EzyMethod(method);
+	}
+	
+	protected EzyMethod getGetRequestURIMethod() {
+		Method method = EzyMethods.getMethod(
+				AbstractRequestHandler.class, "getRequestURI");
 		return new EzyMethod(method);
 	}
 	

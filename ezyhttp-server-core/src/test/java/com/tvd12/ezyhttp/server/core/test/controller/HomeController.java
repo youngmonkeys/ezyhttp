@@ -9,6 +9,7 @@ import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.DoPut;
+import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
@@ -49,6 +50,13 @@ public class HomeController {
 	
 	@DoGet("bye")
 	public String bye(@RequestParam List<String> messages) {
+		return "bye: " + messages;
+	}
+	
+	@DoGet("see")
+	public String see(
+			@RequestParam List<String> messages, 
+			@PathVariable("name") String name) {
 		return "bye: " + messages;
 	}
 	

@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.net.PathVariables;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +23,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Setter
 	@Getter
 	protected HttpMethod method;
+	@Setter
+	protected String uriTemplate;
 	@Getter
 	protected HttpServletRequest request;
 	@Getter
@@ -30,6 +34,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	protected Map<String, String> headerMap;
 	protected List<String> parameterList;
 	protected Map<String, String> parameterMap;
+	protected Map<String, String> pathVariableMap;
+	protected List<Entry<String, String>> pathVariableList;
 	
 	@Override
 	public <T> T getArgument(Object key) {
@@ -103,6 +109,29 @@ public class SimpleRequestArguments implements RequestArguments {
 			headerMap = new HashMap<>();
 		headerList.add(value);
 		headerMap.put(name, value);
+	}
+	
+	@Override
+	public String getPathVariable(int index) {
+		fetchPathVariables();
+		String varValue = pathVariableList.get(index).getValue();
+		return varValue;
+	}
+	
+	@Override
+	public String getPathVariable(String name) {
+		fetchPathVariables();
+		String varValue = pathVariableMap.get(name);
+		return varValue;
+	}
+	
+	protected void fetchPathVariables() {
+		if(pathVariableList == null) {
+			pathVariableList = PathVariables.getVariables(uriTemplate, request.getRequestURI());
+			pathVariableMap = new HashMap<>();
+			for(Entry<String, String> entry : pathVariableList)
+				parameterMap.put(entry.getKey(), entry.getValue());
+		}
 	}
 	
 	public void setRequest(HttpServletRequest request) {
