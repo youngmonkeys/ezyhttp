@@ -28,5 +28,5 @@ public class URITreeTest {
 		tree.addURI("/api/v1/customer/{name}/create");
 		assert tree.containsURI("/api/v1/customer/abc/create");
 	}
-	
+
 }

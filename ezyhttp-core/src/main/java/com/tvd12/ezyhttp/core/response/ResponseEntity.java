@@ -126,6 +126,12 @@ public class ResponseEntity {
 			return this;
 		}
 		
+		public Builder header(String name, List<String> values) {
+			for(String value : values)
+				header(name, value);
+			return this;
+		}
+		
 		@Override
 		public ResponseEntity build() {
 			return new ResponseEntity(status, headers, body);

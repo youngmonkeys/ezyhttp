@@ -130,7 +130,7 @@ public class SimpleRequestArguments implements RequestArguments {
 			pathVariableList = PathVariables.getVariables(uriTemplate, request.getRequestURI());
 			pathVariableMap = new HashMap<>();
 			for(Entry<String, String> entry : pathVariableList)
-				parameterMap.put(entry.getKey(), entry.getValue());
+				pathVariableMap.put(entry.getKey(), entry.getValue());
 		}
 	}
 	

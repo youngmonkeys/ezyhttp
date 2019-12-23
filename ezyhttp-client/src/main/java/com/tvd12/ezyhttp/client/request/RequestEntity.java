@@ -28,6 +28,10 @@ public class RequestEntity {
 		this(headers != null ? new MultiValueMap(headers) : null, body);
 	}
 	
+	public static Builder of(Object body) {
+		return builder().body(body);
+	}
+	
 	public static RequestEntity body(Object body) {
 		return new RequestEntity((MultiValueMap)null, body);
 	}
@@ -90,6 +94,12 @@ public class RequestEntity {
 		public Builder headers(Map<String, String> headers) {
 			for(Entry<String, String> header : headers.entrySet())
 				header(header.getKey(), header.getValue());
+			return this;
+		}
+		
+		public Builder header(String name, List<String> values) {
+			for(String value : values)
+				header(name, value);
 			return this;
 		}
 		

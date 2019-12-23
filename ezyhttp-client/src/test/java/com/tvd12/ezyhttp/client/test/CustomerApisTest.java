@@ -17,7 +17,9 @@ public class CustomerApisTest {
 		Customer body = new Customer();
 		body.setName("dung");
 		body.setAge(28);
-		RequestEntity entity = RequestEntity.body(body);
+		RequestEntity entity = RequestEntity.of(body)
+				.header("token", "123")
+				.build();
 		PostRequest request = new PostRequest()
 				.setURL("http://localhost:8081/api/v1/customer/add")
 				.setEntity(entity)

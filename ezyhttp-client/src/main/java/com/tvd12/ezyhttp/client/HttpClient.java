@@ -125,7 +125,8 @@ public class HttpClient {
 					int responseConentLength = connection.getHeaderFieldInt(Headers.CONTENT_LENGTH, 0);
 					if(responseConentLength > 0) {
 						Class<?> responseType = responseTypes.get(responseCode);
-						responseBody = deserializeResponseBody(responseContentType, inputStream, responseType);
+						responseBody = deserializeResponseBody(
+								responseContentType, responseConentLength, inputStream, responseType);
 					}
 				}
 				finally {
@@ -156,17 +157,26 @@ public class HttpClient {
 	
 	protected Object deserializeResponseBody(
 			String contentType,
+			int contentLength,
 			InputStream inputStream, Class<?> responseType) throws IOException {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)
 			throw new IOException("has no deserializer for: " + contentType);
 		Object body = null;
 		if(responseType != null) {
-			body = deserializer.deserialize(inputStream, responseType);
+			try {
+				body = deserializer.deserialize(inputStream, responseType);
+			}
+			catch (Exception e) {
+				if(responseType == String.class)
+					body = deserializer.deserializeToString(inputStream, contentLength);
+				else
+					throw e;
+			}
 		}
 		else {
 			try {
-				body = deserializer.deserialize(inputStream, String.class);
+				body = deserializer.deserializeToString(inputStream, contentLength);
 			}
 			catch (IOException e) {
 				throw e;
