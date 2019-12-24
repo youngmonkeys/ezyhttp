@@ -100,7 +100,7 @@ public class HttpClient {
 			
 			connection.connect();
 			
-			if(requestBody != null) {
+			if(method != HttpMethod.GET && requestBody != null) {
 				byte[] requestBytes = serializeRequestBody(requestContentType, requestBody);
 				OutputStream outputStream = connection.getOutputStream();
 				outputStream.write(requestBytes);
@@ -164,15 +164,10 @@ public class HttpClient {
 			throw new IOException("has no deserializer for: " + contentType);
 		Object body = null;
 		if(responseType != null) {
-			try {
+			if(responseType == String.class)
+				body = deserializer.deserializeToString(inputStream, contentLength);
+			else
 				body = deserializer.deserialize(inputStream, responseType);
-			}
-			catch (Exception e) {
-				if(responseType == String.class)
-					body = deserializer.deserializeToString(inputStream, contentLength);
-				else
-					throw e;
-			}
 		}
 		else {
 			try {
