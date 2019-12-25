@@ -12,10 +12,10 @@ EzyHttp is a library in EzyFox ecosystem, It support to interact to HTTP (both h
 
 **1. Start HTTP Server application**
 
+```java
 import com.tvd12.ezyhttp.core.boot.EzyHttpApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
 
-```java
 @ComponentsScan({"packageA", "packageB"})
 public class BootApp {
 
