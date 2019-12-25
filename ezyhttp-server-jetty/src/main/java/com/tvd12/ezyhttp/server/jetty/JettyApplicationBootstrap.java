@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
@@ -22,10 +23,23 @@ public class JettyApplicationBootstrap implements ApplicationEntry {
 	@Setter
 	protected int port;
 	
+	@EzyProperty("server.max_threads")
+	@Setter
+	protected int maxThreads = 256;
+	
+	@EzyProperty("server.min_threads")
+	@Setter
+	protected int minThreads = 16;
+	
+	@EzyProperty("server.idle_timeout")
+	@Setter
+	protected int idleTimeout = 150 * 1000;
+	
 	protected Server server;
 	 
     public void start() throws Exception {
-        server = new Server();
+    	QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
+        server = new Server(threadPool);
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         server.setConnectors(new Connector[] {connector});
