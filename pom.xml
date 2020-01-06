@@ -7,9 +7,10 @@
 		<version>0.0.2</version>
 	</parent>
 	<artifactId>ezyhttp</artifactId>
+	<version>0.0.3</version>
 	<packaging>pom</packaging>
 
-	<name>ezyfox-server</name>
+	<name>ezyhttp</name>
 	<url>http://www.tvd12.com/java/projects/ezyhttp</url>
 	<description>
 		Support for HTTP interaction 

@@ -21,7 +21,11 @@ public class JettyApplicationBootstrap implements ApplicationEntry {
 	
 	@EzyProperty("server.port")
 	@Setter
-	protected int port;
+	protected int port = 8080;
+	
+	@EzyProperty("server.host")
+	@Setter
+	protected String host = "0.0.0.0";
 	
 	@EzyProperty("server.max_threads")
 	@Setter
@@ -41,6 +45,7 @@ public class JettyApplicationBootstrap implements ApplicationEntry {
     	QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         server = new Server(threadPool);
         ServerConnector connector = new ServerConnector(server);
+        connector.setHost(host);
         connector.setPort(port);
         server.setConnectors(new Connector[] {connector});
         ServletHandler servletHandler = newServletHandler();

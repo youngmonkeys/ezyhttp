@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
+import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.DoPut;
@@ -55,6 +56,23 @@ public class HomeController {
 	
 	@DoGet("see")
 	public String see(
+			@RequestParam List<String> messages, 
+			@PathVariable("name") String name) {
+		return "bye: " + messages;
+	}
+	
+	@DoPut("see")
+	public String put(
+			@RequestParam List<String> messages, 
+			@PathVariable("name") String name) {
+		return "bye: " + messages;
+	}
+	
+	@DoDelete("see")
+	public String delete(
+			@RequestHeader int count,
+			@RequestParam int skip,
+			@RequestParam int limit,
 			@RequestParam List<String> messages, 
 			@PathVariable("name") String name) {
 		return "bye: " + messages;

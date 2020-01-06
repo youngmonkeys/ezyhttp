@@ -213,7 +213,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected void addRequestHandlers() {
-		List<Object> controllerList = controllerManager.getControllerList();
+		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
 		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
 		requestHandlerManager.addHandlers(requestHandlers);

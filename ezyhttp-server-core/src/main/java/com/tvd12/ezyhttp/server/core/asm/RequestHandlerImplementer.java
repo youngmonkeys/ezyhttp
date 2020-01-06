@@ -140,12 +140,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			if(requestParamAnno != null) {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
+				String valueExpression = "this.deserializeParameter(" +
+						"arg0.getParameter(" + paramKey + ")" + 
+						", " + parameterType.getTypeName() + ".class)" ;
 				instruction
-					.brackets(parameterType)
-					.append("this.deserializeParameter(")
-						.append("arg0.getParameter(").append(paramKey).append(")")
-						.append(", ").clazz(parameterType, true)
-					.append(")");
+					.cast(parameterType, valueExpression);
 				++ parameterCount;
 				hasAnnotation = true;
 			}
@@ -153,12 +152,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			if(requestHeaderAnno != null) {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
+				String valueExpression = "this.deserializeHeader(" +
+						"arg0.getHeader(" + headerKey + ")" + 
+						", " + parameterType.getTypeName() + ".class)";
 				instruction
-					.brackets(parameterType)
-					.append("this.deserializeHeader(")
-						.append("arg0.getHeader(").append(headerKey).append(")")
-						.append(", ").clazz(parameterType, true)
-					.append(")");
+					.cast(parameterType, valueExpression);
 				++ headerCount;
 				hasAnnotation = true;
 			}
@@ -166,11 +164,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			if(pathVariableAnno != null) {
 				String varNameKey = PathVariableAnnotations
 						.getVariableNameKeyString(pathVariableAnno, pathVariableCount);
+				String valueExpression = "(java.lang.String)this.deserializePathVariable(" +
+						"arg0.getPathVariable(" + varNameKey + ")" +
+						", " + parameterType.getTypeName() + ".class)";
 				instruction
-					.append("(java.lang.String)this.deserializePathVariable(")
-						.append("arg0.getPathVariable(").append(varNameKey).append(")")
-						.append(", ").clazz(parameterType, true)
-					.append(")");
+					.cast(parameterType, valueExpression);
 				++ pathVariableCount;
 				hasAnnotation = true;
 			}
@@ -185,10 +183,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			}
 			if(!hasAnnotation) {
 				String argumentKey = RequestParameters.getArgumentKeyString(parameter);
-				instruction
-					.brackets(parameterType)
-					.append("arg0.getArgument(").append(argumentKey)
-				.append(")");
+				String valueExpression = "arg0.getArgument(" + argumentKey + ")";
+				instruction.cast(parameterType, valueExpression);
 			}
 			body.append(instruction);
 			++ paramCount;

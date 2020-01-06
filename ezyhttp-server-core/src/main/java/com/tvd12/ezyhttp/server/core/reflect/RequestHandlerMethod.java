@@ -37,14 +37,17 @@ public class RequestHandlerMethod {
 	}
 	
 	protected String fetchRequestURIFragment() {
-		String uri = "";
 		DoGet doGet = method.getAnnotation(DoGet.class);
 		if(doGet != null)
-			uri = DoGetAnnotations.getURI(doGet);
+			return DoGetAnnotations.getURI(doGet);
 		DoPost doPost = method.getAnnotation(DoPost.class);
 		if(doPost != null)
-			uri = DoPostAnnotations.getURI(doPost);
-		return uri;
+			return DoPostAnnotations.getURI(doPost);
+		DoPut doPut = method.getAnnotation(DoPut.class);
+		if(doPut != null)
+			return DoPutAnnotations.getURI(doPut);
+		DoDelete doDelete = method.getAnnotation(DoDelete.class);
+		return DoDeleteAnnotations.getURI(doDelete);
 	}
 	
 	protected HttpMethod fetchHttpMethod() {
