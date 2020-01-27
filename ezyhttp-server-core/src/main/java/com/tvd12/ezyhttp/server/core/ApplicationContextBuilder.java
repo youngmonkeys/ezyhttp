@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core;
 
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILE;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
 import com.tvd12.ezyhttp.server.core.annotation.PropertiesSources;
+import com.tvd12.ezyhttp.server.core.annotation.Service;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
@@ -34,6 +36,7 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
+import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
 import com.tvd12.properties.file.reader.BaseFileReader;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -160,11 +163,13 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bodyConverterClasses = reflection.getAnnotatedClasses(BodyConvert.class);
 		Set stringConverterClasses = reflection.getAnnotatedClasses(StringConvert.class);
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
+		Map<String, Class> serviceClasses = getServiceClasses(reflection); 
 		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
 				.addProperties(properties)
 				.addAllClasses(reflection)
 				.addSingletonClasses(componentClasses)
+				.addSingletonClasses(serviceClasses)
 				.addSingletonClasses(controllerClasses)
 				.addSingletonClasses(interceptorClases)
 				.addSingletonClasses(exceptionHandlerClasses)
@@ -176,6 +181,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		addRequestHandlers();
 		addExceptionHandlers();
 		return beanContext;
+	}
+	
+	protected Map<String, Class> getServiceClasses(EzyReflection reflection) {
+		Set<Class<?>> classes = reflection.getAnnotatedClasses(Service.class);
+		Map<String, Class> answer = new HashMap<>();
+		for(Class<?> clazz : classes) {
+			String serviceName = ServiceAnnotations.getServiceName(clazz);
+			answer.put(serviceName, clazz);
+		}
+		return answer;
 	}
 	
 	protected Properties readPropertiesSources() {

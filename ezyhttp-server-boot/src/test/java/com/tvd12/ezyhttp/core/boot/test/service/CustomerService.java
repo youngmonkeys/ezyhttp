@@ -3,10 +3,10 @@ package com.tvd12.ezyhttp.core.boot.test.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.core.boot.test.data.Customer;
+import com.tvd12.ezyhttp.server.core.annotation.Service;
 
-@EzySingleton
+@Service
 public class CustomerService {
 
 	protected final Map<String, Customer> customers = new HashMap<>();
