@@ -14,6 +14,18 @@ public class HttpClientProxyTest {
 				.build();
 		client.start();
 		postTest(client);
+		new Thread(() -> {
+			for(int i = 0 ; i < 100 ; ++i) {
+				try {
+					postTest(client);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+		Thread.sleep(3);
+		client.close();
 	}
 	
 	protected static void getTest(HttpClientProxy client) throws Exception {

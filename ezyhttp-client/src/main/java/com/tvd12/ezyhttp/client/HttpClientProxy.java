@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
@@ -60,6 +61,12 @@ public class HttpClientProxy
 	public void close() throws IOException {
 		this.active = false;
 		this.requestQueue.clear();
+		Map<Request, EzyFuture> undoneTasks = futures.clear();
+		for(Request undoneRequest : undoneTasks.keySet()) {
+			EzyFuture undoneTask = undoneTasks.get(undoneRequest);
+			undoneTask.cancel("HttpClientProxy close, request to: " + undoneRequest.getURL() + " has cancelled");
+		}
+		this.threadList.interrupt();
 	}
 	
 	protected void loop() {
@@ -72,7 +79,7 @@ public class HttpClientProxy
 		EzyFuture future = null;
 		try {
 			Request request = requestQueue.take();
-			future = futures.getFuture(request);
+			future = futures.removeFuture(request);
 			ResponseEntity response = client.request(request);
 			future.setResult(response);
 		}
