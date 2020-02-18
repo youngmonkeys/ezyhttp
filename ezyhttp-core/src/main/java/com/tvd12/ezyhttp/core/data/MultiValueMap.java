@@ -1,10 +1,15 @@
 package com.tvd12.ezyhttp.core.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.io.EzyStrings;
 
 public class MultiValueMap {
 
@@ -37,7 +42,26 @@ public class MultiValueMap {
 	
 	public List<String> getValues(String key) {
 		List<String> values = map.get(key);
+		if(values == null)
+			return Collections.emptyList();
 		return values;
+	}
+	
+	public Map<String, String> getValueMap(String name) {
+		List<String> values = getValues(name);
+		Map<String, String> map = new HashMap<>();
+		for(String item : values) {
+			if(EzyStrings.isNoContent(item))
+				continue;
+			String[] kvs = item.split(";");
+			for(String kv : kvs) {
+				String[] strs = kv.split("=");
+				String key = strs[0].trim();
+				String value = strs.length <= 1 ? null : strs[1];
+				map.put(key, value);
+			}
+		}
+		return map;
 	}
 	
 	@Override
@@ -59,6 +83,41 @@ public class MultiValueMap {
 			answer.put(key, valueString.toString());
 		}
 		return answer;
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder implements EzyBuilder<MultiValueMap> {
+		
+		public final Map<String, List<String>> map;
+		
+		public Builder() {
+			this.map = new HashMap<>();
+		}
+		
+		public Builder setValue(String key, String value) {
+			List<String> v = map.get(key);
+			if(v == null) {
+				v = new ArrayList<>();
+				map.put(key, v);
+			}
+			v.add(value);
+			return this;
+		}
+		
+		public Builder setValues(String key, Iterable<String> values) {
+			for(String value : values)
+				setValue(key, value);
+			return this;
+		}
+		
+		@Override
+		public MultiValueMap build() {
+			return new MultiValueMap(map);
+		}
+		
 	}
 	
 }

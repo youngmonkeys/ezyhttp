@@ -59,9 +59,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	protected <T> T deserializeBody(BodyData bodyData, Class<T> type) throws IOException {
-		int contentLength = bodyData.getContentLength();
-		if(contentLength <= 0)
-			return (T)null;
 		String contentType = bodyData.getContentType();
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)

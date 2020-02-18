@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.0.4</version>
+		<version>0.0.5</version>
 	</parent>
 	<artifactId>ezyhttp-core</artifactId>
 	<name>ezyhttp-core</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<ezy.json.version>1.1.1</ezy.json.version>
+		<ezy.json.version>1.1.2</ezy.json.version>
 		<jackson.version>2.10.0</jackson.version>
 	</properties>
 

@@ -75,7 +75,12 @@ public class RequestEntity {
 		protected Map<String, List<String>> headers;
 		
 		public Builder body(Object body) {
-			this.body = body;
+			if(body != null) {
+				if(body instanceof MultiValueMap)
+					this.body = ((MultiValueMap)body).toMap();
+				else
+					this.body = body;
+			}
 			return this;
 		}
 		

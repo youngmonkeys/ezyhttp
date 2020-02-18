@@ -37,6 +37,7 @@ public class HttpClient {
 
 	protected final int defatReadTimeout;
 	protected final int defaultConnectTimeout;
+//	protected final CookieManager cookieManager;
 	protected final DataConverters dataConverters;
 	
 	public static final int NO_TIMEOUT = -1;
@@ -80,30 +81,37 @@ public class HttpClient {
 		try {
 			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
 			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
-			connection.setDoOutput(true);
 			connection.setRequestMethod(method.toString());
+			connection.setDoInput(true);
+			connection.setDoOutput(method.hasOutput());
+			connection.setInstanceFollowRedirects(method == HttpMethod.GET);
 			MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
 			if(requestHeaders != null) {
 				Map<String, String> encodedHeaders = requestHeaders.toMap();
 				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
 					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
 			}
-			String requestContentType = null;
-			Object requestBody = entity != null ? entity.getBody() : null;
+			Object requestBody = null;
+			if(method != HttpMethod.GET && entity != null) {
+				requestBody = entity.getBody();
+			}
+			byte[] requestBodyBytes = null;
 			if(requestBody != null) {
-				requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
+				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
 				if(requestContentType == null) {
 					requestContentType = ContentTypes.APPLICATION_JSON;
 					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 				}
+				requestBodyBytes = serializeRequestBody(requestContentType, requestBody);
+				int requestContentLength = requestBodyBytes.length;
+				connection.setFixedLengthStreamingMode(requestContentLength);
 			}
 			
 			connection.connect();
 			
-			if(method != HttpMethod.GET && requestBody != null) {
-				byte[] requestBytes = serializeRequestBody(requestContentType, requestBody);
+			if(requestBody != null) {
 				OutputStream outputStream = connection.getOutputStream();
-				outputStream.write(requestBytes);
+				outputStream.write(requestBodyBytes);
 				outputStream.flush();
 				outputStream.close();
 			}
@@ -114,20 +122,16 @@ public class HttpClient {
 			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
 			if(responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
-			InputStream inputStream = null;
-			if(responseCode < 400)
+			InputStream inputStream = connection.getErrorStream();
+			if(inputStream == null)
 				inputStream = connection.getInputStream();
-			else
-				inputStream = connection.getErrorStream();
 			Object responseBody = null;
 			if(inputStream != null) {
 				try {
-					int responseConentLength = connection.getHeaderFieldInt(Headers.CONTENT_LENGTH, 0);
-					if(responseConentLength > 0) {
-						Class<?> responseType = responseTypes.get(responseCode);
-						responseBody = deserializeResponseBody(
-								responseContentType, responseConentLength, inputStream, responseType);
-					}
+					int responseContentLength = connection.getContentLength();
+					Class<?> responseType = responseTypes.get(responseCode);
+					responseBody = deserializeResponseBody(
+							responseContentType, responseContentLength, inputStream, responseType);
 				}
 				finally {
 					inputStream.close();

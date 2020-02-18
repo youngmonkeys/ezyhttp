@@ -26,11 +26,19 @@ public class DataConverters {
 	
 	public BodySerializer getBodySerializer(String contentType) {
 		BodySerializer serializer = bodySerializers.get(contentType);
+		if(serializer == null) {
+			String realContentType = ContentTypes.getContentType(contentType);
+			serializer = bodySerializers.get(realContentType);
+		}
 		return serializer;
 	}
 	
 	public BodyDeserializer getBodyDeserializer(String contentType) {
 		BodyDeserializer deserializer = bodyDeserializers.get(contentType);
+		if(deserializer == null) {
+			String realContentType = ContentTypes.getContentType(contentType);
+			deserializer = bodyDeserializers.get(realContentType);
+		}
 		return deserializer;
 	}
 	
@@ -63,10 +71,14 @@ public class DataConverters {
 	protected void addDefaultConverter() {
 		JsonBodyConverter jsonBodyConverter = new JsonBodyConverter();
 		FormBodyConverter formBodyConverter = new FormBodyConverter();
+		TextBodyConverter textBodyConverter = new TextBodyConverter();
 		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodySerializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
 		this.stringDeserializer = new DefaultStringDeserializer();
+		this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, textBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.TEXT_HTML, textBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.TEXT_HTML_UTF8, textBodyConverter);
 	}
 }

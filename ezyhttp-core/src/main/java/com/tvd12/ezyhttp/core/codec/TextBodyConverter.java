@@ -10,42 +10,48 @@ import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
 import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.data.BodyData;
 import com.tvd12.ezyhttp.core.net.MapDecoder;
-import com.tvd12.ezyhttp.core.net.MapEncoder;
 
-public class FormBodyConverter implements BodyConverter {
+public class TextBodyConverter implements BodyConverter {
 
 	protected final ObjectMapper objectMapper;
 	
-	public FormBodyConverter() {
+	public TextBodyConverter() {
 		this(JacksonObjectMapperBuilder.newInstance().build());
 	}
 	
-	public FormBodyConverter(ObjectMapper objectMapper) {
+	public TextBodyConverter(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+	}
+	
+	@Override
+	public byte[] serialize(Object body) throws IOException {
+		byte[] bytes = null;
+		try {
+			bytes = body.toString().getBytes(StandardCharsets.UTF_8);
+		}
+		catch (Exception e) {
+			throw new IOException("serialize body: " + body + " error", e);
+		}
+		return bytes;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public byte[] serialize(Object body) throws IOException {
-		if(body instanceof String)
-			return ((String)body).getBytes(StandardCharsets.UTF_8);
-		Map<String, Object> map = objectMapper.convertValue(body, Map.class);
-	    byte[] bytes = MapEncoder.encodeToBytes(map);
-	    return bytes;
-	}
-	
-	@Override
 	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
+		if(bodyType == String.class)
+			return (T)data;
 		Map<String, String> parameters = MapDecoder.decodeFromString(data);
 		T body = objectMapper.convertValue(parameters, bodyType);
 		return body;
-		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
-		Map<String, String> parameters = data.getParameters();
-		T body = objectMapper.convertValue(parameters, bodyType);
+		String bodyString = EzyInputStreams.toStringUtf8(data.getInputStream());
+		if(bodyType == String.class)
+			return (T)bodyString;
+		T body = objectMapper.convertValue(bodyString, bodyType);
 		return body;
 	}
 	
