@@ -57,7 +57,7 @@ public class EzyHttpApplication
 	
 	@Override
 	public void start() throws Exception {
-		ApplicationEntry entry = applicationContext.getSingleton(ApplicationBootstrap.class);
+		ApplicationEntry entry = applicationContext.getAnnotatedSingleton(ApplicationBootstrap.class);
 		if(entry == null)
 			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found");
 		entry.start();

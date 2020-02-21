@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
@@ -38,6 +41,8 @@ public class BlockingServlet extends HttpServlet {
 	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
+	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
 	public void init() throws ServletException {
@@ -158,7 +163,7 @@ public class BlockingServlet extends HttpServlet {
 		}
 		if(exception != null) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			log("handle request uri: " + request.getRequestURI() + " error", exception);
+			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
 		}
 	}
 	

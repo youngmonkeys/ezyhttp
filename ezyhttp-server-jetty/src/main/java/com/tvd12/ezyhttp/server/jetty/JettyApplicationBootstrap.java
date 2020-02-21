@@ -10,6 +10,7 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
+import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
@@ -17,7 +18,7 @@ import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 import lombok.Setter;
 
 @ApplicationBootstrap
-public class JettyApplicationBootstrap implements ApplicationEntry {
+public class JettyApplicationBootstrap extends EzyLoggable implements ApplicationEntry {
 	
 	@EzyProperty("server.port")
 	@Setter
@@ -51,6 +52,7 @@ public class JettyApplicationBootstrap implements ApplicationEntry {
         ServletHandler servletHandler = newServletHandler();
         server.setHandler(servletHandler);
         server.start();
+        logger.info("http server started on: {}:{}", host, port);
     }
 	
     protected ServletHandler newServletHandler() {
