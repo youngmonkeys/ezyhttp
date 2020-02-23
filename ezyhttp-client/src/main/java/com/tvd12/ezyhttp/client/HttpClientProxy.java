@@ -96,8 +96,14 @@ public class HttpClientProxy
 	
 	public ResponseEntity request(Request request, int timeout) throws Exception {
 		EzyFuture future = new EzyFutureTask();
-		addRequest(request);
 		futures.addFuture(request, future);
+		try {
+			addRequest(request);
+		}
+		catch (Exception e) {
+			futures.removeFuture(request);
+			throw e;
+		}
 		ResponseEntity response = future.get(timeout);
 		return response;
 	}
@@ -124,8 +130,14 @@ public class HttpClientProxy
 	
 	public void execute(Request request, RequestCallback<ResponseEntity> callback) {
 		EzyFuture future = new RequestFutureTask(callback);
-		addRequest(request);
 		futures.addFuture(request, future);
+		try {
+			addRequest(request);
+		}
+		catch (Exception e) {
+			futures.removeFuture(request);
+			throw e;
+		}
 	}
 	
 	protected void addRequest(Request request) {

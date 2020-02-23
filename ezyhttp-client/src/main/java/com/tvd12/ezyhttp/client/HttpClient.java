@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
@@ -33,11 +34,10 @@ import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
-public class HttpClient {
+public class HttpClient extends EzyLoggable {
 
 	protected final int defatReadTimeout;
 	protected final int defaultConnectTimeout;
-//	protected final CookieManager cookieManager;
 	protected final DataConverters dataConverters;
 	
 	public static final int NO_TIMEOUT = -1;
@@ -77,6 +77,7 @@ public class HttpClient {
 			RequestEntity entity, 
 			Map<Integer, Class<?>> responseTypes, 
 			int connectTimeout, int readTimeout) throws Exception {
+		logger.debug("start: {} - {} - {}", method, url, entity.getHeaders());
 		HttpURLConnection connection = connect(url);
 		try {
 			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
@@ -137,6 +138,7 @@ public class HttpClient {
 					inputStream.close();
 				}
 			}
+			logger.debug("end: {} - {} - {} - {}", method, url, responseCode, responseHeaders);
 			return new ResponseEntity(responseCode, responseHeaders, responseBody);
 		}
 		finally {
