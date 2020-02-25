@@ -106,8 +106,13 @@ public class BlockingServlet extends HttpServlet {
 			if(acceptableRequest) {
 				Object responseData = requestHandler.handle(arguments);
 				if(responseData != null) {
-					String responseContentType = requestHandler.getResponseContentType();
-					handleResponseData(response, responseContentType, responseData);
+					if(responseData == ResponseEntity.NOTHING) {
+						request.startAsync();
+					}
+					else {
+						String responseContentType = requestHandler.getResponseContentType();
+						handleResponseData(response, responseContentType, responseData);
+					}
 				}
 			}
 			else {

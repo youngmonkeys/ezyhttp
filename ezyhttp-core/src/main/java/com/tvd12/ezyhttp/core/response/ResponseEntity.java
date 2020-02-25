@@ -19,6 +19,8 @@ public class ResponseEntity {
 	protected final int status;
 	protected final MultiValueMap headers;
 	
+	public static final ResponseNothing NOTHING = ResponseNothing.getInstance();
+	
 	public ResponseEntity(int status, MultiValueMap headers, Object body) {
 		this.body = body;
 		this.status = status;

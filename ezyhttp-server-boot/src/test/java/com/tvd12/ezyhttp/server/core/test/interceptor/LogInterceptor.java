@@ -25,10 +25,10 @@ public class LogInterceptor
 	
 	@Override
 	public void postHandle(RequestArguments arguments, Method handler) {
-		logger.info("post handle request uri: {}, method: {}, handler: {}", 
+		logger.info("post handle request uri: {}, method: {}, code: {}", 
 				arguments.getRequest().getRequestURI(),
 				arguments.getMethod(),
-				handler);
+				arguments.getResponse().getStatus());
 	}
 	
 	
