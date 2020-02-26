@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
-import com.tvd12.ezyhttp.core.response.ResponseNothing;
+import com.tvd12.ezyhttp.core.response.ResponseAsync;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -74,8 +74,8 @@ public class HomeController {
 	}
 	
 	@DoGet("stream-file")
-	public ResponseNothing streamFile() {
-		return ResponseEntity.NOTHING;
+	public ResponseAsync streamFile() {
+		return ResponseEntity.ASYNC;
 	}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
