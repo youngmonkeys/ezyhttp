@@ -13,8 +13,14 @@ public class RequestURI {
 	protected final HttpMethod method;
 	
 	public RequestURI(HttpMethod method, String uri) {
-		this.uri = uri;
 		this.method = method;
+		this.uri = standardizeURI(uri);
+	}
+	
+	protected String standardizeURI(String uri) {
+		if(uri.isEmpty() || uri.startsWith("/"))
+			return uri;
+		return "/" + uri;
 	}
 	
 	@Override

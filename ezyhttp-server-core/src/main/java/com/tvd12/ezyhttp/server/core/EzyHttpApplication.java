@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStartable;
+import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.util.BannerPrinter;
 
@@ -13,7 +14,7 @@ import lombok.Getter;
 
 public class EzyHttpApplication 
 		extends EzyLoggable
-		implements EzyStartable {
+		implements EzyStartable, EzyStoppable {
 
 	@Getter
 	protected final ApplicationContext applicationContext;
@@ -62,6 +63,11 @@ public class EzyHttpApplication
 			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found");
 		entry.start();
 		logger.info("\n{}\n", new BannerPrinter().getBannerText());
+	}
+	
+	@Override
+	public void stop() {
+		applicationContext.destroy();
 	}
 	
 }

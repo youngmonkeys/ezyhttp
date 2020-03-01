@@ -4,8 +4,9 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
+import com.tvd12.ezyfox.util.EzyDestroyable;
 
-public interface ApplicationContext {
+public interface ApplicationContext extends EzyDestroyable {
 	
 	EzyBeanContext getBeanContext();
 	
