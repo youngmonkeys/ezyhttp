@@ -194,14 +194,19 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		Class<?> returnType = handlerMethod.getReturnType();
 		if(returnType != void.class)
 			instruction.answer();
-		instruction.append("this.controller.").append(handlerMethod.getName())
+		StringBuilder answerExpression = new StringBuilder();
+		answerExpression.append("this.controller.").append(handlerMethod.getName())
 				.append("(");
 		for(int i = 0 ; i < paramCount ; ++i) {
-			instruction.append(PARAMETER_PREFIX).append(i);
+			answerExpression.append(PARAMETER_PREFIX).append(i);
 			if(i < paramCount - 1)
-				instruction.append(", ");
+				answerExpression.append(", ");
 		}
-		instruction.append(")");
+		answerExpression.append(")");
+		if(returnType != void.class)
+			instruction.valueOf(returnType, answerExpression.toString());
+		else
+			instruction.append(answerExpression);
 		body.append(instruction);
 		if(returnType == void.class)
 			body.append(new EzyInstruction("\t", "\n").append("return null"));
