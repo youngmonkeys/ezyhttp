@@ -10,7 +10,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
+import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.reflect.EzyClasses;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
@@ -163,7 +165,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bodyConverterClasses = reflection.getAnnotatedClasses(BodyConvert.class);
 		Set stringConverterClasses = reflection.getAnnotatedClasses(StringConvert.class);
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
-		Map<String, Class> serviceClasses = getServiceClasses(reflection); 
+		Map<String, Class> serviceClasses = getServiceClasses(reflection);
+		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
 		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
 				.addProperties(properties)
@@ -176,11 +179,19 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(bodyConverterClasses)
 				.addSingletonClasses(stringConverterClasses)
 				.addSingletonClasses(bootstrapClasses)
+				.propertiesMap(propertiesMap)
 				.build();
 		registerComponents(beanContext);
 		addRequestHandlers();
 		addExceptionHandlers();
 		return beanContext;
+	}
+	
+	protected EzyPropertiesMap getPropertiesMap(EzyReflection reflection) {
+		Class propertiesMapClass = reflection.getExtendsClass(EzyPropertiesMap.class);
+		if(propertiesMapClass == null)
+			return null;
+		return (EzyPropertiesMap)EzyClasses.newInstance(propertiesMapClass);
 	}
 	
 	protected Map<String, Class> getServiceClasses(EzyReflection reflection) {

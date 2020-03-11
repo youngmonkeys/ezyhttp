@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.client.request;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,16 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 		return this.url;
 	}
 	
+	public R setURL(URI uri) {
+		this.url = uri.toString();
+		return (R)this;
+	}
+	
+	public R setURL(URL url) {
+		this.url = url.toString();
+		return (R)this;
+	}
+	
 	public R setURL(String url) {
 		this.url = url;
 		return (R)this;
@@ -33,6 +45,10 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 	public R setEntity(RequestEntity entity) {
 		this.entity = entity;
 		return (R)this;
+	}
+	
+	public R setEntity(Object requestBody) {
+		return setEntity(RequestEntity.body(requestBody));
 	}
 	
 	public R setReadTimeout(int readTimeout) {
