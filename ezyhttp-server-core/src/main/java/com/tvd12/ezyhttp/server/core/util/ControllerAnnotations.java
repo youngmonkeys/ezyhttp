@@ -4,9 +4,9 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 
-public final class ControllerApplications {
+public final class ControllerAnnotations {
 
-	private ControllerApplications() {}
+	private ControllerAnnotations() {}
 
 	public static String getURI(Controller annotation) {
 		String uri = annotation.value();
@@ -14,6 +14,14 @@ public final class ControllerApplications {
 			uri = annotation.uri();
 		if(EzyStrings.isNoContent(uri))
 			uri = Constants.DEFAULT_URI;
+		return uri;
+	}
+	
+	public static String getURI(Class<?> controllerClass) {
+		Controller annotation = controllerClass.getAnnotation(Controller.class);
+		String uri = ControllerAnnotations.getURI(annotation);
+		if(!uri.startsWith("/"))
+			uri = "/" + uri;
 		return uri;
 	}
 	

@@ -164,7 +164,7 @@ public class RequestHandlerImplementer extends EzyLoggable {
 			if(pathVariableAnno != null) {
 				String varNameKey = PathVariableAnnotations
 						.getVariableNameKeyString(pathVariableAnno, pathVariableCount);
-				String valueExpression = "(java.lang.String)this.deserializePathVariable(" +
+				String valueExpression = "this.deserializePathVariable(" +
 						"arg0.getPathVariable(" + varNameKey + ")" +
 						", " + parameterType.getTypeName() + ".class)";
 				instruction

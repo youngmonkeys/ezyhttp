@@ -8,8 +8,8 @@ import java.util.List;
 
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyMethod;
-import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
+import com.tvd12.ezyhttp.server.core.util.ControllerAnnotations;
 
 import lombok.Getter;
 
@@ -32,8 +32,8 @@ public class ControllerProxy {
 	}
 	
 	protected String getRequestURI() {
-		Controller annotation = clazz.getAnnotation(Controller.class);
-		return annotation.value();
+		String uri = ControllerAnnotations.getURI(clazz.getClazz());
+		return uri;
 	}
 	
 	protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {
