@@ -60,7 +60,7 @@ public class EzyHttpApplication
 	public void start() throws Exception {
 		ApplicationEntry entry = applicationContext.getAnnotatedSingleton(ApplicationBootstrap.class);
 		if(entry == null)
-			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found");
+			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found, let's use EzyHttpApplicationBootstrap.start(...)");
 		entry.start();
 		logger.info("\n{}\n", new BannerPrinter().getBannerText());
 	}
