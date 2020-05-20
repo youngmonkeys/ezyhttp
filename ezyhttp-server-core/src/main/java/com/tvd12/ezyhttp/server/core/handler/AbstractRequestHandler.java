@@ -7,6 +7,7 @@ import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.core.data.BodyData;
+import com.tvd12.ezyhttp.core.exception.DeserializeBodyException;
 import com.tvd12.ezyhttp.core.exception.DeserializeHeaderException;
 import com.tvd12.ezyhttp.core.exception.DeserializeParameterException;
 import com.tvd12.ezyhttp.core.exception.DeserializePathVariableException;
@@ -120,8 +121,13 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		if(deserializer == null)
 			throw new IOException("has no body deserializer for: " + contentType);
-		T body = deserializer.deserialize(bodyData, type);
-		return body;
+		try {
+			T body = deserializer.deserialize(bodyData, type);
+			return body;
+		}
+		catch (Exception e) {
+			throw new DeserializeBodyException("can't deserialize body data to: " + type.getName(), e);
+		}
 	}
 	
 }

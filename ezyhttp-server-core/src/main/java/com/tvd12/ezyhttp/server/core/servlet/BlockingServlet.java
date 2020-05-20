@@ -157,6 +157,7 @@ public class BlockingServlet extends HttpServlet {
 				DeserializeValueException deException = (DeserializeValueException)exception;
 				Map<String, String> badData = new HashMap<>();
 				badData.put(deException.getName(), "invalid");
+				badData.put("exception", exception.getClass().getName());
 				exception = new HttpBadRequestException(badData);
 			}
 			if(exception instanceof HttpRequestException) {
