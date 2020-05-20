@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.servlet;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,6 +22,8 @@ import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
+import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
@@ -150,6 +153,12 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
+			if(exception instanceof DeserializeValueException) {
+				DeserializeValueException deException = (DeserializeValueException)exception;
+				Map<String, String> badData = new HashMap<>();
+				badData.put(deException.getName(), "invalid");
+				exception = new HttpBadRequestException(badData);
+			}
 			if(exception instanceof HttpRequestException) {
 				HttpRequestException requestException = (HttpRequestException)exception;
 				int errorStatus = requestException.getCode();

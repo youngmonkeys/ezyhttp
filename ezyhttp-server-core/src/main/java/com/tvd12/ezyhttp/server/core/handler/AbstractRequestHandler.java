@@ -7,6 +7,9 @@ import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.core.data.BodyData;
+import com.tvd12.ezyhttp.core.exception.DeserializeHeaderException;
+import com.tvd12.ezyhttp.core.exception.DeserializeParameterException;
+import com.tvd12.ezyhttp.core.exception.DeserializePathVariableException;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
@@ -40,22 +43,76 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	
 	protected abstract Object handleException(Exception e) throws Exception;
 	
-	protected <T> T deserializeHeader(String header, Class<T> type) throws IOException {
-		StringDeserializer deserializer = dataConverters.getStringDeserializer();
-		T answer = deserializer.deserialize(header, type);
-		return answer;
+	protected <T> T deserializeHeader(
+			int index, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeHeaderException("header#" + index, value, type, e);
+		}
 	}
 	
-	protected <T> T deserializeParameter(String parameter, Class<T> type) throws IOException {
-		StringDeserializer deserializer = dataConverters.getStringDeserializer();
-		T answer = deserializer.deserialize(parameter, type);
-		return answer;
+	protected <T> T deserializeHeader(
+			String name, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeHeaderException(name, value, type, e);
+		}
 	}
 	
-	protected <T> T deserializePathVariable(String variableValue, Class<T> type) throws IOException {
-		StringDeserializer deserializer = dataConverters.getStringDeserializer();
-		T answer = deserializer.deserialize(variableValue, type);
-		return answer;
+	protected <T> T deserializeParameter(
+			int index, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeParameterException("parameter#" + index, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializeParameter(
+			String name, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeParameterException(name, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializePathVariable(
+			String name, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializePathVariableException(name, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializePathVariable(
+			int index, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializePathVariableException("pathVariable#" + index, value, type, e);
+		}
 	}
 	
 	protected <T> T deserializeBody(BodyData bodyData, Class<T> type) throws IOException {

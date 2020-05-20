@@ -141,7 +141,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
 				String valueExpression = "this.deserializeParameter(" +
-						"arg0.getParameter(" + paramKey + ")" + 
+						paramKey +
+						", arg0.getParameter(" + paramKey + ")" + 
 						", " + parameterType.getTypeName() + ".class)" ;
 				instruction
 					.cast(parameterType, valueExpression);
@@ -153,7 +154,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
 				String valueExpression = "this.deserializeHeader(" +
-						"arg0.getHeader(" + headerKey + ")" + 
+						headerKey +
+						", arg0.getHeader(" + headerKey + ")" + 
 						", " + parameterType.getTypeName() + ".class)";
 				instruction
 					.cast(parameterType, valueExpression);
@@ -165,7 +167,8 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				String varNameKey = PathVariableAnnotations
 						.getVariableNameKeyString(pathVariableAnno, pathVariableCount);
 				String valueExpression = "this.deserializePathVariable(" +
-						"arg0.getPathVariable(" + varNameKey + ")" +
+						varNameKey +
+						", arg0.getPathVariable(" + varNameKey + ")" +
 						", " + parameterType.getTypeName() + ".class)";
 				instruction
 					.cast(parameterType, valueExpression);
