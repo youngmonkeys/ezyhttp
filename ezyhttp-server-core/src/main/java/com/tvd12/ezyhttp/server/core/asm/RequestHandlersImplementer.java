@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
-import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandler;
+import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerException;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
@@ -22,7 +22,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
 				RequestHandler handler = map.get(uri);
 				RequestHandler old = handlers.put(uri, handler);
 				if(old != null)
-					throw new DuplicateURIMappingHandler(uri, old, handler);
+					throw new DuplicateURIMappingHandlerException(uri, old, handler);
 			}
 		}
 		return handlers;
@@ -38,7 +38,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
 			RequestURI uri = new RequestURI(httpMethod, method.getRequestURI());
 			RequestHandler old = handlers.put(uri, handler);
 			if(old != null)
-				throw new DuplicateURIMappingHandler(uri, old, handler);
+				throw new DuplicateURIMappingHandlerException(uri, old, handler);
 		}
 		return handlers;
 	}

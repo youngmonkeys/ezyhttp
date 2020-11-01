@@ -36,13 +36,15 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			return handleRequest(arguments);
 		}
 		catch (Exception e) {
-			return handleException(e);
+			return handleException(arguments, e);
 		}
 	}
 	
-	protected abstract Object handleRequest(RequestArguments arguments) throws Exception;
+	protected abstract Object handleRequest(
+			RequestArguments arguments) throws Exception;
 	
-	protected abstract Object handleException(Exception e) throws Exception;
+	protected abstract Object handleException(
+			RequestArguments arguments, Exception e) throws Exception;
 	
 	protected <T> T deserializeHeader(
 			int index, String value, Class<T> type) throws IOException {

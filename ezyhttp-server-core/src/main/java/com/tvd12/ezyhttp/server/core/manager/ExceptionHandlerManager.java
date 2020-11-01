@@ -38,7 +38,7 @@ public class ExceptionHandlerManager extends EzyLoggable {
 	
 	public void addUncaughtExceptionHandler(
 			Class<?> exceptionClass, UncaughtExceptionHandler handler) {
-		this.uncaughtExceptionHandlers.put(exceptionClass, handler);
+		this.uncaughtExceptionHandlers.putIfAbsent(exceptionClass, handler);
 		this.logger.info("add exception handler for: " + exceptionClass.getName());
 	}
 	
@@ -46,5 +46,9 @@ public class ExceptionHandlerManager extends EzyLoggable {
 			Map<Class<?>, UncaughtExceptionHandler> handlers) {
 		for(Class<?> exceptionClass : handlers.keySet())
 			addUncaughtExceptionHandler(exceptionClass, handlers.get(exceptionClass));
+	}
+	
+	public Map<Class<?>, UncaughtExceptionHandler> getUncaughtExceptionHandlers() {
+		return new HashMap<>(uncaughtExceptionHandlers);
 	}
 }

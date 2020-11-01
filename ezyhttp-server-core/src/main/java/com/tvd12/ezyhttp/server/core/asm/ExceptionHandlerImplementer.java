@@ -11,10 +11,10 @@ import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyfox.reflect.EzyReflections;
 import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyhttp.server.core.handler.AbstractUncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerProxy;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -69,12 +69,12 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 		implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
 		Class answerClass = implClass.toClass();
 		implClass.detach();
-		UncaughtExceptionHandler handler = (UncaughtExceptionHandler) answerClass.newInstance();
+		AsmUncaughtExceptionHandler handler = (AsmUncaughtExceptionHandler) answerClass.newInstance();
 		setRepoComponent(handler);
 		return handler;
 	}
 	
-	protected void setRepoComponent(UncaughtExceptionHandler handler) {
+	protected void setRepoComponent(AsmUncaughtExceptionHandler handler) {
 		handler.setExceptionHandler(exceptionHandler.getInstance());
 	}
 	
@@ -115,14 +115,14 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 			instructionHandle
 					.append("this.exceptionHandler.").append(handlerMethod.getName())
 					.bracketopen()
-						.brackets(exceptionClass).append("arg0")
+						.brackets(exceptionClass).append("arg1")
 					.bracketclose();
 			body.append(instructionHandle);
 			if(returnType == void.class)
 				body.append(new EzyInstruction("\t\t", "\n").append("return null"));
 			body.append(new EzyInstruction("\t", "\n", false).append("}"));
 		}
-		body.append(new EzyInstruction("\t", "\n").append("throw arg0"));
+		body.append(new EzyInstruction("\t", "\n").append("throw arg1"));
 		return toThrowExceptionFunction(method, function);
 	}
 	
@@ -147,24 +147,26 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 	
 	protected EzyMethod getSetExceptionHandlerMethod() {
 		Method method = EzyMethods.getMethod(
-				AbstractUncaughtExceptionHandler.class, "setExceptionHandler", Object.class);
+				AsmAbstractUncaughtExceptionHandler.class, "setExceptionHandler", Object.class);
 		return new EzyMethod(method);
 	}
 	
 	protected EzyMethod getHandleExceptionMethod() {
 		Method method = EzyMethods.getMethod(
-				AbstractUncaughtExceptionHandler.class, "handleException", Exception.class);
+				AsmAbstractUncaughtExceptionHandler.class, 
+				"handleException", 
+				RequestArguments.class, Exception.class);
 		return new EzyMethod(method);
 	}
 	
 	protected EzyMethod getGetResponseContentTypeMethod() {
 		Method method = EzyMethods.getMethod(
-				AbstractUncaughtExceptionHandler.class, "getResponseContentType");
+				AsmAbstractUncaughtExceptionHandler.class, "getResponseContentType");
 		return new EzyMethod(method);
 	}
 	
 	protected Class<?> getSuperClass() {
-		return AbstractUncaughtExceptionHandler.class;
+		return AsmAbstractUncaughtExceptionHandler.class;
 	}
 	
 	protected String getImplClassName() {

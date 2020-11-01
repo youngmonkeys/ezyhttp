@@ -1,5 +1,8 @@
 package com.tvd12.ezyhttp.server.core.handler;
 
-public abstract class AbstractUncaughtExceptionHandler 
+import com.tvd12.ezyfox.util.EzyLoggable;
+
+public abstract class AbstractUncaughtExceptionHandler
+		extends EzyLoggable
 		implements UncaughtExceptionHandler {
 }

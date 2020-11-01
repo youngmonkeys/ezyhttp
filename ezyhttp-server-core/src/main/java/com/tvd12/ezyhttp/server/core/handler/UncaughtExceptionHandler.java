@@ -1,10 +1,15 @@
 package com.tvd12.ezyhttp.server.core.handler;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+
 public interface UncaughtExceptionHandler {
 
-	void setExceptionHandler(Object exceptionHandler);
+	Object handleException(
+			RequestArguments arguments, 
+			Exception exception) throws Exception;
 	
-	Object handleException(Exception exception) throws Exception;
-	
-	String getResponseContentType();
+	default String getResponseContentType() {
+		return ContentTypes.APPLICATION_JSON;
+	}
 }

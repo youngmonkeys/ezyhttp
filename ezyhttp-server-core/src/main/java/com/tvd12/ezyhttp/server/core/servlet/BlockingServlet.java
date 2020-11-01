@@ -2,8 +2,10 @@ package com.tvd12.ezyhttp.server.core.servlet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,13 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
-import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
-import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
@@ -44,6 +46,8 @@ public class BlockingServlet extends HttpServlet {
 	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
+	protected List<Class<?>> handledExceptionClasses;
+	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -54,6 +58,10 @@ public class BlockingServlet extends HttpServlet {
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
+		this.addDefaultExceptionHandlers();
+		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
+		this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
+		
 	}
 	
 	@Override
@@ -123,7 +131,7 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		catch (Exception e) {
-			handleException(request, response, e);
+			handleException(arguments, e);
 		}
 		finally {
 			arguments.release();
@@ -133,15 +141,14 @@ public class BlockingServlet extends HttpServlet {
 	}
 	
 	protected void handleException(
-			HttpServletRequest request,
-			HttpServletResponse response, Exception e) throws IOException {
-		Class<?> exceptionClass = e.getClass();
-		UncaughtExceptionHandler handler = 
-				exceptionHandlerManager.getUncaughtExceptionHandler(exceptionClass);
+			RequestArguments arguments, Exception e) throws IOException {
+		UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
+		HttpServletRequest request = arguments.getRequest();
+		HttpServletResponse response = arguments.getResponse();
 		Exception exception = e;
 		if(handler != null) {
 			try {
-				Object result = handler.handleException(e);
+				Object result = handler.handleException(arguments, e);
 				if(result != null) {
 					String responseContentType = handler.getResponseContentType();
 					handleResponseData(response, responseContentType, result);
@@ -153,33 +160,18 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
-			if(exception instanceof DeserializeValueException) {
-				DeserializeValueException deException = (DeserializeValueException)exception;
-				Map<String, String> badData = new HashMap<>();
-				badData.put(deException.getName(), "invalid");
-				badData.put("exception", exception.getClass().getName());
-				exception = new HttpBadRequestException(badData);
-			}
-			if(exception instanceof HttpRequestException) {
-				HttpRequestException requestException = (HttpRequestException)exception;
-				int errorStatus = requestException.getCode();
-				Object errorData = requestException.getData();
-				ResponseEntity errorResponse = ResponseEntity.create(errorStatus, errorData);
-				if(errorData != null) {
-					try {
-						handleResponseData(response, ContentTypes.APPLICATION_JSON, errorResponse);
-						exception = null;
-					}
-					catch (Exception ex) {
-						exception = ex;
-					}
-				}
-			}
-		}
-		if(exception != null) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
 		}
+	}
+	
+	protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
+		for(Class<?> exc : handledExceptionClasses) {
+			if(exc.isAssignableFrom(exceptionClass)) {
+				return uncaughtExceptionHandlers.get(exc);
+			}
+		}
+		return null;
 	}
 	
 	protected boolean preHandleRequest(
@@ -273,6 +265,34 @@ public class BlockingServlet extends HttpServlet {
 		}
 		
 		return arguments;
+	}
+	
+	protected void addDefaultExceptionHandlers() {
+		exceptionHandlerManager.addUncaughtExceptionHandler(
+				DeserializeValueException.class, 
+				new UncaughtExceptionHandler() {
+					@Override
+					public Object handleException(RequestArguments args, Exception e) throws Exception {
+						DeserializeValueException deException = (DeserializeValueException)e;
+						Map<String, String> errorData = new HashMap<>();
+						errorData.put(deException.getValueName(), "invalid");
+						errorData.put("exception", e.getClass().getName());
+						return ResponseEntity.create(StatusCodes.BAD_REQUEST, errorData);
+					}
+				});
+		exceptionHandlerManager.addUncaughtExceptionHandler(
+				HttpRequestException.class, 
+				new UncaughtExceptionHandler() {
+					@Override
+					public Object handleException(RequestArguments args, Exception e) throws Exception {
+						HttpRequestException requestException = (HttpRequestException)e;
+						int errorStatus = requestException.getCode();
+						Object errorData = requestException.getData();
+						if(errorData == null)
+							errorData = Collections.emptyMap();
+						return ResponseEntity.create(errorStatus, errorData);
+					}
+				});
 	}
 
 }
