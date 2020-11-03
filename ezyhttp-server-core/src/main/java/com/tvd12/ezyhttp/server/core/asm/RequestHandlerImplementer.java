@@ -2,16 +2,17 @@ package com.tvd12.ezyhttp.server.core.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.tvd12.ezyfox.asm.EzyFunction;
 import com.tvd12.ezyfox.asm.EzyFunction.EzyBody;
 import com.tvd12.ezyfox.asm.EzyInstruction;
 import com.tvd12.ezyfox.reflect.EzyClass;
+import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
-import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
@@ -34,20 +35,20 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
 
-public class RequestHandlerImplementer extends EzyLoggable {
+public class RequestHandlerImplementer 
+		extends AbstractHandlerImplementer<RequestHandlerMethod> {
 
 	@Setter
 	private static boolean debug;
 	protected final ControllerProxy controller;
-	protected final RequestHandlerMethod handlerMethod;
 	
 	protected final static String PARAMETER_PREFIX = "param";
 	protected final static AtomicInteger COUNT = new AtomicInteger(0);
 	
 	public RequestHandlerImplementer(
 			ControllerProxy controller, RequestHandlerMethod handlerMethod) {
+		super(handlerMethod);
 		this.controller = controller;
-		this.handlerMethod = handlerMethod;
 	}
 	
 	public RequestHandler implement() {
@@ -185,8 +186,11 @@ public class RequestHandlerImplementer extends EzyLoggable {
 				hasAnnotation = true;
 			}
 			if(!hasAnnotation) {
-				String argumentKey = RequestParameters.getArgumentKeyString(parameter);
-				String valueExpression = "arg0.getArgument(" + argumentKey + ")";
+				String valueExpression = "arg0";
+				if(parameterType != RequestArguments.class) {
+					String argumentKey = RequestParameters.getArgumentKeyString(parameter);
+					valueExpression = "arg0.getArgument(" + argumentKey + ")";
+				}
 				instruction.cast(parameterType, valueExpression);
 			}
 			body.append(instruction);
@@ -221,29 +225,31 @@ public class RequestHandlerImplementer extends EzyLoggable {
 		EzyFunction function = new EzyFunction(method)
 				.throwsException();
 		EzyBody body = function.body();
-		List<ExceptionHandlerMethod> exceptionHandlerMethods 
-				= controller.getExceptionHandlerMethods();
-		for(ExceptionHandlerMethod m : exceptionHandlerMethods) {
-			for(Class<?> exceptionClass : m.getExceptionClasses()) {
-				EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
-						.append("if(arg1 instanceof ")
-							.append(exceptionClass.getName())
-						.append(") {");
-				body.append(instructionIf);
-				EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
-				Class<?> returnType = m.getReturnType();
-				if(returnType != void.class)
-					instructionHandle.answer();
-				instructionHandle
-						.append("this.controller.").append(m.getName())
-						.bracketopen()
-							.brackets(exceptionClass).append("arg1")
-						.bracketclose();
-				body.append(instructionHandle);
-				if(returnType == void.class)
-					body.append(new EzyInstruction("\t\t", "\n").append("return null"));
-				body.append(new EzyInstruction("\t", "\n", false).append("}"));
-			}
+		Map<Class<?>, ExceptionHandlerMethod> exceptionHandlerMethodMap 
+				= controller.getExceptionHandlerMethodMap();
+		Set<Class<?>> exceptionClasses = exceptionHandlerMethodMap.keySet();
+		EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
+		for(Class<?> exceptionClass : exceptionTree.toList()) {
+			ExceptionHandlerMethod m = exceptionHandlerMethodMap.get(exceptionClass);
+			EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
+					.append("if(arg1 instanceof ")
+						.append(exceptionClass.getName())
+					.append(") {");
+			body.append(instructionIf);
+			EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
+			Class<?> returnType = m.getReturnType();
+			if(returnType != void.class)
+				instructionHandle.answer();
+			instructionHandle
+					.append("this.controller.").append(m.getName())
+					.bracketopen();
+			appendHandleExceptionMethodArguments(m, instructionHandle, exceptionClass);
+			instructionHandle
+					.bracketclose();
+			body.append(instructionHandle);
+			if(returnType == void.class)
+				body.append(new EzyInstruction("\t\t", "\n").append("return null"));
+			body.append(new EzyInstruction("\t", "\n", false).append("}"));
 		}
 		body.append(new EzyInstruction("\t", "\n").append("throw arg1"));
 		return function.toString();

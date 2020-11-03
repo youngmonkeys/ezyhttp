@@ -3,12 +3,16 @@ package com.tvd12.ezyhttp.server.core.test.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 @ExceptionHandler
 public class GlobalExceptionHandler {
@@ -28,7 +32,11 @@ public class GlobalExceptionHandler {
 	}
 	
 	@TryCatch(InvalidFormatException.class)
-	public void handleException(InvalidFormatException e) {
+	public void handleException(
+			RequestArguments args,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			InvalidFormatException e) {
 		InvalidFormatException ex = (InvalidFormatException)e;
 		Map<String, String> data = new HashMap<>();
 		for(Reference reference : ex.getPath())

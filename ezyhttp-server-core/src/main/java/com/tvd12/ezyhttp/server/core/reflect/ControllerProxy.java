@@ -4,7 +4,9 @@ import static com.tvd12.ezyhttp.server.core.annotation.Annotations.REQUEST_HANDL
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyMethod;
@@ -22,6 +24,7 @@ public class ControllerProxy {
 	protected final String requestURI;
 	protected final List<RequestHandlerMethod> requestHandlerMethods;
 	protected final List<ExceptionHandlerMethod> exceptionHandlerMethods;
+	protected final Map<Class<?>, ExceptionHandlerMethod> exceptionHandlerMethodMap;
 	
 	public ControllerProxy(Object instance) {
 		this.instance = instance;
@@ -29,6 +32,7 @@ public class ControllerProxy {
 		this.requestURI = getRequestURI();
 		this.requestHandlerMethods = fetchRequestHandlerMethods();
 		this.exceptionHandlerMethods = fetchExceptionHandlerMethods();
+		this.exceptionHandlerMethodMap = fetchExceptionHandlerMethodMap();
 	}
 	
 	protected String getRequestURI() {
@@ -54,6 +58,15 @@ public class ControllerProxy {
 			list.add(m);
 		}
 		return list;
+	}
+	
+	protected final Map<Class<?>, ExceptionHandlerMethod> fetchExceptionHandlerMethodMap() {
+		Map<Class<?>, ExceptionHandlerMethod> answer = new HashMap<>();
+		for(ExceptionHandlerMethod m : exceptionHandlerMethods) {
+			for(Class<?> exceptionClass : m.getExceptionClasses())
+				answer.put(exceptionClass, m);
+		}
+		return answer;
 	}
 	
 	protected boolean isRequestHandlerMethod(EzyMethod method) {

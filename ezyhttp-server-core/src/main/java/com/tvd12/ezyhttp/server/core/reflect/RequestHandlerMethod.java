@@ -1,7 +1,5 @@
 package com.tvd12.ezyhttp.server.core.reflect;
 
-import java.lang.reflect.Parameter;
-
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.URIBuilder;
@@ -17,15 +15,14 @@ import com.tvd12.ezyhttp.server.core.util.DoPutAnnotations;
 import lombok.Getter;
 
 @Getter
-public class RequestHandlerMethod {
+public class RequestHandlerMethod extends HandlerMethod {
 	
-	protected final EzyMethod method;
 	protected final String requestURI;
 	protected final String responseType;
 	protected final HttpMethod httpMethod;
 	
 	public RequestHandlerMethod(String rootURI, EzyMethod method) {
-		this.method = method;
+		super(method);
 		this.requestURI = fetchRequestURI(rootURI);
 		this.httpMethod = fetchHttpMethod();
 		this.responseType = fetchResponseType();
@@ -75,18 +72,6 @@ public class RequestHandlerMethod {
 			return DoPutAnnotations.getResponseType(doPut);
 		DoDelete doDelete = method.getAnnotation(DoDelete.class);
 		return DoDeleteAnnotations.getResponseType(doDelete);
-	}
-	
-	public String getName() {
-		return method.getName();
-	}
-	
-	public Class<?> getReturnType() {
-		return method.getReturnType();
-	}
-	
-	public Parameter[] getParameters() {
-		return method.getMethod().getParameters();
 	}
 	
 	@Override

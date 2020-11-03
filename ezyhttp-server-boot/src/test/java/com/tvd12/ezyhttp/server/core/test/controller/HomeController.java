@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.core.response.ResponseAsync;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -19,6 +19,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 import com.tvd12.ezyhttp.server.core.test.request.LoveRequest;
@@ -79,12 +80,17 @@ public class HomeController {
 	}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
-	public String handleException2(Exception e) {
+	public String handleException2( Exception e) {
 		return e.getMessage();
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)
-	public void handleException3(Exception e) {
+	public ResponseEntity handleException3(
+			RequestArguments args, 
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Exception e) {
+		return ResponseEntity.badRequest();
 	}
 	
 }

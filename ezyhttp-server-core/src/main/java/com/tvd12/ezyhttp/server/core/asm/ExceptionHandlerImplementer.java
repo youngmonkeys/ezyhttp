@@ -7,10 +7,10 @@ import com.tvd12.ezyfox.asm.EzyFunction;
 import com.tvd12.ezyfox.asm.EzyFunction.EzyBody;
 import com.tvd12.ezyfox.asm.EzyInstruction;
 import com.tvd12.ezyfox.reflect.EzyClass;
+import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyfox.reflect.EzyReflections;
-import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerProxy;
@@ -22,11 +22,11 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
 
-public class ExceptionHandlerImplementer extends EzyLoggable {
+public class ExceptionHandlerImplementer 
+		extends AbstractHandlerImplementer<ExceptionHandlerMethod> {
 
 	@Setter
 	private static boolean debug;
-	protected final ExceptionHandlerMethod handlerMethod;
 	protected final ExceptionHandlerProxy exceptionHandler;
 	
 	protected final static String PARAMETER_PREFIX = "param";
@@ -34,7 +34,7 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 	
 	public ExceptionHandlerImplementer(
 			ExceptionHandlerProxy exceptionHandler, ExceptionHandlerMethod handlerMethod) {
-		this.handlerMethod = handlerMethod;
+		super(handlerMethod);
 		this.exceptionHandler = exceptionHandler;
 	}
 	
@@ -102,9 +102,11 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 		EzyMethod method = getHandleExceptionMethod();
 		EzyFunction function = new EzyFunction(method);
 		EzyBody body = function.body();
-		for(Class<?> exceptionClass : handlerMethod.getExceptionClasses()) {
+		Class<?>[] exceptionClasses = handlerMethod.getExceptionClasses();
+		EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
+		for(Class<?> exceptionClass : exceptionTree.toList()) {
 			EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
-					.append("if(arg0 instanceof ")
+					.append("if(arg1 instanceof ")
 						.append(exceptionClass.getName())
 					.append(") {");
 			body.append(instructionIf);
@@ -114,9 +116,9 @@ public class ExceptionHandlerImplementer extends EzyLoggable {
 				instructionHandle.answer();
 			instructionHandle
 					.append("this.exceptionHandler.").append(handlerMethod.getName())
-					.bracketopen()
-						.brackets(exceptionClass).append("arg1")
-					.bracketclose();
+					.bracketopen();
+			appendHandleExceptionMethodArguments(handlerMethod, instructionHandle, exceptionClass);
+			instructionHandle.bracketclose();
 			body.append(instructionHandle);
 			if(returnType == void.class)
 				body.append(new EzyInstruction("\t\t", "\n").append("return null"));

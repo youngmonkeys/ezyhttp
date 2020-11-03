@@ -8,14 +8,13 @@ import com.tvd12.ezyhttp.server.core.util.TryCatchAnnotations;
 import lombok.Getter;
 
 @Getter
-public class ExceptionHandlerMethod {
+public class ExceptionHandlerMethod extends HandlerMethod {
 
-	protected final EzyMethod method;
 	protected final String responseType;
 	protected final Class<?>[] exceptionClasses;
 	
 	public ExceptionHandlerMethod(EzyMethod method) {
-		this.method = method;
+		super(method);
 		this.responseType = fetchResponseType();
 		this.exceptionClasses = fetchExceptionClasses();
 		
@@ -30,14 +29,6 @@ public class ExceptionHandlerMethod {
 	protected String fetchResponseType() {
 		TryCatch annotation = method.getAnnotation(TryCatch.class);
 		return TryCatchAnnotations.getResponseType(annotation);
-	}
-	
-	public String getName() {
-		return method.getName();
-	}
-	
-	public Class<?> getReturnType() {
-		return method.getReturnType();
 	}
 	
 	@Override
