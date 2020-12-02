@@ -11,7 +11,7 @@
 	<name>ezyhttp-server-jetty</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<jetty.version>9.4.24.v20191120</jetty.version>
+		<jetty.version>9.4.35.v20201120</jetty.version>
 	</properties>
 	<dependencies>
 		<dependency>
