@@ -46,11 +46,6 @@ public class URITree {
 		
 	}
 	
-	public boolean containsURI(String uri) {
-		String matched = getMatchedURI(uri);
-		return matched != null;
-	}
-	
 	@Override
 	public String toString() {
 		if(uri != null)

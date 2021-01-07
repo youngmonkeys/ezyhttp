@@ -23,25 +23,16 @@ public class RequestHandlerManager extends EzyLoggable {
 		this.handledURIs = new HashSet<>();
 	}
 	
-	public boolean hasHandler(String uri) {
-		boolean answer = handledURIs.contains(uri);
-		if(!answer) {
-			answer = uriTree.containsURI(uri);
-		}
-		return answer;
-	}
-	
-	public RequestHandler getHandler(RequestURI uri) {
-		RequestHandler handler = handlers.get(uri);
-		if(handler == null) {
-			String matchedURI = uriTree.getMatchedURI(uri.getUri());
-			handler = handlers.get(new RequestURI(uri.getMethod(), matchedURI));
-		}
-		return handler;
-	}
-	
 	public RequestHandler getHandler(HttpMethod method, String uri) {
-		return getHandler(new RequestURI(method, uri));
+		String matchedURI = null;
+		if(handledURIs.contains(uri))
+			matchedURI = uri;
+		if(matchedURI == null)
+			matchedURI = uriTree.getMatchedURI(uri);
+		if(matchedURI == null)
+			return null;
+		RequestHandler handler = handlers.get(new RequestURI(method, matchedURI));
+		return handler != null ? handler : RequestHandler.EMPTY;
 	}
 	
 	public void addHandler(RequestURI uri, RequestHandler handler) {

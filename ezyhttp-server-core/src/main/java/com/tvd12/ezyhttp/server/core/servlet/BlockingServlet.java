@@ -97,14 +97,13 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
-		boolean hasHandler = requestHandlerManager.hasHandler(requestURI);
-		if(!hasHandler) {
+		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
+		if(requestHandler == null) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			responseString(response, "uri " + requestURI + " not found");
 			return;
 		}
-		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
-		if(requestHandler == null) {
+		if(requestHandler == RequestHandler.EMPTY) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			responseString(response, "method " + method + " not allowed");
 			return;

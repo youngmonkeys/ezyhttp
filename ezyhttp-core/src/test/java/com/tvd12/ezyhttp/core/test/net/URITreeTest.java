@@ -22,11 +22,4 @@ public class URITreeTest {
 		System.out.println("check12: " + tree.getMatchedURI(check12));
 	}
 	
-	@Test
-	public void test2() {
-		URITree tree = new URITree();
-		tree.addURI("/api/v1/customer/{name}/create");
-		assert tree.containsURI("/api/v1/customer/abc/create");
-	}
-
 }

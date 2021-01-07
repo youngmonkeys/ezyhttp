@@ -6,6 +6,8 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public interface RequestHandler {
+	
+	EmptyRequestHandler EMPTY = EmptyRequestHandler.getInstance();
 
 	void setController(Object controller);
 	
@@ -20,4 +22,5 @@ public interface RequestHandler {
 	String getRequestURI();
 	
 	String getResponseContentType();
+	
 }
