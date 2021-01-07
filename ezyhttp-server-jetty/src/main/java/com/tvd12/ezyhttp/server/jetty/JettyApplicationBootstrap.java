@@ -40,6 +40,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
 	@Setter
 	protected int idleTimeout = 150 * 1000;
 	
+	@Setter
 	@EzyProperty("cors.enable")
 	protected boolean corsEnable;
 	
