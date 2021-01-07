@@ -40,6 +40,9 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
 	@Setter
 	protected int idleTimeout = 150 * 1000;
 	
+	@EzyProperty("cors.enable")
+	protected boolean corsEnable;
+	
 	protected Server server;
 	 
     public void start() throws Exception {
@@ -56,10 +59,12 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
     }
 	
     protected ServletHandler newServletHandler() {
-    	FilterHolder crossOriginFilter = newCrossOriginFilter();
     	ServletHandler servletHandler = new ServletHandler();
         servletHandler.addServletWithMapping(BlockingServlet.class, "/*");
-        addFilter(servletHandler, crossOriginFilter);
+        if(corsEnable) {
+	        FilterHolder crossOriginFilter = newCrossOriginFilter();
+	        addFilter(servletHandler, crossOriginFilter);
+        }
         return servletHandler;
     }
     
