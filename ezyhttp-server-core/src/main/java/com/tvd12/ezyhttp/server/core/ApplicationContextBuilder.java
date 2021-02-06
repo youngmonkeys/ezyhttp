@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core;
 
-import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILE;
+import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -206,16 +206,14 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected Properties readPropertiesSources() {
 		Properties props = new Properties();
-		if(propertiesSources.size() > 0) {
-			for(String source : propertiesSources)
-				props.putAll(readPropertiesSource(source));
-		}
-		else {
+		for(String defaultPropertyFile : DEFAULT_PROPERTIES_FILES) {
 			try {
-				props.putAll(readPropertiesSource(DEFAULT_PROPERTIES_FILE));
+				props.putAll(readPropertiesSource(defaultPropertyFile));
 			}
 			catch (Exception e) {}
 		}
+		for(String source : propertiesSources)
+			props.putAll(readPropertiesSource(source));
 		return props;
 	}
 	

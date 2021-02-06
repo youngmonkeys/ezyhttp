@@ -12,7 +12,10 @@ public class JsonBodyConverter implements BodyConverter {
 	protected final ObjectMapper objectMapper;
 	
 	public JsonBodyConverter() {
-		this(JacksonObjectMapperBuilder.newInstance().build());
+		this(JacksonObjectMapperBuilder.newInstance()
+				.build()
+				.findAndRegisterModules()
+		);
 	}
 	
 	public JsonBodyConverter(ObjectMapper objectMapper) {
