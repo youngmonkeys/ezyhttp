@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>ezyhttp-server-jetty</artifactId>
 	<name>ezyhttp-server-jetty</name>
-	<url>http://maven.apache.org</url>
+	<url>https://youngmonkeys.org/project/ezy-http/</url>
 	<properties>
 		<jetty.version>9.4.35.v20201120</jetty.version>
 	</properties>

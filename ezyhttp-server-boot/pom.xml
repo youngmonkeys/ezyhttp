@@ -9,10 +9,8 @@
 	</parent>
 	<artifactId>ezyhttp-server-boot</artifactId>
 	<name>ezyhttp-server-boot</name>
-	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<url>https://youngmonkeys.org/project/ezy-http/</url>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>

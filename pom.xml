@@ -11,14 +11,14 @@
 	<packaging>pom</packaging>
 
 	<name>ezyhttp</name>
-	<url>http://www.tvd12.com/java/projects/ezyhttp</url>
+	<url>https://youngmonkeys.org/project/ezy-http/</url>
 	<description>
 		Support for HTTP interaction 
 	</description>
 
 	<organization>
 		<name>Young Monkeys</name>
-		<url>http://www.tvd12.com</url>
+		<url>https://youngmonkeys.org</url>
 	</organization>
 
 	<licenses>

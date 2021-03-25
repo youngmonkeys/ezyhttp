@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>ezyhttp-client</artifactId>
 	<name>ezyhttp-client</name>
-	<url>http://maven.apache.org</url>
+	<url>https://youngmonkeys.org/project/ezy-http/</url>
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>

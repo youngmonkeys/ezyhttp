@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>ezyhttp-core</artifactId>
 	<name>ezyhttp-core</name>
-	<url>http://maven.apache.org</url>
+	<url>https://youngmonkeys.org/project/ezy-http/</url>
 
 	<properties>
 		<ezy.json.version>1.1.4</ezy.json.version>

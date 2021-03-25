@@ -2,7 +2,7 @@
 
 # Documentation
 
-[https://tvd12.com/](https://tvd12.com/)
+[https://youngmonkeys.org/ezy-http](https://youngmonkeys.org/project/ezy-http/)
 
 # Synopsis
 
@@ -111,7 +111,7 @@ In an effort to bring HTTP to EzyFox ecosystem and help everyone study one do ev
 
 # API Reference
 
-[https://tvd12.com/](https://tvd12.com/)
+[https://youngmonkeys.org/ezy-http](https://youngmonkeys.org/project/ezy-http/)
 
 # Tests
 
@@ -119,8 +119,7 @@ mvn test
 
 # Contributors
 
-- Project development
-  - [DungTV](mailto:itprono3@gmail.com)
+- [DungTV](mailto:itprono3@gmail.com)
 
 # License
 
