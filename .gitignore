@@ -10,3 +10,5 @@ logs/
 */logs
 test-output
 */test-output/
+.DS_Store
+*.DS_Store

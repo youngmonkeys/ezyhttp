@@ -18,7 +18,7 @@
 	</description>
 	
 	<properties>
-		<ezyhttp.version>0.0.8</ezyhttp.version>
+		<ezyhttp.version>0.1.0</ezyhttp.version>
 	</properties>
 	
 	<dependencies>
