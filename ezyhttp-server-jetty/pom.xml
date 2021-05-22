@@ -5,14 +5,17 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.1.0</version>
+		<version>0.1.1</version>
 	</parent>
+	
 	<artifactId>ezyhttp-server-jetty</artifactId>
 	<name>ezyhttp-server-jetty</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
+	
 	<properties>
-		<jetty.version>9.4.35.v20201120</jetty.version>
+		<jetty.version>9.4.40.v20210413</jetty.version>
 	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>

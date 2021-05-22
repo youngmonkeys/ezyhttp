@@ -5,27 +5,18 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.1.0</version>
+		<version>0.1.1</version>
 	</parent>
+	
 	<artifactId>ezyhttp-core</artifactId>
 	<name>ezyhttp-core</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
 
-	<properties>
-		<ezy.json.version>1.1.4</ezy.json.version>
-		<jackson.version>2.12.0</jackson.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>
-			<artifactId>ezyfox-json</artifactId>
-			<version>${ezy.json.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
+			<artifactId>ezyfox-jackson</artifactId>
+			<version>${ezy.version}</version>
 		</dependency>
 	</dependencies>
 

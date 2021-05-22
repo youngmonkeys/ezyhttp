@@ -5,11 +5,13 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.1.0</version>
+		<version>0.1.1</version>
 	</parent>
+	
 	<artifactId>ezyhttp-client</artifactId>
 	<name>ezyhttp-client</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>
