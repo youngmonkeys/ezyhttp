@@ -19,6 +19,7 @@ import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.core.annotation.StringConvert;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
@@ -30,6 +31,7 @@ import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
@@ -38,6 +40,10 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
+import com.tvd12.ezyhttp.server.core.resources.Resource;
+import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
+import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
+import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
 import com.tvd12.properties.file.reader.BaseFileReader;
 
@@ -182,7 +188,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.propertiesMap(propertiesMap)
 				.build();
 		registerComponents(beanContext);
-		addRequestHandlers();
+		addRequestHandlers(beanContext);
+		addResourceRequestHandlers(beanContext);
 		addExceptionHandlers();
 		return beanContext;
 	}
@@ -236,11 +243,45 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.setStringConverters(stringConverters);
 	}
 	
-	protected void addRequestHandlers() {
+	protected void addRequestHandlers(EzyBeanContext beanContext) {
 		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
 		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
 		requestHandlerManager.addHandlers(requestHandlers);
+	}
+	
+	protected void addResourceRequestHandlers(EzyBeanContext beanContext) {
+		ResourceResolver resourceResolver = getResourceResolver(beanContext);
+		if(resourceResolver == null)
+			return;
+		ResourceDownloadManager downloadManager = getResourceDownloadManager(beanContext);
+		Map<String, Resource> resources = resourceResolver.getResources();
+		for(String resourceURI : resources.keySet()) {
+			Resource resource = resources.get(resourceURI);
+			RequestURI requestURI = new RequestURI(HttpMethod.GET, resourceURI);
+			RequestHandler requestHandler = new ResourceRequestHandler(
+					resource.getPath(), 
+					resource.getUri(),
+					resource.getExtension(),
+					downloadManager);
+			requestHandlerManager.addHandler(requestURI, requestHandler);
+		}
+	}
+	
+	protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
+		ResourceResolver resourceResolver = 
+				(ResourceResolver)beanContext.getSingleton(ResourceResolver.class);
+		if(resourceResolver == null)
+			resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
+		return resourceResolver;
+	}
+	
+	protected ResourceDownloadManager getResourceDownloadManager(EzyBeanContext beanContext) {
+		ResourceDownloadManager resourceDownloadManager = 
+				(ResourceDownloadManager)beanContext.getSingleton(ResourceDownloadManager.class);
+		if(resourceDownloadManager == null)
+			resourceDownloadManager = ResourceResolvers.createDownloadManager(beanContext);
+		return resourceDownloadManager;
 	}
 	
 	protected void addExceptionHandlers() {
