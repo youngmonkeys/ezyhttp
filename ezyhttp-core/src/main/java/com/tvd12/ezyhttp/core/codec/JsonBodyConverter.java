@@ -4,18 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.data.BodyData;
+import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 
 public class JsonBodyConverter implements BodyConverter {
 
 	protected final ObjectMapper objectMapper;
 	
 	public JsonBodyConverter() {
-		this(JacksonObjectMapperBuilder.newInstance()
-				.build()
-				.findAndRegisterModules()
-		);
+		this(new ObjectMapperBuilder().build());
 	}
 	
 	public JsonBodyConverter(ObjectMapper objectMapper) {

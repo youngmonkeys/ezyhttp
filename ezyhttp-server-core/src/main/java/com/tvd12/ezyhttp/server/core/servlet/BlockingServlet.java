@@ -124,7 +124,7 @@ public class BlockingServlet extends HttpServlet {
 						request.startAsync();
 					}
 					else {
-						handleResponseData(response, responseContentType, responseData);
+						handleResponseData(response, responseData);
 					}
 				}
 			}
@@ -153,7 +153,10 @@ public class BlockingServlet extends HttpServlet {
 				Object result = handler.handleException(arguments, e);
 				if(result != null) {
 					String responseContentType = handler.getResponseContentType();
-					handleResponseData(response, responseContentType, result);
+					if(responseContentType != null) {
+						response.setContentType(responseContentType);
+					}
+					handleResponseData(response, result);
 				}
 				exception = null;
 			}
@@ -196,8 +199,7 @@ public class BlockingServlet extends HttpServlet {
 	}
 	
 	protected void handleResponseData(
-			HttpServletResponse response, 
-			String contentType, Object data) throws Exception {
+			HttpServletResponse response, Object data) throws Exception {
 		Object body = data;
 		if(body instanceof ResponseEntity) {
 			ResponseEntity entity = (ResponseEntity)body;
