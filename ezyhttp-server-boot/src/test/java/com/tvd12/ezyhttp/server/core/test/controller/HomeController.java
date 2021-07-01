@@ -36,12 +36,11 @@ public class HomeController {
 			@RequestHeader("key") String key,
 			@RequestHeader String token,
 			@RequestArgument("name") String name,
-			@RequestBody HelloRequest body,
 			@NickName String nickName) {
 		System.out.println("request uri: " + request.getRequestURI());
 		if(who == null)
 			throw new IllegalArgumentException("who cannot be null");
-		return "welcome " + who + " " + body.getWho();
+		return "welcome " + who + " " + who;
 	}
 	
 	@DoPost
@@ -81,7 +80,8 @@ public class HomeController {
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2( Exception e) {
-		return e.getMessage();
+		e.printStackTrace();
+		return e.getClass().getName() + "(" + e.getMessage() + ")";
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)

@@ -37,10 +37,14 @@ import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
+import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
+import com.tvd12.ezyhttp.server.core.view.Redirect;
+import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
 
+	protected ViewContext viewContext;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
 	protected InterceptorManager interceptorManager;
@@ -124,7 +128,7 @@ public class BlockingServlet extends HttpServlet {
 						request.startAsync();
 					}
 					else {
-						handleResponseData(response, responseData);
+						handleResponseData(request, response, responseData);
 					}
 				}
 			}
@@ -156,7 +160,7 @@ public class BlockingServlet extends HttpServlet {
 					if(responseContentType != null) {
 						response.setContentType(responseContentType);
 					}
-					handleResponseData(response, result);
+					handleResponseData(request, response, result);
 				}
 				exception = null;
 			}
@@ -199,9 +203,10 @@ public class BlockingServlet extends HttpServlet {
 	}
 	
 	protected void handleResponseData(
+			HttpServletRequest request,
 			HttpServletResponse response, Object data) throws Exception {
 		Object body = data;
-		if(body instanceof ResponseEntity) {
+		if(data instanceof ResponseEntity) {
 			ResponseEntity entity = (ResponseEntity)body;
 			body = entity.getBody();
 			response.setStatus(entity.getStatus());
@@ -211,6 +216,15 @@ public class BlockingServlet extends HttpServlet {
 				for(Entry<String, String> entry : encodedHeaders.entrySet())
 					response.addHeader(entry.getKey(), entry.getValue());
 			}
+		}
+		else if(data instanceof Redirect) {
+			Redirect redirect = (Redirect)data;
+			String redirectLocation = redirect.getUri();
+			if(!redirect.isURL())
+				redirectLocation = HttpServletRequests.getRequestURL(request, redirect.getUri());
+			response.setHeader("Location", redirectLocation);
+			response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			return;
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
