@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.resources;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -11,6 +12,10 @@ import java.util.Set;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
 public class ResourceLoader extends EzyLoggable {
+	
+	public List<String> listResources(String rootPath) {
+		return listResources(rootPath, Collections.emptySet());
+	}
 	
 	public List<String> listResources(String rootPath, Set<String> regexes) {
 		List<String> answer = new ArrayList<>();
@@ -34,10 +39,15 @@ public class ResourceLoader extends EzyLoggable {
 			for(String resource : fileList) {
 				String fullPath = resourcePath + "/" + resource;
 				folders.offer(fullPath);
-				for(String regex : regexes) {
-					if(fullPath.matches(regex)) {
-						answer.add(fullPath);
-						break;
+				if(regexes.isEmpty()) {
+					answer.add(fullPath);
+				}
+				else {
+					for(String regex : regexes) {
+						if(fullPath.matches(regex)) {
+							answer.add(fullPath);
+							break;
+						}
 					}
 				}
 			}

@@ -39,6 +39,7 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
+import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 public class BlockingServlet extends HttpServlet {
@@ -58,6 +59,7 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
+		this.viewContext = componentManager.getViewContext();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -223,7 +225,13 @@ public class BlockingServlet extends HttpServlet {
 			if(!redirect.isURL())
 				redirectLocation = HttpServletRequests.getRequestURL(request, redirect.getUri());
 			response.setHeader("Location", redirectLocation);
-			response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			response.setStatus(redirect.getCode());
+			return;
+		}
+		else if(data instanceof View) {
+			View view = (View)data;
+			response.setContentType(view.getContentType());
+			viewContext.render(getServletContext(), request, response, view);
 			return;
 		}
 		else {

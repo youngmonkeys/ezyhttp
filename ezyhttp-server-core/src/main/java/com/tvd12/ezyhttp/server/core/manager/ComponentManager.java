@@ -1,11 +1,16 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public final class ComponentManager {
-
+	
+	@Setter
+	@Getter
+	private ViewContext viewContext;
 	@Getter
 	private DataConverters dataConverters;
 	@Getter

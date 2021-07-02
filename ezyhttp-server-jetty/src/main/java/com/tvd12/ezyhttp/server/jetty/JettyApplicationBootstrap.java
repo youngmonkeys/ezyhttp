@@ -46,6 +46,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
 	
 	protected Server server;
 	 
+	@Override   
     public void start() throws Exception {
     	QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         server = new Server(threadPool);

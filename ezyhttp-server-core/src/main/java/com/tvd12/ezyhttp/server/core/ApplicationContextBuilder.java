@@ -45,6 +45,7 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
+import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.properties.file.reader.BaseFileReader;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -175,6 +176,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
 		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
+				.scan("com.tvd12.ezyhttp.server")
 				.addProperties(properties)
 				.addAllClasses(reflection)
 				.addSingletonClasses(componentClasses)
@@ -241,6 +243,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.addBodyConverters(bodyConverters);
 		List stringConverters = beanContext.getSingletons(StringConvert.class);
 		dataConverters.setStringConverters(stringConverters);
+		componentManager.setViewContext(beanContext.getSingleton(ViewContext.class));
 	}
 	
 	protected void addRequestHandlers(EzyBeanContext beanContext) {
