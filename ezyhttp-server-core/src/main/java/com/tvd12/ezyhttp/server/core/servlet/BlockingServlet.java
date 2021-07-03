@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -45,6 +46,9 @@ import com.tvd12.ezyhttp.server.core.view.ViewContext;
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
 
+	private int serverPort;
+	private int managmentPort;
+	private Set<String> managementURIs;
 	protected ViewContext viewContext;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
@@ -59,6 +63,9 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
+		this.serverPort = componentManager.getServerPort();
+		this.managmentPort = componentManager.getManagmentPort();
+		this.managementURIs = componentManager.getManagementURIs();
 		this.viewContext = componentManager.getViewContext();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
@@ -103,6 +110,20 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
 		String requestURI = request.getRequestURI();
+		if(managementURIs.contains(requestURI)) {
+			if(request.getServerPort() == serverPort) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
+				return;
+			}
+		}
+		else {
+			if(request.getServerPort() == managmentPort) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
+				return;
+			}
+		}
 		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
 		if(requestHandler == null) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);

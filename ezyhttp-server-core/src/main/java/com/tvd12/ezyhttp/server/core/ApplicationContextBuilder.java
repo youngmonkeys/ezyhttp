@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core;
 
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.reflect.EzyClasses;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
@@ -246,6 +248,30 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		List stringConverters = beanContext.getSingletons(StringConvert.class);
 		dataConverters.setStringConverters(stringConverters);
 		componentManager.setViewContext(buildViewContext(beanContext));
+		componentManager.setServerPort(getServerPort(beanContext));
+		componentManager.setManagmentPort(getManagementPort(beanContext));
+		componentManager.setManagementURIs(getManagementURIs(beanContext));
+	}
+	
+	private int getServerPort(EzyBeanContext beanContext) {
+		return beanContext.getProperty(PropertyNames.SERVER_PORT, int.class, 0);
+	}
+	
+	private int getManagementPort(EzyBeanContext beanContext) {
+		boolean managementEnable = beanContext.getProperty(
+				PropertyNames.MANAGEMENT_ENABLE, boolean.class, false);
+		return managementEnable 
+				? beanContext.getProperty(PropertyNames.MANAGEMENT_PORT, int.class, 18080)
+				: 0;
+	}
+	
+	private Set<String> getManagementURIs(EzyBeanContext beanContext) {
+		boolean managementEnable = beanContext.getProperty(
+				PropertyNames.MANAGEMENT_ENABLE, boolean.class, false);
+		return managementEnable
+				? Sets.newHashSet(beanContext.getProperty(
+						PropertyNames.MANAGEMENT_URIS, String[].class, new String[0]))
+				: Collections.emptySet();
 	}
 	
 	protected ViewContext buildViewContext(EzyBeanContext beanContext) {

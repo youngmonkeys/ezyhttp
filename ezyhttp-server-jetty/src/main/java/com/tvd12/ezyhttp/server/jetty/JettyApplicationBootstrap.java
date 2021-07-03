@@ -1,5 +1,8 @@
 package com.tvd12.ezyhttp.server.jetty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -15,35 +18,41 @@ import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 
+import lombok.AccessLevel;
 import lombok.Setter;
 
+@Setter
 @ApplicationBootstrap
 public class JettyApplicationBootstrap extends EzyLoggable implements ApplicationEntry {
 	
 	@EzyProperty("server.port")
-	@Setter
 	protected int port = 8080;
 	
 	@EzyProperty("server.host")
-	@Setter
 	protected String host = "0.0.0.0";
 	
 	@EzyProperty("server.max_threads")
-	@Setter
 	protected int maxThreads = 256;
 	
 	@EzyProperty("server.min_threads")
-	@Setter
 	protected int minThreads = 16;
 	
 	@EzyProperty("server.idle_timeout")
-	@Setter
 	protected int idleTimeout = 150 * 1000;
 	
-	@Setter
 	@EzyProperty("cors.enable")
 	protected boolean corsEnable;
 	
+	@EzyProperty("management.enable")
+	protected boolean managementEnable;
+	
+	@EzyProperty("management.host")
+	protected String managementHost = "0.0.0.0";
+	
+	@EzyProperty("management.port")
+	protected int managementPort = 18080;
+
+	@Setter(AccessLevel.NONE)
 	protected Server server;
 	 
 	@Override   
@@ -53,11 +62,21 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         ServerConnector connector = new ServerConnector(server);
         connector.setHost(host);
         connector.setPort(port);
-        server.setConnectors(new Connector[] {connector});
+        List<Connector> connectors = new ArrayList<>();
+        connectors.add(connector);
+        if(managementEnable) {
+        	ServerConnector managementConnector = new ServerConnector(server);
+        	managementConnector.setHost(managementHost);
+        	managementConnector.setPort(managementPort);
+        	connectors.add(managementConnector);
+        }
+        server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
         ServletHandler servletHandler = newServletHandler();
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
+        if(managementEnable)
+        	logger.info("management started on: {}:{}", managementHost, managementPort);
     }
 	
     protected ServletHandler newServletHandler() {

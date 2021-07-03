@@ -1,25 +1,28 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
+import java.util.Set;
+
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public final class ComponentManager {
 	
 	@Setter
-	@Getter
+	private int serverPort;
+	@Setter
+	private int managmentPort;
+	@Setter
+	private Set<String> managementURIs;
+	@Setter
 	private ViewContext viewContext;
-	@Getter
 	private DataConverters dataConverters;
-	@Getter
 	private ControllerManager controllerManager;
-	@Getter
 	private InterceptorManager interceptorManager;
-	@Getter
 	private RequestHandlerManager requestHandlerManager;
-	@Getter
 	private ExceptionHandlerManager exceptionHandlerManager;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
