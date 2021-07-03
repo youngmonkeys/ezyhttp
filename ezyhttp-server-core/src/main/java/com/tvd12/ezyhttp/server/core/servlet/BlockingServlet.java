@@ -229,6 +229,13 @@ public class BlockingServlet extends HttpServlet {
 			return;
 		}
 		else if(data instanceof View) {
+			if(viewContext == null) {
+				throw new IllegalStateException(
+					"viewContext is null, " +
+					"you must add ezyhttp-server-thymeleaf to your dependencies" +
+					" or create viewContext by yourself"
+				);
+			}
 			View view = (View)data;
 			response.setContentType(view.getContentType());
 			viewContext.render(getServletContext(), request, response, view);

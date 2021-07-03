@@ -53,6 +53,10 @@ public class View {
 			return this;
 		}
 		
+		public Builder locale(String locale) {
+			return locale(new Locale(locale));
+		}
+		
 		public Builder contentType(String contentType) {
 			this.contentType = contentType;
 			return this;

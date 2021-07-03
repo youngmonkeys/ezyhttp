@@ -11,19 +11,36 @@ import org.thymeleaf.messageresolver.IMessageResolver;
 
 import com.tvd12.ezyhttp.server.core.view.MessageReader;
 
+import lombok.Getter;
+
 public class ThymeleafMessageResolver implements IMessageResolver {
 	
+	@Getter
+	private final String name = NAME;
+	@Getter
+	private final Integer order = ORDER;
 	private final Properties defaultMessages;
 	private final Map<Locale, Properties> messagesByLocale;
-	
+	private final Map<String, Properties> messagesByLanguage;
+
+	private static final int ORDER = 0;
+	private static final String NAME = "DEFAULT";
 	private static final Object[] EMPTY_MESSAGE_PARAMETERS = new Object[0];
 	
 	public ThymeleafMessageResolver(String folderPath) {
+		messagesByLanguage = readMessages(folderPath);
+		messagesByLocale = mapMessagesToLocal();
+		defaultMessages = messagesByLanguage.computeIfAbsent("", it -> new Properties());
+	}
+	
+	private Map<String, Properties> readMessages(String folderPath) {
 		MessageReader messageReader = new MessageReader();
-		Map<String, Properties> messagesByLanguague = messageReader.read(folderPath);
-		defaultMessages = messagesByLanguague.getOrDefault("", new Properties());
-		messagesByLocale = new HashMap<>();
-		for(String lang : messagesByLanguague.keySet()) {
+		return messageReader.read(folderPath);
+	}
+	
+	private Map<Locale, Properties> mapMessagesToLocal() {
+		Map<Locale, Properties> messagesByLocale = new HashMap<>();
+		for(String lang : messagesByLanguage.keySet()) {
 			if(lang.length() > 0) {
 				Locale locale;
 				if(lang.contains("_")) {
@@ -41,19 +58,10 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 				else {
 					locale = new Locale(lang);
 				}
-				messagesByLocale.put(locale, messagesByLanguague.get(lang));
+				messagesByLocale.put(locale, messagesByLanguage.get(lang));
 			}
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "DEFAULT";
-	}
-
-	@Override
-	public Integer getOrder() {
-		return 0;
+		return messagesByLocale;
 	}
 
 	@Override
@@ -61,19 +69,23 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 			ITemplateContext context, 
 			Class<?> origin,
 			String key, 
-			Object[] messageParameters) {
+			Object[] parameters) {
 		Locale locale = context.getLocale();
 		String message;
 		Properties messages = messagesByLocale.get(locale);
+		if(messages == null) {
+			messages = messagesByLanguage.get(locale.getLanguage());
+		}
 		if(messages == null) {
 			message = defaultMessages.getProperty(key);
 		}
 		else {
 			message = messages.getProperty(key);
-			if(message == null)
+			if(message == null) {
 				message = defaultMessages.getProperty(key);
+			}
 		}
-		return message;
+		return message != null ? formatMessage(locale, message, parameters) : null;
 	}
 
 	@Override
@@ -81,27 +93,27 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 			ITemplateContext context, 
 			Class<?> origin, 
 			String key,
-			Object[] messageParameters) {
+			Object[] parameters) {
 		return key;
 	}
 
-	protected String formatMessage(final Locale locale, final String message, final Object[] messageParameters) {
-		if (message == null) {
+	private String formatMessage(Locale locale, String message, Object[] parameters) {
+		if (message == null)
 			return null;
-		}
-		if (!isFormatCandidate(message)) {
+		if (!isFormatCandidate(message))
 			return message;
-		}
-		final MessageFormat messageFormat = new MessageFormat(message, locale);
-		return messageFormat.format((messageParameters != null ? messageParameters : EMPTY_MESSAGE_PARAMETERS));
+		MessageFormat messageFormat = new MessageFormat(message, locale);
+		return messageFormat.format(
+			parameters != null ? parameters : EMPTY_MESSAGE_PARAMETERS
+		);
 	}
 
-	private static boolean isFormatCandidate(final String message) {
-		char c;
+	private static boolean isFormatCandidate(String message) {
+		char ch;
 		int n = message.length();
-		while (n-- != 0) {
-			c = message.charAt(n);
-			if (c == '}' || c == '\'') {
+		while ((n --) != 0) {
+			ch = message.charAt(n);
+			if (ch == '}' || ch == '\'') {
 				return true;
 			}
 		}

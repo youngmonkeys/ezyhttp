@@ -1,10 +1,16 @@
 package com.tvd12.ezyhttp.server.core.resources;
 
-import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.*;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_DOWNLOAD_BUFFER_SIZE;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_DOWNLOAD_CAPACITY;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_DOWNLOAD_THREAD_POOL_SIZE;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_ENABLE;
 import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_LOCATION;
 import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_LOCATIONS;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_PATTERN;
+import static com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager.DEFAULT_BUFFER_SIZE;
+import static com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager.DEFAULT_CAPACITY;
+import static com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager.DEFAULT_THREAD_POOL_SIZE;
 import static com.tvd12.ezyhttp.server.core.resources.ResourceResolver.DEFAULT_RESOURCE_LOCATION;
-import static com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager.*;
 
 import com.tvd12.ezyfox.bean.EzyPropertyFetcher;
 
@@ -26,8 +32,10 @@ public final class ResourceResolvers {
 				resourceLocation = DEFAULT_RESOURCE_LOCATION;
 			resourceLocations = new String[] { resourceLocation };
 		}
+		String pattern = propertyFetcher.getProperty(RESOURCE_PATTERN, String.class);
+		String[] patterns = pattern != null ? new String[] {pattern} : new String[0];
 		ResourceResolver resourceResolver = new ResourceResolver();
-		resourceResolver.register(resourceLocations);
+		resourceResolver.register(resourceLocations, patterns);
 		return resourceResolver;
 	}
 	
