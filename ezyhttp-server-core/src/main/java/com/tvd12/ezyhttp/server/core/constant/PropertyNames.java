@@ -10,6 +10,12 @@ public final class PropertyNames {
 	public static final String RESOURCE_DOWNLOAD_CAPACITY = "resources.download.capacity";
 	public static final String RESOURCE_DOWNLOAD_THREAD_POOL_SIZE = "resources.dowload.thread_pool_sze";
 	public static final String RESOURCE_DOWNLOAD_BUFFER_SIZE = "resources.download.buffer_size";
+	public static final String VIEW_TEMPLATE_MODE = "view.template.mode";
+	public static final String VIEW_TEMPLATE_PREFIX = "view.template.prefix";
+	public static final String VIEW_TEMPLATE_SUFFIX = "view.template.suffix";
+	public static final String VIEW_TEMPLATE_CACHE_TTL_MS = "view.template.cache_ttl_ms";
+	public static final String VIEW_TEMPLATE_CACHEABLE = "view.template.cacheable";
+	public static final String VIEW_TEMPLATE_MESSAGES_LOCATION = "view.template.messages_location";
 	
 	private PropertyNames() {}
 	

@@ -45,7 +45,9 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
+import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
+import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 import com.tvd12.properties.file.reader.BaseFileReader;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -243,7 +245,23 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.addBodyConverters(bodyConverters);
 		List stringConverters = beanContext.getSingletons(StringConvert.class);
 		dataConverters.setStringConverters(stringConverters);
-		componentManager.setViewContext(beanContext.getSingleton(ViewContext.class));
+		componentManager.setViewContext(buildViewContext(beanContext));
+	}
+	
+	protected ViewContext buildViewContext(EzyBeanContext beanContext) {
+		ViewContext viewContext = beanContext.getSingleton(ViewContext.class);
+		if(viewContext == null) {
+			ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
+			if(viewContextBuilder != null) {
+				TemplateResolver templateResolver = beanContext.getSingleton(TemplateResolver.class);
+				if(templateResolver == null)
+					templateResolver = TemplateResolver.of(beanContext);
+				viewContext = viewContextBuilder.templateResolver(templateResolver).build();
+			}
+		}
+		if(viewContext != null)
+			beanContext.getSingletonFactory().addSingleton(viewContext);
+		return viewContext;
 	}
 	
 	protected void addRequestHandlers(EzyBeanContext beanContext) {

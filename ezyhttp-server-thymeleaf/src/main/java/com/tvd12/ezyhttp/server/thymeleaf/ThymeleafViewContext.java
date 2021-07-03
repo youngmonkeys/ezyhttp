@@ -11,17 +11,16 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import com.tvd12.ezyfox.bean.annotation.EzySingleton;
+import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
-@EzySingleton
 public class ThymeleafViewContext implements ViewContext {
 
 	private final TemplateEngine templateEngine;
 	
-	public ThymeleafViewContext() {
-		this.templateEngine = createTemplateEngine();
+	public ThymeleafViewContext(TemplateResolver templateResolver) {
+		this.templateEngine = createTemplateEngine(templateResolver);
 	}
 	
 	@Override
@@ -35,17 +34,17 @@ public class ThymeleafViewContext implements ViewContext {
 	    templateEngine.process(view.getTemplate(), ctx, response.getWriter());
 	}
 	
-	private TemplateEngine createTemplateEngine() {
+	private TemplateEngine createTemplateEngine(TemplateResolver data) {
 		ClassLoaderTemplateResolver templateResolver = 
                 new ClassLoaderTemplateResolver();
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setPrefix("templates/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setCacheTTLMs(Long.valueOf(3600000L));
-        templateResolver.setCacheable(true);
+        templateResolver.setTemplateMode(TemplateMode.valueOf(data.getTemplateMode()));
+        templateResolver.setPrefix(data.getPrefix());
+        templateResolver.setSuffix(data.getSuffix());
+        templateResolver.setCacheTTLMs(Long.valueOf(data.getCacheTTLMs()));
+        templateResolver.setCacheable(data.isCacheable());
         
         ThymeleafMessageResolver messageResolver = 
-        		new ThymeleafMessageResolver("messages");
+        		new ThymeleafMessageResolver(data.getMessagesLocation());
         
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
