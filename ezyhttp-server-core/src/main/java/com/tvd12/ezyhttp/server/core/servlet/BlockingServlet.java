@@ -105,10 +105,17 @@ public class BlockingServlet extends HttpServlet {
 		handleRequest(HttpMethod.DELETE, request, response);
 	}
 	
+	protected void preHandleRequest(
+			HttpMethod method,
+			HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException {
+	}
+	
 	protected void handleRequest(
 			HttpMethod method,
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
+		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
 		if(managementURIs.contains(requestURI)) {
 			if(request.getServerPort() == serverPort) {

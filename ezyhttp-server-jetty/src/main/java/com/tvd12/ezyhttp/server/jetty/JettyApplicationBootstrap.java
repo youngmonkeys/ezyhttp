@@ -1,22 +1,25 @@
 package com.tvd12.ezyhttp.server.jetty;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.MultipartConfigElement;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
-import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -40,8 +43,23 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
 	@EzyProperty("server.idle_timeout")
 	protected int idleTimeout = 150 * 1000;
 	
+	@EzyProperty("server.multipart.location")
+	protected String multipartLocation = "tmp";
+	
+	@EzyProperty("server.multipart.file_size_threshold")
+	protected String multipartFileSizeThreshold = "5MB";
+	
+	@EzyProperty("server.multipart.max_file_size")
+	protected String multipartMaxFileSize = "5MB";
+	
+	@EzyProperty("server.multipart.max_request_size")
+	protected String multipartMaxRequestSize = "5MB";
+	
 	@EzyProperty("cors.enable")
 	protected boolean corsEnable;
+	
+	@EzyProperty("cors.allowed_origins")
+	protected String allowedOrigins = "*";
 	
 	@EzyProperty("management.enable")
 	protected boolean managementEnable;
@@ -71,7 +89,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         	connectors.add(managementConnector);
         }
         server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
-        ServletHandler servletHandler = newServletHandler();
+        ServletContextHandler servletHandler = newServletHandler();
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
@@ -79,9 +97,16 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         	logger.info("management started on: {}:{}", managementHost, managementPort);
     }
 	
-    protected ServletHandler newServletHandler() {
-    	ServletHandler servletHandler = new ServletHandler();
-        servletHandler.addServletWithMapping(BlockingServlet.class, "/*");
+    protected ServletContextHandler newServletHandler() {
+    	ServletContextHandler servletHandler = new ServletContextHandler();
+        servletHandler.addServlet(JettyBlockingServlet.class, "/*")
+        	.getRegistration()
+        	.setMultipartConfig(new MultipartConfigElement(
+        		multipartLocation,
+        		FileSizes.toByteSize(multipartMaxFileSize),
+        		(int)FileSizes.toByteSize(multipartMaxRequestSize),
+        		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
+        	));;
         if(corsEnable) {
 	        FilterHolder crossOriginFilter = newCrossOriginFilter();
 	        addFilter(servletHandler, crossOriginFilter);
@@ -89,22 +114,14 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         return servletHandler;
     }
     
-    protected void addFilter(ServletHandler servletHandler, FilterHolder filter) {
-    	String filerName = filter.getName();
-    	servletHandler.addFilter(filter, createFilterMapping("/*", filerName));
-    }
-    
-    protected FilterMapping createFilterMapping(String pathSpec, String filterName) {
-        FilterMapping filterMapping = new FilterMapping();
-        filterMapping.setPathSpec(pathSpec);
-        filterMapping.setFilterName(filterName);
-        return filterMapping;
+    protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
+    	servletHandler.addFilter(filter, "/*", EnumSet.of(DispatcherType.REQUEST));
     }
     
     protected FilterHolder newCrossOriginFilter() {
     	FilterHolder filter = new FilterHolder();
     	filter.setName("cross-origin");
-    	filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+    	filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, allowedOrigins);
     	filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
     	filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "*");
     	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");

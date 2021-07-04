@@ -2,17 +2,30 @@ package com.tvd12.ezyhttp.server.core.test.controller;
 
 import java.util.Collections;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tvd12.ezyhttp.core.boot.test.service.FileUploadService;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.annotation.DoPost;
+import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 @Controller("/view")
+@AllArgsConstructor
 public class ViewController {
 
+	private final FileUploadService fileUploadService;
+	
 	@DoGet("/home")
 	public View home() {
 		return View.of("home");
@@ -28,9 +41,34 @@ public class ViewController {
 				.build();
 	}
 	
+	@DoGet("/upload")
+	public View uploadGet() {
+		return View.of("upload/upload");
+	}
+	
+	@DoPost("/upload")
+	public Redirect uploadPost(
+			HttpServletRequest request, 
+			@RequestBody FileUpload data,
+			@RequestParam("name") String fileName,
+			RequestArguments requestArguments
+	) throws Exception {
+		Part filePart = request.getPart("file");
+		if(filePart.getSize() > 0) {
+			fileUploadService.accept(filePart);
+		}
+		return Redirect.to("/view/upload");
+	}
+	
 	@Getter
 	@AllArgsConstructor
 	public static class Welcome {
 		private String message;
+	}
+	
+	@Data
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class FileUpload {
+		private String name;
 	}
 }
