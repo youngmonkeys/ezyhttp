@@ -19,7 +19,7 @@ public class RedirectController {
 	
 	@DoGet("/to-home1")
 	public Redirect toHome() {
-		return Redirect.to("?firstName=Dzung&who=Dzung");
+		return Redirect.to("/?firstName=Dzung&who=Dzung");
 	}
 	
 }

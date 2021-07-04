@@ -38,7 +38,6 @@ import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
-import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
@@ -249,11 +248,7 @@ public class BlockingServlet extends HttpServlet {
 		}
 		else if(data instanceof Redirect) {
 			Redirect redirect = (Redirect)data;
-			String redirectLocation = redirect.getUri();
-			if(!redirect.isURL())
-				redirectLocation = HttpServletRequests.getRequestURL(request, redirect.getUri());
-			response.setHeader("Location", redirectLocation);
-			response.setStatus(redirect.getCode());
+			response.sendRedirect(redirect.getUri());
 			return;
 		}
 		else if(data instanceof View) {
