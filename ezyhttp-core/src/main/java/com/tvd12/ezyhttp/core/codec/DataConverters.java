@@ -76,6 +76,7 @@ public class DataConverters {
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodySerializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.MULTIPART_FORM_DATA, formBodyConverter);
 		this.stringDeserializer = new DefaultStringDeserializer();
 		this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, textBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.TEXT_HTML, textBodyConverter);

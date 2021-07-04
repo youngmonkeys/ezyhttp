@@ -15,7 +15,7 @@ public class ResourceResolver {
 	protected final Map<String, Resource> resources = new HashMap<>();
 	protected final ResourceLoader resourceLoader = new ResourceLoader();
 
-	public final static String DEFAULT_RESOURCE_LOCATION = "templates";
+	public final static String DEFAULT_RESOURCE_LOCATION = "static";
 	public final static String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
 	
 	public void register(String localtion) {

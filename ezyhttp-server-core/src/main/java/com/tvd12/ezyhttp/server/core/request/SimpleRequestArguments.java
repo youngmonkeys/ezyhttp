@@ -147,6 +147,13 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Override
 	public String getContentType() {
 		String type = request.getContentType();
+		int index = type.indexOf(';');
+		return index > 0 ? type.substring(0, index) : type;
+	}
+	
+	@Override
+	public String getRequestContentType() {
+		String type = request.getContentType();
 		return type;
 	}
 	

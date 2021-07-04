@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <title>EzyHTTH View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}" />
+  </head>
+
+  <body>
+  
+    <p th:text="#{home.welcome}">Welcome to EzyHTTP!</p>
+    
+    <form action="upload" method="post" enctype="multipart/form-data">
+    	<label>name:</label><input type="text" name="name" value="Example" />
+    	<label>file:</label><input type="file" name="file" />
+    	<button type="submit">Submit</button>
+    </form>
+  
+  </body>
+
+</html>

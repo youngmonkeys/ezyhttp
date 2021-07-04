@@ -17,6 +17,7 @@ public final class ContentTypes {
 	public static final String IMAGE_SVG = "image/svg+xml";
 	public static final String IMAGE_TIFF = "image/tiff";
 	public static final String IMAGE_WEBP = "image/webp";
+	public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 	public static final String TEXT_CSS = "text/css";
 	public static final String TEXT_JAVASCRIPT = "text/javascript";
 	public static final String TEXT_HTML = "text/html";

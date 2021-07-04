@@ -10,6 +10,8 @@ public interface BodyData {
 	
 	String getContentType();
 	
+	String getRequestContentType();
+	
 	int getContentLength();
 	
 	InputStream getInputStream() throws IOException;

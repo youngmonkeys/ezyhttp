@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <head>
+    <title>EzyHTTH View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/css/home.css" />
+  </head>
+
+  <body>
+  
+    <p th:text="#{greet.title(${who})}">Greet to EzyHTTP!</p>
+    <p th:text="${welcome.message}">Welcome to EzyHTTP!</p>
+    <p th:text="${hi.message}">Hi to EzyHTTP!</p>
+  
+  </body>
+
+</html>

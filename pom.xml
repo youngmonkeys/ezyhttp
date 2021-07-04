@@ -9,7 +9,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>ezyhttp</artifactId>
-	<version>0.1.3</version>
+	<version>0.1.4</version>
 	<packaging>pom</packaging>
 
 	<name>ezyhttp</name>
@@ -74,5 +74,6 @@
 		<module>ezyhttp-server-jetty</module>
 		<module>ezyhttp-server-boot</module>
 		<module>ezyhttp-client</module>
+		<module>ezyhttp-server-thymeleaf</module>
 	</modules>
 </project>

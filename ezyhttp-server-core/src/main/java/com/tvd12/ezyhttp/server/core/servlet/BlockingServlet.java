@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -37,10 +38,17 @@ import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
+import com.tvd12.ezyhttp.server.core.view.Redirect;
+import com.tvd12.ezyhttp.server.core.view.View;
+import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
 
+	private int serverPort;
+	private int managmentPort;
+	private Set<String> managementURIs;
+	protected ViewContext viewContext;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
 	protected InterceptorManager interceptorManager;
@@ -54,6 +62,10 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
+		this.serverPort = componentManager.getServerPort();
+		this.managmentPort = componentManager.getManagmentPort();
+		this.managementURIs = componentManager.getManagementURIs();
+		this.viewContext = componentManager.getViewContext();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -92,11 +104,32 @@ public class BlockingServlet extends HttpServlet {
 		handleRequest(HttpMethod.DELETE, request, response);
 	}
 	
+	protected void preHandleRequest(
+			HttpMethod method,
+			HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException {
+	}
+	
 	protected void handleRequest(
 			HttpMethod method,
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
+		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
+		if(managementURIs.contains(requestURI)) {
+			if(request.getServerPort() == serverPort) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
+				return;
+			}
+		}
+		else {
+			if(request.getServerPort() == managmentPort) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
+				return;
+			}
+		}
 		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
 		if(requestHandler == null) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -124,7 +157,7 @@ public class BlockingServlet extends HttpServlet {
 						request.startAsync();
 					}
 					else {
-						handleResponseData(response, responseData);
+						handleResponseData(request, response, responseData);
 					}
 				}
 			}
@@ -156,7 +189,7 @@ public class BlockingServlet extends HttpServlet {
 					if(responseContentType != null) {
 						response.setContentType(responseContentType);
 					}
-					handleResponseData(response, result);
+					handleResponseData(request, response, result);
 				}
 				exception = null;
 			}
@@ -199,9 +232,10 @@ public class BlockingServlet extends HttpServlet {
 	}
 	
 	protected void handleResponseData(
+			HttpServletRequest request,
 			HttpServletResponse response, Object data) throws Exception {
 		Object body = data;
-		if(body instanceof ResponseEntity) {
+		if(data instanceof ResponseEntity) {
 			ResponseEntity entity = (ResponseEntity)body;
 			body = entity.getBody();
 			response.setStatus(entity.getStatus());
@@ -211,6 +245,24 @@ public class BlockingServlet extends HttpServlet {
 				for(Entry<String, String> entry : encodedHeaders.entrySet())
 					response.addHeader(entry.getKey(), entry.getValue());
 			}
+		}
+		else if(data instanceof Redirect) {
+			Redirect redirect = (Redirect)data;
+			response.sendRedirect(redirect.getUri());
+			return;
+		}
+		else if(data instanceof View) {
+			if(viewContext == null) {
+				throw new IllegalStateException(
+					"viewContext is null, " +
+					"you must add ezyhttp-server-thymeleaf to your dependencies" +
+					" or create viewContext by yourself"
+				);
+			}
+			View view = (View)data;
+			response.setContentType(view.getContentType());
+			viewContext.render(getServletContext(), request, response, view);
+			return;
 		}
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
