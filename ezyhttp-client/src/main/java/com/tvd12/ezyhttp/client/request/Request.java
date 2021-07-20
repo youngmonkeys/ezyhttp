@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
-public interface Request {
+public interface Request<T> {
 
 	String getURL();
 	
@@ -14,7 +14,7 @@ public interface Request {
 	
 	int getConnectTimeout();
 	
-	RequestEntity getEntity();
+	RequestEntity<T> getEntity();
 	
 	Map<Integer, Class<?>> getResponseTypes();
 	

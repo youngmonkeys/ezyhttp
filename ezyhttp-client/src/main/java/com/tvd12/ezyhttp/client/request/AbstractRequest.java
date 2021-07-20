@@ -9,14 +9,19 @@ import com.tvd12.ezyhttp.core.constant.StatusCodes;
 
 import lombok.Getter;
 
+/**
+ * @author github.com/tvd12
+ * @modifier: github.com/phamtiennam23
+ * @param <R> Type of the response's body
+ * @param <T> Type of the request's body
+ */
 @Getter
-@SuppressWarnings({"unchecked"})
-public abstract class AbstractRequest<R extends AbstractRequest<R>> implements Request {
+public abstract class AbstractRequest<R, T> implements Request<T> {
 
 	protected String url; 
 	protected int readTimeout;
 	protected int connectTimeout;
-	protected RequestEntity entity;
+	protected RequestEntity<T> entity;
 	protected final Map<Integer, Class<?>> responseTypes;
 	
 	public AbstractRequest() {
@@ -27,47 +32,47 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 		return this.url;
 	}
 	
-	public R setURL(URI uri) {
+	public AbstractRequest<R, T> setURL(URI uri) {
 		this.url = uri.toString();
-		return (R)this;
+		return this;
 	}
 	
-	public R setURL(URL url) {
+	public AbstractRequest<R, T> setURL(URL url) {
 		this.url = url.toString();
-		return (R)this;
+		return this;
 	}
 	
-	public R setURL(String url) {
+	public AbstractRequest<R, T> setURL(String url) {
 		this.url = url;
-		return (R)this;
+		return this;
 	}
 	
-	public R setEntity(RequestEntity entity) {
+	public AbstractRequest<R, T> setEntity(RequestEntity<T> entity) {
 		this.entity = entity;
-		return (R)this;
+		return this;
 	}
 	
-	public R setEntity(Object requestBody) {
-		return setEntity(RequestEntity.body(requestBody));
+	public AbstractRequest<R, T> setEntity(T requestBody) {
+		return setEntity(new RequestEntity<>(requestBody));
 	}
 	
-	public R setReadTimeout(int readTimeout) {
+	public AbstractRequest<R, T> setReadTimeout(int readTimeout) {
 		this.readTimeout = readTimeout;
-		return (R)this;
+		return this;
 	}
 	
-	public R setConnectTimeout(int connectTimeout) {
+	public AbstractRequest<R, T> setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
-		return (R)this;
+		return this;
 	}
 	
-	public R setResponseType(Class<?> responseType) {
+	public AbstractRequest<R, T> setResponseType(Class<?> responseType) {
 		return setResponseType(StatusCodes.OK, responseType);
 	}
 	
-	public R setResponseType(int statusCode, Class<?> responseType) {
+	public AbstractRequest<R, T> setResponseType(int statusCode, Class<?> responseType) {
 		this.responseTypes.put(statusCode, responseType);
-		return (R)this;
+		return this;
 	}
 	
 }
