@@ -1,6 +1,13 @@
 package com.tvd12.ezyhttp.core.codec;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +16,7 @@ import java.util.Set;
 import com.tvd12.ezyfox.collect.Lists;
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.io.EzyDataConverter;
+import com.tvd12.ezyfox.io.EzyDates;
 import com.tvd12.ezyfox.io.EzyStrings;
 
 public class DefaultStringDeserializer implements StringDeserializer {
@@ -74,6 +82,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		map.put(Integer[].class, v -> stringToWrapperInteger(v));
 		map.put(Long[].class, v -> stringToWrapperLong(v));
 		map.put(Short[].class, v -> stringToWrapperShort(v));
+		
+		map.put(Date.class, v -> new Date(Long.valueOf(v)));
+		map.put(Instant.class, v -> Instant.ofEpochMilli(Long.valueOf(v)));
+		map.put(LocalDate.class, v -> EzyDates.parseDate(v));
+		map.put(LocalTime.class, v -> EzyDates.parseTime(v));
+		map.put(LocalDateTime.class, v -> EzyDates.parseDateTime(v));
+		map.put(BigInteger.class, v -> new BigInteger(v));
+		map.put(BigDecimal.class, v -> new BigDecimal(v));
 		return map;
 	}
 
