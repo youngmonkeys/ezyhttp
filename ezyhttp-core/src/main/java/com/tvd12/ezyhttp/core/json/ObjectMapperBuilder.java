@@ -1,9 +1,11 @@
 package com.tvd12.ezyhttp.core.json;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,9 +31,56 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 	
 	protected Module newModule() {
 		SimpleModule module = new SimpleModule("ezyhttp");
+		module.addDeserializer(Date.class, new DateDeserialize());
+		module.addDeserializer(Instant.class, new InstantDeserialize());
 		module.addDeserializer(LocalDate.class, new LocalDateDeserialize());
+		module.addDeserializer(LocalTime.class, new LocalTimeDeserialize());
 		module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserialize());
 		return module;
+	}
+	
+	public static class DateDeserialize extends StdDeserializer<Date> {
+		private static final long serialVersionUID = -7550269143426341730L;
+
+		public DateDeserialize() {
+			super(Date.class);
+		}
+
+		@Override
+		public Date deserialize(JsonParser p, DeserializationContext ctxt)
+				throws IOException, JsonProcessingException {
+			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
+				return new Date(p.getValueAsLong());
+			}
+			else if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+				return EzyDates.parse(p.getValueAsString()); 
+			}
+			else {
+				throw new IOException("can deserialize value: " + p.getValueAsString() + " to Date");
+			}
+		}
+	}
+	
+	public static class InstantDeserialize extends StdDeserializer<Instant> {
+		private static final long serialVersionUID = -7550269143426341730L;
+
+		public InstantDeserialize() {
+			super(Instant.class);
+		}
+
+		@Override
+		public Instant deserialize(JsonParser p, DeserializationContext ctxt)
+				throws IOException, JsonProcessingException {
+			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
+				return Instant.ofEpochMilli(p.getValueAsLong());
+			}
+			else if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+				return EzyDates.parse(p.getValueAsString()).toInstant(); 
+			}
+			else {
+				throw new IOException("can deserialize value: " + p.getValueAsString() + " to Instant");
+			}
+		}
 	}
 	
 	public static class LocalDateDeserialize extends StdDeserializer<LocalDate> {

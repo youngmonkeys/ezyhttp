@@ -4,6 +4,9 @@
 	<test name="All">
 		<packages>
 			<package name="com.tvd12.ezyhttp.testing"></package>
+			<package name="com.tvd12.ezyhttp.testing.codec"></package>
+			<package name="com.tvd12.ezyhttp.testing.net"></package>
+			<package name="com.tvd12.ezyhttp.testing.json"></package>
 		</packages>
 	</test>
 </suite>
