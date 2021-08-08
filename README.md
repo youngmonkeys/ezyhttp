@@ -10,6 +10,8 @@ EzyHttp is a library in EzyFox ecosystem, It support to interact to HTTP (both h
 
 # Code Example
 
+For full example you can take a look [the examples repository](https://github.com/tvd12/ezyfox-examples)
+
 **1. Start HTTP Server application**
 
 ```java
