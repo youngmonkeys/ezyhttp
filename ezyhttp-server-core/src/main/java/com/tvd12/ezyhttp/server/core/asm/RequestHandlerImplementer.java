@@ -16,6 +16,7 @@ import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.handler.AbstractRequestHandler;
@@ -26,6 +27,7 @@ import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestParameters;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.util.PathVariableAnnotations;
+import com.tvd12.ezyhttp.server.core.util.RequestCookieAnnotations;
 import com.tvd12.ezyhttp.server.core.util.RequestHeaderAnnotations;
 import com.tvd12.ezyhttp.server.core.util.RequestParamAnnotations;
 
@@ -129,6 +131,7 @@ public class RequestHandlerImplementer
 		int headerCount = 0;
 		int parameterCount = 0;
 		int pathVariableCount = 0;
+		int cookieCount = 0;
 		Parameter[] parameters = handlerMethod.getParameters();
 		for(Parameter parameter : parameters) {
 			Class<?> parameterType = parameter.getType();
@@ -174,6 +177,19 @@ public class RequestHandlerImplementer
 				instruction
 					.cast(parameterType, valueExpression);
 				++ pathVariableCount;
+				hasAnnotation = true;
+			}
+			RequestCookie requestCookieAnno = parameter.getAnnotation(RequestCookie.class);
+			if(requestCookieAnno != null) {
+				String cookieKey = RequestCookieAnnotations
+						.getCookieKeyString(requestCookieAnno, cookieCount);
+				String valueExpression = "this.deserializeCookie(" +
+						cookieKey +
+						", arg0.getCookieValue(" + cookieKey + ")" + 
+						", " + parameterType.getTypeName() + ".class)" ;
+				instruction
+					.cast(parameterType, valueExpression);
+				++ cookieCount;
 				hasAnnotation = true;
 			}
 			RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);

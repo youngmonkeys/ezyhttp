@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -248,7 +249,11 @@ public class BlockingServlet extends HttpServlet {
 		}
 		else if(data instanceof Redirect) {
 			Redirect redirect = (Redirect)data;
-			response.sendRedirect(redirect.getUri());
+			for(Cookie cookie : redirect.getCookies())
+				response.addCookie(cookie);
+			for(Entry<String, String> e : redirect.getHeaders().entrySet())
+				response.addHeader(e.getKey(), e.getValue());
+			response.sendRedirect(redirect.getUri() + redirect.getQueryString());
 			return;
 		}
 		else if(data instanceof View) {
@@ -260,6 +265,10 @@ public class BlockingServlet extends HttpServlet {
 				);
 			}
 			View view = (View)data;
+			for(Cookie cookie : view.getCookies())
+				response.addCookie(cookie);
+			for(Entry<String, String> e : view.getHeaders().entrySet())
+				response.addHeader(e.getKey(), e.getValue());
 			response.setContentType(view.getContentType());
 			viewContext.render(getServletContext(), request, response, view);
 			return;
@@ -304,6 +313,7 @@ public class BlockingServlet extends HttpServlet {
 		arguments.setRequest(request);
 		arguments.setResponse(response);
 		arguments.setUriTemplate(uriTemplate);
+		arguments.setCookies(request.getCookies());
 		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,6 +37,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	protected Map<String, String> parameterMap;
 	protected Map<String, String> pathVariableMap;
 	protected List<Entry<String, String>> pathVariableList;
+	protected Cookie[] cookies;
+	protected Map<String, Cookie> cookieMap;
 	
 	@Override
 	public <T> T getArgument(Object key) {
@@ -168,6 +171,33 @@ public class SimpleRequestArguments implements RequestArguments {
 		return request.getInputStream();
 	}
 	
+	public void setCookies(Cookie[] cookies) {
+		if(cookies == null || cookies.length == 0)
+			return;
+		this.cookies = cookies;
+		this.cookieMap = new HashMap<>();
+		for(Cookie cookie : cookies)
+			cookieMap.put(cookie.getName(), cookie);
+	}
+	
+	@Override
+	public String getCookieValue(int index) {
+		if(cookies != null && cookies.length > index)
+			return cookies[index].getValue();
+		return null;
+	}
+	
+	@Override
+	public Cookie getCookie(String name) {
+		return cookieMap != null ? cookieMap.get(name) : null;
+	}
+	
+	@Override
+	public String getCookieValue(String name) {
+		Cookie cookie = getCookie(name);
+		return cookie != null ? cookie.getValue() : null;
+	}
+	
 	@Override
 	public void release() {
 		if(arguments != null)
@@ -185,6 +215,6 @@ public class SimpleRequestArguments implements RequestArguments {
 		this.headerMap = null;
 		this.parameterList = null;
 		this.parameterMap = null;
-		
+		this.cookies = null;
 	}
 }

@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core.request;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,5 +31,11 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	String getPathVariable(int index);
 	
 	String getPathVariable(String name);
+	
+	Cookie getCookie(String name);
+	
+	String getCookieValue(int index);
+	
+	String getCookieValue(String name);
 	
 }
