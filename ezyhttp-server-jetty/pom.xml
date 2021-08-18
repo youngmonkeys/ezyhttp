@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.1.5</version>
+		<version>0.1.6</version>
 	</parent>
 	
 	<artifactId>ezyhttp-server-jetty</artifactId>
