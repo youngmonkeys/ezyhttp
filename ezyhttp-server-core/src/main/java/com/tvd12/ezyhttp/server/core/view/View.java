@@ -1,8 +1,14 @@
 package com.tvd12.ezyhttp.server.core.view;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.Cookie;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
@@ -15,6 +21,8 @@ public class View {
 	private final String template;
 	private final Locale locale;
 	private final String contentType;
+	private final List<Cookie> cookies;
+	private final Map<String, String> headers;
 	private final Map<String, Object> variables;
 	
 	protected View(Builder builder) {
@@ -22,6 +30,8 @@ public class View {
 		this.locale = builder.locale;
 		this.variables = builder.variables;
 		this.contentType = builder.contentType;
+		this.cookies = builder.cookies;
+		this.headers = builder.headers;
 	}
 	
 	public static View of(String template) {
@@ -39,6 +49,8 @@ public class View {
 	
 	public static class Builder implements EzyBuilder<View> {
 		private String template;
+		private List<Cookie> cookies;
+		private Map<String, String> headers;
 		private Locale locale = Locale.ENGLISH;
 		private String contentType = ContentTypes.TEXT_HTML_UTF8;
 		private Map<String, Object> variables = new HashMap<>();
@@ -72,10 +84,38 @@ public class View {
 			return this;
 		}
 		
+		public Builder addHeader(String name, Object value) {
+			if(headers == null)
+				this.headers = new HashMap<>();
+			this.headers.put(name, value.toString());
+			return this;
+		}
+		
+		public Builder addHeaders(Map<String, Object> headers) {
+			for(Entry<String, Object> e : headers.entrySet())
+				addHeader(e.getKey(), e.getValue());
+			return this;
+		}
+		
+		public Builder addCookie(Cookie cookie) {
+			if(cookies == null)
+				this.cookies = new LinkedList<>();
+			this.cookies.add(cookie);
+			return this;
+		}
+		
+		public Builder addCookie(String name, Object value) {
+			return addCookie(new Cookie(name, value.toString()));
+		}
+		
 		@Override
 		public View build() {
 			if(template == null)
 				throw new NullPointerException("template can not be null");
+			if(cookies == null)
+				cookies = Collections.emptyList();
+			if(headers == null)
+				headers = Collections.emptyMap();
 			return new View(this);
 		}
 	}

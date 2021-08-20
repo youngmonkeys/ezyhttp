@@ -8,6 +8,7 @@ import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.codec.StringDeserializer;
 import com.tvd12.ezyhttp.core.data.BodyData;
 import com.tvd12.ezyhttp.core.exception.DeserializeBodyException;
+import com.tvd12.ezyhttp.core.exception.DeserializeCookieException;
 import com.tvd12.ezyhttp.core.exception.DeserializeHeaderException;
 import com.tvd12.ezyhttp.core.exception.DeserializeParameterException;
 import com.tvd12.ezyhttp.core.exception.DeserializePathVariableException;
@@ -129,6 +130,30 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		}
 		catch (Exception e) {
 			throw new DeserializeBodyException("can't deserialize body data to: " + type.getName(), e);
+		}
+	}
+	
+	protected <T> T deserializeCookie(
+			int index, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeCookieException("cookie#" + index, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializeCookie(
+			String name, String value, Class<T> type) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeCookieException(name, value, type, e);
 		}
 	}
 	
