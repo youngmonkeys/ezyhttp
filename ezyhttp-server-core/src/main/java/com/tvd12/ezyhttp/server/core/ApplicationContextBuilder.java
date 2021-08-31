@@ -15,8 +15,8 @@ import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.reflect.EzyClasses;
+import com.tvd12.ezyfox.reflect.EzyPackages;
 import com.tvd12.ezyfox.reflect.EzyReflection;
-import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.core.annotation.StringConvert;
@@ -162,14 +162,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	@Override
 	public ApplicationContext build() {
-		EzyReflection reflection = new EzyReflectionProxy(packageToScans);
-		EzyBeanContext beanContext = createBeanContext(reflection);
+		EzyBeanContext beanContext = createBeanContext();
 		SimpleApplicationContext context = new SimpleApplicationContext();
 		context.setBeanContext(beanContext);
 		return context;
 	}
 	
-	protected EzyBeanContext createBeanContext(EzyReflection reflection) {
+	protected EzyBeanContext createBeanContext() {
+		if(packageToScans.isEmpty())
+			throw new IllegalStateException("must scan at least one package");
+		EzyReflection reflection = EzyPackages.scanPackages(packageToScans);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
@@ -181,8 +183,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		properties.putAll(readPropertiesSources());
 		EzyBeanContext beanContext = EzyBeanContext.builder()
 				.scan("com.tvd12.ezyhttp.server")
+				.scan(packageToScans)
 				.addProperties(properties)
-				.addAllClasses(reflection)
 				.addSingletonClasses(componentClasses)
 				.addSingletonClasses(serviceClasses)
 				.addSingletonClasses(controllerClasses)
