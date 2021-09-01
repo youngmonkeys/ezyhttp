@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.client;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
@@ -12,6 +13,7 @@ import com.tvd12.ezyfox.concurrent.EzyFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyThreadList;
 import com.tvd12.ezyfox.util.EzyCloseable;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
@@ -31,20 +33,37 @@ public class HttpClientProxy
 	protected volatile boolean active;
 	protected final HttpClient client;
 	protected final int threadPoolSize;
+	protected final AtomicBoolean started;
 	protected final RequestQueue requestQueue;
 	protected final EzyFutureMap<Request> futures;
 	
 	public HttpClientProxy(
 			int threadPoolSize,
 			int requestQueueCapacity, HttpClient client) {
+		this(threadPoolSize, requestQueueCapacity, false, client);
+	}
+	
+	public HttpClientProxy(
+			int threadPoolSize,
+			int requestQueueCapacity,
+			boolean autoStart, HttpClient client) {
 		this.client = client;
 		this.threadPoolSize = threadPoolSize;
+		this.started = new AtomicBoolean(false);
 		this.futures = new EzyFutureConcurrentHashMap<>();
 		this.requestQueue = new RequestQueue(requestQueueCapacity);
+		this.doStart(autoStart);
+	}
+	
+	private void doStart(boolean autoStart) {
+		if(autoStart)
+			EzyProcessor.processWithException(() -> start());
 	}
 	
 	@Override
 	public void start() throws Exception {
+		if(!started.compareAndSet(false, true))
+			return;
 		this.active = true;
 		this.threadList = new EzyThreadList(
 				threadPoolSize, 
@@ -152,6 +171,7 @@ public class HttpClientProxy
 	}
 	
 	public static class Builder implements EzyBuilder<HttpClientProxy> {
+		protected boolean autoStart;
 		protected int threadPoolSize;
 		protected int requestQueueCapacity;
 		protected HttpClient.Builder clientBuilder;
@@ -161,6 +181,11 @@ public class HttpClientProxy
 			this.requestQueueCapacity = 10000;
 			this.clientBuilder = HttpClient.builder();
 			
+		}
+		
+		public Builder autoStart(boolean autoStart) {
+			this.autoStart = autoStart;
+			return this;
 		}
 		
 		public Builder readTimeout(int readTimeout) {
@@ -203,6 +228,7 @@ public class HttpClientProxy
 			HttpClientProxy proxy = new HttpClientProxy(
 					threadPoolSize,
 					requestQueueCapacity,
+					autoStart,
 					clientBuilder.build()
 			);
 			return proxy;
