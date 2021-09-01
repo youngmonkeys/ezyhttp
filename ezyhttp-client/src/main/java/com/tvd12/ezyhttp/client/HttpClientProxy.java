@@ -13,6 +13,7 @@ import com.tvd12.ezyfox.concurrent.EzyFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyThreadList;
 import com.tvd12.ezyfox.util.EzyCloseable;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
@@ -28,7 +29,6 @@ public class HttpClientProxy
 		extends EzyLoggable
 		implements EzyStartable, EzyStoppable, EzyCloseable {
 
-	protected boolean autoStart;
 	protected EzyThreadList threadList;
 	protected volatile boolean active;
 	protected final HttpClient client;
@@ -40,11 +40,24 @@ public class HttpClientProxy
 	public HttpClientProxy(
 			int threadPoolSize,
 			int requestQueueCapacity, HttpClient client) {
+		this(threadPoolSize, requestQueueCapacity, false, client);
+	}
+	
+	public HttpClientProxy(
+			int threadPoolSize,
+			int requestQueueCapacity,
+			boolean autoStart, HttpClient client) {
 		this.client = client;
 		this.threadPoolSize = threadPoolSize;
 		this.started = new AtomicBoolean(false);
 		this.futures = new EzyFutureConcurrentHashMap<>();
 		this.requestQueue = new RequestQueue(requestQueueCapacity);
+		this.doStart(autoStart);
+	}
+	
+	private void doStart(boolean autoStart) {
+		if(autoStart)
+			EzyProcessor.processWithException(() -> start());
 	}
 	
 	@Override
@@ -215,6 +228,7 @@ public class HttpClientProxy
 			HttpClientProxy proxy = new HttpClientProxy(
 					threadPoolSize,
 					requestQueueCapacity,
+					autoStart,
 					clientBuilder.build()
 			);
 			return proxy;
