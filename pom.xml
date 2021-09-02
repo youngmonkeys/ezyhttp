@@ -75,5 +75,6 @@
 		<module>ezyhttp-server-boot</module>
 		<module>ezyhttp-client</module>
 		<module>ezyhttp-server-thymeleaf</module>
+		<module>ezyhttp-server-graphql</module>
 	</modules>
 </project>

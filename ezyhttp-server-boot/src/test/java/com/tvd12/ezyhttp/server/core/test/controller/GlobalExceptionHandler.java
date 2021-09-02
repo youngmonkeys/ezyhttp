@@ -24,6 +24,7 @@ public class GlobalExceptionHandler {
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {
+		e.printStackTrace();
 		return e.getMessage();
 	}
 	
