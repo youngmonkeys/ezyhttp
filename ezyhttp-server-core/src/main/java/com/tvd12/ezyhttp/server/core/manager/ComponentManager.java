@@ -2,7 +2,9 @@ package com.tvd12.ezyhttp.server.core.manager;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 import lombok.Getter;
@@ -19,6 +21,7 @@ public final class ComponentManager {
 	private Set<String> managementURIs;
 	@Setter
 	private ViewContext viewContext;
+	private ObjectMapper objectMapper;
 	private DataConverters dataConverters;
 	private ControllerManager controllerManager;
 	private InterceptorManager interceptorManager;
@@ -28,7 +31,8 @@ public final class ComponentManager {
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
 	private ComponentManager() {
-		this.dataConverters = new DataConverters();
+		this.objectMapper = new ObjectMapperBuilder().build();
+		this.dataConverters = new DataConverters(objectMapper);
 		this.controllerManager = new ControllerManager();
 		this.interceptorManager = new InterceptorManager();
 		this.requestHandlerManager = new RequestHandlerManager();

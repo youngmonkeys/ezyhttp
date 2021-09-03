@@ -9,21 +9,11 @@
 	</parent>
 	<artifactId>ezyhttp-server-graphql</artifactId>
 	
-	<properties>
-		<graphql.version>17.2</graphql.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>
 			<artifactId>ezyhttp-server-core</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>com.graphql-java</groupId>
-		    <artifactId>graphql-java</artifactId>
-		    <version>${graphql.version}</version>
 		</dependency>
 	</dependencies>
 </project>

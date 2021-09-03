@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.annotation;
+package com.tvd12.ezyhttp.server.graphql.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,9 +11,13 @@ import java.lang.annotation.Target;
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface TryCatch {
+@Target({ ElementType.TYPE })
+public @interface GraphQLOperation {
     
-	Class<?>[] value();
-	
+	/**
+	 * the operation name
+	 * 
+	 * @return the operation name
+	 */
+	public String value();
 }

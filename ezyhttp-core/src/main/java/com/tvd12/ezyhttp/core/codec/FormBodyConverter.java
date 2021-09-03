@@ -8,17 +8,12 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.data.BodyData;
-import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.net.MapDecoder;
 import com.tvd12.ezyhttp.core.net.MapEncoder;
 
 public class FormBodyConverter implements BodyConverter {
 
 	protected final ObjectMapper objectMapper;
-	
-	public FormBodyConverter() {
-		this(new ObjectMapperBuilder().build());
-	}
 	
 	public FormBodyConverter(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;

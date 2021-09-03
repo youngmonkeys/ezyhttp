@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.request.Request;
@@ -32,6 +33,7 @@ import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
 import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
+import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
 public class HttpClient extends EzyLoggable {
@@ -231,12 +233,14 @@ public class HttpClient extends EzyLoggable {
 		
 		protected int readTimeout;
 		protected int connectTimeout;
+		protected ObjectMapper objectMapper;
 		protected DataConverters dataConverters;
 		
 		public Builder() {
 			this.readTimeout = 15 * 1000;
 			this.connectTimeout = 15 * 1000;
-			this.dataConverters = new DataConverters();
+			this.objectMapper = new ObjectMapperBuilder().build();
+			this.dataConverters = new DataConverters(objectMapper);
 		}
 		
 		public Builder readTimeout(int readTimeout) {
@@ -246,6 +250,12 @@ public class HttpClient extends EzyLoggable {
 		
 		public Builder connectTimeout(int connectTimeout) {
 			this.connectTimeout = connectTimeout;
+			return this;
+		}
+		
+		public Builder objectMapper(Object objectMapper) {
+			if(objectMapper instanceof ObjectMapper)
+				this.objectMapper = (ObjectMapper)objectMapper;
 			return this;
 		}
 		
