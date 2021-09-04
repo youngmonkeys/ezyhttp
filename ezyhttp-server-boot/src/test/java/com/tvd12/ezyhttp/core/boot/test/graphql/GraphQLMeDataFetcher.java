@@ -3,16 +3,16 @@ package com.tvd12.ezyhttp.core.boot.test.graphql;
 import java.util.Arrays;
 import java.util.List;
 
+import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.core.boot.test.graphql.GraphQLMeDataFetcher.MeRequest;
 import com.tvd12.ezyhttp.core.boot.test.graphql.GraphQLMeDataFetcher.MeResponse;
-import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-@Controller("/graphql")
+@EzySingleton
 public class GraphQLMeDataFetcher 
 		extends GraphQLAbstractDataFetcher<MeRequest, MeResponse> {
 
