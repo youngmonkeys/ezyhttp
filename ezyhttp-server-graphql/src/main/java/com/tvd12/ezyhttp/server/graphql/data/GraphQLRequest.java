@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.data;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +9,5 @@ public class GraphQLRequest {
 
 	private String operationName;
 	private String query;
-	private String variables;
+	private Object variables;
 }

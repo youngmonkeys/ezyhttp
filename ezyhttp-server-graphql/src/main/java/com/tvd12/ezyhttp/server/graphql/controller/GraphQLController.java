@@ -17,9 +17,9 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.GraphQLField;
-import com.tvd12.ezyhttp.server.graphql.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 
 @Controller
 public class GraphQLController {
@@ -37,49 +37,80 @@ public class GraphQLController {
 	/**
 	 * Follow by this suggestion: https://graphql.org/learn/serving-over-http/ 
 	 * 
+	 * Example:
+	 * 
+	 * <code>
+	 * curl --location -g --request GET 'http://localhost:8083/graphql?operationName=me&query={me{id+name+friends{name}}}&variables={"id" : 1}'
+	 * </code>
+	 * 
+	 * 
 	 * @param operationName be used to control which one should be executed.
 	 * @param query GraphQL query
 	 * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</cocde>
 	 * @return the result
 	 * @throws Exception when have any error
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@DoGet("/graphql")
 	public Object doGet(
 			@RequestParam("operationName") String operationName,
 			@RequestParam("query") String query,
 			@RequestParam("variables") String variables
 	) throws Exception {
-		GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(operationName);
-		if(dataFetcher == null) {
-			throw new HttpNotFoundException("not found data fetcher with operationName: " + operationName);
-		}
-		Class<?> argumentType = dataFetcher.getArgumentType();
-		Object argument = null;
-		if(argumentType != null) {
-			argument = objectMapper.readValue(variables, argumentType);
-		}
-		else {
-			argument = objectMapper.readValue(variables, Map.class);
-		}
-		Object data = dataFetcher.getData(argument);
-		return mapToResponse(data, query);
+		return fetch(operationName, query, variables);
 	}
 	
 	/**
 	 * Follow by this suggestion: https://graphql.org/learn/serving-over-http/
 	 * 
+	 * Example:
+	 * 
+	 * <pre>
+	 * curl --location --request POST 'http://localhost:8083/graphql' \
+	 *	--header 'Content-Type: application/json' \
+	 *	--data-raw '{
+     *		"operationName": "me",
+     *		"query": "{me{id+name+friends{name}}}",
+     *		"variables": {"id" : 1}
+	 *	  }'
+	 * </pre>
+	 * 
 	 * @param request the request body
 	 * @return the result
 	 * @throws Exception when have any error
 	 */
-	@DoPost
-	private Object doPost(@RequestBody GraphQLRequest request) throws Exception {
-		return doGet(
+	@DoPost("/graphql")
+	public Object doPost(@RequestBody GraphQLRequest request) throws Exception {
+		return fetch(
 				request.getOperationName(), 
 				request.getQuery(),
 				request.getVariables()
 		);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object fetch(
+			String operationName,
+			String query,
+			Object variables
+	) throws Exception {
+		GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(operationName);
+		if(dataFetcher == null) {
+			throw new HttpNotFoundException("not found data fetcher with operationName: " + operationName);
+		}
+		Class<?> argumentType = dataFetcher.getArgumentType();
+		Object argument = variables;
+		if(argumentType != null) {
+			if(variables instanceof String)
+				argument = objectMapper.readValue((String)variables, argumentType);
+			else
+				argument = objectMapper.convertValue(variables, argumentType);
+		}
+		else {
+			if(variables instanceof String)
+				argument = objectMapper.readValue((String)variables, Map.class);
+		}
+		Object data = dataFetcher.getData(argument);
+		return mapToResponse(data, query);
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
