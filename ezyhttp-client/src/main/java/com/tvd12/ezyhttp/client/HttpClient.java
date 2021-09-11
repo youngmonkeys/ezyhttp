@@ -79,7 +79,7 @@ public class HttpClient extends EzyLoggable {
 			RequestEntity entity, 
 			Map<Integer, Class<?>> responseTypes, 
 			int connectTimeout, int readTimeout) throws Exception {
-		logger.debug("start: {} - {} - {}", method, url, entity.getHeaders());
+		logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
 		HttpURLConnection connection = connect(url);
 		try {
 			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);

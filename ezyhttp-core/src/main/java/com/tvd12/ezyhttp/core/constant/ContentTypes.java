@@ -27,8 +27,10 @@ public final class ContentTypes {
 	private ContentTypes() {}
 
 	public static String getContentType(String contentTypeCharset) {
-		String[] strs = contentTypeCharset.split(";");
-		return strs[0];
+		if(contentTypeCharset == null)
+			return null;
+		int index = contentTypeCharset.indexOf(';');
+		return index > 0 ? contentTypeCharset.substring(0, index) : contentTypeCharset;
 	}
 	
 }
