@@ -3,13 +3,13 @@ package com.tvd12.ezyhttp.core.codec;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +95,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		
 		map.put(Boolean[].class, v -> stringToWrapperBoolean(v));
 		map.put(Byte[].class, v -> stringToWrapperByte(v));
+		map.put(Character[].class, v -> stringToWrapperChar(v));
 		map.put(Double[].class, v -> stringToWrapperDouble(v));
 		map.put(Float[].class, v -> stringToWrapperFloat(v));
 		map.put(Integer[].class, v -> stringToWrapperInteger(v));
@@ -206,6 +207,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		Byte[] answer = new Byte[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
 			answer[i] = Byte.valueOf(array[i]);
+		return answer;
+	}
+	
+	protected Character[] stringToWrapperChar(String value) {
+		String[] array = stringToStringArray(value);
+		Character[] answer = new Character[array.length];
+		for(int i = 0 ; i < array.length ; ++i)
+			answer[i] = array[i].charAt(0);
 		return answer;
 	}
 

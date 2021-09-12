@@ -114,17 +114,4 @@ public class ObjectMapperBuilderTest {
 		// then
 		Asserts.assertEquals(BigDecimal.valueOf(12345.6), actual);
 	}
-	
-	@Test
-	public void booleanArrayDecimalTest() {
-		// given
-		String source = "true,false";
-		
-		// when
-		boolean[] actual = sut.convertValue(source, boolean[].class);
-		
-		// then
-		Asserts.assertEquals(new boolean[] {true, false}, actual);
-	}
-	
 }

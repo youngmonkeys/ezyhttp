@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.client.test;
 
+import java.util.List;
+
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.request.DeleteRequest;
 import com.tvd12.ezyhttp.client.request.GetRequest;
@@ -28,6 +30,11 @@ public class V018HttpClientTest {
 		GetRequest textRequest = new GetRequest()
 				.setURL("http://localhost:8083/text");
 		System.out.println((String)client.call(textRequest));
+		
+		GetRequest listRequest = new GetRequest()
+				.setResponseType(List.class)
+				.setURL("http://localhost:8083/list");
+		System.out.println(client.call(listRequest).toString());
 	}
 	
 }

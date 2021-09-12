@@ -85,6 +85,11 @@ public class HomeController {
 				.build();
 	}
 	
+	@DoGet("list")
+	public List<String> list() {
+		return Arrays.asList("hello", "world");
+	}
+	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2( Exception e) {
 		e.printStackTrace();
