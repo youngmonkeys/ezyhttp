@@ -79,6 +79,8 @@ public class HttpClient extends EzyLoggable {
 			RequestEntity entity, 
 			Map<Integer, Class<?>> responseTypes, 
 			int connectTimeout, int readTimeout) throws Exception {
+		if(url == null)
+			throw new IllegalArgumentException("url can not be null");
 		logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
 		HttpURLConnection connection = connect(url);
 		try {

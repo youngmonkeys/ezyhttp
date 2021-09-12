@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.tvd12.ezyhttp.core.boot.test.exception.NoPermissionException;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
@@ -46,6 +48,14 @@ public class GlobalExceptionHandler {
 		for(Reference reference : ex.getPath())
 			data.put(reference.getFieldName(), "invalid");
 		throw new HttpBadRequestException(data);
+	}
+	
+	@TryCatch(NoPermissionException.class)
+	public ResponseEntity handleException(NoPermissionException e) {
+		return ResponseEntity.builder()
+				.status(StatusCodes.UNAUTHORIZED)
+				.body("has no permission")
+				.build();
 	}
 	
 }

@@ -118,6 +118,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Override
 	public String getPathVariable(int index) {
 		fetchPathVariables();
+		if(pathVariableList.size() <= index)
+			return null;
 		String varValue = pathVariableList.get(index).getValue();
 		return varValue;
 	}

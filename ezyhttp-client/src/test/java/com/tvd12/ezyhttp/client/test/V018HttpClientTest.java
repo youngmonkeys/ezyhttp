@@ -1,7 +1,9 @@
 package com.tvd12.ezyhttp.client.test;
 
 import com.tvd12.ezyhttp.client.HttpClient;
+import com.tvd12.ezyhttp.client.request.DeleteRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
+import com.tvd12.ezyhttp.client.request.RequestEntity;
 
 public class V018HttpClientTest {
 
@@ -10,7 +12,17 @@ public class V018HttpClientTest {
 				.build();
 		PostRequest loveRequest = new PostRequest()
 				.setURL("http://localhost:8083/love");
-		client.call(loveRequest);
+		System.out.println(client.request(loveRequest));
+		
+		DeleteRequest deleteRequest = new DeleteRequest()
+				.setURL("http://localhost:8083/api/v1/customer/delete")
+				.setEntity(
+					RequestEntity.builder()
+						.header("token", "123456")
+						.build()
+				);
+		System.out.println(client.request(deleteRequest));
+		System.out.println(client.request(deleteRequest).getBody().toString());
 	}
 	
 }

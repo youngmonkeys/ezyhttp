@@ -8,7 +8,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +32,20 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public <T> T deserialize(
+			String value,
+			Class<T> outType, 
+			Class<?> genericType) throws IOException {
+		if(genericType != null) {
+			if(Set.class.isAssignableFrom(outType))
+				return (T)stringToSet(value, genericType);
+			else if(Collection.class.isAssignableFrom(outType))
+				return (T)stringToList(value, genericType);
+		}
+		return deserialize(value, outType);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
 		StringMapper mapper = mappers.get(outType);
 		if(mapper == null)
@@ -223,4 +240,22 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		return answer;
 	}
 	
+	// =============== collection ===============
+	protected <T> Set<T> stringToSet(
+			String value, Class<T> itemType) throws IOException {
+		String[] array = stringToStringArray(value);
+		Set<T> answer = new HashSet<>();
+		for(int i = 0 ; i < array.length ; ++i)
+			answer.add(deserialize(array[i], itemType));
+		return answer;
+	}
+	
+	protected <T> List<T> stringToList(
+			String value, Class<T> itemType) throws IOException {
+		String[] array = stringToStringArray(value);
+		List<T> answer = new ArrayList<>();
+		for(int i = 0 ; i < array.length ; ++i)
+			answer.add(deserialize(array[i], itemType));
+		return answer;
+	}
 }

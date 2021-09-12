@@ -1,20 +1,27 @@
 package com.tvd12.ezyhttp.server.core.test.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.core.boot.test.data.Customer;
+import com.tvd12.ezyhttp.core.boot.test.exception.NoPermissionException;
 import com.tvd12.ezyhttp.core.boot.test.service.CustomerService;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
+import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
+import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
+import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 
 import lombok.Setter;
 
@@ -38,6 +45,29 @@ public class CustomerController {
 		validateCustomer(customer);
 		customerService.save(customer);
 		return ResponseEntity.status(StatusCodes.NO_CONTENT).build();
+	}
+	
+	@DoDelete("/delete")
+	public void deleteAllCustomers() {
+		throw new NoPermissionException();
+	}
+	
+	@DoDelete("/delete2")
+	public void deleteAllCustomers2() {
+		throw new HttpUnauthorizedException("no permission");
+	}
+	
+	@DoGet("/get-by-ids")
+	public List<Customer> getCustomers(
+		@RequestParam List<Long> ids,
+		@PathVariable String path1,
+		@PathVariable("path") String path2,
+		@RequestHeader String header1,
+		@RequestHeader("header") String header2,
+		@RequestCookie String cookie1,
+		@RequestCookie("cookie") String cookie2
+	) {
+		return customerService.getCustomersById(ids);
 	}
 	
 	protected void validateCustomer(Customer customer) {

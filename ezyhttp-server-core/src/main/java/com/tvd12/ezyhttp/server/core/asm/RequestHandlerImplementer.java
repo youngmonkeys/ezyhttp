@@ -2,6 +2,8 @@ package com.tvd12.ezyhttp.server.core.asm;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -135,6 +137,10 @@ public class RequestHandlerImplementer
 		Parameter[] parameters = handlerMethod.getParameters();
 		for(Parameter parameter : parameters) {
 			Class<?> parameterType = parameter.getType();
+			Class<?> genericType = getGenericType(parameter);
+			String genericTypeClass = genericType != null 
+					? genericType.getName() + ".class" 
+					: "null";
 			EzyInstruction instruction = new EzyInstruction("\t", "\n")
 					.clazz(parameterType)
 					.append(" ").append(PARAMETER_PREFIX).append(paramCount)
@@ -147,7 +153,8 @@ public class RequestHandlerImplementer
 				String valueExpression = "this.deserializeParameter(" +
 						paramKey +
 						", arg0.getParameter(" + paramKey + ")" + 
-						", " + parameterType.getTypeName() + ".class)" ;
+						", " + parameterType.getTypeName() + ".class" + 
+						", " + genericTypeClass + ")" ;
 				instruction
 					.cast(parameterType, valueExpression);
 				++ parameterCount;
@@ -160,7 +167,8 @@ public class RequestHandlerImplementer
 				String valueExpression = "this.deserializeHeader(" +
 						headerKey +
 						", arg0.getHeader(" + headerKey + ")" + 
-						", " + parameterType.getTypeName() + ".class)";
+						", " + parameterType.getTypeName() + ".class" +
+						", " + genericTypeClass + ")" ;
 				instruction
 					.cast(parameterType, valueExpression);
 				++ headerCount;
@@ -173,7 +181,8 @@ public class RequestHandlerImplementer
 				String valueExpression = "this.deserializePathVariable(" +
 						varNameKey +
 						", arg0.getPathVariable(" + varNameKey + ")" +
-						", " + parameterType.getTypeName() + ".class)";
+						", " + parameterType.getTypeName() + ".class" +
+						", " + genericTypeClass + ")" ;
 				instruction
 					.cast(parameterType, valueExpression);
 				++ pathVariableCount;
@@ -186,7 +195,8 @@ public class RequestHandlerImplementer
 				String valueExpression = "this.deserializeCookie(" +
 						cookieKey +
 						", arg0.getCookieValue(" + cookieKey + ")" + 
-						", " + parameterType.getTypeName() + ".class)" ;
+						", " + parameterType.getTypeName() + ".class" +
+						", " + genericTypeClass + ")" ;
 				instruction
 					.cast(parameterType, valueExpression);
 				++ cookieCount;
@@ -303,6 +313,16 @@ public class RequestHandlerImplementer
 							.string(handlerMethod.getResponseType()))
 					.function()
 				.toString();
+	}
+	
+	protected Class<?> getGenericType(Parameter parameter) {
+		Type parameterizedType = parameter.getParameterizedType();
+		if(parameterizedType instanceof ParameterizedType) {
+			ParameterizedType aType = (ParameterizedType) parameterizedType;
+	        Type[] parameterArgTypes = aType.getActualTypeArguments();
+	        return (Class<?>)parameterArgTypes[0];
+		}
+		return null;
 	}
 	
 	protected EzyMethod getSetControllerMethod() {

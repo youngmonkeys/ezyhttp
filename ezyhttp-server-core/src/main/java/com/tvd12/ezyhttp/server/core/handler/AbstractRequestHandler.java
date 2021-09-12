@@ -49,10 +49,12 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			RequestArguments arguments, Exception e) throws Exception;
 	
 	protected <T> T deserializeHeader(
-			int index, String value, Class<T> type) throws IOException {
+			int index, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
@@ -61,10 +63,12 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	protected <T> T deserializeHeader(
-			String name, String value, Class<T> type) throws IOException {
+			String name, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
@@ -73,22 +77,27 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	protected <T> T deserializeParameter(
-			int index, String value, Class<T> type) throws IOException {
+			int index, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new DeserializeParameterException("parameter#" + index, value, type, e);
 		}
 	}
 	
 	protected <T> T deserializeParameter(
-			String name, String value, Class<T> type) throws IOException {
+			String name, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
@@ -97,10 +106,12 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	protected <T> T deserializePathVariable(
-			String name, String value, Class<T> type) throws IOException {
+			String name, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
@@ -109,14 +120,44 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	protected <T> T deserializePathVariable(
-			int index, String value, Class<T> type) throws IOException {
+			int index, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
 		try {
 			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
+			T answer = deserializer.deserialize(value, type, genericType);
 			return answer;
 		}
 		catch (Exception e) {
 			throw new DeserializePathVariableException("pathVariable#" + index, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializeCookie(
+			int index, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type, genericType);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeCookieException("cookie#" + index, value, type, e);
+		}
+	}
+	
+	protected <T> T deserializeCookie(
+			String name, 
+			String value, 
+			Class<T> type, Class<?> genericType) throws IOException {
+		try {
+			StringDeserializer deserializer = dataConverters.getStringDeserializer();
+			T answer = deserializer.deserialize(value, type, genericType);
+			return answer;
+		}
+		catch (Exception e) {
+			throw new DeserializeCookieException(name, value, type, e);
 		}
 	}
 	
@@ -135,29 +176,4 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			throw new DeserializeBodyException("can't deserialize body data to: " + type.getName(), e);
 		}
 	}
-	
-	protected <T> T deserializeCookie(
-			int index, String value, Class<T> type) throws IOException {
-		try {
-			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
-			return answer;
-		}
-		catch (Exception e) {
-			throw new DeserializeCookieException("cookie#" + index, value, type, e);
-		}
-	}
-	
-	protected <T> T deserializeCookie(
-			String name, String value, Class<T> type) throws IOException {
-		try {
-			StringDeserializer deserializer = dataConverters.getStringDeserializer();
-			T answer = deserializer.deserialize(value, type);
-			return answer;
-		}
-		catch (Exception e) {
-			throw new DeserializeCookieException(name, value, type, e);
-		}
-	}
-	
 }
