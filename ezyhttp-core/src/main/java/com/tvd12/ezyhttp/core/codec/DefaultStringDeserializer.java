@@ -86,6 +86,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		
 		map.put(boolean[].class, v -> stringToPrimitiveBoolean(v));
 		map.put(byte[].class, v -> stringToPrimitiveByte(v));
+		map.put(char[].class, v -> stringToPrimitiveChar(v));
 		map.put(double[].class, v -> stringToPrimitiveDouble(v));
 		map.put(float[].class, v -> stringToPrimitiveFloat(v));
 		map.put(int[].class, v -> stringToPrimitiveInteger(v));
@@ -140,6 +141,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		byte[] answer = new byte[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
 			answer[i] = Byte.valueOf(array[i]);
+		return answer;
+	}
+	
+	protected char[] stringToPrimitiveChar(String value) {
+		String[] array = stringToStringArray(value);
+		char[] answer = new char[array.length];
+		for(int i = 0 ; i < array.length ; ++i)
+			answer[i] = array[i].charAt(0);
 		return answer;
 	}
 

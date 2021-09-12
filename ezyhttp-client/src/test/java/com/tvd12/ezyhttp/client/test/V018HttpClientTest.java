@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.client.test;
 
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.request.DeleteRequest;
+import com.tvd12.ezyhttp.client.request.GetRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 
@@ -23,6 +24,10 @@ public class V018HttpClientTest {
 				);
 		System.out.println(client.request(deleteRequest));
 		System.out.println(client.request(deleteRequest).getBody().toString());
+		
+		GetRequest textRequest = new GetRequest()
+				.setURL("http://localhost:8083/text");
+		System.out.println((String)client.call(textRequest));
 	}
 	
 }

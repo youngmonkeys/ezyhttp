@@ -16,12 +16,14 @@ public class DataConverters {
 	@Setter
 	@Getter
 	protected StringDeserializer stringDeserializer;
+	protected final BodyConverter defaultBodyConverter;
 	protected final Map<String, BodySerializer> bodySerializers;
 	protected final Map<String, BodyDeserializer> bodyDeserializers;
 	
 	public DataConverters(ObjectMapper objectMapper) {
 		this.bodySerializers = new HashMap<>();
 		this.bodyDeserializers = new HashMap<>();
+		this.defaultBodyConverter = new TextBodyConverter();
 		this.addDefaultConverter(objectMapper);
 	}
 	
@@ -30,6 +32,9 @@ public class DataConverters {
 		if(serializer == null) {
 			String realContentType = ContentTypes.getContentType(contentType);
 			serializer = bodySerializers.get(realContentType);
+		}
+		if(serializer == null) {
+			serializer = defaultBodyConverter;
 		}
 		return serializer;
 	}
@@ -72,15 +77,15 @@ public class DataConverters {
 	protected void addDefaultConverter(ObjectMapper objectMapper) {
 		JsonBodyConverter jsonBodyConverter = new JsonBodyConverter(objectMapper);
 		FormBodyConverter formBodyConverter = new FormBodyConverter(objectMapper);
-		TextBodyConverter textBodyConverter = new TextBodyConverter();
 		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
-		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodySerializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
+		this.bodySerializers.put(ContentTypes.TEXT_PLAIN, defaultBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.MULTIPART_FORM_DATA, formBodyConverter);
 		this.stringDeserializer = new DefaultStringDeserializer();
-		this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, textBodyConverter);
-		this.bodyDeserializers.put(ContentTypes.TEXT_HTML, textBodyConverter);
-		this.bodyDeserializers.put(ContentTypes.TEXT_HTML_UTF8, textBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, defaultBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.TEXT_HTML, defaultBodyConverter);
+		this.bodyDeserializers.put(ContentTypes.TEXT_HTML_UTF8, defaultBodyConverter);
 	}
 }

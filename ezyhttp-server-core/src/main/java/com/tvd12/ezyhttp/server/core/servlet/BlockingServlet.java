@@ -284,8 +284,6 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response, Object data) throws IOException {
 		String contentType = response.getContentType();
 		BodySerializer bodySerializer = dataConverters.getBodySerializer(contentType);
-		if(bodySerializer == null)
-			throw new IOException("has no body serializer for: " + contentType);
 		byte[] bytes = bodySerializer.serialize(data);
 		responseBytes(response, bytes);
 	}
