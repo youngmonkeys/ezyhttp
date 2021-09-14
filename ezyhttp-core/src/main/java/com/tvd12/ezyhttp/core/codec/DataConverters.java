@@ -3,17 +3,16 @@ package com.tvd12.ezyhttp.core.codec;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.util.BodyConvertAnnotations;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class DataConverters {
 
-	@Setter
 	@Getter
 	protected StringDeserializer stringDeserializer;
 	protected final BodyConverter defaultBodyConverter;
@@ -45,6 +44,9 @@ public class DataConverters {
 			String realContentType = ContentTypes.getContentType(contentType);
 			deserializer = bodyDeserializers.get(realContentType);
 		}
+		if(deserializer == null) {
+			deserializer = defaultBodyConverter;
+		}
 		return deserializer;
 	}
 	
@@ -58,9 +60,24 @@ public class DataConverters {
 			String contentType = BodyConvertAnnotations.getContentType(converter);
 			this.bodySerializers.put(contentType, (BodySerializer) converter);
 		}
-		else if(converter instanceof BodyDeserializer) {
+		if(converter instanceof BodyDeserializer) {
 			String contentType = BodyConvertAnnotations.getContentType(converter);
 			this.bodyDeserializers.put(contentType, (BodyDeserializer) converter);
+		}
+	}
+	
+	public void addBodyConverter(String contentType, Object converter) {
+		if(converter instanceof BodySerializer) {
+			this.bodySerializers.put(contentType, (BodySerializer) converter);
+		}
+		if(converter instanceof BodyDeserializer) {
+			this.bodyDeserializers.put(contentType, (BodyDeserializer) converter);
+		}
+	}
+	
+	public void addBodyConverters(Map<String, Object> converterByContentType) {
+		for(Entry<String, Object> e : converterByContentType.entrySet()) {
+			addBodyConverter(e.getKey(), e.getValue());
 		}
 	}
 	
