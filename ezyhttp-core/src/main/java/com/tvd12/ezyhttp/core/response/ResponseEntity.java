@@ -81,6 +81,10 @@ public class ResponseEntity {
 		return value;
 	}
 	
+	public String getContentType() {
+		return getHeader(Headers.CONTENT_TYPE);
+	}
+	
 	@Override
 	public String toString() {
 		return new StringBuilder()
