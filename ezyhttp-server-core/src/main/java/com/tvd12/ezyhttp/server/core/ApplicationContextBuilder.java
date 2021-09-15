@@ -2,6 +2,8 @@ package com.tvd12.ezyhttp.server.core;
 
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
+import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.collect.Sets;
@@ -183,8 +186,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		Map<String, Class> serviceClasses = getServiceClasses(reflection);
 		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
-		properties.putAll(readPropertiesSources());
-		EzyBeanContext beanContext = EzyBeanContext.builder()
+		EzyBeanContext beanContext = newBeanContextBuilder()
 				.scan("com.tvd12.ezyhttp.server")
 				.scan(packageToScans)
 				.addProperties(properties)
@@ -206,6 +208,17 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return beanContext;
 	}
 	
+	protected EzyBeanContextBuilder newBeanContextBuilder() {
+		EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder();
+		List<String> propertiesFiles = new ArrayList<>();
+		propertiesFiles.addAll(Arrays.asList(DEFAULT_PROPERTIES_FILES));
+		propertiesFiles.addAll(propertiesSources);
+		for(String propertiesFile : propertiesFiles) {
+			beanContextBuilder.addProperties(propertiesFile);
+		}
+		return beanContextBuilder;
+	}
+	
 	protected EzyPropertiesMap getPropertiesMap(EzyReflection reflection) {
 		Class propertiesMapClass = reflection.getExtendsClass(EzyPropertiesMap.class);
 		if(propertiesMapClass == null)
@@ -221,19 +234,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			answer.put(serviceName, clazz);
 		}
 		return answer;
-	}
-	
-	protected Properties readPropertiesSources() {
-		Properties props = new Properties();
-		for(String defaultPropertyFile : DEFAULT_PROPERTIES_FILES) {
-			try {
-				props.putAll(readPropertiesSource(defaultPropertyFile));
-			}
-			catch (Exception e) {}
-		}
-		for(String source : propertiesSources)
-			props.putAll(readPropertiesSource(source));
-		return props;
 	}
 	
 	protected Properties readPropertiesSource(String source) {

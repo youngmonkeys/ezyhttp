@@ -3,6 +3,7 @@
 <suite name="AllTests">
 	<test name="All">
 		<packages>
+			<package name="com.tvd12.ezyhttp.core.test.concurrent"></package>
 			<package name="com.tvd12.ezyhttp.core.test.codec"></package>
 			<package name="com.tvd12.ezyhttp.core.test.constant"></package>
 			<package name="com.tvd12.ezyhttp.core.test.data"></package>
