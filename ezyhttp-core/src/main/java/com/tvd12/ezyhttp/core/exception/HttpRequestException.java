@@ -2,10 +2,10 @@ package com.tvd12.ezyhttp.core.exception;
 
 import lombok.Getter;
 
-@Getter
 public class HttpRequestException extends RuntimeException {
 	private static final long serialVersionUID = 8065221643252546341L;
 
+	@Getter
 	protected final int code;
 	protected final Object data;
 	

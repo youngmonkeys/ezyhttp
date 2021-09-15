@@ -10,6 +10,7 @@
 			<package name="com.tvd12.ezyhttp.core.test.json"></package>
 			<package name="com.tvd12.ezyhttp.core.test.net"></package>
 			<package name="com.tvd12.ezyhttp.core.test.response"></package>
+			<package name="com.tvd12.ezyhttp.core.test.util"></package>
 		</packages>
 	</test>
 </suite>

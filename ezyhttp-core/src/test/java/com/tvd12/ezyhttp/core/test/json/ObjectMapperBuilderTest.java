@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.core.test.json;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -32,6 +33,30 @@ public class ObjectMapperBuilderTest {
 	}
 	
 	@Test
+	public void instantStringTest() {
+		// given
+		String source = "2021-01-30T10:20:30:500";
+		
+		// when
+		Instant actual = sut.convertValue(source, Instant.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.parse(source).toInstant(), actual);
+	}
+	
+	@Test
+	public void instantFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Instant.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
+	}
+	
+	@Test
 	public void dateTest() {
 		// given
 		long current = System.currentTimeMillis();
@@ -56,6 +81,18 @@ public class ObjectMapperBuilderTest {
 	}
 	
 	@Test
+	public void dateFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Date.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
+	}
+	
+	@Test
 	public void localDateTest() {
 		// given
 		String source = "2021-01-30";
@@ -65,6 +102,30 @@ public class ObjectMapperBuilderTest {
 		
 		// then
 		Asserts.assertEquals(EzyDates.parseDate(source), actual);
+	}
+	
+	@Test
+	public void localDateLongTest() {
+		// given
+		Long source = System.currentTimeMillis();
+		
+		// when
+		LocalDate actual = sut.convertValue(source, LocalDate.class);
+		
+		// then
+		Asserts.assertEquals(LocalDate.now(), actual);
+	}
+	
+	@Test
+	public void localDateFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDate.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
 	}
 	
 	@Test
@@ -80,6 +141,30 @@ public class ObjectMapperBuilderTest {
 	}
 	
 	@Test
+	public void localTimeLongTest() {
+		// given
+		long source = System.currentTimeMillis();
+		
+		// when
+		LocalTime actual = sut.convertValue(source, LocalTime.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.millisToDateTime(source).toLocalTime(), actual);
+	}
+	
+	@Test
+	public void localTimeFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalTime.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
+	}
+	
+	@Test
 	public void localDateTimeTest() {
 		// given
 		String source = "2021-01-30T10:20:30:500";
@@ -89,6 +174,30 @@ public class ObjectMapperBuilderTest {
 		
 		// then
 		Asserts.assertEquals(EzyDates.parseDateTime(source), actual);
+	}
+	
+	@Test
+	public void localDateLongTimeTest() {
+		// given
+		long source = System.currentTimeMillis();
+		
+		// when
+		LocalDateTime actual = sut.convertValue(source, LocalDateTime.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.millisToDateTime(source), actual);
+	}
+	
+	@Test
+	public void localDateTimeFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDateTime.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
 	}
 	
 	@Test
