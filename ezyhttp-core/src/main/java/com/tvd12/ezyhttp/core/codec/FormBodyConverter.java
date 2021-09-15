@@ -2,7 +2,6 @@ package com.tvd12.ezyhttp.core.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,9 +21,9 @@ public class FormBodyConverter implements BodyConverter {
 	@SuppressWarnings("unchecked")
 	@Override
 	public byte[] serialize(Object body) throws IOException {
-		if(body instanceof String)
-			return ((String)body).getBytes(StandardCharsets.UTF_8);
-		Map<String, Object> map = objectMapper.convertValue(body, Map.class);
+		Map<String, Object> map = body instanceof String
+				? objectMapper.readValue(((String)body), Map.class)
+				: objectMapper.convertValue(body, Map.class);
 	    byte[] bytes = MapEncoder.encodeToBytes(map);
 	    return bytes;
 	}
