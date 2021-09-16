@@ -73,7 +73,7 @@ public class HttpClientProxy
 	
 	@Override
 	public void stop() {
-		this.active = false;
+		EzyProcessor.processWithLogException(this::close);
 	}
 	
 	@Override
@@ -85,7 +85,8 @@ public class HttpClientProxy
 			EzyFuture undoneTask = undoneTasks.get(undoneRequest);
 			undoneTask.cancel("HttpClientProxy close, request to: " + undoneRequest.getURL() + " has cancelled");
 		}
-		this.threadList.interrupt();
+		if(threadList != null)
+			this.threadList.interrupt();
 	}
 	
 	protected void loop() {
@@ -95,16 +96,29 @@ public class HttpClientProxy
 	}
 	
 	protected void handleRequests() {
+		Request request = null;
 		EzyFuture future = null;
+		Exception exception = null;
+		ResponseEntity response = null;
 		try {
-			Request request = requestQueue.take();
+			request = requestQueue.take();
 			future = futures.removeFuture(request);
-			ResponseEntity response = client.request(request);
-			future.setResult(response);
+			response = client.request(request);
 		}
 		catch (Exception e) {
-			if(future != null)
-				future.setException(e);
+			exception = e;
+		}
+		if(future != null) {
+			if(exception != null)
+				future.setException(exception);
+			else
+				future.setResult(response);
+		}
+		else {
+			if(exception != null)
+				logger.info("handled request: {} with exception, but there is no future", request, exception);
+			else
+				logger.info("handled request: {} with response: {}, but there is no future", request, response);
 		}
 	}
 	
@@ -142,7 +156,7 @@ public class HttpClientProxy
 			}
 			@Override
 			public void onException(Exception e) {
-				callback.onResponse(e);
+				callback.onException(e);
 			}
 		});
 	}
@@ -213,12 +227,22 @@ public class HttpClientProxy
 			return this;
 		}
 		
+		public Builder addBodyConverter(String contentType, Object converter) {
+			this.clientBuilder.addBodyConverter(contentType, converter);
+			return this;
+		}
+		
+		public Builder addBodyConverters(Map<String, Object> converterByContentType) {
+			this.clientBuilder.addBodyConverters(converterByContentType);
+			return this;
+		}
+		
 		public Builder threadPoolSize(int threadPoolSize) {
 			this.threadPoolSize = threadPoolSize;
 			return this;
 		}
 		
-		protected Builder requestQueueCapacity(int requestQueueCapacity) {
+		public Builder requestQueueCapacity(int requestQueueCapacity) {
 			this.requestQueueCapacity = requestQueueCapacity;
 			return this;
 		}

@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -127,9 +129,9 @@ public class HttpClient extends EzyLoggable {
 			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
 			if(responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
-			InputStream inputStream = connection.getErrorStream();
-			if(inputStream == null)
-				inputStream = connection.getInputStream();
+			InputStream inputStream = responseCode >= 400 
+					? connection.getErrorStream()
+					: connection.getInputStream();
 			Object responseBody = null;
 			if(inputStream != null) {
 				try {
@@ -236,13 +238,16 @@ public class HttpClient extends EzyLoggable {
 		protected int readTimeout;
 		protected int connectTimeout;
 		protected ObjectMapper objectMapper;
+		protected Object stringConverter;
+		protected List<Object> bodyConverterList;
+		protected Map<String, Object> bodyConverterMap;
 		protected DataConverters dataConverters;
 		
 		public Builder() {
 			this.readTimeout = 15 * 1000;
 			this.connectTimeout = 15 * 1000;
-			this.objectMapper = new ObjectMapperBuilder().build();
-			this.dataConverters = new DataConverters(objectMapper);
+			this.bodyConverterList = new ArrayList<>();
+			this.bodyConverterMap = new HashMap<>();
 		}
 		
 		public Builder readTimeout(int readTimeout) {
@@ -262,22 +267,39 @@ public class HttpClient extends EzyLoggable {
 		}
 		
 		public Builder setStringConverter(Object converter) {
-			this.dataConverters.setStringConverter(converter);
+			this.stringConverter = converter;
 			return this;
 		}
 		
 		public Builder addBodyConverter(Object converter) {
-			this.dataConverters.addBodyConverter(converter);
+			this.bodyConverterList.add(converter);
 			return this;
 		}
 		
 		public Builder addBodyConverters(List<?> converters) {
-			this.dataConverters.addBodyConverters(converters);
+			this.bodyConverterList.addAll(converters);
+			return this;
+		}
+		
+		public Builder addBodyConverter(String contentType, Object converter) {
+			this.bodyConverterMap.put(contentType, converter);
+			return this;
+		}
+		
+		public Builder addBodyConverters(Map<String, Object> converterByContentType) {
+			this.bodyConverterMap.putAll(converterByContentType);
 			return this;
 		}
 		
 		@Override
 		public HttpClient build() {
+			if(objectMapper == null)
+				this.objectMapper = new ObjectMapperBuilder().build();
+			this.dataConverters = new DataConverters(objectMapper);
+			if(stringConverter != null)
+				this.dataConverters.setStringConverter(stringConverter);
+			this.dataConverters.addBodyConverters(bodyConverterList);
+			this.dataConverters.addBodyConverters(bodyConverterMap);
 			return new HttpClient(this);
 		}
 	}

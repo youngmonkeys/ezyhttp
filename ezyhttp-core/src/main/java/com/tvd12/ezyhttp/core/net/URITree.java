@@ -8,7 +8,7 @@ public class URITree {
 	protected String uri;
 	protected Map<String, URITree> children;
 	
-	public String addURI(String uri) {
+	public void addURI(String uri) {
 		URITree lastChild = this;
 		String[] paths = uri.split("/");
 		for(int i = 0 ; i < paths.length ; ++i) {
@@ -24,9 +24,7 @@ public class URITree {
 			}
 			lastChild = child;
 		}
-		String oldURI = lastChild.uri;
 		lastChild.uri = uri;
-		return oldURI;
 	}
 	
 	public String getMatchedURI(String uri) {
@@ -48,10 +46,8 @@ public class URITree {
 	
 	@Override
 	public String toString() {
-		if(uri != null)
-			return uri;
 		if(children == null)
-			return "";
+			return uri;
 		return children.toString();
 		
 	}

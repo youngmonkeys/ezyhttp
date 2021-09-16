@@ -5,6 +5,7 @@ import java.net.URI;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyhttp.core.net.URIBuilder;
+import com.tvd12.test.assertion.Asserts;
 
 public class URIBuilderTest {
 
@@ -39,4 +40,36 @@ public class URIBuilderTest {
 		System.out.println(uri);
 	}
 	
+	@Test
+	public void addEmptyPath() {
+		// given
+		// when
+		URI uri = new URIBuilder()
+				.addPath("")
+				.build();
+		
+		// then
+		Asserts.assertEquals(URI.create(""), uri);
+	}
+	
+	@Test
+	public void buildPathEmpty() {
+		// given
+		// when
+		URI uri = new URIBuilder()
+				.build();
+		
+		// then
+		Asserts.assertEquals(URI.create(""), uri);
+	}
+	
+	@Test
+	public void normalizePathEmpty() {
+		// given
+		// when
+		String path = URIBuilder.normalizePath("");
+		
+		// then
+		Asserts.assertEquals("", path);
+	}
 }
