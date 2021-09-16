@@ -161,8 +161,6 @@ public class HttpClient extends EzyLoggable {
 	protected byte[] serializeRequestBody(
 			String contentType, Object requestBody) throws IOException {
 		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
-		if(serializer == null)
-			throw new IOException("has no serializer for: " + contentType);
 		byte[] bytes = serializer.serialize(requestBody);
 		return bytes;
 	}
@@ -172,8 +170,6 @@ public class HttpClient extends EzyLoggable {
 			int contentLength,
 			InputStream inputStream, Class<?> responseType) throws IOException {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
-		if(deserializer == null)
-			throw new IOException("has no deserializer for: " + contentType);
 		Object body = null;
 		if(responseType != null) {
 			if(responseType == String.class)
