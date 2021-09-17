@@ -72,6 +72,8 @@ public class ResourceDownloadManager
 		while(active) {
 			try {
 				Entry entry = queue.take();
+				if(entry == POISON)
+					break;
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				boolean done = false;

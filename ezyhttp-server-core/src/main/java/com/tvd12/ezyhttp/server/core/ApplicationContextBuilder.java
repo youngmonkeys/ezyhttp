@@ -54,7 +54,6 @@ import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
-import com.tvd12.properties.file.reader.BaseFileReader;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
@@ -236,12 +235,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return answer;
 	}
 	
-	protected Properties readPropertiesSource(String source) {
-		BaseFileReader reader = new BaseFileReader();
-		Properties props = reader.read(source);
-		return props;
-	}
-	
 	protected void registerComponents(EzyBeanContext beanContext) {
 		List controllers = beanContext.getSingletons(Controller.class);
 		controllerManager.addControllers(controllers);
@@ -324,16 +317,21 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
 		ResourceResolver resourceResolver = 
 				(ResourceResolver)beanContext.getSingleton(ResourceResolver.class);
-		if(resourceResolver == null)
+		if(resourceResolver == null) {
 			resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
+			if(resourceResolver != null)
+				beanContext.getSingletonFactory().addSingleton(resourceResolver);
+		}
 		return resourceResolver;
 	}
 	
 	protected ResourceDownloadManager getResourceDownloadManager(EzyBeanContext beanContext) {
 		ResourceDownloadManager resourceDownloadManager = 
 				(ResourceDownloadManager)beanContext.getSingleton(ResourceDownloadManager.class);
-		if(resourceDownloadManager == null)
+		if(resourceDownloadManager == null) {
 			resourceDownloadManager = ResourceResolvers.createDownloadManager(beanContext);
+			beanContext.getSingletonFactory().addSingleton(resourceDownloadManager);
+		}
 		return resourceDownloadManager;
 	}
 	

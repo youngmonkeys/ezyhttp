@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.tvd12.ezyfox.util.EzyDestroyable;
+
 import lombok.Getter;
 
-public class ControllerManager {
+public class ControllerManager implements EzyDestroyable {
 
 	@Getter
 	protected final List<Object> controllers;
@@ -24,4 +26,8 @@ public class ControllerManager {
 			addController(controller);
 	}
 	
+	@Override
+	public void destroy() {
+		this.controllers.clear();
+	}
 }

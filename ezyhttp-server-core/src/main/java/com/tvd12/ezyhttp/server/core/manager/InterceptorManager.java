@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import static com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations.*;
 
 import lombok.Getter;
 
-public class InterceptorManager {
+public class InterceptorManager implements EzyDestroyable {
 
 	@Getter
 	public List<RequestInterceptor> requestInterceptors;
@@ -25,5 +26,10 @@ public class InterceptorManager {
 	
 	protected Comparator<RequestInterceptor> requestInterceptorComparator() {
 		return (a, b) -> getPriority(a) - getPriority(b);
+	}
+	
+	@Override
+	public void destroy() {
+		this.requestInterceptors.clear();
 	}
 }
