@@ -18,7 +18,9 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ObjectMapperBuilderTest {
 
-	private final ObjectMapper sut = new ObjectMapperBuilder().build();
+	private final ObjectMapper sut = new ObjectMapperBuilder()
+			.decorator(it -> {})
+			.build();
 	
 	@Test
 	public void instantTest() {
@@ -216,6 +218,9 @@ public class ObjectMapperBuilderTest {
 	public void bigDecimalTest() {
 		// given
 		String source = "12345.6";
+		
+		ObjectMapper sut = new ObjectMapperBuilder()
+				.build();
 		
 		// when
 		BigDecimal actual = sut.convertValue(source, BigDecimal.class);

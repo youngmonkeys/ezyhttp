@@ -1,0 +1,6 @@
+management:
+  enable: false
+resources:
+  enable: false
+  upload:
+    enable: false

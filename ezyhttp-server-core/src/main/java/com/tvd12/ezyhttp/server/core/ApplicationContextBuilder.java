@@ -109,8 +109,14 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	public ApplicationContextBuilder addComponentClass(Class<?> componentClass) {
 		ComponentsScan componentsScan = componentClass.getAnnotation(ComponentsScan.class);
-		if(componentsScan != null)
-			scan(componentsScan.value());
+		if(componentsScan != null) {
+			scan(
+				componentsScan.value().length != 0
+					? componentsScan.value()
+					: new String[] { componentClass.getPackage().getName() }
+					
+			);
+		}
 		ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
 		if(componentClasses != null)
 			addComponentClasses(componentClasses.value());
@@ -185,8 +191,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		Map<String, Class> serviceClasses = getServiceClasses(reflection);
 		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
+		addComponentClassesFromReflection(reflection);
 		EzyBeanContext beanContext = newBeanContextBuilder()
-				.scan("com.tvd12.ezyhttp.server")
 				.scan(packageToScans)
 				.addProperties(properties)
 				.addSingletonClasses(componentClasses)
@@ -199,12 +205,22 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(bootstrapClasses)
 				.propertiesMap(propertiesMap)
 				.addSingleton("systemObjectMapper", objectMapper)
+				.addAllClasses(EzyPackages.scanPackage("com.tvd12.ezyhttp.server"))
 				.build();
 		registerComponents(beanContext);
 		addRequestHandlers(beanContext);
 		addResourceRequestHandlers(beanContext);
 		addExceptionHandlers();
 		return beanContext;
+	}
+	
+	protected void addComponentClassesFromReflection(EzyReflection reflection) {
+		Set<Class> classes = new HashSet<>();
+		classes.addAll(reflection.getAnnotatedClasses(ComponentsScan.class));
+		classes.addAll(reflection.getAnnotatedClasses(ComponentClasses.class));
+		classes.addAll(reflection.getAnnotatedClasses(PropertiesSources.class));
+		for(Class clazz : classes)
+			addComponentClass(clazz);
 	}
 	
 	protected EzyBeanContextBuilder newBeanContextBuilder() {

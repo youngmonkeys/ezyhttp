@@ -1,8 +1,9 @@
 package com.tvd12.ezyhttp.core.test.exception;
 
+import java.util.Map;
+
 import org.testng.annotations.Test;
 
-import com.sun.javafx.collections.MappingChange.Map;
 import com.tvd12.ezyhttp.core.exception.DeserializeCookieException;
 import com.tvd12.test.assertion.Asserts;
 
