@@ -90,6 +90,11 @@ public class HomeController {
 		return Arrays.asList("hello", "world");
 	}
 	
+	@DoGet("no-content")
+	public Object noContent() {
+		return null;
+	}
+	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2( Exception e) {
 		e.printStackTrace();

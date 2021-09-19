@@ -35,12 +35,12 @@ import com.tvd12.ezyhttp.client.test.request.HelloRequest;
 import com.tvd12.ezyhttp.client.test.server.TestApplicationBootstrap;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.codec.BodyConverter;
+import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
 
-import javafx.util.converter.DefaultStringConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -490,7 +490,7 @@ public class HttpClientProxyTest {
 				.autoStart(true)
 				.readTimeout(15000)
 				.connectTimeout(15000)
-				.setStringConverter(new DefaultStringConverter())
+				.setStringConverter(SingletonStringDeserializer.getInstance())
 				.addBodyConverter(new TestBodyConverter())
 				.addBodyConverters(Arrays.asList(new TestBodyConverter()))
 				.addBodyConverter("world", new TestBodyConverter())

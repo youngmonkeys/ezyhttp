@@ -118,14 +118,14 @@ public class BlockingServlet extends HttpServlet {
 		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
 		if(managementURIs.contains(requestURI)) {
-			if(request.getServerPort() == serverPort) {
+			if(request.getServerPort() != managmentPort) {
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
 				return;
 			}
 		}
 		else {
-			if(request.getServerPort() == managmentPort) {
+			if(request.getServerPort() != serverPort) {
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
 				return;
@@ -161,6 +161,9 @@ public class BlockingServlet extends HttpServlet {
 						handleResponseData(request, response, responseData);
 					}
 				}
+				else {
+					response.setStatus(HttpServletResponse.SC_OK);
+				}
 			}
 			else {
 				response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
@@ -191,6 +194,9 @@ public class BlockingServlet extends HttpServlet {
 						response.setContentType(responseContentType);
 					}
 					handleResponseData(request, response, result);
+				}
+				else {
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				}
 				exception = null;
 			}

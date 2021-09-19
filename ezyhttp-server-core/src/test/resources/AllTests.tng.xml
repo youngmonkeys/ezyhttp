@@ -5,11 +5,12 @@
 		<packages>
 			<package name="com.tvd12.ezyhttp.server.core.test"></package>
 			<package name="com.tvd12.ezyhttp.server.core.test.annotation"></package>
-			<package name="com.tvd12.ezyhttp.server.core.controller"></package>
-			<package name="com.tvd12.ezyhttp.server.core.interceptor"></package>
-			<package name="com.tvd12.ezyhttp.server.core.reflect"></package>
-			<package name="com.tvd12.ezyhttp.server.core.request"></package>
-			<package name="com.tvd12.ezyhttp.server.core.resources"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.controller"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.interceptor"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.reflect"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.request"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.resources"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.servlet"></package>
 		</packages>
 	</test>
 </suite>

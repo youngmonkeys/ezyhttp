@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.util.BodyConvertAnnotations;
 
 import lombok.Getter;
 
-public class DataConverters {
+public class DataConverters implements EzyDestroyable {
 
 	@Getter
 	protected StringDeserializer stringDeserializer;
@@ -104,5 +105,11 @@ public class DataConverters {
 		this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, defaultBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.TEXT_HTML, defaultBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.TEXT_HTML_UTF8, defaultBodyConverter);
+	}
+	
+	@Override
+	public void destroy() {
+		this.bodySerializers.clear();
+		this.bodyDeserializers.clear();
 	}
 }

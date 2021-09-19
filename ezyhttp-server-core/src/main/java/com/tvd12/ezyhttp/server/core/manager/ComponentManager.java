@@ -46,6 +46,8 @@ public final class ComponentManager implements EzyDestroyable {
 	
 	@Override
 	public void destroy() {
+		this.viewContext = null;
+		this.dataConverters.destroy();
 		this.controllerManager.destroy();
 		this.interceptorManager.destroy();
 		this.requestHandlerManager.destroy();
