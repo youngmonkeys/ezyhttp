@@ -86,7 +86,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			return answer;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			throw new DeserializeParameterException("parameter#" + index, value, type, e);
 		}
 	}
@@ -166,8 +165,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		if(contentType == null)
 			throw new HttpBadRequestException("contentType is null");
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
-		if(deserializer == null)
-			throw new IOException("has no body deserializer for: " + contentType);
 		try {
 			T body = deserializer.deserialize(bodyData, type);
 			return body;
