@@ -13,9 +13,11 @@ import com.tvd12.ezyhttp.server.core.annotation.DoPut;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 
@@ -30,6 +32,8 @@ public class HomeController {
 			@RequestParam String who,
 			@RequestHeader("key") String key,
 			@RequestHeader String token,
+			@RequestCookie String cookieIndex,
+			@RequestCookie("cookie") String cookieValue,
 			@RequestArgument("name") String name,
 			@RequestBody HelloRequest body,
 			@NickName String nickName) {
@@ -41,6 +45,7 @@ public class HomeController {
 	
 	@DoPost
 	public String hello(
+			RequestArguments args,
 			@RequestBody HelloRequest body) {
 		return "hello " + body.getWho();
 	}
