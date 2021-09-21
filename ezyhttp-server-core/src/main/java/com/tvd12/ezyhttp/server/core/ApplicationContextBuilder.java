@@ -50,6 +50,7 @@ import com.tvd12.ezyhttp.server.core.resources.Resource;
 import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
+import com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
@@ -257,6 +258,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		List exceptionHandlers = beanContext.getSingletons(ExceptionHandler.class);
 		exceptionHandlerManager.addExceptionHandlers(exceptionHandlers);
 		List<RequestInterceptor> requestInterceptors = beanContext.getSingletons(Interceptor.class);
+		requestInterceptors.sort(InterceptorAnnotations.comparator());
 		interceptorManager.addRequestInterceptors(requestInterceptors);
 		List bodyConverters = beanContext.getSingletons(BodyConvert.class);
 		dataConverters.addBodyConverters(bodyConverters);

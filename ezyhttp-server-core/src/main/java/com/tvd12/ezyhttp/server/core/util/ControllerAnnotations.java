@@ -9,6 +9,8 @@ public final class ControllerAnnotations {
 	private ControllerAnnotations() {}
 
 	public static String getURI(Controller annotation) {
+		if(annotation == null)
+			return Constants.DEFAULT_URI;
 		String uri = annotation.value();
 		if(EzyStrings.isNoContent(uri))
 			uri = annotation.uri();

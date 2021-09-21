@@ -104,6 +104,7 @@ public class ApplicationContextBuilderTest {
 				"com.tvd12.ezyhttp.server.core.test.service"
 			)
 		);
+		System.out.println(applicationContext);
 		applicationContext.destroy();
 	}
 	

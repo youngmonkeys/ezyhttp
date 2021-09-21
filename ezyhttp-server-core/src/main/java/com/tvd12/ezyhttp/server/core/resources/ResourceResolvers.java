@@ -13,7 +13,7 @@ import com.tvd12.ezyfox.bean.EzyPropertyFetcher;
 
 public final class ResourceResolvers {
 
-	public ResourceResolvers() {}
+	private ResourceResolvers() {}
 	
 	public static ResourceResolver createResourdeResolver(EzyPropertyFetcher propertyFetcher) {
 		boolean resourceEnable = propertyFetcher
