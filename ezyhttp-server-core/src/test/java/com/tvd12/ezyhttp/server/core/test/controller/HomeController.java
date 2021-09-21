@@ -21,7 +21,7 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 
-@Controller("/")
+@Controller("/api")
 public class HomeController {
 
 	@DoGet
