@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
 public class ResourceLoader extends EzyLoggable {
@@ -27,7 +28,7 @@ public class ResourceLoader extends EzyLoggable {
 			File folder;
 			String resourcePath = folders.poll();
 			URL url = getResourceURL(resourcePath);
-			if(url == null || url.getPath() == null) {
+			if(url == null || EzyStrings.isNoContent(url.getPath())) {
 				folder = new File(resourcePath);
 			}
 			else {
@@ -55,7 +56,7 @@ public class ResourceLoader extends EzyLoggable {
 		return answer;
 	}
 	
-	private URL getResourceURL(String resource) {
+	protected URL getResourceURL(String resource) {
 		String[] resources = {resource, "/" + resource};
 		URL url = null;
 		for(String res : resources) {

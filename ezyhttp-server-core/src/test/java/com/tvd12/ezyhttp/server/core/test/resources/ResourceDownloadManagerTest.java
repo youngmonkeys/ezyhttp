@@ -14,21 +14,22 @@ import java.util.concurrent.BlockingQueue;
 
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
-import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
+import com.tvd12.ezyhttp.server.core.exception.MaxResourceDownloadCapacity;
+import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.util.RandomUtil;
 
-public class ResourceUploadManagerTest extends BaseTest {
+public class ResourceDownloadManagerTest extends BaseTest {
 	
 	@Test
 	public void drainTest() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager();
+		info("start drainTest");
+		ResourceDownloadManager sut = new ResourceDownloadManager();
 		
-		int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+		int size = ResourceDownloadManager.DEFAULT_BUFFER_SIZE * 3;
 		
 		byte[] inputBytes = RandomUtil.randomByteArray(size);
 		InputStream inputStream = new ByteArrayInputStream(inputBytes);
@@ -42,14 +43,16 @@ public class ResourceUploadManagerTest extends BaseTest {
 		byte[] outputBytes = outputStream.toByteArray();
 		Asserts.assertEquals(inputBytes, outputBytes);
 		sut.stop();
+		info("end drainTest");
 	}
 	
 	@Test
 	public void drainFailedDueToOutputStream() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager();
+		info("start drainFailedDueToOutputStream");
+		ResourceDownloadManager sut = new ResourceDownloadManager();
 		
-		int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+		int size = ResourceDownloadManager.DEFAULT_BUFFER_SIZE * 3;
 		
 		byte[] inputBytes = RandomUtil.randomByteArray(size);
 		InputStream inputStream = new ByteArrayInputStream(inputBytes);
@@ -59,17 +62,18 @@ public class ResourceUploadManagerTest extends BaseTest {
 		doThrow(exception).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
 		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
+		sut.drain(inputStream, outputStream);
 		
 		// then
-		Asserts.assertThat(e).isEqualsType(IOException.class);
 		sut.stop();
+		info("finish drainFailedDueToOutputStream");
 	}
 	
 	@Test
 	public void drainFailedDueToOutputStreamDueToError() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager();
+		info("start drainFailedDueToOutputStreamDueToError");
+		ResourceDownloadManager sut = new ResourceDownloadManager();
 		
 		BlockingQueue<Object> queue = FieldUtil.getFieldValue(sut, "queue");
 		
@@ -83,15 +87,17 @@ public class ResourceUploadManagerTest extends BaseTest {
 		
 		// then
 		sut.stop();
+		info("finish drainFailedDueToOutputStreamDueToError");
 	}
 	
 	@Test
 	public void activeFalse() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager();
+		info("start activeFalse");
+		ResourceDownloadManager sut = new ResourceDownloadManager();
 		FieldUtil.setFieldValue(sut, "active", false);
 		
-		int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+		int size = ResourceDownloadManager.DEFAULT_BUFFER_SIZE * 3;
 		
 		byte[] inputBytes = RandomUtil.randomByteArray(size);
 		InputStream inputStream = new ByteArrayInputStream(inputBytes);
@@ -105,16 +111,18 @@ public class ResourceUploadManagerTest extends BaseTest {
 		byte[] outputBytes = outputStream.toByteArray();
 		Asserts.assertEquals(inputBytes, outputBytes);
 		sut.stop();
+		info("finish activeFalse");
 	}
 	
 	@Test
 	public void drainFailedDueToMaxResourceUploadCapacity() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager(1, 1, 1024);
+		info("start drainFailedDueToMaxResourceUploadCapacity");
+		ResourceDownloadManager sut = new ResourceDownloadManager(1, 1, 1024);
 		
 		InputStream inputStream = mock(InputStream.class);
-		
 		OutputStream outputStream = mock(OutputStream.class);
+		
 		sut.stop();
 		Thread.sleep(200);
 		
@@ -126,6 +134,8 @@ public class ResourceUploadManagerTest extends BaseTest {
 		Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
 		
 		// then
-		Asserts.assertThat(e).isEqualsType(MaxResourceUploadCapacity.class);
+		Asserts.assertThat(e).isEqualsType(MaxResourceDownloadCapacity.class);
+		sut.stop();
+		info("finsihed drainFailedDueToMaxResourceUploadCapacity");
 	}
 }

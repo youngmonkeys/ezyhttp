@@ -2,9 +2,9 @@ package com.tvd12.ezyhttp.server.core.view;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -93,23 +93,19 @@ public class Redirect {
 		
 		public Builder addParameter(String name, Object value) {
 			if(parameters == null)
-				parameters = new LinkedList<>();
+				parameters = new ArrayList<>();
 			this.parameters.add(new EzyPair<>(name, value));
 			return this;
 		}
 		
 		public Builder addCookie(Cookie cookie) {
 			if(cookies == null)
-				this.cookies = new LinkedList<>();
+				this.cookies = new ArrayList<>();
 			this.cookies.add(cookie);
 			return this;
 		}
 		
 		public Builder addCookie(String name, Object value) {
-			if(EzyStrings.isNoContent(name))
-				throw new IllegalArgumentException("cookie name can not be null or empty");
-			if(value == null)
-				throw new IllegalArgumentException("cookie value can not be null");
 			return addCookie(new Cookie(name, value.toString()));
 		}
 		

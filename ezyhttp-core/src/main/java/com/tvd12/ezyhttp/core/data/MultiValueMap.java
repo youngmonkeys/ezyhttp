@@ -3,7 +3,6 @@ package com.tvd12.ezyhttp.core.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -89,7 +88,7 @@ public class MultiValueMap {
 	}
 	
 	public static List<String> mapToKeyValueList(Map<String, Object> map) {
-		List<String> answer = new LinkedList<>();
+		List<String> answer = new ArrayList<>();
 		for(Entry<String, Object> e : map.entrySet()) {
 			String key = e.getKey();
 			Object value = e.getValue();
