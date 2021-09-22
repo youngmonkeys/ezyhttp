@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import com.tvd12.ezyfox.stream.EzyClassPathInputStreamLoader;
 import com.tvd12.ezyfox.stream.EzyInputStreams;
+import com.tvd12.ezyfox.util.EzyProcessor;
 
 public class BannerPrinter {
 
@@ -13,7 +14,13 @@ public class BannerPrinter {
     }
     
     protected byte[] getBannerBytes() {
-        return getBannerBytes(getBannerInputStream());
+    	InputStream inputStream = getBannerInputStream();
+    	try {
+    		return getBannerBytes(inputStream);
+    	}
+    	finally {
+			EzyProcessor.processSilently(inputStream::close);
+		}
     }
     
     protected byte[] getBannerBytes(InputStream stream) {

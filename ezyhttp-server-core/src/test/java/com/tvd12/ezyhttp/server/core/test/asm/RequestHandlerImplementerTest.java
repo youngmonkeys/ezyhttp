@@ -26,6 +26,7 @@ public class RequestHandlerImplementerTest {
 		Throwable e = Asserts.assertThrows(() -> sut.implement());
 		
 		// then
+		Asserts.assertEquals(0, handlerMethod.getParameterTypes().length);
 		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
 	}
 	

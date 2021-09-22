@@ -33,6 +33,7 @@ public class DataConvertersTest {
 		
 		// then
 		Asserts.assertEquals(JsonBodyConverter.class, actual.getClass());
+		sut.destroy();
 	}
 	
 	@Test

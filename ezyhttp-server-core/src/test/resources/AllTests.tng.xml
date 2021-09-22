@@ -14,6 +14,7 @@
 			<package name="com.tvd12.ezyhttp.server.core.test.request"></package>
 			<package name="com.tvd12.ezyhttp.server.core.test.resources"></package>
 			<package name="com.tvd12.ezyhttp.server.core.test.servlet"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.util"></package>
 			<package name="com.tvd12.ezyhttp.server.core.test.view"></package>
 		</packages>
 	</test>

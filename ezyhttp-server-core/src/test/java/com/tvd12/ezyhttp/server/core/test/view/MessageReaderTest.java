@@ -22,7 +22,7 @@ public class MessageReaderTest {
 		Map<String, Properties> map = reader.read(folderPath);
 		
 		// then
-		Asserts.assertEquals(3, map.size());
+		Asserts.assertEquals(4, map.size());
 		Asserts.assertEquals(2, map.get("").size());
 		Asserts.assertEquals(1, map.get("en_US").size());
 		Asserts.assertEquals(1, map.get("vi").size());

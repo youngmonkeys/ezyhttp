@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
@@ -59,14 +60,14 @@ public class HomeController {
 		return "bye: " + messages;
 	}
 	
-	@DoGet("see")
+	@DoGet(value = "see", responseType = ContentTypes.APPLICATION_JSON)
 	public String see(
 			@RequestParam List<String> messages, 
 			@PathVariable("name") String name) {
 		return "bye: " + messages;
 	}
 	
-	@DoPut("see")
+	@DoPut(value = "see", responseType = ContentTypes.APPLICATION_JSON)
 	public String put(
 			@RequestParam List<String> messages, 
 			@PathVariable("name") String name) {
@@ -82,6 +83,12 @@ public class HomeController {
 			@PathVariable("name") String name) {
 		return "bye: " + messages;
 	}
+	
+	@DoPost("/post1")
+	public void post1() {}
+	
+	@DoPost(uri = "post2", responseType = ContentTypes.APPLICATION_JSON)
+	public void post2() {}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {
