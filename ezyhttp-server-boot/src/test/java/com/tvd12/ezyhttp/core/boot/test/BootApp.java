@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.core.boot.test;
 
+import org.testng.annotations.Test;
+
 import com.tvd12.ezyhttp.core.boot.EzyHttpApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlerImplementer;
@@ -14,4 +16,8 @@ public class BootApp {
 		EzyHttpApplicationBootstrap.start(BootApp.class);
 	}
 	
+	@Test
+	public void test() throws Exception {
+		EzyHttpApplicationBootstrap.start(BootApp.class);
+	}
 }
