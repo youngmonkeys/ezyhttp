@@ -17,3 +17,7 @@ ezyhttp-server-graphql/test_cases.txt
 .idea/
 *.idea/
 *.iml
+<<<<<<< HEAD
+=======
+
+>>>>>>> ba0072d (update code style)
