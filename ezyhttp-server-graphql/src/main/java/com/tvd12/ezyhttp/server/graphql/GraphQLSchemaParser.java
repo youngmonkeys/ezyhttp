@@ -1,11 +1,13 @@
 package com.tvd12.ezyhttp.server.graphql;
 
+
 import java.util.Stack;
 
 public final class GraphQLSchemaParser {
 	
-	public GraphQLSchema parseQuery(String query) {
-		// TODO: standardize query (remove redundant space, tab...)
+	public GraphQLSchema parseQuery(String queryToParse) {
+		String query = standardize(queryToParse);
+		
 		Stack<GraphQLField.Builder> stack = new Stack<>();
 		GraphQLSchema.Builder schemaBuilder = new GraphQLSchema.Builder();
 		
@@ -77,8 +79,10 @@ public final class GraphQLSchemaParser {
 				}
 				
 				GraphQLField.Builder childBuilder = stack.pop();
-				childBuilder.name(String.copyValueOf(nameBuffer, 0, nameLength));
-				nameLength = 0;
+				if (nameLength > 0) {
+					childBuilder.name(String.copyValueOf(nameBuffer, 0, nameLength));
+					nameLength = 0;
+				}
 				
 				GraphQLField.Builder parentBuilder = stack.peek();
 				parentBuilder.addField(childBuilder.build());
@@ -90,5 +94,60 @@ public final class GraphQLSchemaParser {
 			}
 		}
 		return schemaBuilder.build();
+	}
+	
+	/**
+	 * Remove redundant '\t', '\n', '+', ',', ' ' in query
+	 *
+	 * @param query query in original format
+	 * @return standardized query
+	 */
+	private String standardize(String query) {
+		StringBuilder forwardStandard = forwardStandardize(query);
+		StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
+		return removePrefix(backwardStandard.toString(), "query");
+	}
+	
+	private StringBuilder forwardStandardize(String query) {
+		StringBuilder answer = new StringBuilder();
+		for (int i = 0; i < query.length(); ++i) {
+			char ch = query.charAt(i);
+			if (ch == '{' || ch == '}') {
+				answer.append(ch);
+			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+				char lastChar = answer.charAt(answer.length() - 1);
+				if ((lastChar != ' ') && (lastChar != '{')) {
+					answer.append(' ');
+				}
+			} else {
+				answer.append(ch);
+			}
+		}
+		return answer;
+	}
+	
+	private StringBuilder backwardStandardize(String query) {
+		StringBuilder answer = new StringBuilder();
+		for (int i = query.length() - 1; i >= 0; --i) {
+			char ch = query.charAt(i);
+			if (ch == '{' || ch == '}') {
+				answer.insert(0, ch);
+			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+				char firstChar = answer.charAt(0);
+				if ((firstChar != ' ') && (firstChar != '{') && (firstChar != '}')) {
+					answer.insert(0, ' ');
+				}
+			} else {
+				answer.insert(0, ch);
+			}
+		}
+		return answer;
+	}
+	
+	private String removePrefix(String s, String prefix) {
+		if (s != null && prefix != null && s.startsWith(prefix)) {
+			return s.substring(prefix.length());
+		}
+		return s;
 	}
 }

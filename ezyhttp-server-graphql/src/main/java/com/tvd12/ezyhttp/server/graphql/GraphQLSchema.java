@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.graphql;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 public class GraphQLSchema {
 	
+	@Getter
 	private List<GraphQLQueryDefinition> queryDefinitions;
 	
 	public GraphQLSchema(Builder builder) {

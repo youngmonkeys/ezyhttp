@@ -13,3 +13,4 @@ test-output
 .DS_Store
 *.DS_Store
 .idea/*
+ezyhttp-server-graphql/test_cases.txt

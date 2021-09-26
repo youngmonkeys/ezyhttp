@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.server.graphql;
 
+import com.tvd12.ezyfox.builder.EzyBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.tvd12.ezyfox.builder.EzyBuilder;
-import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 
 @SuppressWarnings("rawtypes")
 public class GraphQLDataFetcherManager {
@@ -35,8 +34,8 @@ public class GraphQLDataFetcherManager {
 			return this;
 		}
 		
-		public Builder addDataFetcher(String operationName, GraphQLDataFetcher fetcher) {
-			this.dataFetchers.put(operationName, fetcher);
+		public Builder addDataFetcher(String queryName, GraphQLDataFetcher fetcher) {
+			this.dataFetchers.put(queryName, fetcher);
 			return this;
 		}
 		
