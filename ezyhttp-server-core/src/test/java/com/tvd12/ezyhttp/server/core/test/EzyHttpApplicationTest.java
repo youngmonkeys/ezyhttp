@@ -81,4 +81,21 @@ public class EzyHttpApplicationTest {
 		// then
 		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
 	}
+	
+	@Test
+    public void testDisablePrintBanner() throws Exception {
+        // given
+	    System.setProperty(EzyBeanContext.ACTIVE_PROFILES_KEY, "disable");
+        EzyHttpApplication sut = EzyHttpApplication.start(EzyHttpApplicationTest.class);
+        System.setProperty(EzyBeanContext.ACTIVE_PROFILES_KEY, "enable");
+        ApplicationContext applicationContext = sut.getApplicationContext();
+        EzyBeanContext beanContext = applicationContext.getBeanContext();
+        
+        // when
+        boolean bannerPrintable = beanContext.getProperty("banner.printable", boolean.class);
+        
+        // then
+        Asserts.assertFalse(bannerPrintable);
+        sut.stop();
+    }
 }

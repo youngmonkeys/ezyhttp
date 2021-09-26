@@ -10,6 +10,10 @@ public interface ApplicationContext extends EzyDestroyable {
 	
 	EzyBeanContext getBeanContext();
 	
+	<T> T getProperty(Object key, Class<T> outType);
+	
+	<T> T getProperty(Object key, Class<T> outType, T defaultValue);
+	
 	<T> T getSingleton(Class<T> type);
 	
 	<T> T getAnnotatedSingleton(Class<? extends Annotation> annotationClass);

@@ -18,6 +18,16 @@ public class SimpleApplicationContext implements ApplicationContext {
 	protected EzyBeanContext beanContext;
 	
 	@Override
+	public <T> T getProperty(Object key, Class<T> outType) {
+		return beanContext.getProperty(key, outType);
+	}
+	
+	@Override
+	public <T> T getProperty(Object key, Class<T> outType, T defaultValue) {
+		return beanContext.getProperty(key, outType, defaultValue);
+	}
+	
+	@Override
 	public <T> T getSingleton(Class<T> type) {
 		return beanContext.getSingleton(type);
 	}

@@ -63,7 +63,9 @@ public class EzyHttpApplication
 			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found, let's use EzyHttpApplicationBootstrap.start(...)");
 		entry.init();
 		entry.start();
-		logger.info("\n{}\n", new BannerPrinter().getBannerText());
+		boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class, true);
+		if(printBanner)
+			logger.info("\n{}\n", new BannerPrinter().getBannerText());
 	}
 	
 	@Override

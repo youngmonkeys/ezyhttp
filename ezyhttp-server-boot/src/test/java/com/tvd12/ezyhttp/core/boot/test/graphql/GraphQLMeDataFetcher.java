@@ -16,6 +16,7 @@ import lombok.Getter;
 public class GraphQLMeDataFetcher 
 		extends GraphQLAbstractDataFetcher<MeRequest, MeResponse> {
 
+	@Override
 	public MeResponse getData(MeRequest argument) {
 		return MeResponse.builder()
 				.id(1)

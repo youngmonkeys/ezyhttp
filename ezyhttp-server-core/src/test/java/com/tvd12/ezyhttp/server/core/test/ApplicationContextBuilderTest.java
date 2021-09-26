@@ -35,6 +35,9 @@ public class ApplicationContextBuilderTest {
 	@Test
 	public void test() {
 		// given
+	    EzyBeanContext internalBeanContext = EzyBeanContext.builder()
+	            .addSingleton(new InternalSingleton1())
+	            .build();
 		Properties properties = new Properties();
 		properties.put("b", 2);
 		ApplicationContext applicationContext = new ApplicationContextBuilder()
@@ -57,6 +60,9 @@ public class ApplicationContextBuilderTest {
 			.addProperty("a", "1")
 			.addProperties(properties)
 			.addProperties(Collections.singletonMap("c", "3"))
+			.beanContext(internalBeanContext)
+			.addSingleton(new InternalSingleton2())
+			.addSingleton(Collections.singletonMap("internalSingleton3", new InternalSingleton3()))
 			.build();
 		
 		EzyBeanContext beanContext = applicationContext.getBeanContext();
@@ -74,6 +80,9 @@ public class ApplicationContextBuilderTest {
 		EventService eventService = beanContext.getSingleton(EventService.class);
 		SourceService sourceService = beanContext.getSingleton(SourceService.class);
 		String helloValue = beanContext.getProperty("hello", String.class);
+		InternalSingleton1 internalSingleton1 = beanContext.getBeanCast(InternalSingleton1.class);
+		InternalSingleton2 internalSingleton2 = beanContext.getBeanCast(InternalSingleton2.class);
+		InternalSingleton3 internalSingleton3 = beanContext.getBeanCast(InternalSingleton3.class);
 		
 		
 		// then
@@ -91,6 +100,7 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertEquals("1", beanContext.getProperty("a", String.class));
 		Asserts.assertEquals(2, beanContext.getProperty("b", int.class));
 		Asserts.assertEquals("3", beanContext.getProperty("c", String.class));
+		Asserts.assertEquals("3", applicationContext.getProperty("c", String.class));
 		Asserts.assertEquals(
 			packagesToScan,
 			Sets.newHashSet(
@@ -104,6 +114,9 @@ public class ApplicationContextBuilderTest {
 				"com.tvd12.ezyhttp.server.core.test.service"
 			)
 		);
+		Asserts.assertNotNull(internalSingleton1);
+		Asserts.assertNotNull(internalSingleton2);
+		Asserts.assertNotNull(internalSingleton3);
 		System.out.println(applicationContext);
 		applicationContext.destroy();
 	}
@@ -299,4 +312,10 @@ public class ApplicationContextBuilderTest {
 		
 		verify(beanContext, times(1)).getSingleton(ResourceDownloadManager.class);
 	}
+	
+	private static class InternalSingleton1  {}
+	
+	private static class InternalSingleton2  {}
+	
+	private static class InternalSingleton3  {}
 }

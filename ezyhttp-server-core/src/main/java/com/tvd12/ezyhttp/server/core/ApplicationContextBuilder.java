@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
+import com.tvd12.ezyfox.bean.impl.EzyBeanKey;
+import com.tvd12.ezyfox.bean.impl.EzyBeanNameParser;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.reflect.EzyClasses;
@@ -70,12 +72,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected final InterceptorManager interceptorManager;
 	protected final RequestHandlerManager requestHandlerManager;
 	protected final ExceptionHandlerManager exceptionHandlerManager;
+	protected final Map<String, Object> singletonByName;
+	protected final Map<EzyBeanKey, Object> singletonByKey;
 	
 	public ApplicationContextBuilder() {
 		this.properties = defaultProperties();
 		this.packageToScans = new HashSet<>();
 		this.componentClasses = new HashSet<>();
 		this.propertiesSources = new HashSet<>();
+		this.singletonByKey = new HashMap<>();
+		this.singletonByName = new HashMap<>();
 		this.componentManager = ComponentManager.getInstance();
 		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
@@ -172,6 +178,28 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return this;
 	}
 	
+	public ApplicationContextBuilder addSingleton(Object singleton) {
+		return addSingleton(
+			EzyBeanNameParser.getSingletonName(singleton.getClass()),
+			singleton
+		);
+	}
+	
+	public ApplicationContextBuilder addSingleton(String name, Object singleton) {
+		this.singletonByName.put(name, singleton);
+		return this;
+	}
+	
+	public ApplicationContextBuilder addSingleton(Map<String, Object> singletons) {
+		this.singletonByName.putAll(singletons);
+		return this;
+	}
+	
+	public ApplicationContextBuilder beanContext(EzyBeanContext beanContext) {
+		this.singletonByKey.putAll(beanContext.getSingletonMapByKey());
+		return this;
+	}
+	
 	@Override
 	public ApplicationContext build() {
 		EzyBeanContext beanContext = createBeanContext();
@@ -225,7 +253,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected EzyBeanContextBuilder newBeanContextBuilder() {
-		EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder();
+		EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder()
+				.addSingletons(singletonByName)
+				.addSingletonsByKey(singletonByKey);
 		List<String> propertiesFiles = new ArrayList<>();
 		propertiesFiles.addAll(Arrays.asList(DEFAULT_PROPERTIES_FILES));
 		propertiesFiles.addAll(propertiesSources);
