@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public class GraphQLField {
 	
-	private final String name;
-	private final List<GraphQLField> fields;
+	protected final String name;
+	protected final List<GraphQLField> fields;
 	
 	protected GraphQLField(Builder builder) {
 		this.name = builder.name;

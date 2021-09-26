@@ -14,11 +14,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
-import com.tvd12.ezyhttp.server.graphql.GraphQLField;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
+import com.tvd12.ezyhttp.server.graphql.*;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 
 @Controller
@@ -44,7 +40,6 @@ public class GraphQLController {
 	 * </code>
 	 * 
 	 * 
-	 * @param operationName be used to control which one should be executed.
 	 * @param query GraphQL query
 	 * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</cocde>
 	 * @return the result
@@ -52,11 +47,10 @@ public class GraphQLController {
 	 */
 	@DoGet("/graphql")
 	public Object doGet(
-			@RequestParam("operationName") String operationName,
 			@RequestParam("query") String query,
 			@RequestParam("variables") String variables
 	) throws Exception {
-		return fetch(operationName, query, variables);
+		return fetch(query, variables);
 	}
 	
 	/**
@@ -81,7 +75,6 @@ public class GraphQLController {
 	@DoPost("/graphql")
 	public Object doPost(@RequestBody GraphQLRequest request) throws Exception {
 		return fetch(
-				request.getOperationName(), 
 				request.getQuery(),
 				request.getVariables()
 		);
@@ -89,35 +82,37 @@ public class GraphQLController {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Object fetch(
-			String operationName,
 			String query,
 			Object variables
 	) throws Exception {
-		GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(operationName);
-		if(dataFetcher == null) {
-			throw new HttpNotFoundException("not found data fetcher with operationName: " + operationName);
-		}
-		Class<?> argumentType = dataFetcher.getArgumentType();
-		Object argument = variables;
-		if(argumentType != null) {
-			if(variables instanceof String)
-				argument = objectMapper.readValue((String)variables, argumentType);
-			else
-				argument = objectMapper.convertValue(variables, argumentType);
-		}
-		else {
-			if(variables instanceof String)
-				argument = objectMapper.readValue((String)variables, Map.class);
-		}
-		Object data = dataFetcher.getData(argument);
-		return mapToResponse(data, query);
+		GraphQLSchema schema = schemaParser.parseQuery(query);
+//		String queryName = "";
+//		GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(operationName);
+//		if(dataFetcher == null) {
+//			throw new HttpNotFoundException("not found data fetcher with operationName: " + operationName);
+//		}
+//		Class<?> argumentType = dataFetcher.getArgumentType();
+//		Object argument = variables;
+//		if(argumentType != null) {
+//			if(variables instanceof String)
+//				argument = objectMapper.readValue((String)variables, argumentType);
+//			else
+//				argument = objectMapper.convertValue(variables, argumentType);
+//		}
+//		else {
+//			if(variables instanceof String)
+//				argument = objectMapper.readValue((String)variables, Map.class);
+//		}
+//		Object data = dataFetcher.getData(argument);
+//		return mapToResponse(data, query);
+		return null;
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
 	private Map mapToResponse(Object data, String query) {
 		Map dataMap = objectMapper.convertValue(data, Map.class);
-		GraphQLSchema schema = schemaParser.parseQuery(query);
-		return filterDataMap(dataMap, schema, query);
+//		return filterDataMap(dataMap, schema, query);
+		return null;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

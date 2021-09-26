@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class GraphQLRequest {
 
-	private String operationName;
 	private String query;
 	private Object variables;
 }

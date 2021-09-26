@@ -2,19 +2,19 @@ package com.tvd12.ezyhttp.server.graphql;
 
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.reflect.EzyGenerics;
-import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLOperation;
+import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 
 public interface GraphQLDataFetcher<A,D> {
 
 	D getData(A argument);
 
-	default String getOperationName() {
-		if(getClass().isAnnotationPresent(GraphQLOperation.class)) {
-			return getClass().getAnnotation(GraphQLOperation.class).value();
+	default String getQueryName() {
+		if(getClass().isAnnotationPresent(GraphQLQuery.class)) {
+			return getClass().getAnnotation(GraphQLQuery.class).name();
 		}
 		throw new EzyNotImplementedException("you must implement " + 
 				getClass().getName() + 
-				".getOperationName() method or annotated the class with @GraphQLOperation"
+				".getQueryName() method or annotated the class with @GraphQLQuery"
 		);
 	}
 	

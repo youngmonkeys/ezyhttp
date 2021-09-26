@@ -31,7 +31,7 @@ public class GraphQLMeDataFetcher
 	}
 	
 	@Override
-	public String getOperationName() {
+	public String getQueryName() {
 		return "me";
 	}
 
