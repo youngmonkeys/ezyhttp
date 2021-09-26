@@ -27,11 +27,12 @@ public class GraphQLMeDataFetcher
 						Friend.builder().id(1).name("Bar").build()
 					)
 				)
+				.bank(Bank.builder().id(100).build())
 				.build();
 	}
 	
 	@Override
-	public String getOperationName() {
+	public String getQueryName() {
 		return "me";
 	}
 
@@ -47,6 +48,7 @@ public class GraphQLMeDataFetcher
 		private String name;
 		private String nickName;
 		private List<Friend> friends;
+		private Bank bank;
 	}
 	
 	@Getter
@@ -54,5 +56,11 @@ public class GraphQLMeDataFetcher
 	public static class Friend {
 		private long id;
 		private String name;
+	}
+	
+	@Data
+	@Builder
+	public static class Bank {
+		private long id;
 	}
 }

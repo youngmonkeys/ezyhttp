@@ -1,25 +1,33 @@
 package com.tvd12.ezyhttp.server.graphql;
 
-public class GraphQLSchema extends GraphQLField {
+import com.tvd12.ezyfox.builder.EzyBuilder;
+import lombok.Getter;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+public class GraphQLSchema {
 	
-	protected GraphQLSchema(Builder builder) {
-		super(builder);
+	@Getter
+	private List<GraphQLQueryDefinition> queryDefinitions;
+	
+	public GraphQLSchema(Builder builder) {
+		this.queryDefinitions = builder.queryDefinitions != null ? builder.queryDefinitions : Collections.emptyList();
 	}
 	
 	public static Builder builder() {
 		return new Builder();
 	}
 	
-	public static class Builder extends GraphQLField.Builder {
+	public static class Builder implements EzyBuilder<GraphQLSchema> {
+		private List<GraphQLQueryDefinition> queryDefinitions;
 		
-		@Override
-		public Builder name(String name) {
-			return (Builder)super.name(name);
-		}
-		
-		@Override
-		public Builder addField(GraphQLField field) {
-			return (Builder)super.addField(field);
+		public Builder addQueryDefinition(GraphQLQueryDefinition queryDefinition) {
+			if (queryDefinitions == null)
+				queryDefinitions = new LinkedList<>();
+			this.queryDefinitions.add(queryDefinition);
+			return this;
 		}
 		
 		@Override
@@ -27,4 +35,5 @@ public class GraphQLSchema extends GraphQLField {
 			return new GraphQLSchema(this);
 		}
 	}
+	
 }

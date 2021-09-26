@@ -5,19 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 
- * @author tavandung12
- *
- */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-public @interface GraphQLOperation {
-    
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface GraphQLQuery {
+	
 	/**
-	 * the operation name
-	 * 
-	 * @return the operation name
+	 * Query name
+	 *
+	 * @return name of query
 	 */
-	public String value();
+	public String name();
 }
