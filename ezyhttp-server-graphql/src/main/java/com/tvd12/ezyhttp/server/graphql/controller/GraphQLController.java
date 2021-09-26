@@ -139,7 +139,7 @@ public class GraphQLController {
 					Object newItem = new HashMap<>();
 					parentMap.put(field.getName(), newItem);
 					stack.push(field);
-				} else if (value instanceof List) { // TODO: this condition is never reached
+				} else if (value instanceof List) {
 					parentMap.put(field.getName(), filterDataList((List) value, field, query));
 					continue;
 				} else {
