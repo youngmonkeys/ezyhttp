@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.util.BodyConvertAnnotations;
 
@@ -18,10 +19,10 @@ public class DataConverters {
 	protected final Map<String, BodySerializer> bodySerializers;
 	protected final Map<String, BodyDeserializer> bodyDeserializers;
 	
-	public DataConverters() {
+	public DataConverters(ObjectMapper objectMapper) {
 		this.bodySerializers = new HashMap<>();
 		this.bodyDeserializers = new HashMap<>();
-		this.addDefaultConverter();
+		this.addDefaultConverter(objectMapper);
 	}
 	
 	public BodySerializer getBodySerializer(String contentType) {
@@ -68,9 +69,9 @@ public class DataConverters {
 			setStringConverter(converter);
 	}
 	
-	protected void addDefaultConverter() {
-		JsonBodyConverter jsonBodyConverter = new JsonBodyConverter();
-		FormBodyConverter formBodyConverter = new FormBodyConverter();
+	protected void addDefaultConverter(ObjectMapper objectMapper) {
+		JsonBodyConverter jsonBodyConverter = new JsonBodyConverter(objectMapper);
+		FormBodyConverter formBodyConverter = new FormBodyConverter(objectMapper);
 		TextBodyConverter textBodyConverter = new TextBodyConverter();
 		this.bodySerializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
 		this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);

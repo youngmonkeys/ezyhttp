@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.builder.EzyBuilder;
@@ -59,6 +60,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected final Set<String> packageToScans;
 	protected final Set<Class> componentClasses;
 	protected final Set<String> propertiesSources;
+	protected final ObjectMapper objectMapper;
 	protected final DataConverters dataConverters;
 	protected final ComponentManager componentManager;
 	protected final ControllerManager controllerManager;
@@ -72,6 +74,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		this.componentClasses = new HashSet<>();
 		this.propertiesSources = new HashSet<>();
 		this.componentManager = ComponentManager.getInstance();
+		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
 		this.controllerManager = componentManager.getControllerManager();
 		this.interceptorManager = componentManager.getInterceptorManager();
@@ -194,6 +197,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(stringConverterClasses)
 				.addSingletonClasses(bootstrapClasses)
 				.propertiesMap(propertiesMap)
+				.addSingleton("systemObjectMapper", objectMapper)
 				.build();
 		registerComponents(beanContext);
 		addRequestHandlers(beanContext);

@@ -19,16 +19,19 @@ public class GlobalExceptionHandler {
 
 	@TryCatch(IllegalArgumentException.class)
 	public ResponseEntity handleException(Exception e) {
+		e.printStackTrace();
 		return ResponseEntity.badRequest("global: " + e.getMessage());
 	}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {
+		e.printStackTrace();
 		return e.getMessage();
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)
 	public void handleException3(Exception e) {
+		e.printStackTrace();
 	}
 	
 	@TryCatch(InvalidFormatException.class)
@@ -37,6 +40,7 @@ public class GlobalExceptionHandler {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			InvalidFormatException e) {
+		e.printStackTrace();
 		InvalidFormatException ex = (InvalidFormatException)e;
 		Map<String, String> data = new HashMap<>();
 		for(Reference reference : ex.getPath())
