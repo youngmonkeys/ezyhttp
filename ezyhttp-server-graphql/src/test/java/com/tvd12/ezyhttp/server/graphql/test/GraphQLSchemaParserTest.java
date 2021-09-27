@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 public class GraphQLSchemaParserTest {
 	
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testStandardize1() {
 		// given
 		GraphQLSchemaParser parser = new GraphQLSchemaParser();
@@ -16,10 +16,11 @@ public class GraphQLSchemaParserTest {
 		
 		// when
 		GraphQLSchema schema = parser.parseQuery(query);
+		Throwable e = Asserts.assertThrows(() -> schema.getQueryDefinitions().get(0).getName());
 		
 		// then
 		Asserts.assertEquals(schema.getQueryDefinitions().size(), 1);
-		String queryName = schema.getQueryDefinitions().get(0).getName();
+		Asserts.assertEquals(IllegalArgumentException.class, e.getClass());
 	}
 	
 	@Test
@@ -97,5 +98,43 @@ public class GraphQLSchemaParserTest {
 			Asserts.assertEquals(schemas[i].getQueryDefinitions().get(0).getName(), "queryName");
 			Asserts.assertEquals(schemas[i].getQueryDefinitions().get(0).getFields().size(), 2);
 		}
+	}
+	
+	@Test
+	public void testParseSchema1() {
+		// given
+		GraphQLSchemaParser parser = new GraphQLSchemaParser();
+		
+		String query = "{q1{f1 f2{f21} f3{f31 f32}} q2}";
+		
+		// when
+		GraphQLSchema schema = parser.parseQuery(query);
+		
+		// then
+		Asserts.assertEquals(schema.getQueryDefinitions().size(), 2);
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getName(), "q1");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(1).getName(), "q2");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().size(), 3);
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().get(0).getName(), "f1");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().get(1).getName(), "f2");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().get(2).getName(), "f3");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().get(2).getFields().get(0).getName(), "f31");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getFields().get(2).getFields().get(1).getName(), "f32");
+	}
+	
+	@Test
+	public void testParseSchema2() {
+		// given
+		GraphQLSchemaParser parser = new GraphQLSchemaParser();
+		
+		String query = "{q1 q2}";
+		
+		// when
+		GraphQLSchema schema = parser.parseQuery(query);
+		
+		// then
+		Asserts.assertEquals(schema.getQueryDefinitions().size(), 2);
+		Asserts.assertEquals(schema.getQueryDefinitions().get(0).getName(), "q1");
+		Asserts.assertEquals(schema.getQueryDefinitions().get(1).getName(), "q2");
 	}
 }
