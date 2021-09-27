@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
-class EmptyRequestHandler implements RequestHandler {
+public class EmptyRequestHandler implements RequestHandler {
 	
 	private static final EmptyRequestHandler INSTANCE = new EmptyRequestHandler();
 	

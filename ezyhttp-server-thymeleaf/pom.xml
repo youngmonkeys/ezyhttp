@@ -11,6 +11,7 @@
 
 	<properties>
 		<thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
+		<layout.dialect.version>3.0.0</layout.dialect.version>
 	</properties>
 
 	<dependencies>
@@ -29,6 +30,17 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>${javax.servlet.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>nz.net.ultraq.thymeleaf</groupId>
+			<artifactId>thymeleaf-layout-dialect</artifactId>
+			<version>${layout.dialect.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.thymeleaf</groupId>
+					<artifactId>thymeleaf</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

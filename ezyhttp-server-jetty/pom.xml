@@ -12,10 +12,6 @@
 	<name>ezyhttp-server-jetty</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
 	
-	<properties>
-		<jetty.version>9.4.43.v20210629</jetty.version>
-	</properties>
-	
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>

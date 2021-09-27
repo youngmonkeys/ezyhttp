@@ -17,7 +17,8 @@ public class DeserializeValueException extends IOException {
 		super(
 			"can't deserialize: " + valueName + 
 			" from: " + valueToString(value) + 
-			" to: " + outType.getSimpleName()
+			" to: " + outType.getSimpleName(),
+			e
 		);
 		this.valueName = valueName;
 		this.value = value;

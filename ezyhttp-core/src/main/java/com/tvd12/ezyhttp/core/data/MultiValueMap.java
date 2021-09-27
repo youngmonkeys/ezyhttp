@@ -57,7 +57,9 @@ public class MultiValueMap {
 			for(String kv : kvs) {
 				String[] strs = kv.split("=");
 				String key = strs[0].trim();
-				String value = strs.length <= 1 ? null : strs[1];
+				String value = strs.length <= 1 
+						? kv.contains("=") ? "" : null 
+						: strs[1];
 				map.put(key, value);
 			}
 		}
@@ -81,6 +83,21 @@ public class MultiValueMap {
 				valueString.append(values.get(i));
 			}
 			answer.put(key, valueString.toString());
+		}
+		return answer;
+	}
+	
+	public static List<String> mapToKeyValueList(Map<String, Object> map) {
+		List<String> answer = new ArrayList<>();
+		for(Entry<String, Object> e : map.entrySet()) {
+			String key = e.getKey();
+			Object value = e.getValue();
+			if(value == null) {
+				answer.add(key);
+			}
+			else {
+				answer.add(key + "=" + value);
+			}
 		}
 		return answer;
 	}
@@ -111,6 +128,10 @@ public class MultiValueMap {
 			for(String value : values)
 				setValue(key, value);
 			return this;
+		}
+		
+		public Builder setValues(String key, Map<String, Object> values) {
+			return setValues(key, mapToKeyValueList(values));
 		}
 		
 		@Override

@@ -14,9 +14,9 @@ public final class FileSizes {
 			if(lowercase.endsWith("gb"))
 				return subSizeStringToLong(value, 2) * 1024 * 1024 * 1024;
 			if(lowercase.endsWith("tb"))
-				return subSizeStringToLong(value, 2) * 1024 * 1024 * 1024;
+				return subSizeStringToLong(value, 2) * 1024 * 1024 * 1024 * 1024;
 		}
-		else if(value.length() > 1) {
+		if(value.length() > 1) {
 			if(lowercase.endsWith("b"))
 				return subSizeStringToLong(value, 1);
 		}

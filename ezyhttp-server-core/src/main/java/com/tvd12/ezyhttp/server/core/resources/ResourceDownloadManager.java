@@ -34,6 +34,7 @@ public class ResourceDownloadManager
 	public static final int DEFAULT_CAPACITY = 100000;
 	public static final int DEFAULT_THREAD_POOL_SIZE = 16;
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
+	public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
 	
 	public ResourceDownloadManager() {
 		this(
@@ -72,6 +73,8 @@ public class ResourceDownloadManager
 		while(active) {
 			try {
 				Entry entry = queue.take();
+				if(entry == POISON)
+					break;
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				boolean done = false;
@@ -110,7 +113,7 @@ public class ResourceDownloadManager
 			futureMap.removeFuture(entry);
 			throw new MaxResourceDownloadCapacity(capacity);
 		}
-		future.get();
+		future.get(DEFAULT_TIMEOUT);
 	}
 	
 	@Override

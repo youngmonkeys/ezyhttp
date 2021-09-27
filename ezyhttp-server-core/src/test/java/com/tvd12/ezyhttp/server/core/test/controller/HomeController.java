@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
@@ -13,13 +14,15 @@ import com.tvd12.ezyhttp.server.core.annotation.DoPut;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 
-@Controller("/")
+@Controller("/api")
 public class HomeController {
 
 	@DoGet
@@ -30,6 +33,8 @@ public class HomeController {
 			@RequestParam String who,
 			@RequestHeader("key") String key,
 			@RequestHeader String token,
+			@RequestCookie String cookieIndex,
+			@RequestCookie("cookie") String cookieValue,
 			@RequestArgument("name") String name,
 			@RequestBody HelloRequest body,
 			@NickName String nickName) {
@@ -41,6 +46,7 @@ public class HomeController {
 	
 	@DoPost
 	public String hello(
+			RequestArguments args,
 			@RequestBody HelloRequest body) {
 		return "hello " + body.getWho();
 	}
@@ -54,14 +60,14 @@ public class HomeController {
 		return "bye: " + messages;
 	}
 	
-	@DoGet("see")
+	@DoGet(value = "see", responseType = ContentTypes.APPLICATION_JSON)
 	public String see(
 			@RequestParam List<String> messages, 
 			@PathVariable("name") String name) {
 		return "bye: " + messages;
 	}
 	
-	@DoPut("see")
+	@DoPut(value = "see", responseType = ContentTypes.APPLICATION_JSON)
 	public String put(
 			@RequestParam List<String> messages, 
 			@PathVariable("name") String name) {
@@ -77,6 +83,12 @@ public class HomeController {
 			@PathVariable("name") String name) {
 		return "bye: " + messages;
 	}
+	
+	@DoPost("/post1")
+	public void post1() {}
+	
+	@DoPost(uri = "post2", responseType = ContentTypes.APPLICATION_JSON)
+	public void post2() {}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {

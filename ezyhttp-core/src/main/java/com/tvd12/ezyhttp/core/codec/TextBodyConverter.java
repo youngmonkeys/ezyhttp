@@ -38,14 +38,13 @@ public class TextBodyConverter implements BodyConverter {
 	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
 		if(bodyType == String.class)
 			return (T)data;
-		T body = objectMapper.convertValue(data, bodyType);
+		T body = objectMapper.readValue(data, bodyType);
 		return body;
 	}
 	
 	@Override
 	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
-		String bodyString = EzyInputStreams.toStringUtf8(data.getInputStream());
-		return deserialize(bodyString, bodyType);
+		return deserialize(data.getInputStream(), bodyType);
 	}
 	
 	@Override

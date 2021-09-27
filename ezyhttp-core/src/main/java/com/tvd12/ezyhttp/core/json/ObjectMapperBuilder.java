@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,12 +22,22 @@ import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
 
 public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
+	private Consumer<ObjectMapper> decorator;
+	
 	@Override
 	public ObjectMapper build() {
-		return JacksonObjectMapperBuilder.newInstance()
+		ObjectMapper objectMapper = JacksonObjectMapperBuilder.newInstance()
 			.build()
 			.registerModule(newModule())
 			.findAndRegisterModules();
+		if(decorator != null)
+			decorator.accept(objectMapper);
+		return objectMapper;
+	}
+	
+	public ObjectMapperBuilder decorator(Consumer<ObjectMapper> decorator) {
+		this.decorator = decorator;
+		return this;
 	}
 	
 	protected Module newModule() {

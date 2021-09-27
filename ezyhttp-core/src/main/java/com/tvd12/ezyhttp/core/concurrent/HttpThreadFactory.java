@@ -8,8 +8,10 @@ public class HttpThreadFactory extends EzyThreadFactory {
 		super(builder);
 	}
 	
-	public static EzyThreadFactory create(String poolName) {
-		return builder().poolName(poolName).build();
+	public static HttpThreadFactory create(String poolName) {
+		return (HttpThreadFactory)builder()
+				.poolName(poolName)
+				.build();
 	}
 	
 	public static Builder builder() {
@@ -24,7 +26,7 @@ public class HttpThreadFactory extends EzyThreadFactory {
 		}
 		
 		@Override
-		public EzyThreadFactory build() {
+		public HttpThreadFactory build() {
 			return new HttpThreadFactory(this);
 		}
 		

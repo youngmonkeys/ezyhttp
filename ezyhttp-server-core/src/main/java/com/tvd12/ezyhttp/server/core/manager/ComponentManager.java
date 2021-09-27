@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.manager;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
@@ -11,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public final class ComponentManager {
+public final class ComponentManager implements EzyDestroyable {
 	
 	@Setter
 	private int serverPort;
@@ -43,4 +44,13 @@ public final class ComponentManager {
 		return INSTANCE;
 	}
 	
+	@Override
+	public void destroy() {
+		this.viewContext = null;
+		this.dataConverters.destroy();
+		this.controllerManager.destroy();
+		this.interceptorManager.destroy();
+		this.requestHandlerManager.destroy();
+		this.exceptionHandlerManager.destroy();
+	}
 }

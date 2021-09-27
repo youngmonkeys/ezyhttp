@@ -78,6 +78,23 @@ public class HomeController {
 		return ResponseEntity.ASYNC;
 	}
 	
+	@DoGet("text")
+	public ResponseEntity text() {
+		return ResponseEntity.builder()
+				.textPlain("Hello I'm a text")
+				.build();
+	}
+	
+	@DoGet("list")
+	public List<String> list() {
+		return Arrays.asList("hello", "world");
+	}
+	
+	@DoGet("no-content")
+	public Object noContent() {
+		return null;
+	}
+	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2( Exception e) {
 		e.printStackTrace();

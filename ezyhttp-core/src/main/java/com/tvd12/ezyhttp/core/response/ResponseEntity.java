@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 
@@ -79,6 +81,10 @@ public class ResponseEntity {
 		return value;
 	}
 	
+	public String getContentType() {
+		return getHeader(Headers.CONTENT_TYPE);
+	}
+	
 	@Override
 	public String toString() {
 		return new StringBuilder()
@@ -96,8 +102,8 @@ public class ResponseEntity {
 	
 	public static class Builder implements EzyBuilder<ResponseEntity> {
 
-		protected int status;
 		protected Object body;
+		protected int status = StatusCodes.OK;
 		protected Map<String, List<String>> headers;
 		
 		public Builder status(int status) {
@@ -108,6 +114,19 @@ public class ResponseEntity {
 		public Builder body(Object body) {
 			this.body = body;
 			return this;
+		}
+		
+		public Builder textPlain(Object value) {
+			this.textPlain();
+			return body(value.toString());
+		}
+		
+		public Builder textPlain() {
+			return contentType(ContentTypes.TEXT_PLAIN);
+		}
+		
+		public Builder contentType(String contentType) {
+			return header(Headers.CONTENT_TYPE, contentType);
 		}
 		
 		public Builder header(String name, String value) {

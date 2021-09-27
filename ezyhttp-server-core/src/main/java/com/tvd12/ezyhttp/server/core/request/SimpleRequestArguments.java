@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.PathVariables;
 
@@ -117,6 +118,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Override
 	public String getPathVariable(int index) {
 		fetchPathVariables();
+		if(pathVariableList.size() <= index)
+			return null;
 		String varValue = pathVariableList.get(index).getValue();
 		return varValue;
 	}
@@ -149,9 +152,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public String getContentType() {
-		String type = request.getContentType();
-		int index = type.indexOf(';');
-		return index > 0 ? type.substring(0, index) : type;
+		return ContentTypes.getContentType(request.getContentType());
 	}
 	
 	@Override

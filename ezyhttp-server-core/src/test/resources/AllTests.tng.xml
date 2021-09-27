@@ -3,7 +3,19 @@
 <suite name="AllTests">
 	<test name="All">
 		<packages>
-			<package name="com.tvd12.ezyhttp.testing"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.annotation"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.asm"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.controller"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.handler"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.interceptor"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.manager"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.reflect"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.request"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.resources"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.servlet"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.util"></package>
+			<package name="com.tvd12.ezyhttp.server.core.test.view"></package>
 		</packages>
 	</test>
 </suite>

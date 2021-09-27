@@ -1,0 +1,7 @@
+first: 1
+management:
+  enable: true
+resources:
+  enable: true
+  upload:
+    enable: true

@@ -23,6 +23,7 @@ public class MessageReader {
 		for(MessagesFile file : files) {
 			Properties properties = fileReader.read(file.filePath);
 			answer.put(file.languague, properties);
+			answer.put(file.languague.toLowerCase(), properties);
 		}
 		return answer;
 	}

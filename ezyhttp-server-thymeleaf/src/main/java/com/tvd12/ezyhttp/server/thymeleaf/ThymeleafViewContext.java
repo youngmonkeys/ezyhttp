@@ -15,6 +15,8 @@ import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+
 public class ThymeleafViewContext implements ViewContext {
 
 	private final TemplateEngine templateEngine;
@@ -49,6 +51,7 @@ public class ThymeleafViewContext implements ViewContext {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         templateEngine.setMessageResolver(messageResolver);
+        templateEngine.addDialect(new LayoutDialect());
         return templateEngine;
 	}
 }

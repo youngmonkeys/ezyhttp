@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.util;
 
+import java.util.Comparator;
+
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 
@@ -17,4 +19,9 @@ public final class InterceptorAnnotations {
 		return getPriority(annotation);
 	}
 	
+	public static Comparator<Object> comparator() {
+		return (a, b) ->
+			getPriority(a.getClass().getAnnotation(Interceptor.class)) 
+				- getPriority(b.getClass().getAnnotation(Interceptor.class));
+	}
 }

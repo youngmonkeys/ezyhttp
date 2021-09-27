@@ -1,7 +1,7 @@
 package com.tvd12.ezyhttp.server.graphql;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
@@ -49,7 +49,7 @@ public class GraphQLField {
 		
 		public Builder addField(GraphQLField field) {
 			if(fields == null)
-				fields = new LinkedList<>();
+				fields = new ArrayList<>();
 			this.fields.add(field);
 			return this;
 		}

@@ -98,8 +98,6 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 	}
 
 	private String formatMessage(Locale locale, String message, Object[] parameters) {
-		if (message == null)
-			return null;
 		if (!isFormatCandidate(message))
 			return message;
 		MessageFormat messageFormat = new MessageFormat(message, locale);

@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyhttp.core.net.PathVariables;
+import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.performance.Performance;
 
@@ -23,4 +24,10 @@ public class PathVariablesTest extends BaseTest {
 		System.out.println(time);
 	}
 	
+	@Test
+	public void isPathVariableTest() {
+		Asserts.assertFalse(PathVariables.isPathVariable("{a"));
+		Asserts.assertFalse(PathVariables.isPathVariable("a"));
+		Asserts.assertFalse(PathVariables.isPathVariable("a}"));
+	}
 }

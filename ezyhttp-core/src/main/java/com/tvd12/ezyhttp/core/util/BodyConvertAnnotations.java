@@ -12,6 +12,8 @@ public final class BodyConvertAnnotations {
 	
 	public static String getContentType(Object converter) {
 		BodyConvert annotation = converter.getClass().getAnnotation(BodyConvert.class);
+		if(annotation == null)
+			throw new IllegalArgumentException("you must annotate " + converter.getClass().getName() + " with @BodyConvert annotation");
 		return getContentType(annotation);
 	}
 	

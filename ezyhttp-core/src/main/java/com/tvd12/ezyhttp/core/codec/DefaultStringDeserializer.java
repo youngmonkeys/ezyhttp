@@ -3,12 +3,15 @@ package com.tvd12.ezyhttp.core.codec;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +32,20 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public <T> T deserialize(
+			String value,
+			Class<T> outType, 
+			Class<?> genericType) throws IOException {
+		if(genericType != null) {
+			if(Set.class.isAssignableFrom(outType))
+				return (T)stringToSet(value, genericType);
+			else if(Collection.class.isAssignableFrom(outType))
+				return (T)stringToList(value, genericType);
+		}
+		return deserialize(value, outType);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
 		StringMapper mapper = mappers.get(outType);
 		if(mapper == null)
@@ -69,6 +86,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		
 		map.put(boolean[].class, v -> stringToPrimitiveBoolean(v));
 		map.put(byte[].class, v -> stringToPrimitiveByte(v));
+		map.put(char[].class, v -> stringToPrimitiveChar(v));
 		map.put(double[].class, v -> stringToPrimitiveDouble(v));
 		map.put(float[].class, v -> stringToPrimitiveFloat(v));
 		map.put(int[].class, v -> stringToPrimitiveInteger(v));
@@ -77,6 +95,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		
 		map.put(Boolean[].class, v -> stringToWrapperBoolean(v));
 		map.put(Byte[].class, v -> stringToWrapperByte(v));
+		map.put(Character[].class, v -> stringToWrapperChar(v));
 		map.put(Double[].class, v -> stringToWrapperDouble(v));
 		map.put(Float[].class, v -> stringToWrapperFloat(v));
 		map.put(Integer[].class, v -> stringToWrapperInteger(v));
@@ -123,6 +142,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		byte[] answer = new byte[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
 			answer[i] = Byte.valueOf(array[i]);
+		return answer;
+	}
+	
+	protected char[] stringToPrimitiveChar(String value) {
+		String[] array = stringToStringArray(value);
+		char[] answer = new char[array.length];
+		for(int i = 0 ; i < array.length ; ++i)
+			answer[i] = array[i].charAt(0);
 		return answer;
 	}
 
@@ -182,6 +209,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 			answer[i] = Byte.valueOf(array[i]);
 		return answer;
 	}
+	
+	protected Character[] stringToWrapperChar(String value) {
+		String[] array = stringToStringArray(value);
+		Character[] answer = new Character[array.length];
+		for(int i = 0 ; i < array.length ; ++i)
+			answer[i] = array[i].charAt(0);
+		return answer;
+	}
 
 	protected Double[] stringToWrapperDouble(String value) {
 		String[] array = stringToStringArray(value);
@@ -223,4 +258,22 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		return answer;
 	}
 	
+	// =============== collection ===============
+	protected <T> Set<T> stringToSet(
+			String value, Class<T> itemType) throws IOException {
+		String[] array = stringToStringArray(value);
+		Set<T> answer = new HashSet<>();
+		for(int i = 0 ; i < array.length ; ++i)
+			answer.add(deserialize(array[i], itemType));
+		return answer;
+	}
+	
+	protected <T> List<T> stringToList(
+			String value, Class<T> itemType) throws IOException {
+		String[] array = stringToStringArray(value);
+		List<T> answer = new ArrayList<>();
+		for(int i = 0 ; i < array.length ; ++i)
+			answer.add(deserialize(array[i], itemType));
+		return answer;
+	}
 }

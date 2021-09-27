@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.core.test.json;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -17,7 +18,9 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ObjectMapperBuilderTest {
 
-	private final ObjectMapper sut = new ObjectMapperBuilder().build();
+	private final ObjectMapper sut = new ObjectMapperBuilder()
+			.decorator(it -> {})
+			.build();
 	
 	@Test
 	public void instantTest() {
@@ -29,6 +32,30 @@ public class ObjectMapperBuilderTest {
 		
 		// then
 		Asserts.assertEquals(Instant.ofEpochMilli(current), actual);
+	}
+	
+	@Test
+	public void instantStringTest() {
+		// given
+		String source = "2021-01-30T10:20:30:500";
+		
+		// when
+		Instant actual = sut.convertValue(source, Instant.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.parse(source).toInstant(), actual);
+	}
+	
+	@Test
+	public void instantFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Instant.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
 	}
 	
 	@Test
@@ -56,6 +83,18 @@ public class ObjectMapperBuilderTest {
 	}
 	
 	@Test
+	public void dateFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Date.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
+	}
+	
+	@Test
 	public void localDateTest() {
 		// given
 		String source = "2021-01-30";
@@ -65,6 +104,30 @@ public class ObjectMapperBuilderTest {
 		
 		// then
 		Asserts.assertEquals(EzyDates.parseDate(source), actual);
+	}
+	
+	@Test
+	public void localDateLongTest() {
+		// given
+		Long source = System.currentTimeMillis();
+		
+		// when
+		LocalDate actual = sut.convertValue(source, LocalDate.class);
+		
+		// then
+		Asserts.assertEquals(LocalDate.now(), actual);
+	}
+	
+	@Test
+	public void localDateFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDate.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
 	}
 	
 	@Test
@@ -80,6 +143,30 @@ public class ObjectMapperBuilderTest {
 	}
 	
 	@Test
+	public void localTimeLongTest() {
+		// given
+		long source = System.currentTimeMillis();
+		
+		// when
+		LocalTime actual = sut.convertValue(source, LocalTime.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.millisToDateTime(source).toLocalTime(), actual);
+	}
+	
+	@Test
+	public void localTimeFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalTime.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
+	}
+	
+	@Test
 	public void localDateTimeTest() {
 		// given
 		String source = "2021-01-30T10:20:30:500";
@@ -89,6 +176,30 @@ public class ObjectMapperBuilderTest {
 		
 		// then
 		Asserts.assertEquals(EzyDates.parseDateTime(source), actual);
+	}
+	
+	@Test
+	public void localDateLongTimeTest() {
+		// given
+		long source = System.currentTimeMillis();
+		
+		// when
+		LocalDateTime actual = sut.convertValue(source, LocalDateTime.class);
+		
+		// then
+		Asserts.assertEquals(EzyDates.millisToDateTime(source), actual);
+	}
+	
+	@Test
+	public void localDateTimeFailedDueToBoolean() {
+		// given
+		boolean source = true;
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDateTime.class));
+		
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
 	}
 	
 	@Test
@@ -108,23 +219,13 @@ public class ObjectMapperBuilderTest {
 		// given
 		String source = "12345.6";
 		
+		ObjectMapper sut = new ObjectMapperBuilder()
+				.build();
+		
 		// when
 		BigDecimal actual = sut.convertValue(source, BigDecimal.class);
 		
 		// then
 		Asserts.assertEquals(BigDecimal.valueOf(12345.6), actual);
 	}
-	
-	@Test
-	public void booleanArrayDecimalTest() {
-		// given
-		String source = "true,false";
-		
-		// when
-		boolean[] actual = sut.convertValue(source, boolean[].class);
-		
-		// then
-		Asserts.assertEquals(new boolean[] {true, false}, actual);
-	}
-	
 }
