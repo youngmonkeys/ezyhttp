@@ -103,7 +103,8 @@ public final class GraphQLSchemaParser {
 	 * @return standardized query
 	 */
 	private String standardize(String query) {
-		StringBuilder forwardStandard = forwardStandardize(query);
+		String trimedQuery = query.trim();
+		StringBuilder forwardStandard = forwardStandardize(trimedQuery);
 		StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
 		return removePrefix(backwardStandard.toString(), "query");
 	}
