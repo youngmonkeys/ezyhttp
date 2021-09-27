@@ -223,7 +223,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		addComponentClassesFromReflection(reflection);
 		EzyBeanContext beanContext = newBeanContextBuilder()
 				.scan(packageToScans)
-				.addProperties(properties)
 				.addSingletonClasses(componentClasses)
 				.addSingletonClasses(serviceClasses)
 				.addSingletonClasses(controllerClasses)
@@ -254,6 +253,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected EzyBeanContextBuilder newBeanContextBuilder() {
 		EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder()
+		        .addProperties(properties)
 				.addSingletons(singletonByName)
 				.addSingletonsByKey(singletonByKey);
 		List<String> propertiesFiles = new ArrayList<>();
