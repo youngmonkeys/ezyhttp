@@ -108,6 +108,7 @@ public class ApplicationContextBuilderTest {
 				"com.tvd12.ezyhttp.server.core.test.config", 
 				"com.tvd12.ezyhttp.server.core.test.controller",
 				"com.tvd12.ezyhttp.server.core.test.event",
+				"com.tvd12.ezyhttp.server.core.test.api",
 				"com.tvd12.ezyhttp.server.core.test.reflect", 
 				"com.tvd12.ezyhttp.server.core.test.request",
 				"com.tvd12.ezyhttp.server.core.test.resources",
@@ -147,7 +148,13 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertFalse(resourceUploadEnable);
 		Asserts.assertNull(resourceResolver);
 		Asserts.assertNull(resourceDownloadManager);
-		Asserts.assertEquals(Sets.newHashSet("i_dont_know"), packagesToScan);
+		Asserts.assertEquals(
+	        Sets.newHashSet(
+                "i_dont_know",
+                "com.tvd12.ezyhttp.server.core.test.config", 
+                "com.tvd12.ezyhttp.server.core.test.event",
+                "com.tvd12.ezyhttp.server.core.test.api"), 
+	        packagesToScan);
 		applicationContext.destroy();
 	}
 	
