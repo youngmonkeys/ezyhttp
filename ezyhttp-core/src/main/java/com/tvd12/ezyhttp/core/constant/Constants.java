@@ -9,6 +9,7 @@ public final class Constants {
 			"application.properties",
 			"application.yaml"
 	};
+	public static final String DEFAULT_PACKAGE_TO_SCAN = "com.tvd12.ezyhttp.server";
 	
 	private Constants() {}
 	

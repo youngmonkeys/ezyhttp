@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core;
 
+import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PACKAGE_TO_SCAN;
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.annotation.EzyPackagesToScan;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
@@ -124,6 +126,15 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 					
 			);
 		}
+		EzyPackagesToScan packagesToScan = componentClass.getAnnotation(EzyPackagesToScan.class);
+        if(packagesToScan != null) {
+            scan(
+                 packagesToScan.value().length != 0
+                    ? packagesToScan.value()
+                    : new String[] { componentClass.getPackage().getName() }
+                    
+            );
+        }
 		ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
 		if(componentClasses != null)
 			addComponentClasses(componentClasses.value());
@@ -211,6 +222,11 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected EzyBeanContext createBeanContext() {
 		if(packageToScans.isEmpty())
 			throw new IllegalStateException("must scan at least one package");
+		Set<String> firstPackageToScans = new HashSet<>();
+		firstPackageToScans.add(DEFAULT_PACKAGE_TO_SCAN);
+		firstPackageToScans.addAll(packageToScans);
+		EzyReflection firstReflection = EzyPackages.scanPackages(firstPackageToScans);
+		addComponentClassesFromReflection(firstReflection);
 		EzyReflection reflection = EzyPackages.scanPackages(packageToScans);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
@@ -220,7 +236,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
 		Map<String, Class> serviceClasses = getServiceClasses(reflection);
 		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
-		addComponentClassesFromReflection(reflection);
 		EzyBeanContext beanContext = newBeanContextBuilder()
 				.scan(packageToScans)
 				.addSingletonClasses(componentClasses)
@@ -233,7 +248,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(bootstrapClasses)
 				.propertiesMap(propertiesMap)
 				.addSingleton("systemObjectMapper", objectMapper)
-				.addAllClasses(EzyPackages.scanPackage("com.tvd12.ezyhttp.server"))
+				.addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
 				.build();
 		registerComponents(beanContext);
 		addRequestHandlers(beanContext);
@@ -247,6 +262,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		classes.addAll(reflection.getAnnotatedClasses(ComponentsScan.class));
 		classes.addAll(reflection.getAnnotatedClasses(ComponentClasses.class));
 		classes.addAll(reflection.getAnnotatedClasses(PropertiesSources.class));
+		classes.addAll(reflection.getAnnotatedClasses(EzyPackagesToScan.class));
 		for(Class clazz : classes)
 			addComponentClass(clazz);
 	}
