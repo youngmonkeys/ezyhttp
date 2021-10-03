@@ -1,22 +1,32 @@
 package com.tvd12.ezyhttp.server.core.test;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.util.List;
 
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
-import com.tvd12.ezyhttp.server.core.test.component.ViewContextBuilderTest;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 import com.tvd12.test.assertion.Asserts;
 
 public class EzyHttpApplicationTest {
 
+    @AfterMethod
+    public void postTest() {
+        ComponentManager.getInstance().destroy();
+    }
+    
 	@Test
 	public void test() throws Exception {
 		// given
@@ -73,13 +83,17 @@ public class EzyHttpApplicationTest {
 	}
 	
 	@Test
-	public void testFailed() {
+	public void testFailedDueToNoApplicationEntry() {
 		// given
+	    ApplicationContext context = mock(ApplicationContext.class);
+	    EzyHttpApplication sut = new EzyHttpApplication(context);
+	    
 		// when
-		Throwable e = Asserts.assertThrows(() -> EzyHttpApplication.start(ViewContextBuilderTest.class));
+		Throwable e = Asserts.assertThrows(() -> sut.start());
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
+		verify(context, times(1)).getAnnotatedSingleton(ApplicationBootstrap.class);
 	}
 	
 	@Test

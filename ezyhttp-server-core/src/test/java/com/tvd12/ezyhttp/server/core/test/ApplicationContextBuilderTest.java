@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
@@ -19,6 +20,7 @@ import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.reflect.EzyReflection;
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.ApplicationContextBuilder;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.event.EventService;
@@ -32,6 +34,11 @@ import com.tvd12.test.reflect.MethodInvoker;
 
 public class ApplicationContextBuilderTest {
 
+    @AfterMethod
+    public void postTest() {
+        ComponentManager.getInstance().destroy();
+    }
+    
 	@Test
 	public void test() {
 		// given

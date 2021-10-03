@@ -222,12 +222,11 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected EzyBeanContext createBeanContext() {
 		if(packageToScans.isEmpty())
 			throw new IllegalStateException("must scan at least one package");
-		Set<String> firstPackageToScans = new HashSet<>();
-		firstPackageToScans.add(DEFAULT_PACKAGE_TO_SCAN);
-		firstPackageToScans.addAll(packageToScans);
-		EzyReflection firstReflection = EzyPackages.scanPackages(firstPackageToScans);
-		addComponentClassesFromReflection(firstReflection);
-		EzyReflection reflection = EzyPackages.scanPackages(packageToScans);
+		Set<String> allPackageToScans = new HashSet<>();
+		allPackageToScans.add(DEFAULT_PACKAGE_TO_SCAN);
+		allPackageToScans.addAll(packageToScans);
+		EzyReflection reflection = EzyPackages.scanPackages(allPackageToScans);
+		addComponentClassesFromReflection(reflection);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
