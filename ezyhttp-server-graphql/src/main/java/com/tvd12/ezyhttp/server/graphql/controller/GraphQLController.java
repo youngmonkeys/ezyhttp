@@ -1,15 +1,26 @@
 package com.tvd12.ezyhttp.server.graphql.controller;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.server.core.annotation.*;
-import com.tvd12.ezyhttp.server.graphql.*;
+import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.annotation.DoPost;
+import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.GraphQLField;
+import com.tvd12.ezyhttp.server.graphql.GraphQLQueryDefinition;
+import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
+import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 
-import java.util.*;
-
-@Controller
 public class GraphQLController {
 	
 	private final ObjectMapper objectMapper;

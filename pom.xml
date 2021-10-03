@@ -77,5 +77,6 @@
 		<module>ezyhttp-client</module>
 		<module>ezyhttp-server-thymeleaf</module>
 		<module>ezyhttp-server-graphql</module>
+		<module>ezyhttp-server-management</module>
 	</modules>
 </project>
