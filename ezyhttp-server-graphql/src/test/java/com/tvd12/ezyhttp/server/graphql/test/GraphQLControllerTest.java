@@ -13,6 +13,7 @@ import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("rawtypes")
 public class GraphQLControllerTest {
 	
 	@Test

@@ -103,10 +103,13 @@ public final class GraphQLSchemaParser {
 	 * @return standardized query
 	 */
 	private String standardize(String query) {
+		if (query == null) {
+			return "";
+		}
 		String trimedQuery = query.trim();
 		StringBuilder forwardStandard = forwardStandardize(trimedQuery);
 		StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
-		return removePrefix(backwardStandard.toString(), "query");
+		return removeQueryPrefix(backwardStandard.toString());
 	}
 	
 	private StringBuilder forwardStandardize(String query) {
@@ -145,8 +148,9 @@ public final class GraphQLSchemaParser {
 		return answer;
 	}
 	
-	private String removePrefix(String s, String prefix) {
-		if (s != null && prefix != null && s.startsWith(prefix)) {
+	private String removeQueryPrefix(String s) {
+		String prefix = "query";
+		if (s.startsWith(prefix)) {
 			return s.substring(prefix.length());
 		}
 		return s;
