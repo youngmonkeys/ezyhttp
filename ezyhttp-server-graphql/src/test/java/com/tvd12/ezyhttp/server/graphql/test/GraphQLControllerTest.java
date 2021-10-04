@@ -8,6 +8,7 @@ import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
@@ -74,12 +75,18 @@ public class GraphQLControllerTest {
 				.schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 		
 		String welcomeQuery = "{welcome}";
+		String variables = "{\"name\": \"Foo\"}";
+		GraphQLRequest welcomeRequest = new GraphQLRequest();
+		welcomeRequest.setQuery(welcomeQuery);
+		welcomeRequest.setVariables(variables);
 		
 		// when
-		Object welcomeResult = controller.doGet(welcomeQuery, "{\"name\": \"Foo\"}");
+		Object welcomeResult1 = controller.doGet(welcomeQuery, variables);
+		Object welcomeResult2 = controller.doPost(welcomeRequest);
 		
 		// then
-		Asserts.assertEquals(welcomeResult.toString(), "{welcome=Welcome Foo}");
+		Asserts.assertEquals(welcomeResult1.toString(), "{welcome=Welcome Foo}");
+		Asserts.assertEquals(welcomeResult2.toString(), "{welcome=Welcome Foo}");
 	}
 	
 	@Test
@@ -106,7 +113,7 @@ public class GraphQLControllerTest {
 	}
 	
 	@Test
-	public void testInvalidScheme() throws Exception {
+	public void testInvalidScheme() {
 		// given
 		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
 		GraphQLDataFetcher meDataFetcher = new GraphQLYouDataFetcher();
@@ -125,11 +132,11 @@ public class GraphQLControllerTest {
 		Throwable e = Asserts.assertThrows(() -> controller.doPost(youRequest));
 		
 		// then
-		Asserts.assertEquals(IllegalStateException.class.toString(), e.getClass().toString());
+		Asserts.assertEquals(GraphQLInvalidSchemeException.class.toString(), e.getClass().toString());
 	}
 	
 	@Test
-	public void testNoNameDataFetcher() throws Exception {
+	public void testNoNameDataFetcher() {
 		// given
 		GraphQLDataFetcher nonameDataFetcher = new GraphQLNoNameDataFetcher();
 		

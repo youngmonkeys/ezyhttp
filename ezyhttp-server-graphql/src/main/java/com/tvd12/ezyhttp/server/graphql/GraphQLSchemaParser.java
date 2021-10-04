@@ -9,7 +9,7 @@ public final class GraphQLSchemaParser {
 		String query = standardize(queryToParse);
 		
 		Stack<GraphQLField.Builder> stack = new Stack<>();
-		GraphQLSchema.Builder schemaBuilder = new GraphQLSchema.Builder();
+		GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 		
 		int nameLength = 0;
 		char[] nameBuffer = new char[128];
