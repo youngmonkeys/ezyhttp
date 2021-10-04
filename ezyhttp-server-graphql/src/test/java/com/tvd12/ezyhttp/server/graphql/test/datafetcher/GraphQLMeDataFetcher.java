@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
@@ -25,6 +25,7 @@ public class GraphQLMeDataFetcher
 					)
 				)
 				.bank(Bank.builder().id(100).build())
+				.address(null)
 				.build();
 	}
 	
@@ -46,6 +47,7 @@ public class GraphQLMeDataFetcher
 		private String nickName;
 		private List<Friend> friends;
 		private Bank bank;
+		private String address;
 	}
 	
 	@Getter

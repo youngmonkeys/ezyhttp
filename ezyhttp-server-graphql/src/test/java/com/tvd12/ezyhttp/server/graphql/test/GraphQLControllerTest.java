@@ -1,12 +1,14 @@
 package com.tvd12.ezyhttp.server.graphql.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
+import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
@@ -27,7 +29,7 @@ public class GraphQLControllerTest {
 				.schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 		
 		GraphQLRequest meRequest = new GraphQLRequest();
-		meRequest.setQuery("query{    me   {     name bank{id} friends{name}}}");
+		meRequest.setQuery("query{    me   {     name bank{id} friends{name} address}}");
 		
 		String heroQuery = "{hero}";
 		
@@ -56,6 +58,86 @@ public class GraphQLControllerTest {
 		Throwable e = Asserts.assertThrows(() -> controller.doGet(heroQuery, null));
 		
 		// then
-		Asserts.assertEquals(HttpNotFoundException.class, e.getClass());
+		Asserts.assertEquals(HttpNotFoundException.class.toString(), e.getClass().toString());
 	}
+	
+	@Test
+	public void testQueryWithVariables() throws Exception {
+		// given
+		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+		GraphQLDataFetcher welcomeDataFetcher = new GraphQLWelcomeDataFetcher();
+		GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+				.addDataFetcher(welcomeDataFetcher).build();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		GraphQLController controller = GraphQLController.builder()
+				.schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+		
+		String welcomeQuery = "{welcome}";
+		
+		// when
+		Object welcomeResult = controller.doGet(welcomeQuery, "{\"name\": \"Foo\"}");
+		
+		// then
+		Asserts.assertEquals(welcomeResult.toString(), "{welcome=Welcome Foo}");
+	}
+	
+	@Test
+	public void testQueryWithNullVariableType() throws Exception {
+		// given
+		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+		GraphQLDataFetcher fooDataFetcher = new GraphQLFooDataFetcher();
+		GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+				.addDataFetcher(fooDataFetcher).build();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		GraphQLController controller = GraphQLController.builder()
+				.schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+		
+		String fooQuery = "{foo}";
+		
+		// when
+		Object fooResult1 = controller.doGet(fooQuery, "{\"value\": \"Bar\"}");
+		Object fooResult2 = controller.doGet(fooQuery, null);
+		
+		// then
+		Asserts.assertEquals(fooResult1.toString(), "{foo=Foo {value=Bar}}");
+		Asserts.assertEquals(fooResult2.toString(), "{foo=Foo null}");
+	}
+	
+	@Test
+	public void testInvalidScheme() throws Exception {
+		// given
+		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+		GraphQLDataFetcher meDataFetcher = new GraphQLYouDataFetcher();
+		GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+				.addDataFetcher(meDataFetcher)
+				.build();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		GraphQLController controller = GraphQLController.builder()
+				.schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+		
+		GraphQLRequest youRequest = new GraphQLRequest();
+		youRequest.setQuery("query{you{friends{name}}}}");
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> controller.doPost(youRequest));
+		
+		// then
+		Asserts.assertEquals(IllegalStateException.class.toString(), e.getClass().toString());
+	}
+	
+	@Test
+	public void testNoNameDataFetcher() throws Exception {
+		// given
+		GraphQLDataFetcher nonameDataFetcher = new GraphQLNoNameDataFetcher();
+		
+		// when
+		Throwable e = Asserts.assertThrows(() -> GraphQLDataFetcherManager.builder().addDataFetcher(nonameDataFetcher).build());
+		
+		// then
+		Asserts.assertEquals(EzyNotImplementedException.class.toString(), e.getClass().toString());
+	}
+	
 }

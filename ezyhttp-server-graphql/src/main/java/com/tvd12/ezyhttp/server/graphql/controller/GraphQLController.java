@@ -111,7 +111,7 @@ public class GraphQLController {
 			try {
 				Object currentResponse = mapToResponse(data, queryDefinition, query);
 				answer.put(queryName, currentResponse);
-			} catch (Exception e) {
+			} catch (IllegalArgumentException e) {
 				answer.put(queryName, data);
 			}
 		}
@@ -154,7 +154,7 @@ public class GraphQLController {
 					parentMap.put(field.getName(), filterDataList((List) value, field, query));
 					continue;
 				} else {
-					throw new IllegalArgumentException("invalid schema: " + query + " at: " + field.getName());
+					throw new IllegalStateException("invalid schema: " + query + " at: " + field.getName());
 				}
 			}
 		}
