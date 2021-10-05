@@ -42,11 +42,11 @@ public class GraphQLController implements IRequestController {
 	 * Example:
 	 *
 	 * <code>
-	 * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{id+name+friends{name}}}&variables={"id" : 1}'
+	 * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{id+name+friends{name}}}&amp;variables={"id" : 1}'
 	 * </code>
 	 *
 	 * @param query     GraphQL query
-	 * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</cocde>
+	 * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</code>
 	 * @return the result
 	 * @throws Exception when have any error
 	 */
