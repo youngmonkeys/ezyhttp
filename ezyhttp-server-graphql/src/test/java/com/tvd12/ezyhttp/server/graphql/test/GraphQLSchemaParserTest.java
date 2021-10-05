@@ -183,15 +183,4 @@ public class GraphQLSchemaParserTest {
 		Asserts.assertEquals(schema.getQueryDefinitions().get(1).getFields().get(0).getName(), null);
 		Asserts.assertEquals(schema.getQueryDefinitions().get(1).getFields().get(0).getFields().get(0).getName(), null);
 	}
-	
-	@Test
-	public void test1() {
-		// given
-		GraphQLSchemaParser parser = new GraphQLSchemaParser();
-		
-		String query = "{me\t{name\n{friend {id + name,age+teacher }}}}";
-		
-		// when
-		GraphQLSchema schema = parser.parseQuery(query);
-	}
 }
