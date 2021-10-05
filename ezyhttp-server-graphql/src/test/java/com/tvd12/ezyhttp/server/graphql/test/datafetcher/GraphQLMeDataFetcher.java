@@ -10,19 +10,19 @@ import java.util.Arrays;
 import java.util.List;
 
 @EzySingleton
-public class GraphQLMeDataFetcher 
+public class GraphQLMeDataFetcher
 		extends GraphQLAbstractDataFetcher<GraphQLMeDataFetcher.MeRequest, GraphQLMeDataFetcher.MeResponse> {
-
+	
 	public MeResponse getData(MeRequest argument) {
 		return MeResponse.builder()
 				.id(1)
 				.name("Dzung")
 				.nickName("Hello")
 				.friends(
-					Arrays.asList(
-						Friend.builder().id(1).name("Foo").build(),
-						Friend.builder().id(1).name("Bar").build()
-					)
+						Arrays.asList(
+								Friend.builder().id(1).name("Foo").build(),
+								Friend.builder().id(1).name("Bar").build()
+						)
 				)
 				.bank(Bank.builder().id(100).build())
 				.address(null)
@@ -33,7 +33,7 @@ public class GraphQLMeDataFetcher
 	public String getQueryName() {
 		return "me";
 	}
-
+	
 	@Data
 	public static class MeRequest {
 		private long id;

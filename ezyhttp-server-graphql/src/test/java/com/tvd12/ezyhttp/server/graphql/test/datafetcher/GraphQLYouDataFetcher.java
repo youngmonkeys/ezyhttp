@@ -4,7 +4,6 @@ import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @EzySingleton

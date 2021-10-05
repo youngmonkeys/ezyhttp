@@ -4,6 +4,7 @@ import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
 
 @EzySingleton
+@SuppressWarnings("rawtypes")
 public class GraphQLNoNameDataFetcher
 		extends GraphQLAbstractDataFetcher {
 	

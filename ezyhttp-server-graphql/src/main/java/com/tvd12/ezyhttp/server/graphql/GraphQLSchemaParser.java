@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.server.graphql;
 
-
 import java.util.Stack;
 
 public final class GraphQLSchemaParser {
@@ -59,7 +58,7 @@ public final class GraphQLSchemaParser {
 					GraphQLField.Builder item = stack.pop();
 					schemaBuilder.addQueryDefinition((GraphQLQueryDefinition) item.build());
 				}
-			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+			} else if (ch == ' ') {// ',' '\t' '\n' '+' have been removed
 				if (stack.isEmpty()) {
 					GraphQLQueryDefinition.Builder queryBuilder = GraphQLQueryDefinition.builder();
 					stack.add(queryBuilder);
@@ -136,9 +135,9 @@ public final class GraphQLSchemaParser {
 			char ch = query.charAt(i);
 			if (ch == '{' || ch == '}') {
 				answer.insert(0, ch);
-			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+			} else if (ch == ' ') { // ',' '\t' '\n' '+' have been removed in forward pass
 				char firstChar = answer.charAt(0);
-				if ((firstChar != ' ') && (firstChar != '{') && (firstChar != '}')) {
+				if ((firstChar != '{') && (firstChar != '}')) {
 					answer.insert(0, ' ');
 				}
 			} else {
