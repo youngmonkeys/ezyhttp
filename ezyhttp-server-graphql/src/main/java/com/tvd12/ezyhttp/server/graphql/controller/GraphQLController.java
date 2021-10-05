@@ -20,6 +20,8 @@ import com.tvd12.ezyhttp.server.graphql.GraphQLQueryDefinition;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 
 public class GraphQLController {
 	
@@ -111,7 +113,7 @@ public class GraphQLController {
 			try {
 				Object currentResponse = mapToResponse(data, queryDefinition, query);
 				answer.put(queryName, currentResponse);
-			} catch (Exception e) {
+			} catch (GraphQLObjectMapperException e) {
 				answer.put(queryName, data);
 			}
 		}
@@ -120,7 +122,12 @@ public class GraphQLController {
 	
 	@SuppressWarnings({"rawtypes"})
 	private Map mapToResponse(Object data, GraphQLQueryDefinition queryDefinition, String query) {
-		Map dataMap = objectMapper.convertValue(data, Map.class);
+		Map dataMap;
+		try {
+			dataMap = objectMapper.convertValue(data, Map.class);
+		} catch (Exception e) {
+			throw new GraphQLObjectMapperException("Could not convert: " + data.getClass() + " to Map");
+		}
 		return filterDataMap(dataMap, queryDefinition, query);
 	}
 	
@@ -154,7 +161,7 @@ public class GraphQLController {
 					parentMap.put(field.getName(), filterDataList((List) value, field, query));
 					continue;
 				} else {
-					throw new IllegalArgumentException("invalid schema: " + query + " at: " + field.getName());
+					throw new GraphQLInvalidSchemeException("invalid schema: " + query + " at: " + field.getName());
 				}
 			}
 		}

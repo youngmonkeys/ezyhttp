@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.server.graphql;
 
-
 import java.util.Stack;
 
 public final class GraphQLSchemaParser {
@@ -9,7 +8,7 @@ public final class GraphQLSchemaParser {
 		String query = standardize(queryToParse);
 		
 		Stack<GraphQLField.Builder> stack = new Stack<>();
-		GraphQLSchema.Builder schemaBuilder = new GraphQLSchema.Builder();
+		GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 		
 		int nameLength = 0;
 		char[] nameBuffer = new char[128];
@@ -59,7 +58,7 @@ public final class GraphQLSchemaParser {
 					GraphQLField.Builder item = stack.pop();
 					schemaBuilder.addQueryDefinition((GraphQLQueryDefinition) item.build());
 				}
-			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+			} else if (ch == ' ') {// ',' '\t' '\n' '+' have been removed
 				if (stack.isEmpty()) {
 					GraphQLQueryDefinition.Builder queryBuilder = GraphQLQueryDefinition.builder();
 					stack.add(queryBuilder);
@@ -103,10 +102,13 @@ public final class GraphQLSchemaParser {
 	 * @return standardized query
 	 */
 	private String standardize(String query) {
+		if (query == null) {
+			return "";
+		}
 		String trimedQuery = query.trim();
 		StringBuilder forwardStandard = forwardStandardize(trimedQuery);
 		StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
-		return removePrefix(backwardStandard.toString(), "query");
+		return removeQueryPrefix(backwardStandard.toString());
 	}
 	
 	private StringBuilder forwardStandardize(String query) {
@@ -133,9 +135,9 @@ public final class GraphQLSchemaParser {
 			char ch = query.charAt(i);
 			if (ch == '{' || ch == '}') {
 				answer.insert(0, ch);
-			} else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+			} else if (ch == ' ') { // ',' '\t' '\n' '+' have been removed in forward pass
 				char firstChar = answer.charAt(0);
-				if ((firstChar != ' ') && (firstChar != '{') && (firstChar != '}')) {
+				if ((firstChar != '{') && (firstChar != '}')) {
 					answer.insert(0, ' ');
 				}
 			} else {
@@ -145,8 +147,9 @@ public final class GraphQLSchemaParser {
 		return answer;
 	}
 	
-	private String removePrefix(String s, String prefix) {
-		if (s != null && prefix != null && s.startsWith(prefix)) {
+	private String removeQueryPrefix(String s) {
+		String prefix = "query";
+		if (s.startsWith(prefix)) {
 			return s.substring(prefix.length());
 		}
 		return s;
