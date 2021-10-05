@@ -13,6 +13,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.GraphQLField;
@@ -23,7 +24,7 @@ import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 
-public class GraphQLController {
+public class GraphQLController implements IRequestController {
 	
 	private final ObjectMapper objectMapper;
 	private final GraphQLSchemaParser schemaParser;

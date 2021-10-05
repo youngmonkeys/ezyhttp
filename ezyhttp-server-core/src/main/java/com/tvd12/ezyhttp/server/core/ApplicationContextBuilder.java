@@ -40,6 +40,7 @@ import com.tvd12.ezyhttp.server.core.annotation.Service;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
+import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
@@ -298,7 +299,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected void registerComponents(EzyBeanContext beanContext) {
-		List controllers = beanContext.getSingletons(Controller.class);
+		Set controllers = new HashSet<>();
+		controllers.addAll(beanContext.getSingletons(Controller.class));
+		controllers.addAll(beanContext.getSingletonsOf(IRequestController.class));
 		controllerManager.addControllers(controllers);
 		List exceptionHandlers = beanContext.getSingletons(ExceptionHandler.class);
 		exceptionHandlerManager.addExceptionHandlers(exceptionHandlers);

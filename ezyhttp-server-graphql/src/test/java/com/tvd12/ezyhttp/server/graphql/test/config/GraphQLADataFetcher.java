@@ -4,6 +4,7 @@ import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 
+@SuppressWarnings("rawtypes")
 @EzySingleton
 @GraphQLQuery(name = "A")
 public class GraphQLADataFetcher implements GraphQLDataFetcher {
