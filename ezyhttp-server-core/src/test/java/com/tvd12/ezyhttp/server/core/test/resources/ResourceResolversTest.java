@@ -32,7 +32,7 @@ public class ResourceResolversTest {
 		ResourceResolver resourceResolver = ResourceResolvers.createResourdeResolver(propertyFetcher);
 		
 		// then
-		Asserts.assertEquals(6, resourceResolver.getResources().size());
+		Asserts.assertEquals(4, resourceResolver.getResources().size());
 	}
 	
 	@Test
@@ -50,6 +50,6 @@ public class ResourceResolversTest {
 		ResourceResolver resourceResolver = ResourceResolvers.createResourdeResolver(propertyFetcher);
 		
 		// then
-		Asserts.assertEquals(6, resourceResolver.getResources().size());
+		Asserts.assertEquals(4, resourceResolver.getResources().size());
 	}
 }
