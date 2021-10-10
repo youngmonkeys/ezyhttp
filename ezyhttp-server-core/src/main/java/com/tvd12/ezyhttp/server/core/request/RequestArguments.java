@@ -38,4 +38,33 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	
 	String getCookieValue(String name);
 	
+	default String getParameter(int index, String defaultValue) {
+	    String answer = getParameter(index);
+	    return answer != null ? answer : defaultValue;
+	}
+    
+	default String getParameter(String name, String defaultValue) {
+	    String answer = getParameter(name);
+        return answer != null ? answer : defaultValue;
+	}
+
+    default String getHeader(String name, String defaultValue) {
+        String answer = getHeader(name);
+        return answer != null ? answer : defaultValue;
+    }
+    
+    default String getHeader(int index, String defaultValue) {
+        String answer = getHeader(index);
+        return answer != null ? answer : defaultValue;
+    }
+    
+    default String getCookieValue(int index, String defaultValue) {
+        String answer = getCookieValue(index);
+        return answer != null ? answer : defaultValue;
+    }
+    
+    default String getCookieValue(String name, String defaultValue) {
+        String answer = getCookieValue(name);
+        return answer != null ? answer : defaultValue;
+    }
 }

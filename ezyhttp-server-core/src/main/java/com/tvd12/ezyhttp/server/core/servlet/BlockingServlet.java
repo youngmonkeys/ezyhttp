@@ -31,6 +31,7 @@ import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.UncaughtErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
@@ -55,6 +56,7 @@ public class BlockingServlet extends HttpServlet {
 	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
+	protected UncaughtErrorHandler uncaughtErrorHandler;
 	protected List<Class<?>> handledExceptionClasses;
 	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 	
@@ -72,6 +74,7 @@ public class BlockingServlet extends HttpServlet {
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
 		this.addDefaultExceptionHandlers();
+		this.uncaughtErrorHandler = componentManager.getUncaughtErrorHandler();
 		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
 		this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
 		
@@ -119,27 +122,29 @@ public class BlockingServlet extends HttpServlet {
 		String requestURI = request.getRequestURI();
 		if(managementURIs.contains(requestURI)) {
 			if(request.getServerPort() != managmentPort) {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
 				return;
 			}
 		}
 		else {
 			if(request.getServerPort() != serverPort) {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
 				return;
 			}
 		}
 		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
 		if(requestHandler == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			responseString(response, "uri " + requestURI + " not found");
-			return;
+		    if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
+		        responseString(response, "uri " + requestURI + " not found");
+		    }
+		    return;
 		}
 		if(requestHandler == RequestHandler.EMPTY) {
-			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			responseString(response, "method " + method + " not allowed");
+		    if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
+		        responseString(response, "method " + method + " not allowed");
+		    }
 			return;
 		}
 		boolean acceptableRequest = false;
@@ -162,15 +167,15 @@ public class BlockingServlet extends HttpServlet {
 					}
 				}
 				else {
-					response.setStatus(HttpServletResponse.SC_OK);
+				    response.setStatus(HttpServletResponse.SC_OK);
 				}
 			}
 			else {
-				response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_ACCEPTABLE);
 			}
 		}
 		catch (Exception e) {
-			handleException(arguments, e);
+			handleException(method, arguments, e);
 		}
 		finally {
 			arguments.release();
@@ -179,8 +184,48 @@ public class BlockingServlet extends HttpServlet {
 			postHandleRequest(arguments, requestHandler);
 	}
 	
+	protected boolean handleError(
+        HttpMethod method,
+        HttpServletRequest request, 
+        HttpServletResponse response,
+        int errorStatusCode
+    ) {
+	    return handleError(method, request, response, errorStatusCode, null);
+	}
+	
+	protected boolean handleError(
+        HttpMethod method,
+        HttpServletRequest request, 
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
+    ) {
+	    if (uncaughtErrorHandler != null) {
+	        Object data = uncaughtErrorHandler
+	                .handleError(method, request, response, errorStatusCode);
+	        if (data != null) {
+	            try {
+	                handleResponseData(request, response, data);
+	            } catch (Exception e) {
+	                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	                logger.warn("handle error: {} with uri: {} failed", errorStatusCode, request.getRequestURI(), e);
+	            }
+	        }
+	        return true;
+	    } else {
+	        response.setStatus(errorStatusCode);
+	        if (exception != null) {
+	            logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+	        }
+	        return false;
+	    }
+	}
+	
 	protected void handleException(
-			RequestArguments arguments, Exception e) throws IOException {
+	        HttpMethod method,
+			RequestArguments arguments, 
+			Exception e
+	) throws IOException {
 		UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
 		HttpServletRequest request = arguments.getRequest();
 		HttpServletResponse response = arguments.getResponse();
@@ -196,7 +241,7 @@ public class BlockingServlet extends HttpServlet {
 					handleResponseData(request, response, result);
 				}
 				else {
-					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				    handleError(method, request, response, HttpServletResponse.SC_BAD_REQUEST);
 				}
 				exception = null;
 			}
@@ -205,8 +250,7 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+		    handleError(method, request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception);
 		}
 	}
 	

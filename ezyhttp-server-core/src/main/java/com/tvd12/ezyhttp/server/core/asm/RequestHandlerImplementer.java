@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.tvd12.ezyfox.asm.EzyFunction;
 import com.tvd12.ezyfox.asm.EzyFunction.EzyBody;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.asm.EzyInstruction;
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
@@ -38,6 +39,8 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
+
+import static com.tvd12.ezyfox.io.EzyStrings.quote;
 
 public class RequestHandlerImplementer 
 		extends AbstractHandlerImplementer<RequestHandlerMethod> {
@@ -150,9 +153,13 @@ public class RequestHandlerImplementer
 			if(requestParamAnno != null) {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
+				String defaultValue = requestParamAnno.defaultValue();
+				String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getParameter(" + paramKey + ")"
+				   : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeParameter(" +
 						paramKey +
-						", arg0.getParameter(" + paramKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" + 
 						", " + genericTypeClass + ")" ;
 				instruction
@@ -164,9 +171,13 @@ public class RequestHandlerImplementer
 			if(requestHeaderAnno != null) {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
+				String defaultValue = requestHeaderAnno.defaultValue();
+                String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getHeader(" + headerKey + ")"
+                   : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeHeader(" +
 						headerKey +
-						", arg0.getHeader(" + headerKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" +
 						", " + genericTypeClass + ")" ;
 				instruction
@@ -192,9 +203,13 @@ public class RequestHandlerImplementer
 			if(requestCookieAnno != null) {
 				String cookieKey = RequestCookieAnnotations
 						.getCookieKeyString(requestCookieAnno, cookieCount);
+				String defaultValue = requestCookieAnno.defaultValue();
+                String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getCookieValue(" + cookieKey + ")"
+                   : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeCookie(" +
 						cookieKey +
-						", arg0.getCookieValue(" + cookieKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" +
 						", " + genericTypeClass + ")" ;
 				instruction
