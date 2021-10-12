@@ -31,7 +31,7 @@ import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
-import com.tvd12.ezyhttp.server.core.handler.UncaughtErrorHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
@@ -56,7 +56,7 @@ public class BlockingServlet extends HttpServlet {
 	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
-	protected UncaughtErrorHandler uncaughtErrorHandler;
+	protected UnhandledErrorHandler unhandledErrorHandler;
 	protected List<Class<?>> handledExceptionClasses;
 	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 	
@@ -74,7 +74,7 @@ public class BlockingServlet extends HttpServlet {
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
 		this.addDefaultExceptionHandlers();
-		this.uncaughtErrorHandler = componentManager.getUncaughtErrorHandler();
+		this.unhandledErrorHandler = componentManager.getUnhandledErrorHandler();
 		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
 		this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
 		
@@ -200,18 +200,20 @@ public class BlockingServlet extends HttpServlet {
         int errorStatusCode,
         Exception exception
     ) {
-	    if (uncaughtErrorHandler != null) {
-	        Object data = uncaughtErrorHandler
+	    if (unhandledErrorHandler != null) {
+	        Object data = unhandledErrorHandler
 	                .handleError(method, request, response, errorStatusCode);
-	        if (data != null) {
-	            try {
-	                handleResponseData(request, response, data);
-	            } catch (Exception e) {
-	                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	                logger.warn("handle error: {} with uri: {} failed", errorStatusCode, request.getRequestURI(), e);
-	            }
+	        if (data == null) {
+	            response.setStatus(errorStatusCode);
+	            return false;
 	        }
-	        return true;
+	        try {
+                handleResponseData(request, response, data);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                logger.warn("handle error: {} with uri: {} failed", errorStatusCode, request.getRequestURI(), e);
+            }
+            return true;
 	    } else {
 	        response.setStatus(errorStatusCode);
 	        if (exception != null) {

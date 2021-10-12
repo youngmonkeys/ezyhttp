@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
-import com.tvd12.ezyhttp.server.core.handler.UncaughtErrorHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 import lombok.Getter;
@@ -30,7 +30,7 @@ public final class ComponentManager implements EzyDestroyable {
 	private InterceptorManager interceptorManager;
 	private RequestHandlerManager requestHandlerManager;
 	private ExceptionHandlerManager exceptionHandlerManager;
-	private UncaughtErrorHandler uncaughtErrorHandler;
+	private UnhandledErrorHandler unhandledErrorHandler;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
@@ -47,16 +47,16 @@ public final class ComponentManager implements EzyDestroyable {
 		return INSTANCE;
 	}
 	
-	public void setUncaughtErrorHandler(List<UncaughtErrorHandler> handlers) {
+	public void setUnhandledErrorHandler(List<UnhandledErrorHandler> handlers) {
 	    if (handlers.size() > 0) {
-	        this.uncaughtErrorHandler = handlers.get(0);
+	        this.unhandledErrorHandler = handlers.get(0);
 	    }
 	}
 	
 	@Override
 	public void destroy() {
 		this.viewContext = null;
-		this.uncaughtErrorHandler = null;
+		this.unhandledErrorHandler = null;
 		this.dataConverters.destroy();
 		this.controllerManager.destroy();
 		this.interceptorManager.destroy();

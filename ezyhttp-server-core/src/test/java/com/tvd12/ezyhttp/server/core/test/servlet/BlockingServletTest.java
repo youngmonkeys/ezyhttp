@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.servlet;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +32,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
@@ -291,6 +293,55 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void requestHandlerNullAndHasErrorHandler() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_NOT_FOUND
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get-handler-null";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void requestHandlerEmpty() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
@@ -332,6 +383,173 @@ public class BlockingServletTest {
 		
 		componentManager.destroy();
 	}
+	
+	@Test
+    public void requestHandlerEmptyAndHasErrorHandler() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        componentManager.destroy();
+    }
+	
+	@Test
+    public void requestHandlerEmptyWithErrorHandlerButDataNull() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_NOT_FOUND
+            )
+        ).thenReturn(null);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).getOutputStream();
+        verify(response, times(1)).setStatus(StatusCodes.METHOD_NOT_ALLOWED);
+        
+        verify(outputStream, times(1)).write("method GET not allowed".getBytes());
+        
+        componentManager.destroy();
+    }
+	
+	@Test
+    public void requestHandlerEmptyAndHasErrorHandlerButException() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        doThrow(
+            new IllegalStateException("just test")
+        ).when(response).setStatus(StatusCodes.OK);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(2)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+        
+        componentManager.destroy();
+    }
 	
 	@Test
 	public void doGetNotAcceptable() throws Exception {

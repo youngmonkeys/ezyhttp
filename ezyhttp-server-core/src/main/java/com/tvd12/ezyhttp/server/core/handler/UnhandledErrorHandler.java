@@ -9,7 +9,7 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.view.View;
 
-public interface UncaughtErrorHandler {
+public interface UnhandledErrorHandler {
 
     default Object processError(int errorStatusCode) {
         return null;
@@ -31,14 +31,16 @@ public interface UncaughtErrorHandler {
         int errorStatusCode
     ) {
 	    Object result = processError(method, request, response, errorStatusCode);
-	    if (result instanceof ResponseEntity) {
-	        response.setContentType(((ResponseEntity)result).getContentType());
-	    }
-	    else if (result instanceof View) {
-	        response.setContentType(ContentTypes.TEXT_HTML_UTF8);
-	    }
-	    else if (EzyStrings.isNoContent(response.getContentType())) {
-	        response.setContentType(ContentTypes.APPLICATION_JSON);
+	    if (result != null) {
+	        if (result instanceof ResponseEntity) {
+	            response.setContentType(((ResponseEntity)result).getContentType());
+	        }
+	        else if (result instanceof View) {
+	            response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+	        }
+	        if (EzyStrings.isNoContent(response.getContentType())) {
+	            response.setContentType(ContentTypes.APPLICATION_JSON);
+	        }
 	    }
 	    return result;
 	}

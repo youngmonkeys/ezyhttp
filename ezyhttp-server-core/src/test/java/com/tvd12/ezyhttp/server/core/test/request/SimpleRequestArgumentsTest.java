@@ -187,4 +187,39 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookie("unknown"));
 		sut.release();
 	}
+	
+	@Test
+	public void getByDefaultTest() {
+	 // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        
+        // when
+        // then
+        Asserts.assertEquals("paramValue", sut.getParameter(1, "paramValue"));
+        Asserts.assertEquals("paramValue", sut.getParameter("key", "paramValue"));
+        Asserts.assertEquals("headerValue", sut.getHeader(1, "headerValue"));
+        Asserts.assertEquals("headerValue", sut.getHeader("key", "headerValue"));
+        Asserts.assertEquals("cookieValue", sut.getCookieValue(1, "cookieValue"));
+        Asserts.assertEquals("cookieValue", sut.getCookieValue("key", "cookieValue"));
+        sut.release();
+	}
+	
+	@Test
+    public void getByDefaultButNotNullTest() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", "paramValue0");
+        sut.setHeader("key", "headerValue0");
+        sut.setCookies(new Cookie[] { new Cookie("key", "cookieValue0") });
+        
+        // when
+        // then
+        Asserts.assertEquals("paramValue0", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("paramValue0", sut.getParameter("key", "paramValue"));
+        Asserts.assertEquals("headerValue0", sut.getHeader(0, "headerValue"));
+        Asserts.assertEquals("headerValue0", sut.getHeader("key", "headerValue"));
+        Asserts.assertEquals("cookieValue0", sut.getCookieValue(0, "cookieValue"));
+        Asserts.assertEquals("cookieValue0", sut.getCookieValue("key", "cookieValue"));
+        sut.release();
+    }
 }
