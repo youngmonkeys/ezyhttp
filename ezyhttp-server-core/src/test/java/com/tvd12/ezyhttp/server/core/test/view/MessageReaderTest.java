@@ -43,7 +43,7 @@ public class MessageReaderTest {
 	}
 	
 	@Test
-	public void getFileNameHahsPath() {
+	public void getFileNameHasPath() {
 		// given
 		String filePath = "messages/";
 		

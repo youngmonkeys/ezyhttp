@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.handler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
@@ -30,11 +31,14 @@ public interface UncaughtErrorHandler {
         int errorStatusCode
     ) {
 	    Object result = processError(method, request, response, errorStatusCode);
-	    if (request instanceof ResponseEntity) {
+	    if (result instanceof ResponseEntity) {
 	        response.setContentType(((ResponseEntity)result).getContentType());
 	    }
-	    else if (request instanceof View) {
+	    else if (result instanceof View) {
 	        response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+	    }
+	    else if (EzyStrings.isNoContent(response.getContentType())) {
+	        response.setContentType(ContentTypes.APPLICATION_JSON);
 	    }
 	    return result;
 	}
