@@ -31,6 +31,7 @@ import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
@@ -58,6 +59,7 @@ public class BlockingServlet extends HttpServlet {
 	protected ExceptionHandlerManager exceptionHandlerManager;
 	protected UnhandledErrorHandler unhandledErrorHandler;
 	protected List<Class<?>> handledExceptionClasses;
+	protected List<RequestResponseWatcher> requestResponseWatchers;
 	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -73,6 +75,7 @@ public class BlockingServlet extends HttpServlet {
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
+		this.requestResponseWatchers = componentManager.getRequestResponseWatchers();
 		this.addDefaultExceptionHandlers();
 		this.unhandledErrorHandler = componentManager.getUnhandledErrorHandler();
 		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
@@ -84,29 +87,60 @@ public class BlockingServlet extends HttpServlet {
 	protected void doGet(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.GET, request, response);
+	    doHandleRequest(HttpMethod.GET, request, response);
 	}
 	
 	@Override
 	protected void doPost(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.POST, request, response);
+	    doHandleRequest(HttpMethod.POST, request, response);
 	}
 	
 	@Override
 	protected void doPut(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.PUT, request, response);
+	    doHandleRequest(HttpMethod.PUT, request, response);
 	}
 	
 	@Override
 	protected void doDelete(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.DELETE, request, response);
+	    doHandleRequest(HttpMethod.DELETE, request, response);
 	}
+	
+	private void doHandleRequest(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+        try {
+            watchRequest(method, request, response);
+            handleRequest(method, request, response);
+        }
+        finally {
+            watchResponse(method, request, response);
+        }
+    }
+	
+	private void watchRequest(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+	    for (RequestResponseWatcher watcher : requestResponseWatchers) {
+	        watcher.watchRequest(method, request);
+	    }
+    }
+	
+	private void watchResponse(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+        for (RequestResponseWatcher watcher : requestResponseWatchers) {
+            watcher.watchResponse(method, request, response);
+        }
+    }
 	
 	protected void preHandleRequest(
 			HttpMethod method,

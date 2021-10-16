@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
@@ -31,12 +33,14 @@ public final class ComponentManager implements EzyDestroyable {
 	private RequestHandlerManager requestHandlerManager;
 	private ExceptionHandlerManager exceptionHandlerManager;
 	private UnhandledErrorHandler unhandledErrorHandler;
+	private List<RequestResponseWatcher> requestResponseWatchers;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
 	private ComponentManager() {
 		this.objectMapper = new ObjectMapperBuilder().build();
 		this.dataConverters = new DataConverters(objectMapper);
+		this.requestResponseWatchers = new ArrayList<>();
 		this.controllerManager = new ControllerManager();
 		this.interceptorManager = new InterceptorManager();
 		this.requestHandlerManager = new RequestHandlerManager();
@@ -53,6 +57,10 @@ public final class ComponentManager implements EzyDestroyable {
 	    }
 	}
 	
+	public void addRequestResponseWatchers(List<RequestResponseWatcher> watchers) {
+	    this.requestResponseWatchers.addAll(watchers);
+    }
+	
 	@Override
 	public void destroy() {
 		this.viewContext = null;
@@ -62,5 +70,6 @@ public final class ComponentManager implements EzyDestroyable {
 		this.interceptorManager.destroy();
 		this.requestHandlerManager.destroy();
 		this.exceptionHandlerManager.destroy();
+		this.requestResponseWatchers.clear();
 	}
 }

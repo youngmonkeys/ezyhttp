@@ -107,6 +107,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         		(int)FileSizes.toByteSize(multipartMaxRequestSize),
         		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
         	));;
+        logger.info("cors.enable = {}", corsEnable);
         if(corsEnable) {
 	        FilterHolder crossOriginFilter = newCrossOriginFilter();
 	        addFilter(servletHandler, crossOriginFilter);

@@ -42,6 +42,7 @@ import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
@@ -313,12 +314,14 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.addBodyConverters(bodyConverters);
 		List stringConverters = beanContext.getSingletons(StringConvert.class);
 		List uncaughtErrorHandlers = beanContext.getSingletonsOf(UnhandledErrorHandler.class);
+		List requestResponseWathcers = beanContext.getSingletonsOf(RequestResponseWatcher.class);
 		dataConverters.setStringConverters(stringConverters);
 		componentManager.setViewContext(buildViewContext(beanContext));
 		componentManager.setServerPort(getServerPort(beanContext));
 		componentManager.setManagmentPort(getManagementPort(beanContext));
 		componentManager.setManagementURIs(getManagementURIs(beanContext));
 		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
+		componentManager.addRequestResponseWatchers(requestResponseWathcers);
 	}
 	
 	private int getServerPort(EzyBeanContext beanContext) {

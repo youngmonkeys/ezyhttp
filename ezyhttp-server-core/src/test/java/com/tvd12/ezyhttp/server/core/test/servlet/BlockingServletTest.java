@@ -31,6 +31,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
@@ -61,6 +62,9 @@ public class BlockingServletTest {
 		ComponentManager componentManager = ComponentManager.getInstance();
 		componentManager.setManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
+		
+		RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+		componentManager.addRequestResponseWatchers(Arrays.asList(watcher));
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -120,6 +124,8 @@ public class BlockingServletTest {
 		
 		verify(interceptor, times(1)).preHandle(any(), any());
 		verify(interceptor, times(1)).postHandle(any(), any());
+		verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
+		verify(watcher, times(1)).watchResponse(HttpMethod.GET, request, response);
 		
 		componentManager.destroy();
 	}

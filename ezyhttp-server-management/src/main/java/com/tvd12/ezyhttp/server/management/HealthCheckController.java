@@ -12,4 +12,9 @@ public class HealthCheckController {
         return ResponseEntity.ok();
     }
     
+    @DoGet("/management/health-check")
+    public ResponseEntity managementHealthCheck() {
+        return ResponseEntity.noContent();
+    }
+    
 }

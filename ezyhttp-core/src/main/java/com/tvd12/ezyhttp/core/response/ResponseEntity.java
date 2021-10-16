@@ -69,6 +69,10 @@ public class ResponseEntity {
 		return create(StatusCodes.NOT_FOUND, body);
 	}
 	
+	public static ResponseEntity noContent() {
+        return create(StatusCodes.NO_CONTENT, null);
+    }
+	
 	@SuppressWarnings("unchecked")
 	public <T> T getBody() {
 		return (T)body;
