@@ -51,6 +51,7 @@ public class BlockingServlet extends HttpServlet {
 	private int serverPort;
 	private int managmentPort;
 	private Set<String> managementURIs;
+	private boolean exposeMangementURIs;
 	protected ViewContext viewContext;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
@@ -70,6 +71,7 @@ public class BlockingServlet extends HttpServlet {
 		this.serverPort = componentManager.getServerPort();
 		this.managmentPort = componentManager.getManagmentPort();
 		this.managementURIs = componentManager.getManagementURIs();
+		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
 		this.viewContext = componentManager.getViewContext();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
@@ -154,7 +156,8 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
-		if(managementURIs.contains(requestURI)) {
+		boolean isManagementURI = managementURIs.contains(requestURI);
+		if(isManagementURI && !exposeMangementURIs) {
 			if(request.getServerPort() != managmentPort) {
 			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
@@ -168,7 +171,8 @@ public class BlockingServlet extends HttpServlet {
 				return;
 			}
 		}
-		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
+		RequestHandler requestHandler = 
+		        requestHandlerManager.getHandler(method, requestURI, isManagementURI);
 		if(requestHandler == null) {
 		    if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
 		        responseString(response, "uri " + requestURI + " not found");

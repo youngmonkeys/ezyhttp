@@ -31,11 +31,13 @@ public class RequestHandlersImplementer extends EzyLoggable {
 	public Map<RequestURI, RequestHandler> implement(Object controller) {
 		Map<RequestURI, RequestHandler> handlers = new HashMap<>();
 		ControllerProxy proxy = new ControllerProxy(controller);
+		boolean isManagement = proxy.isManagement();
 		for(RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
 			RequestHandlerImplementer implementer = newImplementer(proxy, method);
 			RequestHandler handler = implementer.implement();
 			HttpMethod httpMethod = handler.getMethod();
-			RequestURI uri = new RequestURI(httpMethod, method.getRequestURI());
+			String requestURI = method.getRequestURI(); 
+			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement);
 			RequestHandler old = handlers.put(uri, handler);
 			if(old != null)
 				throw new DuplicateURIMappingHandlerException(uri, old, handler);

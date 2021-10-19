@@ -11,10 +11,14 @@ public class RequestURI {
 
 	protected final String uri;
 	protected final HttpMethod method;
+	protected final boolean management;
 	
-	public RequestURI(HttpMethod method, String uri) {
+	public RequestURI(
+	        HttpMethod method, 
+	        String uri, boolean management) {
 		this.method = method;
 		this.uri = standardizeURI(uri);
+		this.management = management;
 	}
 	
 	protected String standardizeURI(String uri) {
@@ -32,8 +36,11 @@ public class RequestURI {
 		if(!other.getClass().equals(this.getClass()))
 			return false;
 		RequestURI t = (RequestURI)other;
-		if(uri.equals(t.uri) && method.equals(t.method))
+		if(uri.equals(t.uri) 
+		        && method.equals(t.method) 
+		        && management == t.management) {
 			return true;
+		}
 		return false;
 	}
 	
@@ -43,6 +50,7 @@ public class RequestURI {
 		int result = 1;
 		result = result * prime + uri.hashCode();
 		result = result * prime + method.hashCode();
+		result = result * prime + Boolean.hashCode(management);
 		return result;
 	}
 	

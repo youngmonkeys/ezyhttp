@@ -44,8 +44,8 @@ import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
-import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
@@ -318,8 +318,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.setStringConverters(stringConverters);
 		componentManager.setViewContext(buildViewContext(beanContext));
 		componentManager.setServerPort(getServerPort(beanContext));
+		componentManager.setExposeMangementURIs(isExposeManagementURIs(beanContext));
 		componentManager.setManagmentPort(getManagementPort(beanContext));
-		componentManager.setManagementURIs(getManagementURIs(beanContext));
+		componentManager.addManagementURIs(getManagementURIs(beanContext));
 		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
 		componentManager.addRequestResponseWatchers(requestResponseWathcers);
 	}
@@ -327,6 +328,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	private int getServerPort(EzyBeanContext beanContext) {
 		return beanContext.getProperty(PropertyNames.SERVER_PORT, int.class, 0);
 	}
+	
+	private boolean isExposeManagementURIs(EzyBeanContext beanContext) {
+        return beanContext.getProperty(PropertyNames.MANAGEMENT_URIS_EXPOSE, boolean.class, false);
+    }
 	
 	private int getManagementPort(EzyBeanContext beanContext) {
 		boolean managementEnable = beanContext.getProperty(
@@ -365,6 +370,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
 		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
+		componentManager.appendManagementURIs(requestHandlers.keySet());
 		requestHandlerManager.addHandlers(requestHandlers);
 	}
 	
@@ -376,7 +382,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Map<String, Resource> resources = resourceResolver.getResources();
 		for(String resourceURI : resources.keySet()) {
 			Resource resource = resources.get(resourceURI);
-			RequestURI requestURI = new RequestURI(HttpMethod.GET, resourceURI);
+			RequestURI requestURI = new RequestURI(HttpMethod.GET, resourceURI, false);
 			RequestHandler requestHandler = new ResourceRequestHandler(
 					resource.getPath(), 
 					resource.getUri(),

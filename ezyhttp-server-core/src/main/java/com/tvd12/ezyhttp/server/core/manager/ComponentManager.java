@@ -1,6 +1,8 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +12,7 @@ import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
+import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 import lombok.Getter;
@@ -22,7 +25,9 @@ public final class ComponentManager implements EzyDestroyable {
 	private int serverPort;
 	@Setter
 	private int managmentPort;
-	@Setter
+	@Setter 
+	private boolean exposeMangementURIs;
+	
 	private Set<String> managementURIs;
 	@Setter
 	private ViewContext viewContext;
@@ -38,6 +43,7 @@ public final class ComponentManager implements EzyDestroyable {
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
 	private ComponentManager() {
+	    this.managementURIs = new HashSet<>();
 		this.objectMapper = new ObjectMapperBuilder().build();
 		this.dataConverters = new DataConverters(objectMapper);
 		this.requestResponseWatchers = new ArrayList<>();
@@ -50,6 +56,18 @@ public final class ComponentManager implements EzyDestroyable {
 	public static ComponentManager getInstance() {
 		return INSTANCE;
 	}
+	
+	public void addManagementURIs(Collection<String> uris) {
+	    this.managementURIs.addAll(uris);
+	}
+	
+	public void appendManagementURIs(Iterable<RequestURI> uris) {
+	    for (RequestURI uri : uris) {
+	        if (uri.isManagement()) {
+	            this.managementURIs.add(uri.getUri());
+	        }
+	    }
+    }
 	
 	public void setUnhandledErrorHandler(List<UnhandledErrorHandler> handlers) {
 	    if (handlers.size() > 0) {
@@ -64,7 +82,9 @@ public final class ComponentManager implements EzyDestroyable {
 	@Override
 	public void destroy() {
 		this.viewContext = null;
+		this.exposeMangementURIs = false;
 		this.unhandledErrorHandler = null;
+		this.managementURIs.clear();
 		this.dataConverters.destroy();
 		this.controllerManager.destroy();
 		this.interceptorManager.destroy();

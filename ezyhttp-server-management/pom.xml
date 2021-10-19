@@ -14,6 +14,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>
+			<artifactId>ezyfox-monitor</artifactId>
+			<version>${ezy.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.tvd12</groupId>
 			<artifactId>ezyhttp-server-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>

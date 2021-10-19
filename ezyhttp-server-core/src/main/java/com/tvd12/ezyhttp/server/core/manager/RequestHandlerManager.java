@@ -24,7 +24,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handledURIs = new HashSet<>();
 	}
 	
-	public RequestHandler getHandler(HttpMethod method, String uri) {
+	public RequestHandler getHandler(
+	        HttpMethod method, String uri, boolean isManagement) {
 		String matchedURI = null;
 		if(handledURIs.contains(uri))
 			matchedURI = uri;
@@ -32,7 +33,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 			matchedURI = uriTree.getMatchedURI(uri);
 		if(matchedURI == null)
 			return null;
-		RequestHandler handler = handlers.get(new RequestURI(method, matchedURI));
+		RequestURI requestURI = new RequestURI(method, matchedURI, isManagement);
+		RequestHandler handler = handlers.get(requestURI);
 		return handler != null ? handler : RequestHandler.EMPTY;
 	}
 	

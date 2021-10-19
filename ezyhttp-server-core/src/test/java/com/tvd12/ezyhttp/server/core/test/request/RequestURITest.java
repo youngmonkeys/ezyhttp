@@ -11,12 +11,13 @@ public class RequestURITest {
 	@Test
 	public void test() {
 		// given
-		RequestURI uri1 = new RequestURI(HttpMethod.GET, "/");
-		RequestURI uri2 = new RequestURI(HttpMethod.GET, "/");
-		RequestURI uri3 = new RequestURI(HttpMethod.POST, "/");
-		RequestURI uri4 = new RequestURI(HttpMethod.GET, "/api");
-		RequestURI uri5 = new RequestURI(HttpMethod.PUT, "/api/v1");
-		RequestURI uri6 = new RequestURI(HttpMethod.GET, "");
+		RequestURI uri1 = new RequestURI(HttpMethod.GET, "/", true);
+		RequestURI uri2 = new RequestURI(HttpMethod.GET, "/", true);
+		RequestURI uri3 = new RequestURI(HttpMethod.POST, "/", true);
+		RequestURI uri4 = new RequestURI(HttpMethod.GET, "/api", true);
+		RequestURI uri5 = new RequestURI(HttpMethod.PUT, "/api/v1", true);
+		RequestURI uri6 = new RequestURI(HttpMethod.GET, "", true);
+		RequestURI uri11 = new RequestURI(HttpMethod.GET, "/", false);
 		
 		// when
 		// then
@@ -30,6 +31,7 @@ public class RequestURITest {
 		Asserts.assertNotEquals(uri1, uri4);
 		Asserts.assertNotEquals(uri1, uri5);
 		Asserts.assertNotEquals(uri1, uri6);
+		Asserts.assertNotEquals(uri1, uri11);
 		
 	}
 }
