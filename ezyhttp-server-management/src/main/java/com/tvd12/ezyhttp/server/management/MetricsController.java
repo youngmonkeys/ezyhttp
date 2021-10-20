@@ -70,4 +70,19 @@ public class MetricsController implements ManagementController {
             .totalMemory(memoryMonitor.getTotalMemory())
             .build();
     }
+    
+    @DoGet("/management/total-request")
+    public long totalRequestGet() {
+        return SystemMonitor.getInstance().getRequestCount();
+    }
+    
+    @DoGet("/management/request-per-second")
+    public long requestPerSecondGet() {
+        return SystemMonitor.getInstance().getRequestPerSecond();
+    }
+    
+    @DoGet("/management/response-per-second")
+    public long responsePerSecondGet() {
+        return SystemMonitor.getInstance().getRequestPerSecond();
+    }
 }
