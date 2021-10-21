@@ -250,8 +250,11 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(bootstrapClasses)
 				.propertiesMap(propertiesMap)
 				.addSingleton("systemObjectMapper", objectMapper)
+				.addSingleton("componentManager", componentManager)
+				.addSingleton("requestHandlerManager", requestHandlerManager)
 				.addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
 				.build();
+		setComponentProperties(beanContext);
 		registerComponents(beanContext);
 		addRequestHandlers(beanContext);
 		addResourceRequestHandlers(beanContext);
@@ -298,6 +301,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			answer.put(serviceName, clazz);
 		}
 		return answer;
+	}
+	
+	protected void setComponentProperties(EzyBeanContext beanContext) {
+	    requestHandlerManager.setAllowOverrideURI(
+            beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
+        );
 	}
 	
 	protected void registerComponents(EzyBeanContext beanContext) {
@@ -369,7 +378,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected void addRequestHandlers(EzyBeanContext beanContext) {
 		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
-		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
+		Map<RequestURI, List<RequestHandler>> requestHandlers = 
+		        implementer.implement(controllerList);
 		componentManager.appendManagementURIs(requestHandlers.keySet());
 		requestHandlerManager.addHandlers(requestHandlers);
 	}
