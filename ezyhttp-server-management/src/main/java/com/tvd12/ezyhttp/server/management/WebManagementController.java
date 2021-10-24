@@ -27,5 +27,4 @@ public class WebManagementController implements ManagementController {
             )
             .collect(Collectors.toList());
     }
-    
 }

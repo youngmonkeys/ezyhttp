@@ -12,13 +12,26 @@ public class RequestURI {
 	protected final String uri;
 	protected final HttpMethod method;
 	protected final boolean management;
+	protected final boolean resource;
+	protected final String resourceFullPath;
+	
+	public RequestURI(
+            HttpMethod method, 
+            String uri, boolean management) {
+	    this(method, uri, management, false, null);
+	}
 	
 	public RequestURI(
 	        HttpMethod method, 
-	        String uri, boolean management) {
+	        String uri, 
+	        boolean management,
+	        boolean resource,
+	        String resourceFullPath) {
 		this.method = method;
 		this.uri = standardizeURI(uri);
 		this.management = management;
+		this.resource = resource;
+		this.resourceFullPath = resourceFullPath;
 	}
 	
 	protected String standardizeURI(String uri) {

@@ -10,4 +10,5 @@ public class Resource {
 	private final String path;
 	private final String uri;
 	private final String extension;
+	private final String fullPath;
 }

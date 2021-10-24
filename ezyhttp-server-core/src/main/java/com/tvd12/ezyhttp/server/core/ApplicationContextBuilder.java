@@ -392,7 +392,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Map<String, Resource> resources = resourceResolver.getResources();
 		for(String resourceURI : resources.keySet()) {
 			Resource resource = resources.get(resourceURI);
-			RequestURI requestURI = new RequestURI(HttpMethod.GET, resourceURI, false);
+			RequestURI requestURI = new RequestURI(
+			        HttpMethod.GET, 
+			        resourceURI, 
+			        false,
+			        true,
+			        resource.getFullPath());
 			RequestHandler requestHandler = new ResourceRequestHandler(
 					resource.getPath(), 
 					resource.getUri(),

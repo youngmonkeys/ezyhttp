@@ -14,6 +14,8 @@ public class ApiInformation {
     private final String uri;
     private final HttpMethod method;
     private final boolean management;
+    private final boolean resource;
+    private final String resourcePath;
     private final List<JavaMethod> handlers;
 
     public ApiInformation(
@@ -23,6 +25,8 @@ public class ApiInformation {
         this.uri = requestUri.getUri();
         this.method = requestUri.getMethod();
         this.management = requestUri.isManagement();
+        this.resource = requestUri.isResource();
+        this.resourcePath = requestUri.getResourceFullPath();
         this.handlers = handlerMethods.stream()
             .map(it -> new JavaMethod(it.getHandlerMethod()))
             .collect(Collectors.toList());

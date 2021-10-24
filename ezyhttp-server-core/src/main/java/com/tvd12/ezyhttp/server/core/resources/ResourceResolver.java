@@ -33,12 +33,21 @@ public class ResourceResolver {
 	
 	public void register(String location, String... filePathRegexes) {
 		String trimLocation = location.trim();
-		List<String> resourceFiles = resourceLoader
-				.listResources(trimLocation, Sets.newHashSet(filePathRegexes));
-		for(String res : resourceFiles) {
-			String resourceURI = res.substring(trimLocation.length() + 1);
+		List<ResourceFile> resourceFiles = resourceLoader.listResourceFiles(
+	        trimLocation, 
+	        Sets.newHashSet(filePathRegexes)
+        );
+		for(ResourceFile res : resourceFiles) {
+		    String relativePath = res.getRelativePath();
+			String resourceURI = relativePath.substring(trimLocation.length() + 1);
 			String extension = EzyFileUtil.getFileExtension(resourceURI);
-			resources.put(resourceURI, new Resource(res, resourceURI, extension));
+			Resource resource = new Resource(
+		        relativePath, 
+		        resourceURI, 
+		        extension,
+		        res.getFullPath()
+	        );
+			resources.put(resourceURI, resource);
 		}
 	}
 	

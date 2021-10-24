@@ -15,6 +15,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.tvd12.ezyfox.function.EzySupplier;
+import com.tvd12.ezyfox.io.EzyLists;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
@@ -22,14 +23,28 @@ public class ResourceLoader extends EzyLoggable {
     
     private static final String PROTOCOL_FILE = "file";
     private static final String PROTOCOL_JAR = "jar";
-    private static final String PROTOCOL_JAR_PREFIX = "jar:/";
+    private static final String PROTOCOL_FILE_PREFIX = "file:";
 	
 	public List<String> listResources(String rootPath) {
-		return listResources(rootPath, Collections.emptySet());
+	    return EzyLists.newArrayList(
+            listResourceFiles(rootPath),
+            it -> it.getRelativePath()
+        );
 	}
 	
+	public List<ResourceFile> listResourceFiles(String rootPath) {
+	    return listResourceFiles(rootPath, Collections.emptySet());
+    }
+	
 	public List<String> listResources(String rootPath, Set<String> regexes) {
-		List<String> answer = new ArrayList<>();
+	    return EzyLists.newArrayList(
+            listResourceFiles(rootPath, regexes),
+            it -> it.getRelativePath()
+        );
+	}
+	
+	public List<ResourceFile> listResourceFiles(String rootPath, Set<String> regexes) {
+		List<ResourceFile> answer = new ArrayList<>();
 		Set<URL> resourceURLs = getResourceURLs(rootPath);
         if(resourceURLs.isEmpty()) {
             listResourcesByFolder(new File(rootPath), regexes, rootPath, answer);
@@ -46,7 +61,7 @@ public class ResourceLoader extends EzyLoggable {
 	        URL url,
             Set<String> regexes,
             String rootPath,
-            List<String> answer
+            List<ResourceFile> answer
     ) {
 	    if (url.getProtocol().equals(PROTOCOL_FILE)) {
 	        listResourcesByFileURL(url, regexes, rootPath, answer);
@@ -60,7 +75,7 @@ public class ResourceLoader extends EzyLoggable {
 	        URL url,
 	        Set<String> regexes,
 	        String rootPath,
-	        List<String> answer
+	        List<ResourceFile> answer
     ) {
 	    listResourcesByFolder(
             new File(url.getPath()), 
@@ -74,7 +89,7 @@ public class ResourceLoader extends EzyLoggable {
             File rootFolder,
             Set<String> regexes,
             String rootPath,
-            List<String> answer
+            List<ResourceFile> answer
     ) {
         Queue<File> folders = new LinkedList<>();
         folders.offer(rootFolder);
@@ -96,7 +111,7 @@ public class ResourceLoader extends EzyLoggable {
                     }
                 }
                 if(addable && resource.isFile()) {
-                    answer.add(fullPath);
+                    answer.add(new ResourceFile(fullPath, resource.toURI().toString()));
                 }
                 if(resource.isDirectory()) {
                     folders.offer(resource);
@@ -109,10 +124,10 @@ public class ResourceLoader extends EzyLoggable {
             URL url,
             Set<String> regexes,
             String rootPath,
-            List<String> answer
+            List<ResourceFile> answer
     ) {
 	    String jarPath = url.getPath().substring(
-	        PROTOCOL_JAR_PREFIX.length(), 
+            PROTOCOL_FILE_PREFIX.length(), 
             url.getPath().indexOf("!")
         );
         JarFile jar = getJarFile(jarPath);
@@ -129,7 +144,7 @@ public class ResourceLoader extends EzyLoggable {
                     }
                 }
                 if(addable && isFileElement(name)) {
-                    answer.add(name);
+                    answer.add(new ResourceFile(name, "jar:" + jarPath + "!/" + name));
                 }
             }
         }
