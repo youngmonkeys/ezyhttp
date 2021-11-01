@@ -14,6 +14,7 @@ public class ApiInformation {
     private final String uri;
     private final HttpMethod method;
     private final boolean management;
+    private final boolean authenticated;
     private final boolean resource;
     private final String resourcePath;
     private final List<JavaMethod> handlers;
@@ -25,6 +26,7 @@ public class ApiInformation {
         this.uri = requestUri.getUri();
         this.method = requestUri.getMethod();
         this.management = requestUri.isManagement();
+        this.authenticated = requestUri.isAuthenticated();
         this.resource = requestUri.isResource();
         this.resourcePath = requestUri.getResourceFullPath();
         this.handlers = handlerMethods.stream()

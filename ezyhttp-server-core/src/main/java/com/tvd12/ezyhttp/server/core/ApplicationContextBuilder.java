@@ -252,6 +252,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingleton("systemObjectMapper", objectMapper)
 				.addSingleton("componentManager", componentManager)
 				.addSingleton("requestHandlerManager", requestHandlerManager)
+				.addSingleton("requestURIManager", requestHandlerManager.getRequestURIManager())
 				.addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
 				.build();
 		setComponentProperties(beanContext);

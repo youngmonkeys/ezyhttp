@@ -30,6 +30,7 @@ import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
@@ -1181,7 +1182,10 @@ public class BlockingServletTest {
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
 		when(request.getCookies()).thenReturn(
-			new Cookie[] { new Cookie("cookie", "CookieValue") }
+			new Cookie[] { 
+		        new Cookie("cookie", "CookieValue"),
+		        new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "{}")
+	        }
 		);
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1282,6 +1286,67 @@ public class BlockingServletTest {
 		
 		componentManager.destroy();
 	}
+	
+	@Test
+    public void doPutWithRedirectTest() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/put-with-redirect-attributes";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.PUT.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        PutWithRedirectAttributesRequestHandler requestHandler = 
+                new PutWithRedirectAttributesRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI, false), requestHandler);
+        
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        when(interceptor.preHandle(any(), any())).thenReturn(true);
+        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).sendRedirect("/home");
+        
+        verify(interceptor, times(1)).preHandle(any(), any());
+        verify(interceptor, times(1)).postHandle(any(), any());
+        
+        componentManager.destroy();
+    }
 	
 	@Test
 	public void doDeleteTest() throws Exception {
@@ -1734,6 +1799,35 @@ public class BlockingServletTest {
 		}
 	}
 	
+	public static class PutWithRedirectAttributesRequestHandler implements RequestHandler {
+
+        @Override
+        public Object handle(RequestArguments arguments) throws Exception {
+            return CONTROLLER.doPutWithRedirectAttributes(
+                arguments.getRequest(), 
+                arguments.getResponse(), 
+                arguments.getParameter(0), 
+                arguments.getHeader(0), 
+                arguments.getCookieValue(0)
+            );
+        }
+
+        @Override
+        public HttpMethod getMethod() {
+            return HttpMethod.PUT;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return "/put";
+        }
+
+        @Override
+        public String getResponseContentType() {
+            return ContentTypes.APPLICATION_JSON;
+        }
+    }
+	
 	public static class DeleteRequestHandler implements RequestHandler {
 
 		@Override
@@ -1811,6 +1905,22 @@ public class BlockingServletTest {
 					.uri("/home")
 					.build();
 		}
+		
+		@DoGet("/put-with-redirect-attributes")
+        public Redirect doPutWithRedirectAttributes(
+                HttpServletRequest request, 
+                HttpServletResponse response,
+                @RequestArgument("param") String param,
+                @RequestArgument("header") String header,
+                @RequestCookie("cookie") String cookie) {
+            return Redirect.builder()
+                    .addCookie("foo", "bar")
+                    .addHeader("hello", "world")
+                    .uri("/home")
+                    .addAttribute("error", Collections.singletonMap("hello", "world"))
+                    .addAttributes(Collections.singletonMap("foo", "bar"))
+                    .build();
+        }
 		
 		@DoGet("/delete")
 		public View doDelete(

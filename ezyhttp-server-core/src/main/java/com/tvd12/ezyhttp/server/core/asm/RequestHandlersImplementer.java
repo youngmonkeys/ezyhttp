@@ -33,12 +33,14 @@ public class RequestHandlersImplementer extends EzyLoggable {
 		Map<RequestURI, List<RequestHandler>> handlers = new HashMap<>();
 		ControllerProxy proxy = new ControllerProxy(controller);
 		boolean isManagement = proxy.isManagement();
+		boolean authenticated = proxy.isAuthenticated();
 		for(RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
 			RequestHandlerImplementer implementer = newImplementer(proxy, method);
 			RequestHandler handler = implementer.implement();
 			HttpMethod httpMethod = handler.getMethod();
 			String requestURI = method.getRequestURI(); 
-			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement);
+			boolean authen = authenticated || method.isAuthenticated();
+			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement, authen);
 			handlers.computeIfAbsent(uri, k -> new ArrayList<>())
 			        .add(handler);
 		}

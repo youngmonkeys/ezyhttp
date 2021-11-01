@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.request;
 
+import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +39,12 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	String getCookieValue(int index);
 	
 	String getCookieValue(String name);
+	
+	<T> T getRedirectionAttribute(String name);
+	
+	<T> T getRedirectionAttribute(String name, Class<T> outType);
+	
+	Map<String, Object> getRedirectionAttributes();
 	
 	default String getParameter(int index, String defaultValue) {
 	    String answer = getParameter(index);

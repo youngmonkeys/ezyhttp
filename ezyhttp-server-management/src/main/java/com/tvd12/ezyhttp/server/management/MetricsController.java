@@ -5,6 +5,7 @@ import com.tvd12.ezyfox.monitor.EzyGcMonitor;
 import com.tvd12.ezyfox.monitor.EzyMemoryMonitor;
 import com.tvd12.ezyfox.monitor.EzyThreadsMonitor;
 import com.tvd12.ezyfox.monitor.data.EzyThreadsDetail;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.handler.ManagementController;
@@ -13,6 +14,7 @@ import com.tvd12.ezyhttp.server.management.data.MemoryPoint;
 import com.tvd12.ezyhttp.server.management.data.ThreadCountPoint;
 import com.tvd12.ezyhttp.server.management.monitor.SystemMonitor;
 
+@Authenticated
 @Controller
 public class MetricsController implements ManagementController {
 

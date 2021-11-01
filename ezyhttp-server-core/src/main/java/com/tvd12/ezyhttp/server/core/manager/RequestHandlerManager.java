@@ -16,6 +16,7 @@ import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerExcepti
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 
+import lombok.Getter;
 import lombok.Setter;
 
 public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable {
@@ -24,6 +25,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     protected boolean allowOverrideURI;
 	protected final URITree uriTree;
 	protected final Set<String> handledURIs;
+	@Getter
+	protected final RequestURIManager requestURIManager;
 	protected final Map<RequestURI, RequestHandler> handlers;
 	protected final Map<RequestURI, List<RequestHandler>> handlerListByURI;
 	
@@ -32,6 +35,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handlers = new HashMap<>();
 		this.handledURIs = new HashSet<>();
 		this.handlerListByURI = new HashMap<>();
+		this.requestURIManager = new RequestURIManager();
 	}
 	
 	public RequestHandler getHandler(
@@ -59,6 +63,10 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handlerListByURI
             .computeIfAbsent(uri, k -> new ArrayList<>())
             .add(handler);
+		this.requestURIManager.addHandledURI(uri.getUri());
+		if (uri.isAuthenticated()) {
+		    this.requestURIManager.addAuthenticatedUri(uri.getUri());
+		}
 	}
 	
 	public void addHandlers(Map<RequestURI, List<RequestHandler>> handlers) {
@@ -79,5 +87,6 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handledURIs.clear();
 		this.handlerListByURI.clear();
 		this.allowOverrideURI = false;
+		this.requestURIManager.destroy();
 	}
 }

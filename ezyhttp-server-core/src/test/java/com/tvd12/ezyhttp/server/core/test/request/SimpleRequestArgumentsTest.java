@@ -5,6 +5,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletInputStream;
@@ -14,9 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.test.assertion.Asserts;
 
@@ -221,5 +227,64 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals("cookieValue0", sut.getCookieValue(0, "cookieValue"));
         Asserts.assertEquals("cookieValue0", sut.getCookieValue("key", "cookieValue"));
         sut.release();
+    }
+	
+	@Test
+	public void setRedirectionAttributesFromCookieTest() throws IOException {
+	    // given
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    SimpleRequestArguments sut = new SimpleRequestArguments();
+	    sut.setObjectMapper(objectMapper);
+	    sut.setResponse(mock(HttpServletResponse.class));
+	    
+	    Map<String, Map<String, Object>> data = new HashMap<>();
+	    data.put("hello", Collections.singletonMap("foo", true));
+	    data.put("world", Collections.singletonMap("bar", 10));
+	    
+	    String dataString = EzyBase64.encodeUtf(
+            objectMapper.writeValueAsString(data)
+        );
+	    
+	    Cookie cookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            dataString
+        );
+	    sut.setCookies(new Cookie[] { cookie });
+	    
+	    // when
+	    sut.setRedirectionAttributesFromCookie();
+	    
+	    // then
+	    Map<String, Object> actualAttributes = sut.getRedirectionAttributes();
+	    Asserts.assertEquals(actualAttributes, data, false);
+	    Asserts.assertEquals(sut.getRedirectionAttribute("hello"), data.get("hello"), false);
+	    Asserts.assertEquals(sut.getRedirectionAttribute("world", Map.class), data.get("world"), false);
+	    sut.release();
+	}
+	
+	@Test
+    public void setRedirectionAttributesFromCookieExceptionTest() throws IOException {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setObjectMapper(objectMapper);
+        sut.setResponse(mock(HttpServletResponse.class));
+        
+        String dataString = EzyBase64.encodeUtf("hello world");
+        
+        Cookie cookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            dataString
+        );
+        sut.setCookies(new Cookie[] { cookie });
+        
+        // when
+        sut.setRedirectionAttributesFromCookie();
+        
+        // then
+        Map<String, Object> actualAttributes = sut.getRedirectionAttributes();
+        Asserts.assertNull(actualAttributes);
+        Asserts.assertNull(sut.getRedirectionAttribute("hello"));
+        Asserts.assertNull(sut.getRedirectionAttribute("hello", Map.class));
     }
 }

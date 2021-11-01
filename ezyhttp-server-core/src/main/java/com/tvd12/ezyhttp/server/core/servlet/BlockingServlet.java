@@ -20,8 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
+import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
@@ -30,10 +32,11 @@ import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
-import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
@@ -53,6 +56,7 @@ public class BlockingServlet extends HttpServlet {
 	private Set<String> managementURIs;
 	private boolean exposeMangementURIs;
 	protected ViewContext viewContext;
+	protected ObjectMapper objectMapper;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
 	protected InterceptorManager interceptorManager;
@@ -73,6 +77,7 @@ public class BlockingServlet extends HttpServlet {
 		this.managementURIs = componentManager.getManagementURIs();
 		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
 		this.viewContext = componentManager.getViewContext();
+		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -216,10 +221,11 @@ public class BlockingServlet extends HttpServlet {
 			handleException(method, arguments, e);
 		}
 		finally {
+		    if (acceptableRequest) {
+	            postHandleRequest(arguments, requestHandler);
+		    }
 			arguments.release();
 		}
-		if(acceptableRequest)
-			postHandleRequest(arguments, requestHandler);
 	}
 	
 	protected boolean handleError(
@@ -343,6 +349,15 @@ public class BlockingServlet extends HttpServlet {
 				response.addCookie(cookie);
 			for(Entry<String, String> e : redirect.getHeaders().entrySet())
 				response.addHeader(e.getKey(), e.getValue());
+			Map<String, Object> attributes = redirect.getAttributes();
+			if (attributes != null) {
+			    String attributesValue = objectMapper.writeValueAsString(attributes);
+			    Cookie attributesCookie = new Cookie(
+			            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, 
+			            EzyBase64.encodeUtf(attributesValue));
+			    attributesCookie.setMaxAge(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE);
+			    response.addCookie(attributesCookie);
+			}
 			response.sendRedirect(redirect.getUri() + redirect.getQueryString());
 			return;
 		}
@@ -402,6 +417,8 @@ public class BlockingServlet extends HttpServlet {
 		arguments.setResponse(response);
 		arguments.setUriTemplate(uriTemplate);
 		arguments.setCookies(request.getCookies());
+		arguments.setObjectMapper(objectMapper);
+		arguments.setRedirectionAttributesFromCookie();
 		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {
