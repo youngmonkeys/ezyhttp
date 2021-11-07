@@ -88,8 +88,8 @@ public class SimpleRequestArgumentsTest {
 	public void parameterTest() {
 		// given
 		SimpleRequestArguments sut = new SimpleRequestArguments();
-		sut.setParameter("hello", "world");
-		sut.setParameter("foo", "bar");
+		sut.setParameter("hello", new String[] {"world"});
+		sut.setParameter("foo", new String[] {"bar"});
 		
 		// when
 		String paramOverSize = sut.getParameter(3);
@@ -214,7 +214,7 @@ public class SimpleRequestArgumentsTest {
     public void getByDefaultButNotNullTest() {
      // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setParameter("key", "paramValue0");
+        sut.setParameter("key", new String[] {"paramValue0"});
         sut.setHeader("key", "headerValue0");
         sut.setCookies(new Cookie[] { new Cookie("key", "cookieValue0") });
         
@@ -226,6 +226,32 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals("headerValue0", sut.getHeader("key", "headerValue"));
         Asserts.assertEquals("cookieValue0", sut.getCookieValue(0, "cookieValue"));
         Asserts.assertEquals("cookieValue0", sut.getCookieValue("key", "cookieValue"));
+        sut.release();
+    }
+	
+	@Test
+    public void setParameterEmpty() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", new String[0]);
+        
+        // when
+        // then
+        Asserts.assertEquals("", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("", sut.getParameter("key", "paramValue"));
+        sut.release();
+    }
+	
+	@Test
+    public void setParameterMulti() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", new String[] { "a", "b" });
+        
+        // when
+        // then
+        Asserts.assertEquals("a,b", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("a,b", sut.getParameter("key", "paramValue"));
         sut.release();
     }
 	

@@ -86,11 +86,19 @@ public class SimpleRequestArguments implements RequestArguments {
 		return parameterMap;
 	}
 	
-	public void setParameter(String name, String value) {
-		if(parameterList == null)
+	public void setParameter(String name, String[] values) {
+	    if (values == null) {
+	        return;
+	    }
+		if (parameterList == null) {
 			parameterList = new ArrayList<>();
-		if(parameterMap == null)
+		}
+		if (parameterMap == null) {
 			parameterMap = new HashMap<>();
+		}
+		String value = values.length == 0 
+	        ? "" 
+            : values.length == 1 ? values[0] : String.join(",", values);
 		parameterList.add(value);
 		parameterMap.put(name, value);
 	}

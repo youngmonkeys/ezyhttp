@@ -80,6 +80,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -152,6 +153,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -613,6 +615,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -668,6 +671,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -1175,6 +1179,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -1247,6 +1252,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -1307,6 +1313,7 @@ public class BlockingServletTest {
             Collections.enumeration(Arrays.asList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Arrays.asList("header"))
