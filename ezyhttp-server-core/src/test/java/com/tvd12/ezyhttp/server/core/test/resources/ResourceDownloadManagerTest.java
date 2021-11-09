@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,6 +15,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.testng.annotations.Test;
 
+import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyhttp.server.core.exception.MaxResourceDownloadCapacity;
 import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.test.assertion.Asserts;
@@ -62,10 +64,11 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		doThrow(exception).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
 		
 		// when
-		sut.drain(inputStream, outputStream);
+		Throwable throwable = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
 		
 		// then
 		sut.stop();
+		Asserts.assertEqualsType(throwable, IOException.class);
 		info("finish drainFailedDueToOutputStream");
 	}
 	
@@ -121,16 +124,14 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		ResourceDownloadManager sut = new ResourceDownloadManager(1, 1, 1024);
 		
 		InputStream inputStream = mock(InputStream.class);
+		when(inputStream.read(any(byte[].class))).thenReturn(10);
 		OutputStream outputStream = mock(OutputStream.class);
 		
 		sut.stop();
 		Thread.sleep(200);
 		
-		BlockingQueue<Object> queue = FieldUtil.getFieldValue(sut, "queue");
-		
-		queue.offer(new Object());
-		
 		// when
+		sut.drainAsync(inputStream, outputStream, it -> {});
 		Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
 		
 		// then
@@ -138,4 +139,30 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		sut.stop();
 		info("finsihed drainFailedDueToMaxResourceUploadCapacity");
 	}
+	
+	@SuppressWarnings("rawtypes")
+    @Test
+    public void drainButFutureNull() throws Exception {
+        // given
+        info("start drainButFutureNull");
+        ResourceDownloadManager sut = new ResourceDownloadManager(100, 1, 1024);
+        
+        EzyFutureMap futureMap = FieldUtil.getFieldValue(sut, "futureMap");
+        
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenAnswer(it -> {
+            Thread.sleep(200);
+            return 0;
+        });
+        OutputStream outputStream = mock(OutputStream.class);
+        
+        // when
+        sut.drainAsync(inputStream, outputStream, it -> {});
+        futureMap.clear();
+        
+        // then
+        Thread.sleep(300);
+        sut.stop();
+        info("finsihed drainButFutureNull");
+    }
 }

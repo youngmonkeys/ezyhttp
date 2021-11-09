@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.servlet;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -10,6 +11,9 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -19,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
@@ -682,23 +687,34 @@ public class BlockingServletTest {
 			new Cookie[] { new Cookie("cookie", "CookieValue") }
 		);
 		
+		HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(request.startAsync(request, response)).thenReturn(asyncContext);
+        when(request.isAsyncStarted()).thenReturn(true);
+        EzyWrap<AsyncListener> asyncListener = new EzyWrap<>();
+        doAnswer(it -> {
+            asyncListener.setValue(it.getArgumentAt(0, AsyncListener.class));
+            return null;
+        }).when(asyncContext).addListener(any(AsyncListener.class));
+		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandlerContentTypeNull requestHandler = new GetRequestHandlerContentTypeNull();
 		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-		
-		ServletOutputStream outputStream = mock(ServletOutputStream.class);
-		when(response.getOutputStream()).thenReturn(outputStream);
-		
 		// when
 		sut.service(request, response);
+		asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
 		
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
 		verify(request, times(1)).getServerPort();
+		verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
 		
 		componentManager.destroy();
 	}

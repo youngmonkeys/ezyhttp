@@ -111,14 +111,18 @@ public class ResourceUploadManager
 	}
 	
 	public void drain(InputStream from, OutputStream to) throws Exception {
-		Entry entry = new Entry(from, to);
-		EzyFuture future = futureMap.putFuture(entry);
-		boolean success = this.queue.offer(entry);
-		if(!success) {
-			futureMap.removeFuture(entry);
-			throw new MaxResourceUploadCapacity(capacity);
-		}
-		future.get(DEFAULT_TIMEOUT);
+		drainAsync(from, to).get(DEFAULT_TIMEOUT);
+	}
+	
+	public EzyFuture drainAsync(InputStream from, OutputStream to) {
+	    Entry entry = new Entry(from, to);
+        EzyFuture future = futureMap.putFuture(entry);
+        boolean success = this.queue.offer(entry);
+        if(!success) {
+            futureMap.removeFuture(entry);
+            throw new MaxResourceUploadCapacity(capacity);
+        }
+        return future;
 	}
 	
 	@Override

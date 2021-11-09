@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -127,7 +130,9 @@ public class BlockingServlet extends HttpServlet {
             handleRequest(method, request, response);
         }
         finally {
-            watchResponse(method, request, response);
+            if (!request.isAsyncStarted()) {
+                watchResponse(method, request, response);
+            }
         }
     }
 	
@@ -191,6 +196,7 @@ public class BlockingServlet extends HttpServlet {
 			return;
 		}
 		boolean acceptableRequest = false;
+		boolean syncResponse = true;
 		String uriTemplate = requestHandler.getRequestURI();
 		RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
 		try {
@@ -203,7 +209,10 @@ public class BlockingServlet extends HttpServlet {
 				}
 				if(responseData != null) {
 					if(responseData == ResponseEntity.ASYNC) {
-						request.startAsync();
+					    syncResponse = false;
+					    AsyncContext asyncContext = request.startAsync(request, response);
+					    asyncContext.addListener(newAsyncListener(arguments, requestHandler));
+					    requestHandler.handleAsync(arguments);
 					}
 					else {
 						handleResponseData(request, response, responseData);
@@ -221,11 +230,44 @@ public class BlockingServlet extends HttpServlet {
 			handleException(method, arguments, e);
 		}
 		finally {
-		    if (acceptableRequest) {
-	            postHandleRequest(arguments, requestHandler);
+		    if (syncResponse) {
+		        if (acceptableRequest) {
+		            postHandleRequest(arguments, requestHandler);
+		        }
+		        arguments.release();
 		    }
-			arguments.release();
 		}
+	}
+	
+	protected AsyncListener newAsyncListener(
+	        RequestArguments arguments, RequestHandler requestHandler) {
+	    return new AsyncCallback() {
+            
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                try {
+                    try {
+                        postHandleRequest(arguments, requestHandler);
+                    }
+                    finally {
+                        watchResponse(
+                            arguments.getMethod(), 
+                            arguments.getRequest(), 
+                            arguments.getResponse()
+                        );
+                    }
+                }
+                catch (Exception e) {
+                    logger.warn(
+                        "AsyncCallback.onComplete on uri: {} error", 
+                        arguments.getRequest().getRequestURI(), e
+                    );
+                }
+                finally {
+                    arguments.release();
+                }
+            }
+        };
 	}
 	
 	protected boolean handleError(

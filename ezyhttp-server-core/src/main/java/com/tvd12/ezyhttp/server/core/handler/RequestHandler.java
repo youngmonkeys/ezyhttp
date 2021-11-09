@@ -16,6 +16,8 @@ public interface RequestHandler {
 	
 	Object handle(RequestArguments arguments) throws Exception;
 	
+	default void handleAsync(RequestArguments arguments) throws Exception {}
+	
 	default Method getHandlerMethod() {
 		return EzyMethods.getMethod(getClass(), "handle", RequestArguments.class);
 	}
