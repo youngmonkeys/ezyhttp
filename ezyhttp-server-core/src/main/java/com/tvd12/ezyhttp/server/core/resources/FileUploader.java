@@ -11,6 +11,7 @@ import javax.servlet.http.Part;
 
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyVoid;
+import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
@@ -65,33 +66,21 @@ public class FileUploader extends EzyLoggable {
         FileUploadCallback callback
     ) {
         try {
-            if (!outputFile.exists()) {
-                File parentFile = outputFile.getParentFile();
-                if (parentFile != null && !parentFile.exists()) {
-                    parentFile.mkdirs();
-                }
-                outputFile.createNewFile();
-            }
+            EzyFileUtil.createFileIfNotExists(outputFile);
             FileOutputStream outputStream = new FileOutputStream(outputFile);
-            try {
-                accept(asyncContext, inputStream, outputStream, new FileUploadCallback() {
-                    @Override
-                    public void onSuccess() {
-                        EzyProcessor.processWithLogException(outputStream::close);
-                        callback.onSuccess();
-                    }
-                    
-                    @Override
-                    public void onFailure(Exception e) {
-                        EzyProcessor.processWithLogException(outputStream::close);
-                        callback.onFailure(e);
-                    }
-                });
-            }
-            catch (Exception e) {
-                EzyProcessor.processWithLogException(outputStream::close);
-                callback.onFailure(e);
-            }
+            accept(asyncContext, inputStream, outputStream, new FileUploadCallback() {
+                @Override
+                public void onSuccess() {
+                    EzyProcessor.processWithLogException(outputStream::close);
+                    callback.onSuccess();
+                }
+                
+                @Override
+                public void onFailure(Exception e) {
+                    EzyProcessor.processWithLogException(outputStream::close);
+                    callback.onFailure(e);
+                }
+            });
         }
         catch (Exception e) {
             callback.onFailure(e);

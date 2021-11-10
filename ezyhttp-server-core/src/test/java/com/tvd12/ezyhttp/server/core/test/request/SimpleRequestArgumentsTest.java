@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +44,9 @@ public class SimpleRequestArgumentsTest {
 		when(servletRequest.getContentType()).thenReturn(ContentTypes.TEXT_HTML_UTF8);
 		sut.setRequest(servletRequest);
 		
+		AsyncContext asyncContext = mock(AsyncContext.class);
+		when(servletRequest.getAsyncContext()).thenReturn(asyncContext);
+		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		sut.setResponse(servletResponse);
 		
@@ -66,6 +70,7 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookieValue(0));
 		Asserts.assertNull(sut.getCookieValue("unknown"));
 		Asserts.assertEquals(HttpMethod.HEAD, sut.getMethod());
+		Asserts.assertEquals(sut.getAsynContext(), asyncContext);
 		
 		verify(servletRequest, times(1)).getRequestURI();
 		verify(servletRequest, times(1)).getInputStream();
