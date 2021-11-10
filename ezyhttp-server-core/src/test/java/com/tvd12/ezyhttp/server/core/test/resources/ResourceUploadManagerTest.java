@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,6 +15,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.testng.annotations.Test;
 
+import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
 import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
 import com.tvd12.test.assertion.Asserts;
@@ -99,7 +101,8 @@ public class ResourceUploadManagerTest extends BaseTest {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
 		
 		// when
-		sut.drain(inputStream, outputStream);
+		sut.drainAsync(inputStream, outputStream, it -> {});
+		Thread.sleep(100);
 		
 		// then
 		byte[] outputBytes = outputStream.toByteArray();
@@ -110,22 +113,45 @@ public class ResourceUploadManagerTest extends BaseTest {
 	@Test
 	public void drainFailedDueToMaxResourceUploadCapacity() throws Exception {
 		// given
-		ResourceUploadManager sut = new ResourceUploadManager(1, 1, 1024);
-		
-		InputStream inputStream = mock(InputStream.class);
-		
-		OutputStream outputStream = mock(OutputStream.class);
-		sut.stop();
-		Thread.sleep(200);
-		
-		BlockingQueue<Object> queue = FieldUtil.getFieldValue(sut, "queue");
-		
-		queue.offer(new Object());
-		
-		// when
-		Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
-		
-		// then
-		Asserts.assertThat(e).isEqualsType(MaxResourceUploadCapacity.class);
+	    ResourceUploadManager sut = new ResourceUploadManager(1, 1, 1024);
+        
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(10);
+        OutputStream outputStream = mock(OutputStream.class);
+        
+        sut.stop();
+        Thread.sleep(200);
+        
+        // when
+        sut.drainAsync(inputStream, outputStream, it -> {});
+        Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
+        
+        // then
+        Asserts.assertThat(e).isEqualsType(MaxResourceUploadCapacity.class);
+        sut.stop();
 	}
+	
+	@SuppressWarnings("rawtypes")
+    @Test
+    public void drainButFutureNull() throws Exception {
+        // given
+        ResourceUploadManager sut = new ResourceUploadManager(100, 1, 1024);
+        
+        EzyFutureMap futureMap = FieldUtil.getFieldValue(sut, "futureMap");
+        
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenAnswer(it -> {
+            Thread.sleep(200);
+            return 0;
+        });
+        OutputStream outputStream = mock(OutputStream.class);
+        
+        // when
+        sut.drainAsync(inputStream, outputStream, it -> {});
+        futureMap.clear();
+        
+        // then
+        Thread.sleep(300);
+        sut.stop();
+    }
 }

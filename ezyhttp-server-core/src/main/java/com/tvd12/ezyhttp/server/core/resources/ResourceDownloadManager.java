@@ -9,6 +9,7 @@ import com.tvd12.ezyfox.concurrent.EzyCallableFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
 import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
+import com.tvd12.ezyfox.concurrent.EzyFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyThreadList;
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.util.EzyDestroyable;
@@ -115,7 +116,7 @@ public class ResourceDownloadManager
 	
 	public void drain(InputStream from, OutputStream to) throws Exception {
 	    Entry entry = new Entry(from, to);
-	    EzyFuture future = futureMap.putFuture(entry);
+	    EzyFuture future = new EzyFutureTask();
         drain(from, to, entry, future).get(DEFAULT_TIMEOUT);
 	}
 	

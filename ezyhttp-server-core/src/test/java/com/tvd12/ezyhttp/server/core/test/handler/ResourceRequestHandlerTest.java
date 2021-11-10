@@ -23,7 +23,6 @@ import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
@@ -31,29 +30,6 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ResourceRequestHandlerTest {
     
-    @Test
-    public void handleTest() throws Exception {
-        // given
-        String resourcePath = "static/index.html";
-        String resourceURI = "/index.html";
-        String resourceExtension = "html";
-        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
-        ResourceRequestHandler sut = new ResourceRequestHandler(
-            resourcePath,
-            resourceURI,
-            resourceExtension,
-            downloadManager
-        );
-        
-        RequestArguments arguments = mock(RequestArguments.class);
-        
-        // when
-        Object actual = sut.handle(arguments);
-        
-        // then
-        Asserts.assertEquals(actual, ResponseEntity.ASYNC);
-    }
-
 	@Test
 	public void handleAsynctest() throws Exception {
 		// given
@@ -85,9 +61,10 @@ public class ResourceRequestHandlerTest {
         when(asyncContext.getResponse()).thenReturn(response);
 		
 		// when
-		sut.handleAsync(arguments);
+		sut.handle(arguments);
 		
 		// then
+		Asserts.assertTrue(sut.isAsync());
 		Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
 		Asserts.assertEquals("/index.html", sut.getRequestURI());
 		Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getResponseContentType());
@@ -128,7 +105,7 @@ public class ResourceRequestHandlerTest {
         when(asyncContext.getResponse()).thenReturn(response);
         
         // when
-        sut.handleAsync(arguments);
+        sut.handle(arguments);
         
         // then
         Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
@@ -180,7 +157,7 @@ public class ResourceRequestHandlerTest {
         when(asyncContext.getResponse()).thenReturn(response);
         
         // when
-        sut.handleAsync(arguments);
+        sut.handle(arguments);
         
         // then
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);

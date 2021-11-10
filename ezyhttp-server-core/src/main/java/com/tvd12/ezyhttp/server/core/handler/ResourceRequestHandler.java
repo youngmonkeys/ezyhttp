@@ -38,13 +38,9 @@ public class ResourceRequestHandler implements RequestHandler {
 		this.inputStreamLoader = new EzyAnywayInputStreamLoader();
 	}
 	
-	@Override
-	public Object handle(RequestArguments arguments) throws Exception {
-	    return ResponseEntity.ASYNC;
-	}
 	
 	@Override
-	public void handleAsync(RequestArguments arguments) throws Exception {
+	public Object handle(RequestArguments arguments) throws Exception {
 	    HttpServletRequest servletRequest = arguments.getRequest();
         AsyncContext asyncContext = servletRequest.getAsyncContext();
         HttpServletResponse servletResponse = arguments.getResponse();
@@ -74,6 +70,12 @@ public class ResourceRequestHandler implements RequestHandler {
             servletResponse.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
             asyncContext.complete();
         }
+        return ResponseEntity.ASYNC;
+	}
+	
+	@Override
+	public boolean isAsync() {
+	    return true;
 	}
 
 	@Override

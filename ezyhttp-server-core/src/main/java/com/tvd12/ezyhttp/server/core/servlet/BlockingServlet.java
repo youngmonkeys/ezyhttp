@@ -202,25 +202,25 @@ public class BlockingServlet extends HttpServlet {
 		try {
 			acceptableRequest = preHandleRequest(arguments, requestHandler);
 			if(acceptableRequest) {
-				Object responseData = requestHandler.handle(arguments);
-				String responseContentType = requestHandler.getResponseContentType();
-				if(responseContentType != null) {
-					response.setContentType(responseContentType);
-				}
-				if(responseData != null) {
-					if(responseData == ResponseEntity.ASYNC) {
-					    syncResponse = false;
-					    AsyncContext asyncContext = request.startAsync(request, response);
-					    asyncContext.addListener(newAsyncListener(arguments, requestHandler));
-					    requestHandler.handleAsync(arguments);
-					}
-					else {
-						handleResponseData(request, response, responseData);
-					}
-				}
-				else {
-				    response.setStatus(HttpServletResponse.SC_OK);
-				}
+			    if (requestHandler.isAsync()) {
+			        syncResponse = false;
+                    AsyncContext asyncContext = request.startAsync(request, response);
+                    asyncContext.addListener(newAsyncListener(arguments, requestHandler));
+                    requestHandler.handle(arguments);
+			    }
+			    else {
+    				Object responseData = requestHandler.handle(arguments);
+    				String responseContentType = requestHandler.getResponseContentType();
+    				if(responseContentType != null) {
+    					response.setContentType(responseContentType);
+    				}
+    				if(responseData != null) {
+    				    handleResponseData(request, response, responseData);
+    				}
+    				else {
+    				    response.setStatus(HttpServletResponse.SC_OK);
+    				}
+			    }
 			}
 			else {
 			    handleError(method, request, response, HttpServletResponse.SC_NOT_ACCEPTABLE);

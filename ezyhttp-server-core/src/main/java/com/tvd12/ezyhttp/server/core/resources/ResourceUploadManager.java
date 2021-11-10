@@ -1,15 +1,17 @@
 package com.tvd12.ezyhttp.server.core.resources;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.tvd12.ezyfox.concurrent.EzyCallableFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
 import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
+import com.tvd12.ezyfox.concurrent.EzyFutureTask;
 import com.tvd12.ezyfox.concurrent.EzyThreadList;
+import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStoppable;
@@ -71,59 +73,78 @@ public class ResourceUploadManager
 	private void loop() {
 		byte[] buffer = new byte[bufferSize];
 		while(active) {
+		    Entry entry = null;
+            boolean done = true;
+            Exception exception = null;
 			try {
-				Entry entry = queue.take();
-				if(entry == POISON)
+				entry = queue.take();
+				if(entry == POISON) {
 					break;
+				}
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
-				boolean done = false;
-				IOException exception = null;
-				while(true) {
-					int read = inputStream.read(buffer);
-					if(read <= 0) {
-						done = true;
-						break;
-					}
-					try {
-						outputStream.write(buffer, 0, read);
-					}
-					catch (IOException e) {
-						done = true;
-						exception = e;
-						break;
-					}
-					queue.offer(entry);
-					break;
-				}
-				if(done) {
-					EzyFuture future = futureMap.removeFuture(entry);
-					if(exception == null)
-						future.setResult(Boolean.TRUE);
-					else
-						future.setException(exception);
-				}
+				int read = inputStream.read(buffer);
+                if(read > 0) {
+                    outputStream.write(buffer, 0, read);
+                    done = false;
+                }
 			}
-			catch (Throwable e) {
-				logger.debug("download error", e);
+			catch (Exception e) {
+			    exception = e;
+				logger.debug("upload error", e);
 			}
+			if (entry == null) {
+			    continue;
+			}
+
+            if(done) {
+                EzyFuture future = futureMap.removeFuture(entry);
+                if (future == null) {
+                    continue;
+                }
+                if(exception != null) {
+                    future.setException(exception);
+                }
+                else {
+                    future.setResult(Boolean.TRUE);
+                }
+            }
+            else {
+                queue.offer(entry);
+            }
 		}
 	}
 	
 	public void drain(InputStream from, OutputStream to) throws Exception {
-		drainAsync(from, to).get(DEFAULT_TIMEOUT);
+	    Entry entry = new Entry(from, to);
+        EzyFuture future = new EzyFutureTask();
+        drain(from, to, entry, future).get(DEFAULT_TIMEOUT);
 	}
 	
-	public EzyFuture drainAsync(InputStream from, OutputStream to) {
+	public EzyFuture drainAsync(
+        InputStream from, 
+        OutputStream to,
+        EzyResultCallback<Boolean> callback
+    ) {
 	    Entry entry = new Entry(from, to);
-        EzyFuture future = futureMap.putFuture(entry);
+        EzyFuture future = new EzyCallableFutureTask(callback);
+        return drain(from, to, entry, future);
+	}
+	
+	private EzyFuture drain(
+        InputStream from, 
+        OutputStream to,
+        Entry entry,
+        EzyFuture future
+    ) {
+        futureMap.addFuture(entry, future);
         boolean success = this.queue.offer(entry);
         if(!success) {
             futureMap.removeFuture(entry);
             throw new MaxResourceUploadCapacity(capacity);
         }
         return future;
-	}
+    }
 	
 	@Override
 	public void stop() {

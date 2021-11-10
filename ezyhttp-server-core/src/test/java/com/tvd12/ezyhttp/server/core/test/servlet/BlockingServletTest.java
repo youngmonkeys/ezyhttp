@@ -720,6 +720,73 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void doGetResponseContentTypeNullAndPostHandleRequestError() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(request.startAsync(request, response)).thenReturn(asyncContext);
+        when(request.isAsyncStarted()).thenReturn(true);
+        EzyWrap<AsyncListener> asyncListener = new EzyWrap<>();
+        doAnswer(it -> {
+            asyncListener.setValue(it.getArgumentAt(0, AsyncListener.class));
+            return null;
+        }).when(asyncContext).addListener(any(AsyncListener.class));
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandlerContentTypeNull requestHandler = new GetRequestHandlerContentTypeNull();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        doThrow(IllegalStateException.class).when(interceptor).postHandle(any(), any());
+        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(2)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void responseDataIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
@@ -1678,7 +1745,7 @@ public class BlockingServletTest {
 
 		@Override
 		public String getResponseContentType() {
-			return ContentTypes.APPLICATION_JSON;
+			return null;
 		}
 	}
 	
@@ -1688,6 +1755,11 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return ResponseEntity.ASYNC;
+		}
+		
+		@Override
+		public boolean isAsync() {
+		    return true;
 		}
 
 		@Override
