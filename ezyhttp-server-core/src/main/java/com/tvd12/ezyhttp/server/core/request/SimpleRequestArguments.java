@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -242,6 +243,11 @@ public class SimpleRequestArguments implements RequestArguments {
 	public <T> T getRedirectionAttribute(String name, Class<T> outType) {
 	    Object value = getRedirectionAttribute(name);
 	    return value != null ? objectMapper.convertValue(value, outType) : null;
+	}
+	
+	@Override
+	public AsyncContext getAsynContext() {
+	    return request.getAsyncContext();
 	}
 	
 	@Override

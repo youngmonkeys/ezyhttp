@@ -1,19 +1,21 @@
 package com.tvd12.ezyhttp.server.core.test.controller;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tvd12.ezyhttp.core.boot.test.service.FileUploadService;
+import com.tvd12.ezyhttp.server.core.annotation.Async;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 
 import lombok.AllArgsConstructor;
@@ -46,18 +48,25 @@ public class ViewController {
 		return View.of("upload/upload");
 	}
 	
+	@Async
 	@DoPost("/upload")
-	public Redirect uploadPost(
+	public void uploadPost(
 			HttpServletRequest request, 
+			HttpServletResponse response,
 			@RequestBody FileUpload data,
 			@RequestParam("name") String fileName,
 			RequestArguments requestArguments
 	) throws Exception {
 		Part filePart = request.getPart("file");
 		if(filePart.getSize() > 0) {
-			fileUploadService.accept(filePart);
+			fileUploadService.accept(request, filePart, () -> {
+			    try {
+                    response.sendRedirect("/view/upload");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+			});
 		}
-		return Redirect.to("/view/upload");
 	}
 	
 	@Getter

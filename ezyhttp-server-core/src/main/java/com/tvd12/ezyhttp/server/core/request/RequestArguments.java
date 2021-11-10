@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core.request;
 
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,8 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	HttpServletRequest getRequest();
 	
 	HttpServletResponse getResponse();
+	
+	AsyncContext getAsynContext();
 	
 	<T> T getArgument(Object key);
 	

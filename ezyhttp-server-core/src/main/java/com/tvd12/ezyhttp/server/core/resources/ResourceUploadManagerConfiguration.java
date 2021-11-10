@@ -23,7 +23,11 @@ public class ResourceUploadManagerConfiguration
 	
 	@Override
 	public void config() {
-		if(resourceUploadEnable)
-			context.getSingletonFactory().addSingleton(createUploadManager(context));
+		if(resourceUploadEnable) {
+		    ResourceUploadManager resourceUploadManager = createUploadManager(context);
+		    FileUploader fileUploader = new FileUploader(resourceUploadManager);
+			context.getSingletonFactory().addSingleton(resourceUploadManager);
+			context.getSingletonFactory().addSingleton(fileUploader);
+		}
 	}
 }
