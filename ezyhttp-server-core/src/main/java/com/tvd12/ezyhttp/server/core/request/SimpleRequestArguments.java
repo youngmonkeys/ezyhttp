@@ -251,6 +251,11 @@ public class SimpleRequestArguments implements RequestArguments {
 	}
 	
 	@Override
+	public boolean isAsyncStarted() {
+	    return request.isAsyncStarted();
+	}
+	
+	@Override
 	public void release() {
 		if(arguments != null)
 			arguments.clear();

@@ -21,6 +21,8 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	
 	AsyncContext getAsynContext();
 	
+	boolean isAsyncStarted();
+	
 	<T> T getArgument(Object key);
 	
 	void setArgument(Object key, Object value);

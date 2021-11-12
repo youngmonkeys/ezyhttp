@@ -71,6 +71,7 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookieValue("unknown"));
 		Asserts.assertEquals(HttpMethod.HEAD, sut.getMethod());
 		Asserts.assertEquals(sut.getAsynContext(), asyncContext);
+		Asserts.assertFalse(sut.isAsyncStarted());
 		
 		verify(servletRequest, times(1)).getRequestURI();
 		verify(servletRequest, times(1)).getInputStream();
