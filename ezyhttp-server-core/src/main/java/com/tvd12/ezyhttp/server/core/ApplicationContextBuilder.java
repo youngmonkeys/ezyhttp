@@ -389,7 +389,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		ResourceResolver resourceResolver = getResourceResolver(beanContext);
 		if(resourceResolver == null)
 			return;
-		ResourceDownloadManager downloadManager = getResourceDownloadManager(beanContext);
+		ResourceDownloadManager downloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
 		Map<String, Resource> resources = resourceResolver.getResources();
 		for(String resourceURI : resources.keySet()) {
 			Resource resource = resources.get(resourceURI);
@@ -417,16 +417,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				beanContext.getSingletonFactory().addSingleton(resourceResolver);
 		}
 		return resourceResolver;
-	}
-	
-	protected ResourceDownloadManager getResourceDownloadManager(EzyBeanContext beanContext) {
-		ResourceDownloadManager resourceDownloadManager = 
-				(ResourceDownloadManager)beanContext.getSingleton(ResourceDownloadManager.class);
-		if(resourceDownloadManager == null) {
-			resourceDownloadManager = ResourceResolvers.createDownloadManager(beanContext);
-			beanContext.getSingletonFactory().addSingleton(resourceDownloadManager);
-		}
-		return resourceDownloadManager;
 	}
 	
 	protected void addExceptionHandlers() {

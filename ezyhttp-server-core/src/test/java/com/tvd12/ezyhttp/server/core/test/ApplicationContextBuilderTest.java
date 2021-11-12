@@ -305,28 +305,6 @@ public class ApplicationContextBuilderTest {
 		verify(beanContext, times(1)).getSingleton(ResourceResolver.class);
 	}
 	
-	@Test
-	public void getResourceDownloadManagerNotNull() {
-		// given
-		EzyBeanContext beanContext = mock(EzyBeanContext.class);
-		ResourceDownloadManager manager = mock(ResourceDownloadManager.class);
-		when(beanContext.getSingleton(ResourceDownloadManager.class)).thenReturn(manager);
-		
-		ApplicationContextBuilder sut = new ApplicationContextBuilder();
-		
-		// when
-		ResourceDownloadManager actual = MethodInvoker.create()
-				.object(sut)
-				.method("getResourceDownloadManager")
-				.param(EzyBeanContext.class, beanContext)
-				.invoke(ResourceDownloadManager.class);
-		
-		// then
-		Asserts.assertEquals(manager, actual);
-		
-		verify(beanContext, times(1)).getSingleton(ResourceDownloadManager.class);
-	}
-	
 	private static class InternalSingleton1  {}
 	
 	private static class InternalSingleton2  {}

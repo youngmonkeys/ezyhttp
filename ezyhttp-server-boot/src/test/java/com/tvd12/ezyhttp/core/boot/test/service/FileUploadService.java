@@ -8,7 +8,7 @@ import javax.servlet.http.Part;
 
 import com.tvd12.ezyfox.bean.annotation.EzyPostInit;
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyfox.function.EzyVoid;
+import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class FileUploadService {
 		new File("files").mkdir();
 	}
 	
-	public void accept(HttpServletRequest request, Part part, EzyVoid callback) {
+	public void accept(HttpServletRequest request, Part part, EzyExceptionVoid callback) {
 		String fileName = part.getSubmittedFileName();
 		File file = new File("files/" + fileName);
 		AsyncContext asyncContext = request.getAsyncContext();

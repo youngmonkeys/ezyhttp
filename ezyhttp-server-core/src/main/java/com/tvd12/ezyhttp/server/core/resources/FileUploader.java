@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
-import com.tvd12.ezyfox.function.EzyVoid;
+import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyProcessor;
@@ -27,18 +27,24 @@ public class FileUploader extends EzyLoggable {
         AsyncContext asyncContext,
         Part part,
         File outputFile,
-        EzyVoid callback
+        EzyExceptionVoid callback
     ) {
+        HttpServletResponse response = 
+                (HttpServletResponse)asyncContext.getResponse();
         accept(asyncContext, part, outputFile, new FileUploadCallback() {
             @Override
             public void onSuccess() {
-                callback.apply();
+                try {
+                    callback.apply();
+                    response.setStatus(StatusCodes.OK);
+                }
+                catch (Exception e) {
+                    onFailure(e);
+                }
             }
             
             @Override
             public void onFailure(Exception e) {
-                HttpServletResponse response = 
-                        (HttpServletResponse)asyncContext.getResponse();
                 response.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
                 logger.warn("FileUploader.accept request: {} error", asyncContext.getRequest(), e);
             }
