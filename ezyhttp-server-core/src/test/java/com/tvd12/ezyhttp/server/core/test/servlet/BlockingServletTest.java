@@ -241,6 +241,10 @@ public class BlockingServletTest {
 		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
+		componentManager.getRequestHandlerManager().addHandler(
+	        new RequestURI(HttpMethod.GET, "/get", false),
+	        mock(RequestHandler.class)
+		);
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -275,6 +279,10 @@ public class BlockingServletTest {
         componentManager.setServerPort(PORT);
         componentManager.setManagmentPort(MANAGEMENT_POR);
         componentManager.setExposeMangementURIs(true);
+        componentManager.getRequestHandlerManager().addHandler(
+            new RequestURI(HttpMethod.GET, "/management", false),
+            mock(RequestHandler.class)
+        );
         
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -330,7 +338,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getOutputStream();
 		verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
@@ -382,7 +389,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).setStatus(StatusCodes.OK);
         

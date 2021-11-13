@@ -166,7 +166,14 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
-		boolean isManagementURI = managementURIs.contains(requestURI);
+		String matchedURI = requestHandlerManager.getMatchedURI(requestURI);
+		if(matchedURI == null) {
+            if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
+                responseString(response, "uri " + requestURI + " not found");
+            }
+            return;
+        }
+		boolean isManagementURI = managementURIs.contains(matchedURI);
 		if(isManagementURI && !exposeMangementURIs) {
 			if(request.getServerPort() != managmentPort) {
 			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
@@ -182,13 +189,7 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		RequestHandler requestHandler = 
-		        requestHandlerManager.getHandler(method, requestURI, isManagementURI);
-		if(requestHandler == null) {
-		    if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
-		        responseString(response, "uri " + requestURI + " not found");
-		    }
-		    return;
-		}
+		        requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
 		if(requestHandler == RequestHandler.EMPTY) {
 		    if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
 		        responseString(response, "method " + method + " not allowed");
