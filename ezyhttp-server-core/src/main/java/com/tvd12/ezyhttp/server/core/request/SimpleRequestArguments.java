@@ -30,6 +30,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Getter
 	protected HttpMethod method;
 	@Setter
+	@Getter
 	protected String uriTemplate;
 	@Setter
 	protected ObjectMapper objectMapper;
@@ -149,7 +150,10 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	protected void fetchPathVariables() {
 		if(pathVariableList == null) {
-			pathVariableList = PathVariables.getVariables(uriTemplate, request.getRequestURI());
+			pathVariableList = PathVariables.getVariables(
+		        uriTemplate, 
+		        request.getRequestURI()
+	        );
 			pathVariableMap = new HashMap<>();
 			for(Entry<String, String> entry : pathVariableList)
 				pathVariableMap.put(entry.getKey(), entry.getValue());
