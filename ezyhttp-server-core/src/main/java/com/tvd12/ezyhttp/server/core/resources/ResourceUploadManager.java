@@ -17,8 +17,7 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
-
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
 
 public class ResourceUploadManager
 		extends EzyLoggable
@@ -37,6 +36,7 @@ public class ResourceUploadManager
 	public static final int DEFAULT_THREAD_POOL_SIZE = 16;
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 	public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
+	public static final long UNLIMIT_UPLOAD_SIZE = -1;
 	
 	public ResourceUploadManager() {
 		this(
@@ -75,6 +75,7 @@ public class ResourceUploadManager
 		while(active) {
 		    Entry entry = null;
             boolean done = true;
+            boolean isMaxUploaded = false;
             Exception exception = null;
 			try {
 				entry = queue.take();
@@ -84,10 +85,14 @@ public class ResourceUploadManager
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				int read = inputStream.read(buffer);
-                if(read > 0) {
-                    outputStream.write(buffer, 0, read);
-                    done = false;
-                }
+				if (entry.increaseUploadedSize(read)) {
+                    if(read > 0) {
+                        outputStream.write(buffer, 0, read);
+                        done = false;
+                    }
+				} else {
+				    isMaxUploaded = true;
+				}
 			}
 			catch (Exception e) {
 			    exception = e;
@@ -95,6 +100,10 @@ public class ResourceUploadManager
 			}
 			if (entry == null) {
 			    continue;
+			}
+			
+			if (isMaxUploaded) {
+			    exception = new MaxUploadSizeException(entry.maxUploadSize);
 			}
 
             if(done) {
@@ -115,10 +124,29 @@ public class ResourceUploadManager
 		}
 	}
 	
-	public void drain(InputStream from, OutputStream to) throws Exception {
-	    Entry entry = new Entry(from, to);
+	public void drain(
+        InputStream from, 
+        OutputStream to,
+        long maxUploadSize
+    ) throws Exception {
+	    Entry entry = new Entry(from, to, maxUploadSize);
         EzyFuture future = new EzyFutureTask();
         drain(from, to, entry, future).get(DEFAULT_TIMEOUT);
+	}
+	
+	public void drain(InputStream from, OutputStream to) throws Exception {
+	    drain(from, to, UNLIMIT_UPLOAD_SIZE);
+	}
+	
+	public EzyFuture drainAsync(
+        InputStream from, 
+        OutputStream to,
+        long maxUploadSize,
+        EzyResultCallback<Boolean> callback
+    ) {
+	    Entry entry = new Entry(from, to, maxUploadSize);
+        EzyFuture future = new EzyCallableFutureTask(callback);
+        return drain(from, to, entry, future);
 	}
 	
 	public EzyFuture drainAsync(
@@ -126,9 +154,7 @@ public class ResourceUploadManager
         OutputStream to,
         EzyResultCallback<Boolean> callback
     ) {
-	    Entry entry = new Entry(from, to);
-        EzyFuture future = new EzyCallableFutureTask(callback);
-        return drain(from, to, entry, future);
+	    return drainAsync(from, to, UNLIMIT_UPLOAD_SIZE, callback);
 	}
 	
 	private EzyFuture drain(
@@ -159,13 +185,32 @@ public class ResourceUploadManager
 		this.stop();
 	}
 
-	@AllArgsConstructor
 	private static class Entry {
 		private final InputStream inputStream;
 		private final OutputStream outputStream;
+		private final long maxUploadSize;
+		private long currentUploadedSize;
 		
 		public Entry() {
-			this(null, null);
+			this(null, null, 0L);
+		}
+		
+		public Entry(
+	        InputStream inputStream,
+	        OutputStream outputStream,
+	        long maxUploadSize
+        ) {
+		    this.inputStream = inputStream;
+		    this.outputStream = outputStream;
+		    this.maxUploadSize = maxUploadSize;
+		}
+		
+		public boolean increaseUploadedSize(int uploadedSize) {
+		    this.currentUploadedSize += uploadedSize;
+		    if (maxUploadSize <= 0) {
+		        return true;
+		    }
+		    return currentUploadedSize <= maxUploadSize;
 		}
 	}
 }

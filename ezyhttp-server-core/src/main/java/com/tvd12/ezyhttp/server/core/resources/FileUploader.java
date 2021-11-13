@@ -15,6 +15,7 @@ import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
 
 import lombok.AllArgsConstructor;
 
@@ -22,6 +23,9 @@ import lombok.AllArgsConstructor;
 public class FileUploader extends EzyLoggable {
 
     private final ResourceUploadManager resourceUploadManager;
+    
+    private static final byte[] OVER_UPLOAD_SIZE_MESSAGE = 
+            "{\"uploadSize\":\"over\"}".getBytes();
     
     public void accept(
         AsyncContext asyncContext,
@@ -45,7 +49,14 @@ public class FileUploader extends EzyLoggable {
             
             @Override
             public void onFailure(Exception e) {
-                response.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+                if (e instanceof MaxUploadSizeException) {
+                    EzyProcessor.processWithLogException(() ->
+                        response.getOutputStream().write(OVER_UPLOAD_SIZE_MESSAGE)
+                    );
+                    response.setStatus(StatusCodes.BAD_REQUEST);
+                } else {
+                    response.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+                }
                 logger.warn("FileUploader.accept request: {} error", asyncContext.getRequest(), e);
             }
         });

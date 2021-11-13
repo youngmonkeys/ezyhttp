@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
@@ -22,6 +23,7 @@ import org.testng.annotations.Test;
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
 import com.tvd12.ezyhttp.server.core.resources.FileUploadCallback;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
 import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
@@ -87,6 +89,42 @@ public class FileUploaderTest {
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void acceptFirstMaxUploadSizeException() throws Exception {
+        // given
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        Part part = mock(Part.class);
+        File outputFile = new File("test-output/files");
+        EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
+        doThrow(new MaxUploadSizeException(100)).when(callback).apply();
+        
+        ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
+        doAnswer(it -> {
+            EzyResultCallback<Boolean> cb = it.getArgumentAt(2, EzyResultCallback.class);
+            cb.onResponse(Boolean.TRUE);
+            return null;
+        }).when(resourceUploadManager).drainAsync(any(), any(), any());
+        
+        FileUploader sut = new FileUploader(resourceUploadManager);
+        
+        // when
+        sut.accept(asyncContext, part, outputFile, callback);
+        
+        // then
+        verify(callback, times(1)).apply();
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(response, times(1)).setStatus(StatusCodes.BAD_REQUEST);
+        verify(response, times(1)).getOutputStream();
+        verify(outputStream, times(1)).write(any(byte[].class));
     }
     
     @SuppressWarnings("unchecked")

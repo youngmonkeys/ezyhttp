@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
+import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
 import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
@@ -45,6 +46,28 @@ public class ResourceUploadManagerTest extends BaseTest {
 		Asserts.assertEquals(inputBytes, outputBytes);
 		sut.stop();
 	}
+	
+
+    @Test
+    public void drainWithMaxUploadSizeTest() throws Exception {
+        // given
+        ResourceUploadManager sut = new ResourceUploadManager();
+        
+        int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+        
+        byte[] inputBytes = RandomUtil.randomByteArray(size);
+        InputStream inputStream = new ByteArrayInputStream(inputBytes);
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
+        
+        // when
+        sut.drain(inputStream, outputStream, Integer.MAX_VALUE);
+        
+        // then
+        byte[] outputBytes = outputStream.toByteArray();
+        Asserts.assertEquals(inputBytes, outputBytes);
+        sut.stop();
+    }
 	
 	@Test
 	public void drainFailedDueToOutputStream() throws Exception {
@@ -86,6 +109,26 @@ public class ResourceUploadManagerTest extends BaseTest {
 		// then
 		sut.stop();
 	}
+	
+	@Test
+    public void drainFailedDueToOverUploadSizeTest() throws Exception {
+        // given
+        ResourceUploadManager sut = new ResourceUploadManager();
+        
+        int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+        
+        byte[] inputBytes = RandomUtil.randomByteArray(size);
+        InputStream inputStream = new ByteArrayInputStream(inputBytes);
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
+        
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream, 1));
+        
+        // then
+        Asserts.assertEqualsType(e, MaxUploadSizeException.class);
+        sut.stop();
+    }
 	
 	@Test
 	public void activeFalse() throws Exception {
