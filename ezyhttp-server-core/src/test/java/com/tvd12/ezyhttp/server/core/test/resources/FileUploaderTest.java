@@ -44,10 +44,10 @@ public class FileUploaderTest {
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
-            EzyResultCallback<Boolean> cb = it.getArgumentAt(2, EzyResultCallback.class);
+            EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
-        }).when(resourceUploadManager).drainAsync(any(), any(), any());
+        }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
         
         FileUploader sut = new FileUploader(resourceUploadManager);
         
@@ -56,7 +56,7 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).apply();
-        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.OK);
     }
     
@@ -75,10 +75,10 @@ public class FileUploaderTest {
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
-            EzyResultCallback<Boolean> cb = it.getArgumentAt(2, EzyResultCallback.class);
+            EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
-        }).when(resourceUploadManager).drainAsync(any(), any(), any());
+        }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
         
         FileUploader sut = new FileUploader(resourceUploadManager);
         
@@ -87,7 +87,7 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).apply();
-        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
     
@@ -109,10 +109,10 @@ public class FileUploaderTest {
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
-            EzyResultCallback<Boolean> cb = it.getArgumentAt(2, EzyResultCallback.class);
+            EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
-        }).when(resourceUploadManager).drainAsync(any(), any(), any());
+        }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
         
         FileUploader sut = new FileUploader(resourceUploadManager);
         
@@ -121,7 +121,7 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).apply();
-        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.BAD_REQUEST);
         verify(response, times(1)).getOutputStream();
         verify(outputStream, times(1)).write(any(byte[].class));
@@ -140,10 +140,10 @@ public class FileUploaderTest {
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
-            EzyResultCallback<Boolean> cb = it.getArgumentAt(2, EzyResultCallback.class);
+            EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onException(new Exception("just test"));
             return null;
-        }).when(resourceUploadManager).drainAsync(any(), any(), any());
+        }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
         
         FileUploader sut = new FileUploader(resourceUploadManager);
         
@@ -152,7 +152,7 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(0)).apply();
-        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
     
@@ -210,7 +210,7 @@ public class FileUploaderTest {
         FileUploadCallback callback = mock(FileUploadCallback.class);
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
-        when(resourceUploadManager.drainAsync(any(), any(), any())).thenThrow(IllegalStateException.class);
+        when(resourceUploadManager.drainAsync(any(), any(), any(long.class), any())).thenThrow(IllegalStateException.class);
         
         FileUploader sut = new FileUploader(resourceUploadManager);
         
@@ -219,6 +219,6 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).onFailure(any());
-        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any());
+        verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
     }
 }

@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.resources;
 
+import static com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -33,9 +35,19 @@ public class FileUploader extends EzyLoggable {
         File outputFile,
         EzyExceptionVoid callback
     ) {
+        accept(asyncContext, part, outputFile, UNLIMIT_UPLOAD_SIZE, callback);
+    }
+    
+    public void accept(
+        AsyncContext asyncContext,
+        Part part,
+        File outputFile,
+        long maxUploadSize,
+        EzyExceptionVoid callback
+    ) {
         HttpServletResponse response = 
                 (HttpServletResponse)asyncContext.getResponse();
-        accept(asyncContext, part, outputFile, new FileUploadCallback() {
+        accept(asyncContext, part, outputFile, maxUploadSize, new FileUploadCallback() {
             @Override
             public void onSuccess() {
                 try {
@@ -68,8 +80,18 @@ public class FileUploader extends EzyLoggable {
         File outputFile,
         FileUploadCallback callback
     ) {
+        accept(asyncContext, part, outputFile, UNLIMIT_UPLOAD_SIZE, callback);
+    }
+    
+    public void accept(
+        AsyncContext asyncContext,
+        Part part,
+        File outputFile,
+        long maxUploadSize,
+        FileUploadCallback callback
+    ) {
         try {
-            accept(asyncContext, part.getInputStream(), outputFile, callback);
+            accept(asyncContext, part.getInputStream(), outputFile, maxUploadSize, callback);
         }
         catch (Exception e) {
             callback.onFailure(e);
@@ -82,21 +104,36 @@ public class FileUploader extends EzyLoggable {
         File outputFile,
         FileUploadCallback callback
     ) {
+        accept(asyncContext, inputStream, outputFile, UNLIMIT_UPLOAD_SIZE, callback);
+    }
+    
+    public void accept(
+        AsyncContext asyncContext,
+        InputStream inputStream,
+        File outputFile,
+        long maxUploadSize,
+        FileUploadCallback callback
+    ) {
         try {
             EzyFileUtil.createFileIfNotExists(outputFile);
             FileOutputStream outputStream = new FileOutputStream(outputFile);
-            accept(asyncContext, inputStream, outputStream, new FileUploadCallback() {
-                @Override
-                public void onSuccess() {
-                    EzyProcessor.processWithLogException(outputStream::close);
-                    callback.onSuccess();
-                }
-                
-                @Override
-                public void onFailure(Exception e) {
-                    EzyProcessor.processWithLogException(outputStream::close);
-                    callback.onFailure(e);
-                }
+            accept(
+                asyncContext, 
+                inputStream,
+                outputStream, 
+                maxUploadSize, 
+                new FileUploadCallback() {
+                    @Override
+                    public void onSuccess() {
+                        EzyProcessor.processWithLogException(outputStream::close);
+                        callback.onSuccess();
+                    }
+                    
+                    @Override
+                    public void onFailure(Exception e) {
+                        EzyProcessor.processWithLogException(outputStream::close);
+                        callback.onFailure(e);
+                    }
             });
         }
         catch (Exception e) {
@@ -110,10 +147,21 @@ public class FileUploader extends EzyLoggable {
         OutputStream outputStream,
         FileUploadCallback callback
     ) {
+        accept(asyncContext, inputStream, outputStream, UNLIMIT_UPLOAD_SIZE, callback);
+    }
+    
+    public void accept(
+        AsyncContext asyncContext,
+        InputStream inputStream,
+        OutputStream outputStream,
+        long maxUploadSize,
+        FileUploadCallback callback
+    ) {
         try {
             resourceUploadManager.drainAsync(
                 inputStream,
                 outputStream,
+                maxUploadSize,
                 new EzyResultCallback<Boolean>() {
                     @Override
                     public void onResponse(Boolean response) {
