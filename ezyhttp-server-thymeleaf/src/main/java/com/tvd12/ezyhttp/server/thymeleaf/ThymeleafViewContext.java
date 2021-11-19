@@ -31,7 +31,7 @@ public class ThymeleafViewContext implements ViewContext {
 			HttpServletRequest request,
 			HttpServletResponse response, View view) throws IOException {
 		WebContext ctx = 
-	            new WebContext(request, response, servletContext, request.getLocale());
+	            new WebContext(request, response, servletContext, view.getLocale());
 		ctx.setVariables(view.getVariables());
 	    templateEngine.process(view.getTemplate(), ctx, response.getWriter());
 	}

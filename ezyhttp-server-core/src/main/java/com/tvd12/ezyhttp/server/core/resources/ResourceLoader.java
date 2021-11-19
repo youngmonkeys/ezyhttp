@@ -99,19 +99,19 @@ public class ResourceLoader extends EzyLoggable {
             File[] fileList = listFile(folder);
 
             for(File resource : fileList) {
-                String relativePath = resource
+                String resourcePath = resource
                         .toString()
                         .substring(rootFolder.toString().length() + 1);
-                String fullPath = rootPath + "/" + relativePath;
+                String relativePath = rootPath + "/" + resourcePath;
                 boolean addable = regexes.isEmpty();
                 for(String regex : regexes) {
-                    if(fullPath.matches(regex)) {
+                    if(relativePath.matches(regex)) {
                         addable = true;
                         break;
                     }
                 }
                 if(addable && resource.isFile()) {
-                    answer.add(new ResourceFile(fullPath, resource.toURI().toString()));
+                    answer.add(new ResourceFile(relativePath, resource.toString(), false));
                 }
                 if(resource.isDirectory()) {
                     folders.offer(resource);
@@ -144,7 +144,7 @@ public class ResourceLoader extends EzyLoggable {
                     }
                 }
                 if(addable && isFileElement(name)) {
-                    answer.add(new ResourceFile(name, "jar:" + jarPath + "!/" + name));
+                    answer.add(new ResourceFile(name, jarPath + "!/" + name, true));
                 }
             }
         }
