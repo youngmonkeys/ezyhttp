@@ -28,8 +28,12 @@ public class MessageReader {
 			Properties properties = file.resourceFile.isInJar()
 			        ? fileReader.read(file.resourceFile.getRelativePath())
 			        : fileReader.read(new File(file.resourceFile.getFullPath()));
-			answer.put(file.languague, properties);
-			answer.put(file.languague.toLowerCase(), properties);
+			answer
+			    .computeIfAbsent(file.languague, k -> new Properties())
+			    .putAll(properties);
+			answer
+			    .computeIfAbsent(file.languague.toLowerCase(), k -> new Properties())
+			    .putAll(properties);
 		}
 		return answer;
 	}
