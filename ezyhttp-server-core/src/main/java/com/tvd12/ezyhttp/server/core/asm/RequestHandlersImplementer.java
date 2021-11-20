@@ -9,12 +9,18 @@ import java.util.Map;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 
+import lombok.Setter;
+
 public class RequestHandlersImplementer extends EzyLoggable {
-	
+    
+    @Setter
+    private RequestURIDecorator requestURIDecorator;
+    
 	public Map<RequestURI, List<RequestHandler>> implement(
 	        Collection<Object> controllers
     ) {
@@ -38,7 +44,10 @@ public class RequestHandlersImplementer extends EzyLoggable {
 			RequestHandlerImplementer implementer = newImplementer(proxy, method);
 			RequestHandler handler = implementer.implement();
 			HttpMethod httpMethod = handler.getMethod();
-			String requestURI = method.getRequestURI(); 
+			String requestURI = method.getRequestURI();
+			if (requestURIDecorator != null) {
+			    requestURI = requestURIDecorator.decorate(proxy.getClazz(), requestURI);
+			}
 			boolean authen = authenticated || method.isAuthenticated();
 			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement, authen);
 			handlers.computeIfAbsent(uri, k -> new ArrayList<>())

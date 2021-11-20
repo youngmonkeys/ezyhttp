@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -26,9 +27,13 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.event.EventService;
 import com.tvd12.ezyhttp.server.core.test.event.SourceService;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
+import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
+import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
+import com.tvd12.ezyhttp.server.core.view.ViewDialect;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.MethodInvoker;
 
@@ -263,6 +268,25 @@ public class ApplicationContextBuilderTest {
 		EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
 		when(beanContext.getSingletonFactory()).thenReturn(singletonFactory);
 		
+		ViewDialect viewDialect = mock(ViewDialect.class);
+		List<ViewDialect> viewDialects = Arrays.asList(viewDialect);
+		when(beanContext.getSingletonsOf(ViewDialect.class)).thenReturn(viewDialects);
+		when(viewContextBuilder.viewDialects(viewDialects)).thenReturn(viewContextBuilder);
+		
+		ViewDecorator viewDecorator = mock(ViewDecorator.class);
+		List<ViewDecorator> viewDecorators = Arrays.asList(viewDecorator);
+		when(beanContext.getSingletonsOf(ViewDecorator.class)).thenReturn(viewDecorators);
+		when(viewContextBuilder.viewDecorators(viewDecorators)).thenReturn(viewContextBuilder);
+		
+		MessageProvider messageProvider = mock(MessageProvider.class);
+		List<MessageProvider> messageProviders = Arrays.asList(messageProvider);
+		when(beanContext.getSingletonsOf(MessageProvider.class)).thenReturn(messageProviders);
+		when(viewContextBuilder.messageProviders(messageProviders)).thenReturn(viewContextBuilder);
+		
+		AbsentMessageResolver absentMessageResolver = mock(AbsentMessageResolver.class);
+		when(beanContext.getSingleton(AbsentMessageResolver.class)).thenReturn(absentMessageResolver);
+		when(viewContextBuilder.absentMessageResolver(absentMessageResolver)).thenReturn(viewContextBuilder);
+		
 		ApplicationContextBuilder sut = new ApplicationContextBuilder();
 		
 		// when
@@ -278,7 +302,15 @@ public class ApplicationContextBuilderTest {
 		verify(beanContext, times(1)).getSingleton(ViewContext.class);
 		verify(beanContext, times(1)).getSingleton(ViewContextBuilder.class);
 		verify(beanContext, times(1)).getSingleton(TemplateResolver.class);
+		verify(beanContext, times(1)).getSingletonsOf(ViewDialect.class);
+		verify(beanContext, times(1)).getSingletonsOf(ViewDecorator.class);
+		verify(beanContext, times(1)).getSingleton(AbsentMessageResolver.class);
+		verify(beanContext, times(1)).getSingletonsOf(MessageProvider.class);
 		verify(viewContextBuilder, times(1)).templateResolver(templateResolver);
+		verify(viewContextBuilder, times(1)).viewDialects(viewDialects);
+		verify(viewContextBuilder, times(1)).viewDecorators(viewDecorators);
+		verify(viewContextBuilder, times(1)).messageProviders(messageProviders);
+		verify(viewContextBuilder, times(1)).absentMessageResolver(absentMessageResolver);
 		verify(viewContextBuilder, times(1)).build();
 		verify(singletonFactory, times(1)).addSingleton(viewContext);
 	}

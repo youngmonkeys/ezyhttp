@@ -29,10 +29,10 @@ public class MessageReader {
 			        ? fileReader.read(file.resourceFile.getRelativePath())
 			        : fileReader.read(new File(file.resourceFile.getFullPath()));
 			answer
-			    .computeIfAbsent(file.languague, k -> new Properties())
+			    .computeIfAbsent(file.language, k -> new Properties())
 			    .putAll(properties);
 			answer
-			    .computeIfAbsent(file.languague.toLowerCase(), k -> new Properties())
+			    .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
 			    .putAll(properties);
 		}
 		return answer;
@@ -59,7 +59,7 @@ public class MessageReader {
 	
 	@AllArgsConstructor
 	private static final class MessagesFile {
-		private final String languague;
+		private final String language;
 		private final ResourceFile resourceFile;
 	}
 	

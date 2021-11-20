@@ -173,6 +173,7 @@ public class BlockingServlet extends HttpServlet {
             }
             return;
         }
+		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
 		boolean isManagementURI = managementURIs.contains(matchedURI);
 		if(isManagementURI && !exposeMangementURIs) {
 			if(request.getServerPort() != managmentPort) {

@@ -43,6 +43,7 @@ import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
+import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
@@ -59,9 +60,13 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
+import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
+import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
+import com.tvd12.ezyhttp.server.core.view.ViewDialect;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
@@ -230,6 +235,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		allPackageToScans.addAll(packageToScans);
 		EzyReflection reflection = EzyPackages.scanPackages(allPackageToScans);
 		addComponentClassesFromReflection(reflection);
+		allPackageToScans.addAll(packageToScans);
+		reflection = EzyPackages.scanPackages(allPackageToScans);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
@@ -366,9 +373,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
 			if(viewContextBuilder != null) {
 				TemplateResolver templateResolver = beanContext.getSingleton(TemplateResolver.class);
-				if(templateResolver == null)
+				if(templateResolver == null) {
 					templateResolver = TemplateResolver.of(beanContext);
-				viewContext = viewContextBuilder.templateResolver(templateResolver).build();
+				}
+				viewContext = viewContextBuilder
+			        .templateResolver(templateResolver)
+			        .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
+			        .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
+			        .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
+			        .absentMessageResolver(beanContext.getSingleton(AbsentMessageResolver.class))
+			        .build();
 			}
 		}
 		if(viewContext != null)
@@ -379,6 +393,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected void addRequestHandlers(EzyBeanContext beanContext) {
 		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
+		implementer.setRequestURIDecorator(beanContext.getSingleton(RequestURIDecorator.class));
 		Map<RequestURI, List<RequestHandler>> requestHandlers = 
 		        implementer.implement(controllerList);
 		componentManager.appendManagementURIs(requestHandlers.keySet());
