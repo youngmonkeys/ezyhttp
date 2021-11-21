@@ -1,4 +1,4 @@
-# ezyfox-server
+# ezyhttp <img src="https://github.com/youngmonkeys/ezydata/blob/master/logo.png" width="72" />
 
 # Documentation
 
