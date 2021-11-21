@@ -57,10 +57,12 @@ public class ViewTest {
 	public void ofTest() {
 		// given
 		View sut = View.of("home.html");
+		sut.setLocale(Locale.CANADA);
 		
 		// when
 		// then
 		Asserts.assertEquals("home.html", sut.getTemplate());
+		Asserts.assertEquals(sut.getLocale(), Locale.CANADA);
 	}
 
 	@Test

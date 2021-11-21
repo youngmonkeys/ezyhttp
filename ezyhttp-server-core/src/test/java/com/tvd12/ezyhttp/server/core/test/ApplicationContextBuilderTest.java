@@ -75,6 +75,7 @@ public class ApplicationContextBuilderTest {
 			.beanContext(internalBeanContext)
 			.addSingleton(new InternalSingleton2())
 			.addSingleton(Collections.singletonMap("internalSingleton3", new InternalSingleton3()))
+			.addSingleton(mock(AbsentMessageResolver.class))
 			.build();
 		
 		EzyBeanContext beanContext = applicationContext.getBeanContext();

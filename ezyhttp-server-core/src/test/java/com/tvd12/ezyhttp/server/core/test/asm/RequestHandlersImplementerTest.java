@@ -8,9 +8,11 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerException;
+import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.test.assertion.Asserts;
+import static org.mockito.Mockito.*;
 
 public class RequestHandlersImplementerTest {
 
@@ -64,6 +66,26 @@ public class RequestHandlersImplementerTest {
         
         // then
         RequestURI uri = new RequestURI(HttpMethod.GET, "/get", false);
+        Asserts.assertThat(manager.getHandlerListByURI().get(uri).size()).isEqualsTo(2);
+    }
+	
+	@Test
+    public void implementOneWithURIDecorator() {
+        // given
+        RequestHandlersImplementer sut = new RequestHandlersImplementer();
+        Controller controller = new Controller();
+        RequestHandlerManager manager = new RequestHandlerManager();
+        manager.setAllowOverrideURI(true);
+        
+        RequestURIDecorator requestURIDecorator = mock(RequestURIDecorator.class);
+        when(requestURIDecorator.decorate(any(), any())).thenReturn("hello-world");
+        sut.setRequestURIDecorator(requestURIDecorator);
+        
+        // when
+        manager.addHandlers(sut.implement(Arrays.asList(controller)));
+        
+        // then
+        RequestURI uri = new RequestURI(HttpMethod.GET, "/hello-world", false);
         Asserts.assertThat(manager.getHandlerListByURI().get(uri).size()).isEqualsTo(2);
     }
 	
