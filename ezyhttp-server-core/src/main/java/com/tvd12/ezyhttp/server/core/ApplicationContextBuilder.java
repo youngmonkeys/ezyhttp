@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.annotation.EzyPackagesToScan;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
+import com.tvd12.ezyfox.bean.EzyPackagesToScanProvider;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.bean.impl.EzyBeanKey;
 import com.tvd12.ezyfox.bean.impl.EzyBeanNameParser;
@@ -236,6 +237,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		EzyReflection reflection = EzyPackages.scanPackages(allPackageToScans);
 		addComponentClassesFromReflection(reflection);
 		allPackageToScans.addAll(packageToScans);
+		allPackageToScans.addAll(getPackagesToScanFromProviders(reflection));
 		reflection = EzyPackages.scanPackages(allPackageToScans);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
@@ -269,6 +271,18 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		addExceptionHandlers();
 		return beanContext;
 	}
+	
+	private Set<String> getPackagesToScanFromProviders(EzyReflection reflection) {
+        Set<String> answer = new HashSet<>();
+        Set<Class<?>> providerClasses = reflection
+                .getExtendsClasses(EzyPackagesToScanProvider.class);
+        for (Class<?> clazz : providerClasses) {
+            EzyPackagesToScanProvider provider = 
+                    (EzyPackagesToScanProvider)EzyClasses.newInstance(clazz);
+            answer.addAll(provider.provide());
+        }
+        return answer;
+    }
 	
 	protected void addComponentClassesFromReflection(EzyReflection reflection) {
 		Set<Class> classes = new HashSet<>();
