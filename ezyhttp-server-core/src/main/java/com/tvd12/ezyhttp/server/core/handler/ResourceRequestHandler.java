@@ -14,9 +14,9 @@ import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyhttp.core.constant.ContentType;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 
 public class ResourceRequestHandler implements RequestHandler {
 	

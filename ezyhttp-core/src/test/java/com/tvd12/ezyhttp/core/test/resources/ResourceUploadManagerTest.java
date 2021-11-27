@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.resources;
+package com.tvd12.ezyhttp.core.test.resources;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -16,9 +16,9 @@ import java.util.concurrent.BlockingQueue;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
-import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
-import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
-import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
+import com.tvd12.ezyhttp.core.exception.MaxResourceUploadCapacity;
+import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
@@ -45,6 +45,7 @@ public class ResourceUploadManagerTest extends BaseTest {
 		byte[] outputBytes = outputStream.toByteArray();
 		Asserts.assertEquals(inputBytes, outputBytes);
 		sut.stop();
+		sut.destroy();
 	}
 	
 

@@ -3,8 +3,10 @@ package com.tvd12.ezyhttp.client.test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -452,6 +454,82 @@ public class HttpClientTest {
 		// then
 		Asserts.assertNull(actual);
 	}
+	
+	@Test
+    public void downloadToFileNotFoundTest() throws Exception {
+        // given
+        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/not-found-here";
+        
+        HttpClient sut = HttpClient.builder()
+                .build();
+        
+        // when
+        Throwable e = Asserts.assertThrows(
+                () -> sut.download(fileUrl, new File("test-output/no-commit"))
+        );
+        
+        // then
+        Asserts.assertEqualsType(e, HttpNotFoundException.class);
+    }
+    
+    @Test
+    public void downloadToOutputStreamNotFoundTest() throws Exception {
+        // given
+        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/not-found-here";
+        
+        HttpClient sut = HttpClient.builder()
+                .build();
+        
+        OutputStream outputStream = mock(OutputStream.class);
+        
+        // when
+        Throwable e = Asserts.assertThrows(
+                () -> sut.download(fileUrl, outputStream)
+        );
+        
+        // then
+        Asserts.assertEqualsType(e, HttpNotFoundException.class);
+    }
+    
+    @Test
+    public void getDownloadFileNameTest() {
+        // given
+        HttpClient sut = HttpClient.builder()
+                .build();
+        
+        String contentDisposition = "Content-Disposition: attachment; filename=\"filename.jpg\"";
+        
+        // when
+        String actual = MethodInvoker.create()
+                .object(sut)
+                .method("getDownloadFileName")
+                .param("fileUrl")
+                .param(contentDisposition)
+                .call();
+        
+        // then
+        Asserts.assertEquals(actual, "filename.jpg");
+    }
+    
+    @Test
+    public void getDownloadFileNameWithEmptyDispositionTest() {
+        // given
+        HttpClient sut = HttpClient.builder()
+                .build();
+        
+        String contentDisposition = "";
+        
+        // when
+        String actual = MethodInvoker.create()
+                .object(sut)
+                .method("getDownloadFileName")
+                .param("https://example.com/file.jpg")
+                .param(contentDisposition)
+                .call();
+        
+        // then
+        Asserts.assertEquals(actual, "file.jpg");
+    }
 	
 	@BeforeTest
 	public void setUp() {

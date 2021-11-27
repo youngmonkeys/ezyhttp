@@ -1,6 +1,8 @@
 package com.tvd12.ezyhttp.client;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -179,6 +181,29 @@ public class HttpClientProxy
 		if(!requestQueue.add(request))
 			throw new RequestQueueFullException(requestQueue.getCapacity());
 	}
+	
+	/**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(String fileURL, File storeLocation) throws IOException {
+        return client.download(fileURL, storeLocation);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(String fileURL, OutputStream outputStream) throws IOException {
+        client.download(fileURL, outputStream);
+    }
 	
 	public static Builder builder() {
 		return new Builder();

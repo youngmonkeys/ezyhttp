@@ -4,7 +4,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -17,6 +20,7 @@ import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyfox.exception.BadRequestException;
+import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.client.HttpClient;
@@ -484,6 +488,49 @@ public class HttpClientProxyTest {
 		sut.close();
 		sut.stop();
 	}
+	
+	@Test
+    public void downloadToFileTest() throws Exception {
+        // given
+	    String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/ezydata-1.1.0.pom";
+	    
+        HttpClientProxy sut = HttpClientProxy.builder()
+                .requestQueueCapacity(1)
+                .threadPoolSize(1)
+                .build();
+        
+        // when
+        String fileName = sut.download(fileUrl, new File("test-output/no-commit"));
+        
+        // then
+        Asserts.assertEquals(fileName, "ezydata-1.1.0.pom");
+        Asserts.assertTrue(new File("test-output/no-commit/ezydata-1.1.0.pom").exists());
+        sut.close();
+        sut.stop();
+    }
+	
+	@Test
+    public void downloadToOutputStreamTest() throws Exception {
+        // given
+        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/ezydata-1.1.0.pom";
+        
+        HttpClientProxy sut = HttpClientProxy.builder()
+                .requestQueueCapacity(1)
+                .threadPoolSize(1)
+                .build();
+        
+        File outFile = new File("test-output/no-commit/download-test.xml");
+        EzyFileUtil.createFileIfNotExists(outFile);
+        OutputStream outputStream = new FileOutputStream(outFile);
+        
+        // when
+        sut.download(fileUrl, outputStream);
+        
+        // then
+        Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
+        sut.close();
+        sut.stop();
+    }
 	
 	private HttpClientProxy newClientProxy() {
 		HttpClientProxy sut = HttpClientProxy.builder()

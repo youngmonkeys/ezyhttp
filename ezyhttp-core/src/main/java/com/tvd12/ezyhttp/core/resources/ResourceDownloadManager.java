@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.resources;
+package com.tvd12.ezyhttp.core.resources;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,10 +16,11 @@ import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
-import com.tvd12.ezyhttp.server.core.exception.MaxResourceUploadCapacity;
-import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.exception.MaxResourceDownloadCapacity;
 
-public class ResourceUploadManager
+import lombok.AllArgsConstructor;
+
+public class ResourceDownloadManager
 		extends EzyLoggable
 		implements EzyStoppable, EzyDestroyable {
 
@@ -36,9 +37,8 @@ public class ResourceUploadManager
 	public static final int DEFAULT_THREAD_POOL_SIZE = 16;
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 	public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
-	public static final long UNLIMIT_UPLOAD_SIZE = -1;
 	
-	public ResourceUploadManager() {
+	public ResourceDownloadManager() {
 		this(
 			DEFAULT_CAPACITY, 
 			DEFAULT_THREAD_POOL_SIZE, 
@@ -46,7 +46,7 @@ public class ResourceUploadManager
 		);
 	}
 	
-	public ResourceUploadManager(
+	public ResourceDownloadManager(
 			int capacity, 
 			int threadPoolSize, int bufferSize) {
 		this.capacity = capacity;
@@ -62,7 +62,7 @@ public class ResourceUploadManager
 		return new EzyThreadList(
 				threadPoolSize, 
 				() -> loop(), 
-				HttpThreadFactory.create("upload-manager"));
+				HttpThreadFactory.create("download-manager"));
 	}
 	
 	private void start(int threadPoolSize) {
@@ -74,9 +74,8 @@ public class ResourceUploadManager
 		byte[] buffer = new byte[bufferSize];
 		while(active) {
 		    Entry entry = null;
-            boolean done = true;
-            boolean isMaxUploaded = false;
-            Exception exception = null;
+		    boolean done = true;
+		    Exception exception = null;
 			try {
 				entry = queue.take();
 				if(entry == POISON) {
@@ -85,33 +84,24 @@ public class ResourceUploadManager
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				int read = inputStream.read(buffer);
-				if (entry.increaseUploadedSize(read)) {
-                    if(read > 0) {
-                        outputStream.write(buffer, 0, read);
-                        done = false;
-                    }
-				} else {
-				    isMaxUploaded = true;
-				}
+                if(read > 0) {
+                    outputStream.write(buffer, 0, read);
+                    done = false;
+                }
 			}
 			catch (Exception e) {
 			    exception = e;
-				logger.debug("upload error", e);
+				logger.debug("download error", e);
 			}
 			if (entry == null) {
 			    continue;
 			}
-			
-			if (isMaxUploaded) {
-			    exception = new MaxUploadSizeException(entry.maxUploadSize);
-			}
-
-            if(done) {
+			if(done) {
                 EzyFuture future = futureMap.removeFuture(entry);
                 if (future == null) {
                     continue;
                 }
-                if(exception != null) {
+                if (exception != null) {
                     future.setException(exception);
                 }
                 else {
@@ -124,50 +114,33 @@ public class ResourceUploadManager
 		}
 	}
 	
-	public void drain(
-        InputStream from, 
-        OutputStream to,
-        long maxUploadSize
-    ) throws Exception {
-	    Entry entry = new Entry(from, to, maxUploadSize);
-        EzyFuture future = new EzyFutureTask();
+	public void drain(InputStream from, OutputStream to) throws Exception {
+	    Entry entry = new Entry(from, to);
+	    EzyFuture future = new EzyFutureTask();
         drain(from, to, entry, future).get(DEFAULT_TIMEOUT);
 	}
 	
-	public void drain(InputStream from, OutputStream to) throws Exception {
-	    drain(from, to, UNLIMIT_UPLOAD_SIZE);
-	}
-	
 	public EzyFuture drainAsync(
-        InputStream from, 
-        OutputStream to,
-        long maxUploadSize,
-        EzyResultCallback<Boolean> callback
+	        InputStream from, 
+	        OutputStream to,
+	        EzyResultCallback<Boolean> callback
     ) {
-	    Entry entry = new Entry(from, to, maxUploadSize);
-        EzyFuture future = new EzyCallableFutureTask(callback);
+        Entry entry = new Entry(from, to);
+        EzyCallableFutureTask future = new EzyCallableFutureTask(callback);
         return drain(from, to, entry, future);
-	}
-	
-	public EzyFuture drainAsync(
-        InputStream from, 
-        OutputStream to,
-        EzyResultCallback<Boolean> callback
-    ) {
-	    return drainAsync(from, to, UNLIMIT_UPLOAD_SIZE, callback);
-	}
+    }
 	
 	private EzyFuture drain(
-        InputStream from, 
-        OutputStream to,
-        Entry entry,
-        EzyFuture future
+            InputStream from, 
+            OutputStream to,
+            Entry entry,
+            EzyFuture future
     ) {
         futureMap.addFuture(entry, future);
         boolean success = this.queue.offer(entry);
         if(!success) {
             futureMap.removeFuture(entry);
-            throw new MaxResourceUploadCapacity(capacity);
+            throw new MaxResourceDownloadCapacity(capacity);
         }
         return future;
     }
@@ -185,32 +158,13 @@ public class ResourceUploadManager
 		this.stop();
 	}
 
+	@AllArgsConstructor
 	private static class Entry {
 		private final InputStream inputStream;
 		private final OutputStream outputStream;
-		private final long maxUploadSize;
-		private long currentUploadedSize;
 		
 		public Entry() {
-			this(null, null, 0L);
-		}
-		
-		public Entry(
-	        InputStream inputStream,
-	        OutputStream outputStream,
-	        long maxUploadSize
-        ) {
-		    this.inputStream = inputStream;
-		    this.outputStream = outputStream;
-		    this.maxUploadSize = maxUploadSize;
-		}
-		
-		public boolean increaseUploadedSize(int uploadedSize) {
-		    this.currentUploadedSize += uploadedSize;
-		    if (maxUploadSize <= 0) {
-		        return true;
-		    }
-		    return currentUploadedSize <= maxUploadSize;
+			this(null, null);
 		}
 	}
 }

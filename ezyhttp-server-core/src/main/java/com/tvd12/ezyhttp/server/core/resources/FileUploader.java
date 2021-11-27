@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core.resources;
 
-import static com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
+import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,7 +17,8 @@ import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 
 import lombok.AllArgsConstructor;
 

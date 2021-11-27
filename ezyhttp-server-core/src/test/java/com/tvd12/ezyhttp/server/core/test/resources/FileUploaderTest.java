@@ -23,10 +23,10 @@ import org.testng.annotations.Test;
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.server.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.ezyhttp.server.core.resources.FileUploadCallback;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
-import com.tvd12.ezyhttp.server.core.resources.ResourceUploadManager;
 
 public class FileUploaderTest {
 

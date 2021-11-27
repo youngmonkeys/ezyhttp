@@ -10,11 +10,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
-import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;

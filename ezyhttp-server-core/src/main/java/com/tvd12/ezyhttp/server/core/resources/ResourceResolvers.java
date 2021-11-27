@@ -10,6 +10,8 @@ import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.RESOURCE_PATT
 import static com.tvd12.ezyhttp.server.core.resources.ResourceResolver.DEFAULT_RESOURCE_LOCATION;
 
 import com.tvd12.ezyfox.bean.EzyPropertyFetcher;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 
 public final class ResourceResolvers {
 

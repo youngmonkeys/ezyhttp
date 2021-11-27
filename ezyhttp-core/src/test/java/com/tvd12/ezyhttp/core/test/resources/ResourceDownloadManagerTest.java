@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.resources;
+package com.tvd12.ezyhttp.core.test.resources;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -16,8 +16,8 @@ import java.util.concurrent.BlockingQueue;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
-import com.tvd12.ezyhttp.server.core.exception.MaxResourceDownloadCapacity;
-import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
+import com.tvd12.ezyhttp.core.exception.MaxResourceDownloadCapacity;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
@@ -70,6 +70,7 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		sut.stop();
 		Asserts.assertEqualsType(throwable, IOException.class);
 		info("finish drainFailedDueToOutputStream");
+		sut.destroy();
 	}
 	
 	@Test

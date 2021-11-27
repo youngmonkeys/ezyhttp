@@ -1,11 +1,18 @@
 package com.tvd12.ezyhttp.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,6 +231,102 @@ public class HttpClient extends EzyLoggable {
 			throw new HttpInternalServerErrorException(body);
 		throw new HttpRequestException(statusCode, body);
 	}
+	
+	/**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(String fileURL, File storeLocation) throws IOException {
+        URL url = new URL(fileURL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            return download(connection, fileURL, storeLocation);
+        } finally {
+            connection.disconnect();
+        }
+    }
+    
+    private String download(
+        HttpURLConnection connection,
+        String fileURL,
+        File storeLocation
+    ) throws IOException {
+        int responseCode = connection.getResponseCode();
+        
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new HttpNotFoundException(Collections.singletonMap("file", "not found"));
+        }
+        String disposition = connection.getHeaderField("Content-Disposition");
+        String fileName = getDownloadFileName(fileURL, disposition);
+        Files.createDirectories(storeLocation.toPath());
+        File storeFile = Paths.get(storeLocation.toString(), fileName).toFile();
+        File downloadingFile = new File(storeFile + ".downloading");
+        Path downloadingFilePath = downloadingFile.toPath();
+        Files.deleteIfExists(downloadingFilePath);
+        Files.createFile(downloadingFilePath);
+         
+        try(InputStream inputStream = connection.getInputStream()) {
+            try (FileOutputStream outputStream = new FileOutputStream(downloadingFile)) {
+                int bytesRead;
+                byte[] buffer = new byte[1024];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        }
+        Files.move(downloadingFile.toPath(), storeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
+    
+    private String getDownloadFileName(String fileURL, String contentDisposition) {
+        if (contentDisposition != null) {
+            int index = contentDisposition.indexOf("filename=");
+            if (index > 0) {
+                return contentDisposition.substring(index + 10, contentDisposition.length() - 1);
+            }
+        }
+        return fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(String fileURL, OutputStream outputStream) throws IOException {
+        URL url = new URL(fileURL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            download(connection, outputStream);
+        } finally {
+            connection.disconnect();
+        }
+    }
+    
+    public void download(
+        HttpURLConnection connection,
+        OutputStream outputStream
+    ) throws IOException {
+        int responseCode = connection.getResponseCode();
+        
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new HttpNotFoundException(Collections.singletonMap("file", "not found"));
+        }
+         
+        try(InputStream inputStream = connection.getInputStream()) {
+            int bytesRead;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+    }
 	
 	public static Builder builder() {
 		return new Builder();
