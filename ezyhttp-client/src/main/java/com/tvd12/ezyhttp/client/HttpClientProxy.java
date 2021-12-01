@@ -191,7 +191,7 @@ public class HttpClientProxy
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(String fileURL, File storeLocation) throws IOException {
+    public String download(String fileURL, File storeLocation) throws Exception {
         return client.download(fileURL, storeLocation);
     }
     
@@ -203,7 +203,7 @@ public class HttpClientProxy
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(DownloadRequest request, File storeLocation) throws IOException {
+    public String download(DownloadRequest request, File storeLocation) throws Exception {
         return client.download(request, storeLocation);
     }
     
@@ -214,7 +214,7 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(String fileURL, OutputStream outputStream) throws IOException {
+    public void download(String fileURL, OutputStream outputStream) throws Exception {
         client.download(fileURL, outputStream);
     }
     
@@ -225,7 +225,7 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(DownloadRequest request, OutputStream outputStream) throws IOException {
+    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
         client.download(request, outputStream);
     }
 	

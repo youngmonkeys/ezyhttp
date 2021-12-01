@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,27 +209,31 @@ public class HttpClient extends EzyLoggable {
 		Object body = entity.getBody();
 		if(statusCode < 400)
 			return (T)body;
-		if(statusCode == StatusCodes.BAD_REQUEST)
-			throw new HttpBadRequestException(body);
-		if(statusCode == StatusCodes.NOT_FOUND)
-			throw new HttpNotFoundException(body);
-		if(statusCode == StatusCodes.UNAUTHORIZED)
-			throw new HttpUnauthorizedException(body);
-		if(statusCode == StatusCodes.FORBIDDEN)
-			throw new HttpForbiddenException(body);
-		if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
-			throw new HttpMethodNotAllowedException(body);
-		if(statusCode == StatusCodes.NOT_ACCEPTABLE)
-			throw new HttpNotAcceptableException(body);
-		if(statusCode == StatusCodes.REQUEST_TIMEOUT)
-			throw new HttpRequestTimeoutException(body);
-		if(statusCode == StatusCodes.CONFLICT)
-			throw new HttpConflictException(body);
-		if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
-			throw new HttpUnsupportedMediaTypeException(body);
-		if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
-			throw new HttpInternalServerErrorException(body);
-		throw new HttpRequestException(statusCode, body);
+		throw translateErrorCode(statusCode, body);
+	}
+	
+	private Exception translateErrorCode(int statusCode, Object body) {
+	    if(statusCode == StatusCodes.BAD_REQUEST)
+            return new HttpBadRequestException(body);
+        if(statusCode == StatusCodes.NOT_FOUND)
+            return new HttpNotFoundException(body);
+        if(statusCode == StatusCodes.UNAUTHORIZED)
+            return new HttpUnauthorizedException(body);
+        if(statusCode == StatusCodes.FORBIDDEN)
+            return new HttpForbiddenException(body);
+        if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
+            return new HttpMethodNotAllowedException(body);
+        if(statusCode == StatusCodes.NOT_ACCEPTABLE)
+            return new HttpNotAcceptableException(body);
+        if(statusCode == StatusCodes.REQUEST_TIMEOUT)
+            return new HttpRequestTimeoutException(body);
+        if(statusCode == StatusCodes.CONFLICT)
+            return new HttpConflictException(body);
+        if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
+            return new HttpUnsupportedMediaTypeException(body);
+        if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
+            return new HttpInternalServerErrorException(body);
+        return new HttpRequestException(statusCode, body);
 	}
 	
 	/**
@@ -241,7 +244,7 @@ public class HttpClient extends EzyLoggable {
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(String fileURL, File storeLocation) throws IOException {
+    public String download(String fileURL, File storeLocation) throws Exception {
         return download(new DownloadRequest(fileURL), storeLocation);
     }
     
@@ -253,12 +256,12 @@ public class HttpClient extends EzyLoggable {
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(DownloadRequest request, File storeLocation) throws IOException {
+    public String download(DownloadRequest request, File storeLocation) throws Exception {
         String fileURL = request.getFileURL();
-        URL url = new URL(fileURL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = connect(fileURL);
         try {
             decoratConnection(connection, request);
+            connection.connect();
             return download(connection, fileURL, storeLocation);
         } finally {
             connection.disconnect();
@@ -269,11 +272,11 @@ public class HttpClient extends EzyLoggable {
         HttpURLConnection connection,
         String fileURL,
         File storeLocation
-    ) throws IOException {
+    ) throws Exception {
         int responseCode = connection.getResponseCode();
         
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new HttpNotFoundException(Collections.singletonMap("file", "not found"));
+        if (responseCode >= 400) {
+            throw processDownloadError(connection, fileURL, responseCode);
         }
         String disposition = connection.getHeaderField("Content-Disposition");
         String fileName = getDownloadFileName(fileURL, disposition);
@@ -297,6 +300,7 @@ public class HttpClient extends EzyLoggable {
         return fileName;
     }
     
+    
     private String getDownloadFileName(String fileURL, String contentDisposition) {
         if (contentDisposition != null) {
             int index = contentDisposition.indexOf("filename=");
@@ -314,7 +318,7 @@ public class HttpClient extends EzyLoggable {
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(String fileURL, OutputStream outputStream) throws IOException {
+    public void download(String fileURL, OutputStream outputStream) throws Exception {
         download(new DownloadRequest(fileURL), outputStream);
     }
     
@@ -325,13 +329,13 @@ public class HttpClient extends EzyLoggable {
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(DownloadRequest request, OutputStream outputStream) throws IOException {
+    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
         String fileURL = request.getFileURL();
-        URL url = new URL(fileURL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = connect(fileURL);
         try {
             decoratConnection(connection, request);
-            download(connection, outputStream);
+            connection.connect();
+            download(connection, fileURL, outputStream);
         } finally {
             connection.disconnect();
         }
@@ -339,12 +343,13 @@ public class HttpClient extends EzyLoggable {
     
     private void download(
         HttpURLConnection connection,
+        String fileURL,
         OutputStream outputStream
-    ) throws IOException {
+    ) throws Exception {
         int responseCode = connection.getResponseCode();
         
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new HttpNotFoundException(Collections.singletonMap("file", "not found"));
+        if (responseCode >= 400) {
+            throw processDownloadError(connection, fileURL, responseCode);
         }
          
         try(InputStream inputStream = connection.getInputStream()) {
@@ -371,6 +376,26 @@ public class HttpClient extends EzyLoggable {
                 connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
             }
         }
+    }
+    
+    private Exception processDownloadError(
+        HttpURLConnection connection,
+        String fileURL,
+        int responseCode
+    ) throws Exception {
+        InputStream inputStream = connection.getErrorStream();
+        Object responseBody = "";
+        if(inputStream != null) {
+            try {
+                int contentLength = connection.getContentLength();
+                responseBody = deserializeResponseBody(null, contentLength, inputStream, null);
+            }
+            finally {
+                inputStream.close();
+            }
+        }
+        logger.debug("download error: {} - {} - {}", fileURL, responseCode, responseBody);
+        return translateErrorCode(responseCode, responseBody);
     }
 	
 	public static Builder builder() {
