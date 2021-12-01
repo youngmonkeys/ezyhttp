@@ -22,6 +22,7 @@ import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestQueue;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
@@ -195,6 +196,18 @@ public class HttpClientProxy
     }
     
     /**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param request the request of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(DownloadRequest request, File storeLocation) throws IOException {
+        return client.download(request, storeLocation);
+    }
+    
+    /**
      * Downloads a file from a URL and store to an output stream
      * 
      * @param fileURL HTTP URL of the file to be download
@@ -203,6 +216,17 @@ public class HttpClientProxy
      */
     public void download(String fileURL, OutputStream outputStream) throws IOException {
         client.download(fileURL, outputStream);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param request the request of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(DownloadRequest request, OutputStream outputStream) throws IOException {
+        client.download(request, outputStream);
     }
 	
 	public static Builder builder() {

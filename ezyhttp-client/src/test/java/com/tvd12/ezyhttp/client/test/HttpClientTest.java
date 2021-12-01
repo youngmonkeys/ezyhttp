@@ -458,7 +458,7 @@ public class HttpClientTest {
 	@Test
     public void downloadToFileNotFoundTest() throws Exception {
         // given
-        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/not-found-here";
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
         
         HttpClient sut = HttpClient.builder()
                 .build();
@@ -475,7 +475,7 @@ public class HttpClientTest {
     @Test
     public void downloadToOutputStreamNotFoundTest() throws Exception {
         // given
-        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/not-found-here";
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
         
         HttpClient sut = HttpClient.builder()
                 .build();

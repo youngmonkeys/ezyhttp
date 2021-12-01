@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
@@ -241,9 +242,23 @@ public class HttpClient extends EzyLoggable {
      * @return the downloaded file name
      */
     public String download(String fileURL, File storeLocation) throws IOException {
+        return download(new DownloadRequest(fileURL), storeLocation);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param request the request of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(DownloadRequest request, File storeLocation) throws IOException {
+        String fileURL = request.getFileURL();
         URL url = new URL(fileURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         try {
+            decoratConnection(connection, request);
             return download(connection, fileURL, storeLocation);
         } finally {
             connection.disconnect();
@@ -300,16 +315,29 @@ public class HttpClient extends EzyLoggable {
      * @throws IOException when there is any I/O error
      */
     public void download(String fileURL, OutputStream outputStream) throws IOException {
+        download(new DownloadRequest(fileURL), outputStream);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param request the request of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(DownloadRequest request, OutputStream outputStream) throws IOException {
+        String fileURL = request.getFileURL();
         URL url = new URL(fileURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         try {
+            decoratConnection(connection, request);
             download(connection, outputStream);
         } finally {
             connection.disconnect();
         }
     }
     
-    public void download(
+    private void download(
         HttpURLConnection connection,
         OutputStream outputStream
     ) throws IOException {
@@ -324,6 +352,23 @@ public class HttpClient extends EzyLoggable {
             byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+    
+    private void decoratConnection(
+        HttpURLConnection connection, 
+        DownloadRequest request
+    ) throws IOException {
+        int connectTimeout = request.getReadTimeout();
+        int readTimeout = request.getReadTimeout();
+        connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
+        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
+        MultiValueMap requestHeaders = request.getHeaders();
+        if(requestHeaders != null) {
+            Map<String, String> encodedHeaders = requestHeaders.toMap();
+            for(Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+                connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
             }
         }
     }

@@ -29,6 +29,7 @@ import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
 import com.tvd12.ezyhttp.client.request.DeleteRequest;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.GetRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.PutRequest;
@@ -41,6 +42,7 @@ import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.codec.BodyConverter;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
@@ -492,7 +494,7 @@ public class HttpClientProxyTest {
 	@Test
     public void downloadToFileTest() throws Exception {
         // given
-	    String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/ezydata-1.1.0.pom";
+	    String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
 	    
         HttpClientProxy sut = HttpClientProxy.builder()
                 .requestQueueCapacity(1)
@@ -503,8 +505,37 @@ public class HttpClientProxyTest {
         String fileName = sut.download(fileUrl, new File("test-output/no-commit"));
         
         // then
-        Asserts.assertEquals(fileName, "ezydata-1.1.0.pom");
-        Asserts.assertTrue(new File("test-output/no-commit/ezydata-1.1.0.pom").exists());
+        Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
+        sut.close();
+        sut.stop();
+    }
+	
+	@Test
+    public void downloadToFileByRequestTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        DownloadRequest request = new DownloadRequest()
+            .setFileURL(fileUrl)
+            .setConnectTimeout(5000)
+            .setReadTimeout(5000)
+            .setHeaders(
+                MultiValueMap.builder()
+                    .setValue("hello", "world")
+                    .build()
+            );
+        
+        HttpClientProxy sut = HttpClientProxy.builder()
+                .requestQueueCapacity(1)
+                .threadPoolSize(1)
+                .build();
+        
+        // when
+        String fileName = sut.download(request, new File("test-output/no-commit"));
+        
+        // then
+        Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
         sut.close();
         sut.stop();
     }
@@ -512,7 +543,7 @@ public class HttpClientProxyTest {
 	@Test
     public void downloadToOutputStreamTest() throws Exception {
         // given
-        String fileUrl = "https://repo1.maven.org/maven2/com/tvd12/ezydata/1.1.0/ezydata-1.1.0.pom";
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
         
         HttpClientProxy sut = HttpClientProxy.builder()
                 .requestQueueCapacity(1)
@@ -525,6 +556,38 @@ public class HttpClientProxyTest {
         
         // when
         sut.download(fileUrl, outputStream);
+        
+        // then
+        Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
+        sut.close();
+        sut.stop();
+    }
+	
+	@Test
+    public void downloadToOutputStreamByRequestTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        DownloadRequest request = new DownloadRequest()
+            .setFileURL(fileUrl)
+            .setConnectTimeout(5000)
+            .setReadTimeout(5000)
+            .setHeaders(
+                MultiValueMap.builder()
+                    .setValue("hello", "world")
+                    .build()
+            );
+        
+        HttpClientProxy sut = HttpClientProxy.builder()
+                .requestQueueCapacity(1)
+                .threadPoolSize(1)
+                .build();
+        
+        File outFile = new File("test-output/no-commit/download-test.xml");
+        EzyFileUtil.createFileIfNotExists(outFile);
+        OutputStream outputStream = new FileOutputStream(outFile);
+        
+        // when
+        sut.download(request, outputStream);
         
         // then
         Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());

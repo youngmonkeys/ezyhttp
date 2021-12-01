@@ -69,5 +69,4 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 		this.responseTypes.put(statusCode, responseType);
 		return (R)this;
 	}
-	
 }
