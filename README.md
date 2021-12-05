@@ -1,4 +1,4 @@
-# ezyhttp <img src="https://github.com/youngmonkeys/ezydata/blob/master/logo.png" width="72" />
+# ezyhttp <img src="https://github.com/youngmonkeys/ezyhttp/blob/master/logo.png" width="72" />
 
 # Documentation
 
