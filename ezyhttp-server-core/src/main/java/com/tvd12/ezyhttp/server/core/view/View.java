@@ -14,12 +14,14 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class View {
 
+    @Setter
+    private Locale locale;
 	private final String template;
-	private final Locale locale;
 	private final String contentType;
 	private final List<Cookie> cookies;
 	private final Map<String, String> headers;

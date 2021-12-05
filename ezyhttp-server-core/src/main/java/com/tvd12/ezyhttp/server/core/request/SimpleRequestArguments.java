@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.PathVariables;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +30,10 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Getter
 	protected HttpMethod method;
 	@Setter
+	@Getter
 	protected String uriTemplate;
+	@Setter
+	protected ObjectMapper objectMapper;
 	@Getter
 	protected HttpServletRequest request;
 	@Getter
@@ -40,6 +47,8 @@ public class SimpleRequestArguments implements RequestArguments {
 	protected List<Entry<String, String>> pathVariableList;
 	protected Cookie[] cookies;
 	protected Map<String, Cookie> cookieMap;
+	@Getter
+	protected Map<String, Object> redirectionAttributes;
 	
 	@Override
 	public <T> T getArgument(Object key) {
@@ -79,11 +88,19 @@ public class SimpleRequestArguments implements RequestArguments {
 		return parameterMap;
 	}
 	
-	public void setParameter(String name, String value) {
-		if(parameterList == null)
+	public void setParameter(String name, String[] values) {
+	    if (values == null) {
+	        return;
+	    }
+		if (parameterList == null) {
 			parameterList = new ArrayList<>();
-		if(parameterMap == null)
+		}
+		if (parameterMap == null) {
 			parameterMap = new HashMap<>();
+		}
+		String value = values.length == 0 
+	        ? "" 
+            : values.length == 1 ? values[0] : String.join(",", values);
 		parameterList.add(value);
 		parameterMap.put(name, value);
 	}
@@ -133,7 +150,10 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	protected void fetchPathVariables() {
 		if(pathVariableList == null) {
-			pathVariableList = PathVariables.getVariables(uriTemplate, request.getRequestURI());
+			pathVariableList = PathVariables.getVariables(
+		        uriTemplate, 
+		        request.getRequestURI()
+	        );
 			pathVariableMap = new HashMap<>();
 			for(Entry<String, String> entry : pathVariableList)
 				pathVariableMap.put(entry.getKey(), entry.getValue());
@@ -199,6 +219,46 @@ public class SimpleRequestArguments implements RequestArguments {
 		return cookie != null ? cookie.getValue() : null;
 	}
 	
+	public void setRedirectionAttributesFromCookie() {
+	    Cookie cookie = getCookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME);
+	    if (cookie == null) {
+	        return;
+	    }
+	    try {
+	        String value = EzyBase64.decodeUtf(cookie.getValue());
+            this.redirectionAttributes = objectMapper.readValue(value, Map.class);
+        } catch (Exception e) {
+            // do nothing
+        }
+	    Cookie newCookie = new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "");
+        newCookie.setMaxAge(0);
+        response.addCookie(newCookie);
+    }
+	
+	@Override
+	public <T> T getRedirectionAttribute(String name) {
+	    if (redirectionAttributes == null) {
+	        return null;
+	    }
+	    return (T)redirectionAttributes.get(name);
+	}
+	
+	@Override
+	public <T> T getRedirectionAttribute(String name, Class<T> outType) {
+	    Object value = getRedirectionAttribute(name);
+	    return value != null ? objectMapper.convertValue(value, outType) : null;
+	}
+	
+	@Override
+	public AsyncContext getAsynContext() {
+	    return request.getAsyncContext();
+	}
+	
+	@Override
+	public boolean isAsyncStarted() {
+	    return request.isAsyncStarted();
+	}
+	
 	@Override
 	public void release() {
 		if(arguments != null)
@@ -211,11 +271,26 @@ public class SimpleRequestArguments implements RequestArguments {
 			parameterList.clear();
 		if(parameterMap != null)
 			parameterMap.clear();
+		if (cookieMap != null)
+		    cookieMap.clear();
+		if (pathVariableList != null)
+		    pathVariableList.clear();
+		if (pathVariableMap != null)
+		    pathVariableMap.clear();
+		if (redirectionAttributes != null)
+		    redirectionAttributes.clear();
 		this.arguments = null;
 		this.headerList = null;
 		this.headerMap = null;
 		this.parameterList = null;
 		this.parameterMap = null;
 		this.cookies = null;
+		this.cookieMap = null;
+		this.pathVariableList = null;
+        this.pathVariableMap = null;
+		this.request = null;
+		this.response = null;
+		this.objectMapper = null;
+		this.redirectionAttributes = null;
 	}
 }

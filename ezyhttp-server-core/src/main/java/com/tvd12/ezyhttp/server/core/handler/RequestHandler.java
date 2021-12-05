@@ -20,6 +20,10 @@ public interface RequestHandler {
 		return EzyMethods.getMethod(getClass(), "handle", RequestArguments.class);
 	}
 
+	default boolean isAsync() {
+	    return false;
+	}
+	
 	HttpMethod getMethod();
 	
 	String getRequestURI();

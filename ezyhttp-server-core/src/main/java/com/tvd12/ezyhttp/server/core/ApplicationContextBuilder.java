@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.annotation.EzyPackagesToScan;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
+import com.tvd12.ezyfox.bean.EzyPackagesToScanProvider;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.bean.impl.EzyBeanKey;
 import com.tvd12.ezyfox.bean.impl.EzyBeanNameParser;
@@ -30,6 +31,7 @@ import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.core.annotation.StringConvert;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
 import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
@@ -42,8 +44,11 @@ import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
+import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ControllerManager;
@@ -52,14 +57,17 @@ import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.ezyhttp.server.core.resources.Resource;
-import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
+import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
+import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
+import com.tvd12.ezyhttp.server.core.view.ViewDialect;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
@@ -228,6 +236,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		allPackageToScans.addAll(packageToScans);
 		EzyReflection reflection = EzyPackages.scanPackages(allPackageToScans);
 		addComponentClassesFromReflection(reflection);
+		allPackageToScans.addAll(packageToScans);
+		allPackageToScans.addAll(getPackagesToScanFromProviders(reflection));
+		reflection = EzyPackages.scanPackages(allPackageToScans);
 		Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
 		Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
 		Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
@@ -248,14 +259,30 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				.addSingletonClasses(bootstrapClasses)
 				.propertiesMap(propertiesMap)
 				.addSingleton("systemObjectMapper", objectMapper)
+				.addSingleton("componentManager", componentManager)
+				.addSingleton("requestHandlerManager", requestHandlerManager)
+				.addSingleton("requestURIManager", requestHandlerManager.getRequestURIManager())
 				.addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
 				.build();
+		setComponentProperties(beanContext);
 		registerComponents(beanContext);
 		addRequestHandlers(beanContext);
 		addResourceRequestHandlers(beanContext);
 		addExceptionHandlers();
 		return beanContext;
 	}
+	
+	private Set<String> getPackagesToScanFromProviders(EzyReflection reflection) {
+        Set<String> answer = new HashSet<>();
+        Set<Class<?>> providerClasses = reflection
+                .getExtendsClasses(EzyPackagesToScanProvider.class);
+        for (Class<?> clazz : providerClasses) {
+            EzyPackagesToScanProvider provider = 
+                    (EzyPackagesToScanProvider)EzyClasses.newInstance(clazz);
+            answer.addAll(provider.provide());
+        }
+        return answer;
+    }
 	
 	protected void addComponentClassesFromReflection(EzyReflection reflection) {
 		Set<Class> classes = new HashSet<>();
@@ -298,6 +325,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return answer;
 	}
 	
+	protected void setComponentProperties(EzyBeanContext beanContext) {
+	    requestHandlerManager.setAllowOverrideURI(
+            beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
+        );
+	}
+	
 	protected void registerComponents(EzyBeanContext beanContext) {
 		Set controllers = new HashSet<>();
 		controllers.addAll(beanContext.getSingletons(Controller.class));
@@ -311,16 +344,25 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		List bodyConverters = beanContext.getSingletons(BodyConvert.class);
 		dataConverters.addBodyConverters(bodyConverters);
 		List stringConverters = beanContext.getSingletons(StringConvert.class);
+		List uncaughtErrorHandlers = beanContext.getSingletonsOf(UnhandledErrorHandler.class);
+		List requestResponseWathcers = beanContext.getSingletonsOf(RequestResponseWatcher.class);
 		dataConverters.setStringConverters(stringConverters);
 		componentManager.setViewContext(buildViewContext(beanContext));
 		componentManager.setServerPort(getServerPort(beanContext));
+		componentManager.setExposeMangementURIs(isExposeManagementURIs(beanContext));
 		componentManager.setManagmentPort(getManagementPort(beanContext));
-		componentManager.setManagementURIs(getManagementURIs(beanContext));
+		componentManager.addManagementURIs(getManagementURIs(beanContext));
+		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
+		componentManager.addRequestResponseWatchers(requestResponseWathcers);
 	}
 	
 	private int getServerPort(EzyBeanContext beanContext) {
 		return beanContext.getProperty(PropertyNames.SERVER_PORT, int.class, 0);
 	}
+	
+	private boolean isExposeManagementURIs(EzyBeanContext beanContext) {
+        return beanContext.getProperty(PropertyNames.MANAGEMENT_URIS_EXPOSE, boolean.class, false);
+    }
 	
 	private int getManagementPort(EzyBeanContext beanContext) {
 		boolean managementEnable = beanContext.getProperty(
@@ -345,9 +387,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
 			if(viewContextBuilder != null) {
 				TemplateResolver templateResolver = beanContext.getSingleton(TemplateResolver.class);
-				if(templateResolver == null)
+				if(templateResolver == null) {
 					templateResolver = TemplateResolver.of(beanContext);
-				viewContext = viewContextBuilder.templateResolver(templateResolver).build();
+				}
+				viewContext = viewContextBuilder
+			        .templateResolver(templateResolver)
+			        .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
+			        .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
+			        .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
+			        .absentMessageResolver(beanContext.getSingleton(AbsentMessageResolver.class))
+			        .build();
 			}
 		}
 		if(viewContext != null)
@@ -358,7 +407,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected void addRequestHandlers(EzyBeanContext beanContext) {
 		List<Object> controllerList = controllerManager.getControllers();
 		RequestHandlersImplementer implementer = newRequestHandlersImplementer();
-		Map<RequestURI, RequestHandler> requestHandlers = implementer.implement(controllerList);
+		implementer.setRequestURIDecorator(beanContext.getSingleton(RequestURIDecorator.class));
+		Map<RequestURI, List<RequestHandler>> requestHandlers = 
+		        implementer.implement(controllerList);
+		componentManager.appendManagementURIs(requestHandlers.keySet());
 		requestHandlerManager.addHandlers(requestHandlers);
 	}
 	
@@ -366,11 +418,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		ResourceResolver resourceResolver = getResourceResolver(beanContext);
 		if(resourceResolver == null)
 			return;
-		ResourceDownloadManager downloadManager = getResourceDownloadManager(beanContext);
+		ResourceDownloadManager downloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
 		Map<String, Resource> resources = resourceResolver.getResources();
 		for(String resourceURI : resources.keySet()) {
 			Resource resource = resources.get(resourceURI);
-			RequestURI requestURI = new RequestURI(HttpMethod.GET, resourceURI);
+			RequestURI requestURI = new RequestURI(
+			        HttpMethod.GET, 
+			        resourceURI, 
+			        false,
+			        true,
+			        resource.getFullPath());
 			RequestHandler requestHandler = new ResourceRequestHandler(
 					resource.getPath(), 
 					resource.getUri(),
@@ -389,16 +446,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 				beanContext.getSingletonFactory().addSingleton(resourceResolver);
 		}
 		return resourceResolver;
-	}
-	
-	protected ResourceDownloadManager getResourceDownloadManager(EzyBeanContext beanContext) {
-		ResourceDownloadManager resourceDownloadManager = 
-				(ResourceDownloadManager)beanContext.getSingleton(ResourceDownloadManager.class);
-		if(resourceDownloadManager == null) {
-			resourceDownloadManager = ResourceResolvers.createDownloadManager(beanContext);
-			beanContext.getSingletonFactory().addSingleton(resourceDownloadManager);
-		}
-		return resourceDownloadManager;
 	}
 	
 	protected void addExceptionHandlers() {

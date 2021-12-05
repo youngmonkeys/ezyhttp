@@ -10,11 +10,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
+import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
-import com.tvd12.ezyhttp.server.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
@@ -48,7 +48,7 @@ public class EzyHttpApplicationTest {
 		Asserts.assertNotNull(userService);
 		Asserts.assertNotNull(viewContextBuilder);
 		Asserts.assertNotNull(resourceDownloadManager);
-		Asserts.assertEquals(6, resourceResolver.getResources().size());
+		Asserts.assertEquals(4, resourceResolver.getResources().size());
 		sut.stop();
 	}
 	
@@ -77,7 +77,7 @@ public class EzyHttpApplicationTest {
 		Asserts.assertNotNull(userService);
 		Asserts.assertNotNull(viewContextBuilder);
 		Asserts.assertNotNull(resourceDownloadManager);
-		Asserts.assertEquals(6, resourceResolver.getResources().size());
+		Asserts.assertEquals(4, resourceResolver.getResources().size());
 		Asserts.assertFalse(bootstraps.isEmpty());
 		sut.stop();
 	}

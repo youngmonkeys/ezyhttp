@@ -8,11 +8,15 @@ public final class RequestCookieAnnotations {
 	private RequestCookieAnnotations() {}
 	
 	public static String getCookieKeyString(RequestCookie annotation, int index) {
-		String keyString = annotation.value();
-		if(EzyStrings.isNoContent(keyString))
+	    String keyString = annotation.value();
+        if (EzyStrings.isNoContent(keyString)) {
+            keyString = annotation.name();
+        }
+		if(EzyStrings.isNoContent(keyString)) {
 			keyString = String.valueOf(index);
-		else
+		} else {
 			keyString = EzyStrings.quote(keyString);
+		}
 		return keyString;
 	}
 	

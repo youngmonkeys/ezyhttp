@@ -180,4 +180,14 @@ public class ResponseEntityTest {
 		Asserts.assertNull(sut.getHeader("nothing"));
 		System.out.println(sut);
 	}
+	
+	@Test
+    public void noContentTest() {
+        // given
+        // when
+        ResponseEntity sut = ResponseEntity.noContent();
+        
+        // then
+        Asserts.assertEquals(StatusCodes.NO_CONTENT, sut.getStatus());
+    }
 }

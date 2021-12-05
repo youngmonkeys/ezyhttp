@@ -16,5 +16,4 @@ public interface RequestInterceptor {
 	default void postHandle(
 			RequestArguments arguments, Method handler) {
 	}
-	
 }

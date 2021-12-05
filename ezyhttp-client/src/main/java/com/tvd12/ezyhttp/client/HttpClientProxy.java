@@ -1,6 +1,8 @@
 package com.tvd12.ezyhttp.client;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +22,7 @@ import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestQueue;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
@@ -179,6 +182,52 @@ public class HttpClientProxy
 		if(!requestQueue.add(request))
 			throw new RequestQueueFullException(requestQueue.getCapacity());
 	}
+	
+	/**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(String fileURL, File storeLocation) throws Exception {
+        return client.download(fileURL, storeLocation);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param request the request of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(DownloadRequest request, File storeLocation) throws Exception {
+        return client.download(request, storeLocation);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(String fileURL, OutputStream outputStream) throws Exception {
+        client.download(fileURL, outputStream);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param request the request of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
+        client.download(request, outputStream);
+    }
 	
 	public static Builder builder() {
 		return new Builder();

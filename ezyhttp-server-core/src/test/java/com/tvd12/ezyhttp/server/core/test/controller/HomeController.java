@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
@@ -22,6 +23,7 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
 import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 
+@Authenticated
 @Controller("/api")
 public class HomeController {
 

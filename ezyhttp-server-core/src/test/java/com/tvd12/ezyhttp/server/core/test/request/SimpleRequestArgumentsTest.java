@@ -5,8 +5,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -14,9 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.test.assertion.Asserts;
 
@@ -36,6 +43,9 @@ public class SimpleRequestArgumentsTest {
 		when(servletRequest.getRequestURI()).thenReturn("/");
 		when(servletRequest.getContentType()).thenReturn(ContentTypes.TEXT_HTML_UTF8);
 		sut.setRequest(servletRequest);
+		
+		AsyncContext asyncContext = mock(AsyncContext.class);
+		when(servletRequest.getAsyncContext()).thenReturn(asyncContext);
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		sut.setResponse(servletResponse);
@@ -60,6 +70,9 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookieValue(0));
 		Asserts.assertNull(sut.getCookieValue("unknown"));
 		Asserts.assertEquals(HttpMethod.HEAD, sut.getMethod());
+		Asserts.assertEquals(sut.getAsynContext(), asyncContext);
+		Asserts.assertFalse(sut.isAsyncStarted());
+		Asserts.assertEquals(sut.getUriTemplate(), "/");
 		
 		verify(servletRequest, times(1)).getRequestURI();
 		verify(servletRequest, times(1)).getInputStream();
@@ -82,8 +95,8 @@ public class SimpleRequestArgumentsTest {
 	public void parameterTest() {
 		// given
 		SimpleRequestArguments sut = new SimpleRequestArguments();
-		sut.setParameter("hello", "world");
-		sut.setParameter("foo", "bar");
+		sut.setParameter("hello", new String[] {"world"});
+		sut.setParameter("foo", new String[] {"bar"});
 		
 		// when
 		String paramOverSize = sut.getParameter(3);
@@ -187,4 +200,124 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookie("unknown"));
 		sut.release();
 	}
+	
+	@Test
+	public void getByDefaultTest() {
+	 // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        
+        // when
+        // then
+        Asserts.assertEquals("paramValue", sut.getParameter(1, "paramValue"));
+        Asserts.assertEquals("paramValue", sut.getParameter("key", "paramValue"));
+        Asserts.assertEquals("headerValue", sut.getHeader(1, "headerValue"));
+        Asserts.assertEquals("headerValue", sut.getHeader("key", "headerValue"));
+        Asserts.assertEquals("cookieValue", sut.getCookieValue(1, "cookieValue"));
+        Asserts.assertEquals("cookieValue", sut.getCookieValue("key", "cookieValue"));
+        sut.release();
+	}
+	
+	@Test
+    public void getByDefaultButNotNullTest() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", new String[] {"paramValue0"});
+        sut.setHeader("key", "headerValue0");
+        sut.setCookies(new Cookie[] { new Cookie("key", "cookieValue0") });
+        
+        // when
+        // then
+        Asserts.assertEquals("paramValue0", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("paramValue0", sut.getParameter("key", "paramValue"));
+        Asserts.assertEquals("headerValue0", sut.getHeader(0, "headerValue"));
+        Asserts.assertEquals("headerValue0", sut.getHeader("key", "headerValue"));
+        Asserts.assertEquals("cookieValue0", sut.getCookieValue(0, "cookieValue"));
+        Asserts.assertEquals("cookieValue0", sut.getCookieValue("key", "cookieValue"));
+        sut.release();
+    }
+	
+	@Test
+    public void setParameterEmpty() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", new String[0]);
+        
+        // when
+        // then
+        Asserts.assertEquals("", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("", sut.getParameter("key", "paramValue"));
+        sut.release();
+    }
+	
+	@Test
+    public void setParameterMulti() {
+     // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setParameter("key", new String[] { "a", "b" });
+        
+        // when
+        // then
+        Asserts.assertEquals("a,b", sut.getParameter(0, "paramValue"));
+        Asserts.assertEquals("a,b", sut.getParameter("key", "paramValue"));
+        sut.release();
+    }
+	
+	@Test
+	public void setRedirectionAttributesFromCookieTest() throws IOException {
+	    // given
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    SimpleRequestArguments sut = new SimpleRequestArguments();
+	    sut.setObjectMapper(objectMapper);
+	    sut.setResponse(mock(HttpServletResponse.class));
+	    
+	    Map<String, Map<String, Object>> data = new HashMap<>();
+	    data.put("hello", Collections.singletonMap("foo", true));
+	    data.put("world", Collections.singletonMap("bar", 10));
+	    
+	    String dataString = EzyBase64.encodeUtf(
+            objectMapper.writeValueAsString(data)
+        );
+	    
+	    Cookie cookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            dataString
+        );
+	    sut.setCookies(new Cookie[] { cookie });
+	    
+	    // when
+	    sut.setRedirectionAttributesFromCookie();
+	    
+	    // then
+	    Map<String, Object> actualAttributes = sut.getRedirectionAttributes();
+	    Asserts.assertEquals(actualAttributes, data, false);
+	    Asserts.assertEquals(sut.getRedirectionAttribute("hello"), data.get("hello"), false);
+	    Asserts.assertEquals(sut.getRedirectionAttribute("world", Map.class), data.get("world"), false);
+	    sut.release();
+	}
+	
+	@Test
+    public void setRedirectionAttributesFromCookieExceptionTest() throws IOException {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setObjectMapper(objectMapper);
+        sut.setResponse(mock(HttpServletResponse.class));
+        
+        String dataString = EzyBase64.encodeUtf("hello world");
+        
+        Cookie cookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            dataString
+        );
+        sut.setCookies(new Cookie[] { cookie });
+        
+        // when
+        sut.setRedirectionAttributesFromCookie();
+        
+        // then
+        Map<String, Object> actualAttributes = sut.getRedirectionAttributes();
+        Asserts.assertNull(actualAttributes);
+        Asserts.assertNull(sut.getRedirectionAttribute("hello"));
+        Asserts.assertNull(sut.getRedirectionAttribute("hello", Map.class));
+    }
 }

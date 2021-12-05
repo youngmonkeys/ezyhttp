@@ -3,6 +3,8 @@ package com.tvd12.ezyhttp.server.core.handler;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import javax.servlet.AsyncContext;
+
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.codec.StringDeserializer;
@@ -33,12 +35,20 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	}
 	
 	@Override
-	public Object handle(RequestArguments arguments) throws Exception {
+	public final Object handle(RequestArguments arguments) throws Exception {
 		try {
 			return handleRequest(arguments);
 		}
 		catch (Exception e) {
-			return handleException(arguments, e);
+			try {
+			    return handleException(arguments, e);
+			}
+			finally {
+                if (arguments.isAsyncStarted()) {
+                    AsyncContext asynContext = arguments.getAsynContext();
+                    asynContext.complete();
+                }
+            }
 		}
 	}
 	

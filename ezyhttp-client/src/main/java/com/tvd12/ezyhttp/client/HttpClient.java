@@ -1,10 +1,16 @@
 package com.tvd12.ezyhttp.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +20,7 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
@@ -202,28 +209,194 @@ public class HttpClient extends EzyLoggable {
 		Object body = entity.getBody();
 		if(statusCode < 400)
 			return (T)body;
-		if(statusCode == StatusCodes.BAD_REQUEST)
-			throw new HttpBadRequestException(body);
-		if(statusCode == StatusCodes.NOT_FOUND)
-			throw new HttpNotFoundException(body);
-		if(statusCode == StatusCodes.UNAUTHORIZED)
-			throw new HttpUnauthorizedException(body);
-		if(statusCode == StatusCodes.FORBIDDEN)
-			throw new HttpForbiddenException(body);
-		if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
-			throw new HttpMethodNotAllowedException(body);
-		if(statusCode == StatusCodes.NOT_ACCEPTABLE)
-			throw new HttpNotAcceptableException(body);
-		if(statusCode == StatusCodes.REQUEST_TIMEOUT)
-			throw new HttpRequestTimeoutException(body);
-		if(statusCode == StatusCodes.CONFLICT)
-			throw new HttpConflictException(body);
-		if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
-			throw new HttpUnsupportedMediaTypeException(body);
-		if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
-			throw new HttpInternalServerErrorException(body);
-		throw new HttpRequestException(statusCode, body);
+		throw translateErrorCode(statusCode, body);
 	}
+	
+	private Exception translateErrorCode(int statusCode, Object body) {
+	    if(statusCode == StatusCodes.BAD_REQUEST)
+            return new HttpBadRequestException(body);
+        if(statusCode == StatusCodes.NOT_FOUND)
+            return new HttpNotFoundException(body);
+        if(statusCode == StatusCodes.UNAUTHORIZED)
+            return new HttpUnauthorizedException(body);
+        if(statusCode == StatusCodes.FORBIDDEN)
+            return new HttpForbiddenException(body);
+        if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
+            return new HttpMethodNotAllowedException(body);
+        if(statusCode == StatusCodes.NOT_ACCEPTABLE)
+            return new HttpNotAcceptableException(body);
+        if(statusCode == StatusCodes.REQUEST_TIMEOUT)
+            return new HttpRequestTimeoutException(body);
+        if(statusCode == StatusCodes.CONFLICT)
+            return new HttpConflictException(body);
+        if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
+            return new HttpUnsupportedMediaTypeException(body);
+        if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
+            return new HttpInternalServerErrorException(body);
+        return new HttpRequestException(statusCode, body);
+	}
+	
+	/**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(String fileURL, File storeLocation) throws Exception {
+        return download(new DownloadRequest(fileURL), storeLocation);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param request the request of the file to be download
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(DownloadRequest request, File storeLocation) throws Exception {
+        String fileURL = request.getFileURL();
+        HttpURLConnection connection = connect(fileURL);
+        try {
+            decoratConnection(connection, request);
+            connection.connect();
+            return download(connection, fileURL, storeLocation);
+        } finally {
+            connection.disconnect();
+        }
+    }
+    
+    private String download(
+        HttpURLConnection connection,
+        String fileURL,
+        File storeLocation
+    ) throws Exception {
+        int responseCode = connection.getResponseCode();
+        
+        if (responseCode >= 400) {
+            throw processDownloadError(connection, fileURL, responseCode);
+        }
+        String disposition = connection.getHeaderField("Content-Disposition");
+        String fileName = getDownloadFileName(fileURL, disposition);
+        Files.createDirectories(storeLocation.toPath());
+        File storeFile = Paths.get(storeLocation.toString(), fileName).toFile();
+        File downloadingFile = new File(storeFile + ".downloading");
+        Path downloadingFilePath = downloadingFile.toPath();
+        Files.deleteIfExists(downloadingFilePath);
+        Files.createFile(downloadingFilePath);
+         
+        try(InputStream inputStream = connection.getInputStream()) {
+            try (FileOutputStream outputStream = new FileOutputStream(downloadingFile)) {
+                int bytesRead;
+                byte[] buffer = new byte[1024];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        }
+        Files.move(downloadingFile.toPath(), storeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
+    
+    
+    private String getDownloadFileName(String fileURL, String contentDisposition) {
+        if (contentDisposition != null) {
+            int index = contentDisposition.indexOf("filename=");
+            if (index > 0) {
+                return contentDisposition.substring(index + 10, contentDisposition.length() - 1);
+            }
+        }
+        return fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param fileURL HTTP URL of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(String fileURL, OutputStream outputStream) throws Exception {
+        download(new DownloadRequest(fileURL), outputStream);
+    }
+    
+    /**
+     * Downloads a file from a URL and store to an output stream
+     * 
+     * @param request the request of the file to be download
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
+        String fileURL = request.getFileURL();
+        HttpURLConnection connection = connect(fileURL);
+        try {
+            decoratConnection(connection, request);
+            connection.connect();
+            download(connection, fileURL, outputStream);
+        } finally {
+            connection.disconnect();
+        }
+    }
+    
+    private void download(
+        HttpURLConnection connection,
+        String fileURL,
+        OutputStream outputStream
+    ) throws Exception {
+        int responseCode = connection.getResponseCode();
+        
+        if (responseCode >= 400) {
+            throw processDownloadError(connection, fileURL, responseCode);
+        }
+         
+        try(InputStream inputStream = connection.getInputStream()) {
+            int bytesRead;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+    }
+    
+    private void decoratConnection(
+        HttpURLConnection connection, 
+        DownloadRequest request
+    ) throws IOException {
+        int connectTimeout = request.getReadTimeout();
+        int readTimeout = request.getReadTimeout();
+        connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
+        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
+        MultiValueMap requestHeaders = request.getHeaders();
+        if(requestHeaders != null) {
+            Map<String, String> encodedHeaders = requestHeaders.toMap();
+            for(Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+                connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+            }
+        }
+    }
+    
+    private Exception processDownloadError(
+        HttpURLConnection connection,
+        String fileURL,
+        int responseCode
+    ) throws Exception {
+        InputStream inputStream = connection.getErrorStream();
+        Object responseBody = "";
+        if(inputStream != null) {
+            try {
+                int contentLength = connection.getContentLength();
+                responseBody = deserializeResponseBody(null, contentLength, inputStream, null);
+            }
+            finally {
+                inputStream.close();
+            }
+        }
+        logger.debug("download error: {} - {} - {}", fileURL, responseCode, responseBody);
+        return translateErrorCode(responseCode, responseBody);
+    }
 	
 	public static Builder builder() {
 		return new Builder();

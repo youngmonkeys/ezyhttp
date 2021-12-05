@@ -61,6 +61,9 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
 	@EzyProperty("cors.allowed_origins")
 	protected String allowedOrigins = "*";
 	
+	@EzyProperty("cors.allowed_headers")
+    protected String allowedHeaders = "*";
+	
 	@EzyProperty("management.enable")
 	protected boolean managementEnable;
 	
@@ -107,6 +110,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         		(int)FileSizes.toByteSize(multipartMaxRequestSize),
         		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
         	));;
+        logger.info("cors.enable = {}", corsEnable);
         if(corsEnable) {
 	        FilterHolder crossOriginFilter = newCrossOriginFilter();
 	        addFilter(servletHandler, crossOriginFilter);
@@ -123,10 +127,10 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
     	filter.setName("cross-origin");
     	filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, allowedOrigins);
     	filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
-    	filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "*");
-    	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+    	filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, allowedHeaders);
+    	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowedOrigins);
     	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_METHODS_HEADER, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
-    	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER, "*");
+    	filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER, allowedHeaders);
     	CrossOriginFilter corsFilter = new CrossOriginFilter();
     	filter.setFilter(corsFilter);
     	return filter;

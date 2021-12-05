@@ -25,6 +25,8 @@ public class Redirect {
 	private final List<Cookie> cookies;
 	@Getter
 	private final Map<String, String> headers;
+	@Getter
+	private final Map<String, Object> attributes;
 	private final List<EzyPair<String, Object>> parameters;
 	
 	protected Redirect(Builder builder) {
@@ -32,6 +34,7 @@ public class Redirect {
 		this.cookies = builder.cookies;
 		this.headers = builder.headers;
 		this.parameters = builder.parameters;
+		this.attributes = builder.attributes;
 	}
 	
 	public static Redirect to(String uri) {
@@ -65,6 +68,7 @@ public class Redirect {
 		private String uri;
 		private List<Cookie> cookies;
 		private Map<String, String> headers;
+		private Map<String, Object> attributes;
 		private List<EzyPair<String, Object>> parameters;
 		
 		public Builder uri(String uri) {
@@ -83,6 +87,24 @@ public class Redirect {
 			for(Entry<String, Object> e : headers.entrySet())
 				addHeader(e.getKey(), e.getValue());
 			return this;
+		}
+		
+		public Builder addAttribute(String name, Object value) {
+		    this.preAddAttributes();
+		    this.attributes.put(name, value);
+		    return this;
+		}
+		
+		public Builder addAttributes(Map<String, Object> attributes) {
+		    this.preAddAttributes();
+		    this.attributes.putAll(attributes);
+		    return this;
+		}
+		
+		private void preAddAttributes() {
+		    if (attributes == null) {
+                attributes = new HashMap<>();
+            }
 		}
 		
 		public Builder addParameters(Map<String, Object> parameters) {

@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -20,8 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
+import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
@@ -30,8 +35,11 @@ import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.DeserializeValueException;
 import com.tvd12.ezyhttp.core.exception.HttpRequestException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
@@ -49,13 +57,17 @@ public class BlockingServlet extends HttpServlet {
 	private int serverPort;
 	private int managmentPort;
 	private Set<String> managementURIs;
+	private boolean exposeMangementURIs;
 	protected ViewContext viewContext;
+	protected ObjectMapper objectMapper;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
 	protected InterceptorManager interceptorManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
+	protected UnhandledErrorHandler unhandledErrorHandler;
 	protected List<Class<?>> handledExceptionClasses;
+	protected List<RequestResponseWatcher> requestResponseWatchers;
 	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -66,12 +78,16 @@ public class BlockingServlet extends HttpServlet {
 		this.serverPort = componentManager.getServerPort();
 		this.managmentPort = componentManager.getManagmentPort();
 		this.managementURIs = componentManager.getManagementURIs();
+		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
 		this.viewContext = componentManager.getViewContext();
+		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
+		this.requestResponseWatchers = componentManager.getRequestResponseWatchers();
 		this.addDefaultExceptionHandlers();
+		this.unhandledErrorHandler = componentManager.getUnhandledErrorHandler();
 		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
 		this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
 		
@@ -81,29 +97,62 @@ public class BlockingServlet extends HttpServlet {
 	protected void doGet(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.GET, request, response);
+	    doHandleRequest(HttpMethod.GET, request, response);
 	}
 	
 	@Override
 	protected void doPost(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.POST, request, response);
+	    doHandleRequest(HttpMethod.POST, request, response);
 	}
 	
 	@Override
 	protected void doPut(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.PUT, request, response);
+	    doHandleRequest(HttpMethod.PUT, request, response);
 	}
 	
 	@Override
 	protected void doDelete(
 			HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(HttpMethod.DELETE, request, response);
+	    doHandleRequest(HttpMethod.DELETE, request, response);
 	}
+	
+	private void doHandleRequest(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+        try {
+            watchRequest(method, request, response);
+            handleRequest(method, request, response);
+        }
+        finally {
+            if (!request.isAsyncStarted()) {
+                watchResponse(method, request, response);
+            }
+        }
+    }
+	
+	private void watchRequest(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+	    for (RequestResponseWatcher watcher : requestResponseWatchers) {
+	        watcher.watchRequest(method, request);
+	    }
+    }
+	
+	private void watchResponse(
+            HttpMethod method,
+            HttpServletRequest request, 
+            HttpServletResponse response) throws ServletException, IOException {
+        for (RequestResponseWatcher watcher : requestResponseWatchers) {
+            watcher.watchResponse(method, request, response);
+        }
+    }
 	
 	protected void preHandleRequest(
 			HttpMethod method,
@@ -117,70 +166,156 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
-		if(managementURIs.contains(requestURI)) {
+		String matchedURI = requestHandlerManager.getMatchedURI(requestURI);
+		if(matchedURI == null) {
+            if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
+                responseString(response, "uri " + requestURI + " not found");
+            }
+            return;
+        }
+		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
+		boolean isManagementURI = managementURIs.contains(matchedURI);
+		if(isManagementURI && !exposeMangementURIs) {
 			if(request.getServerPort() != managmentPort) {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
 				return;
 			}
 		}
 		else {
 			if(request.getServerPort() != serverPort) {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
 				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
 				return;
 			}
 		}
-		RequestHandler requestHandler = requestHandlerManager.getHandler(method, requestURI);
-		if(requestHandler == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			responseString(response, "uri " + requestURI + " not found");
-			return;
-		}
+		RequestHandler requestHandler = 
+		        requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
 		if(requestHandler == RequestHandler.EMPTY) {
-			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-			responseString(response, "method " + method + " not allowed");
+		    if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
+		        responseString(response, "method " + method + " not allowed");
+		    }
 			return;
 		}
 		boolean acceptableRequest = false;
+		boolean syncResponse = true;
 		String uriTemplate = requestHandler.getRequestURI();
 		RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
 		try {
 			acceptableRequest = preHandleRequest(arguments, requestHandler);
 			if(acceptableRequest) {
-				Object responseData = requestHandler.handle(arguments);
-				String responseContentType = requestHandler.getResponseContentType();
-				if(responseContentType != null) {
-					response.setContentType(responseContentType);
-				}
-				if(responseData != null) {
-					if(responseData == ResponseEntity.ASYNC) {
-						request.startAsync();
-					}
-					else {
-						handleResponseData(request, response, responseData);
-					}
-				}
-				else {
-					response.setStatus(HttpServletResponse.SC_OK);
-				}
+			    if (requestHandler.isAsync()) {
+			        syncResponse = false;
+                    AsyncContext asyncContext = request.startAsync(request, response);
+                    asyncContext.addListener(newAsyncListener(arguments, requestHandler));
+                    requestHandler.handle(arguments);
+			    }
+			    else {
+    				Object responseData = requestHandler.handle(arguments);
+    				String responseContentType = requestHandler.getResponseContentType();
+    				if(responseContentType != null) {
+    					response.setContentType(responseContentType);
+    				}
+    				if(responseData != null) {
+    				    handleResponseData(request, response, responseData);
+    				}
+    				else {
+    				    response.setStatus(HttpServletResponse.SC_OK);
+    				}
+			    }
 			}
 			else {
-				response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+			    handleError(method, request, response, HttpServletResponse.SC_NOT_ACCEPTABLE);
 			}
 		}
 		catch (Exception e) {
-			handleException(arguments, e);
+			handleException(method, arguments, e);
 		}
 		finally {
-			arguments.release();
+		    if (syncResponse) {
+		        if (acceptableRequest) {
+		            postHandleRequest(arguments, requestHandler);
+		        }
+		        arguments.release();
+		    }
 		}
-		if(acceptableRequest)
-			postHandleRequest(arguments, requestHandler);
+	}
+	
+	protected AsyncListener newAsyncListener(
+	        RequestArguments arguments, RequestHandler requestHandler) {
+	    return new AsyncCallback() {
+            
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                try {
+                    try {
+                        postHandleRequest(arguments, requestHandler);
+                    }
+                    finally {
+                        watchResponse(
+                            arguments.getMethod(), 
+                            arguments.getRequest(), 
+                            arguments.getResponse()
+                        );
+                    }
+                }
+                catch (Exception e) {
+                    logger.warn(
+                        "AsyncCallback.onComplete on uri: {} error", 
+                        arguments.getRequest().getRequestURI(), e
+                    );
+                }
+                finally {
+                    arguments.release();
+                }
+            }
+        };
+	}
+	
+	protected boolean handleError(
+        HttpMethod method,
+        HttpServletRequest request, 
+        HttpServletResponse response,
+        int errorStatusCode
+    ) {
+	    return handleError(method, request, response, errorStatusCode, null);
+	}
+	
+	protected boolean handleError(
+        HttpMethod method,
+        HttpServletRequest request, 
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
+    ) {
+	    if (unhandledErrorHandler != null) {
+	        Object data = unhandledErrorHandler
+	                .handleError(method, request, response, errorStatusCode);
+	        if (data == null) {
+	            response.setStatus(errorStatusCode);
+	            return false;
+	        }
+	        try {
+                handleResponseData(request, response, data);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                logger.warn("handle error: {} with uri: {} failed", errorStatusCode, request.getRequestURI(), e);
+            }
+            return true;
+	    } else {
+	        response.setStatus(errorStatusCode);
+	        if (exception != null) {
+	            logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+	        }
+	        return false;
+	    }
 	}
 	
 	protected void handleException(
-			RequestArguments arguments, Exception e) throws IOException {
+	        HttpMethod method,
+			RequestArguments arguments, 
+			Exception e
+	) throws IOException {
 		UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
 		HttpServletRequest request = arguments.getRequest();
 		HttpServletResponse response = arguments.getResponse();
@@ -196,7 +331,7 @@ public class BlockingServlet extends HttpServlet {
 					handleResponseData(request, response, result);
 				}
 				else {
-					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				    handleError(method, request, response, HttpServletResponse.SC_BAD_REQUEST);
 				}
 				exception = null;
 			}
@@ -205,8 +340,7 @@ public class BlockingServlet extends HttpServlet {
 			}
 		}
 		if(exception != null) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+		    handleError(method, request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception);
 		}
 	}
 	
@@ -259,6 +393,15 @@ public class BlockingServlet extends HttpServlet {
 				response.addCookie(cookie);
 			for(Entry<String, String> e : redirect.getHeaders().entrySet())
 				response.addHeader(e.getKey(), e.getValue());
+			Map<String, Object> attributes = redirect.getAttributes();
+			if (attributes != null) {
+			    String attributesValue = objectMapper.writeValueAsString(attributes);
+			    Cookie attributesCookie = new Cookie(
+			            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, 
+			            EzyBase64.encodeUtf(attributesValue));
+			    attributesCookie.setMaxAge(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE);
+			    response.addCookie(attributesCookie);
+			}
 			response.sendRedirect(redirect.getUri() + redirect.getQueryString());
 			return;
 		}
@@ -318,12 +461,14 @@ public class BlockingServlet extends HttpServlet {
 		arguments.setResponse(response);
 		arguments.setUriTemplate(uriTemplate);
 		arguments.setCookies(request.getCookies());
+		arguments.setObjectMapper(objectMapper);
+		arguments.setRedirectionAttributesFromCookie();
 		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {
 			String paramName = paramNames.nextElement();
-			String paramValue = request.getParameter(paramName);
-			arguments.setParameter(paramName, paramValue);
+			String[] paramValues = request.getParameterValues(paramName);
+			arguments.setParameter(paramName, paramValues);
 		}
 		
 		Enumeration<String> headerNames = request.getHeaderNames();

@@ -9,7 +9,13 @@ public class ThymeleafViewContextBuilder extends ViewContextBuilder {
 
 	@Override
 	public ViewContext build() {
-		return new ThymeleafViewContext(templateResolver);
+		return new ThymeleafViewContext(
+	        templateResolver,
+	        viewDialects,
+	        viewDecorators,
+	        messageProviders,
+	        absentMessageResolver
+        );
 	}
 	
 }

@@ -2,10 +2,12 @@ package com.tvd12.ezyhttp.server.core.constant;
 
 public final class PropertyNames {
 
+    public static final String ALLOW_OVERRIDE_URI = "server.allow_override_uri";
 	public static final String SERVER_PORT = "server.port";
 	public static final String MANAGEMENT_ENABLE = "management.enable";
 	public static final String MANAGEMENT_PORT = "management.port";
 	public static final String MANAGEMENT_URIS = "management.uris";
+	public static final String MANAGEMENT_URIS_EXPOSE = "management.uris_expose";
 	public static final String RESOURCE_ENABLE = "resources.enable";
 	public static final String RESOURCE_LOCATIONS = "resources.locations";
 	public static final String RESOURCE_LOCATION = "resources.location";

@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.thymeleaf;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -9,6 +10,9 @@ import java.util.Properties;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.messageresolver.IMessageResolver;
 
+import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.MessageReader;
 
 import lombok.Getter;
@@ -19,23 +23,53 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 	private final String name = NAME;
 	@Getter
 	private final Integer order = ORDER;
+	private final String messageLocation;
 	private final Properties defaultMessages;
 	private final Map<Locale, Properties> messagesByLocale;
 	private final Map<String, Properties> messagesByLanguage;
+	private final List<MessageProvider> messageProviders;
+    private final AbsentMessageResolver absentMessageResolver;
 
 	private static final int ORDER = 0;
 	private static final String NAME = "DEFAULT";
 	private static final Object[] EMPTY_MESSAGE_PARAMETERS = new Object[0];
 	
-	public ThymeleafMessageResolver(String folderPath) {
-		messagesByLanguage = readMessages(folderPath);
-		messagesByLocale = mapMessagesToLocal();
-		defaultMessages = messagesByLanguage.computeIfAbsent("", it -> new Properties());
+	protected ThymeleafMessageResolver(Builder builder) {
+	    this.messageLocation = builder.messageLocation;
+	    this.messageProviders = builder.messageProviders;
+	    this.absentMessageResolver = builder.absentMessageResolver;
+	    this.messagesByLanguage = collectMessages();
+	    this.messagesByLocale = mapMessagesToLocal();
+	    this.defaultMessages = messagesByLanguage.computeIfAbsent("", it -> new Properties());
 	}
 	
-	private Map<String, Properties> readMessages(String folderPath) {
+	private Map<String, Properties> collectMessages() {
+	    Map<String, Properties> answer = new HashMap<>();
+	    mergeAnswerMessages(answer, readMessages());
+	    for (MessageProvider provider : messageProviders) {
+	        mergeAnswerMessages(answer, provider.provide());
+	    }
+	    return answer;
+	}
+	
+	private Map<String, Properties> readMessages() {
 		MessageReader messageReader = new MessageReader();
-		return messageReader.read(folderPath);
+		return messageReader.read(messageLocation);
+	}
+	
+	private void mergeAnswerMessages(
+        Map<String, Properties> answer,
+        Map<String, Properties> messagesMap
+    ) {
+	    for (String language : messagesMap.keySet()) {
+            Properties messages = messagesMap.get(language);
+            answer
+                .computeIfAbsent(language, (k) -> new Properties())
+                .putAll(messages);
+            answer
+                .computeIfAbsent(language.toLowerCase(), k -> new Properties())
+                .putAll(messages);
+        }
 	}
 	
 	private Map<Locale, Properties> mapMessagesToLocal() {
@@ -94,6 +128,17 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 			Class<?> origin, 
 			String key,
 			Object[] parameters) {
+	    if (absentMessageResolver != null) {
+	        String message = absentMessageResolver.resolve(
+                context.getLocale(), 
+                origin, 
+                key, 
+                parameters
+            );
+	        if (message != null) {
+	            return message;
+	        }
+	    }
 		return key;
 	}
 
@@ -117,5 +162,35 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 		}
 		return false;
 	}
+	
+	public static Builder builder() {
+	    return new Builder();
+	}
 
+	public static class Builder implements EzyBuilder<ThymeleafMessageResolver> {
+	    
+	    private String messageLocation;
+	    private List<MessageProvider> messageProviders;
+	    private AbsentMessageResolver absentMessageResolver;
+	    
+	    public Builder messageLocation(String messageLocation) {
+	        this.messageLocation = messageLocation;
+	        return this;
+	    }
+	    
+	    public Builder messageProviders(List<MessageProvider> messageProviders) {
+	        this.messageProviders = messageProviders;
+	        return this;
+	    }
+	    
+	    public Builder absentMessageResolver(AbsentMessageResolver absentMessageResolver) {
+	        this.absentMessageResolver = absentMessageResolver;
+	        return this;
+	    }
+	    
+	    @Override
+	    public ThymeleafMessageResolver build() {
+	        return new ThymeleafMessageResolver(this);
+	    }
+	}
 }

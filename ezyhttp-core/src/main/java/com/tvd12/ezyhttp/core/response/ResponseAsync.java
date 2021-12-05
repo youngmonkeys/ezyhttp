@@ -9,5 +9,4 @@ public final class ResponseAsync {
 	public static ResponseAsync getInstance() {
 		return INSTANCE;
 	}
-	
 }

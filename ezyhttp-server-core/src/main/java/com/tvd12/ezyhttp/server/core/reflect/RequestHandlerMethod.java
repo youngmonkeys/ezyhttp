@@ -3,6 +3,8 @@ package com.tvd12.ezyhttp.server.core.reflect;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.URIBuilder;
+import com.tvd12.ezyhttp.server.core.annotation.Async;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -72,6 +74,14 @@ public class RequestHandlerMethod extends HandlerMethod {
 			return DoPutAnnotations.getResponseType(doPut);
 		DoDelete doDelete = method.getAnnotation(DoDelete.class);
 		return DoDeleteAnnotations.getResponseType(doDelete);
+	}
+	
+	public boolean isAuthenticated() {
+	    return method.isAnnotated(Authenticated.class);
+	}
+	
+	public boolean isAsync() {
+	    return method.isAnnotated(Async.class);
 	}
 	
 	@Override

@@ -9,10 +9,14 @@ public final class RequestParamAnnotations {
 	
 	public static String getParamKeyString(RequestParam annotation, int index) {
 		String keyString = annotation.value();
-		if(EzyStrings.isNoContent(keyString))
+		if (EzyStrings.isNoContent(keyString)) {
+		    keyString = annotation.name();
+		}
+		if (EzyStrings.isNoContent(keyString)) {
 			keyString = String.valueOf(index);
-		else
+		} else {
 			keyString = EzyStrings.quote(keyString);
+		}
 		return keyString;
 	}
 	

@@ -20,4 +20,18 @@ public @interface RequestParam {
 	 * @return the parameter's name
 	 */
 	public String value() default "";
+	
+	/**
+     * name or parameter
+     * 
+     * @return the parameter's name
+     */
+    public String name() default "";
+    
+    /**
+     * default or parameter
+     * 
+     * @return the default value of the parameter
+     */
+    public String defaultValue() default "null";
 }

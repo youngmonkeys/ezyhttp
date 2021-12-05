@@ -20,4 +20,18 @@ public @interface RequestHeader {
 	 * @return the header's name
 	 */
 	public String value() default "";
+	
+	/**
+     * name or header
+     * 
+     * @return the header's name
+     */
+    public String name() default "";
+    
+    /**
+     * default or header
+     * 
+     * @return the default value of the header
+     */
+    public String defaultValue() default "null";
 }

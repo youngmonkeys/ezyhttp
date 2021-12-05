@@ -7,6 +7,7 @@ import com.tvd12.ezyfox.bean.EzyBeanConfig;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextAware;
 import com.tvd12.ezyfox.bean.annotation.EzyConfigurationBefore;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
 
 import lombok.Setter;
@@ -23,7 +24,11 @@ public class ResourceUploadManagerConfiguration
 	
 	@Override
 	public void config() {
-		if(resourceUploadEnable)
-			context.getSingletonFactory().addSingleton(createUploadManager(context));
+		if(resourceUploadEnable) {
+		    ResourceUploadManager resourceUploadManager = createUploadManager(context);
+		    FileUploader fileUploader = new FileUploader(resourceUploadManager);
+			context.getSingletonFactory().addSingleton(resourceUploadManager);
+			context.getSingletonFactory().addSingleton(fileUploader);
+		}
 	}
 }

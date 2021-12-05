@@ -1,6 +1,8 @@
 package com.tvd12.ezyhttp.server.core.test.servlet;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,6 +11,9 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -18,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
@@ -29,8 +35,11 @@ import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
+import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
@@ -57,8 +66,11 @@ public class BlockingServletTest {
 	public void doGetTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
+		
+		RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+		componentManager.addRequestResponseWatchers(Arrays.asList(watcher));
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -73,6 +85,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -85,7 +98,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandler requestHandler = new GetRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -118,6 +131,8 @@ public class BlockingServletTest {
 		
 		verify(interceptor, times(1)).preHandle(any(), any());
 		verify(interceptor, times(1)).postHandle(any(), any());
+		verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
+		verify(watcher, times(1)).watchResponse(HttpMethod.GET, request, response);
 		
 		componentManager.destroy();
 	}
@@ -126,7 +141,7 @@ public class BlockingServletTest {
 	public void doGetManagementTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Sets.newHashSet("/get"));
+		componentManager.addManagementURIs(Sets.newHashSet("/get"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
 		
@@ -143,6 +158,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -155,7 +171,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandler requestHandler = new GetRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, true), requestHandler);
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -189,7 +205,7 @@ public class BlockingServletTest {
 	public void doGetToManagementNotAllow() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Sets.newHashSet("/management"));
+		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
 		
@@ -222,9 +238,13 @@ public class BlockingServletTest {
 	public void doGetFromManagement() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Sets.newHashSet("/management"));
+		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
+		componentManager.getRequestHandlerManager().addHandler(
+	        new RequestURI(HttpMethod.GET, "/get", false),
+	        mock(RequestHandler.class)
+		);
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -252,10 +272,48 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void doGetFromManagementButExpose() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Sets.newHashSet("/management"));
+        componentManager.setServerPort(PORT);
+        componentManager.setManagmentPort(MANAGEMENT_POR);
+        componentManager.setExposeMangementURIs(true);
+        componentManager.getRequestHandlerManager().addHandler(
+            new RequestURI(HttpMethod.GET, "/management", false),
+            mock(RequestHandler.class)
+        );
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/management";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
+
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void requestHandlerNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -280,7 +338,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getOutputStream();
 		verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
@@ -291,10 +348,58 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void requestHandlerNullAndHasErrorHandler() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_NOT_FOUND
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get-handler-null";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void requestHandlerEmpty() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -315,7 +420,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandler requestHandler = new GetRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
 		
 		// when
 		sut.service(request, response);
@@ -334,10 +439,177 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void requestHandlerEmptyAndHasErrorHandler() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        componentManager.destroy();
+    }
+	
+	@Test
+    public void requestHandlerEmptyWithErrorHandlerButDataNull() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_NOT_FOUND
+            )
+        ).thenReturn(null);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).getOutputStream();
+        verify(response, times(1)).setStatus(StatusCodes.METHOD_NOT_ALLOWED);
+        
+        verify(outputStream, times(1)).write("method GET not allowed".getBytes());
+        
+        componentManager.destroy();
+    }
+	
+	@Test
+    public void requestHandlerEmptyAndHasErrorHandlerButException() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.ok();
+        when(
+            unhandledErrorHandler.handleError(
+                HttpMethod.GET, 
+                request, 
+                response, 
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        doThrow(
+            new IllegalStateException("just test")
+        ).when(response).setStatus(StatusCodes.OK);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(2)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void doGetNotAcceptable() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -354,6 +626,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -366,7 +639,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandler requestHandler = new GetRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(false);
@@ -393,7 +666,7 @@ public class BlockingServletTest {
 	public void doGetResponseContentTypeNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -409,6 +682,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -419,32 +693,110 @@ public class BlockingServletTest {
 			new Cookie[] { new Cookie("cookie", "CookieValue") }
 		);
 		
+		HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(request.startAsync(request, response)).thenReturn(asyncContext);
+        when(request.isAsyncStarted()).thenReturn(true);
+        EzyWrap<AsyncListener> asyncListener = new EzyWrap<>();
+        doAnswer(it -> {
+            asyncListener.setValue(it.getArgumentAt(0, AsyncListener.class));
+            return null;
+        }).when(asyncContext).addListener(any(AsyncListener.class));
+		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHandlerContentTypeNull requestHandler = new GetRequestHandlerContentTypeNull();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
-		
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-		
-		ServletOutputStream outputStream = mock(ServletOutputStream.class);
-		when(response.getOutputStream()).thenReturn(outputStream);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		// when
 		sut.service(request, response);
+		asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
 		
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
 		verify(request, times(1)).getServerPort();
+		verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
 		
 		componentManager.destroy();
 	}
 	
 	@Test
+    public void doGetResponseContentTypeNullAndPostHandleRequestError() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(request.startAsync(request, response)).thenReturn(asyncContext);
+        when(request.isAsyncStarted()).thenReturn(true);
+        EzyWrap<AsyncListener> asyncListener = new EzyWrap<>();
+        doAnswer(it -> {
+            asyncListener.setValue(it.getArgumentAt(0, AsyncListener.class));
+            return null;
+        }).when(asyncContext).addListener(any(AsyncListener.class));
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandlerContentTypeNull requestHandler = new GetRequestHandlerContentTypeNull();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
+        
+        // when
+        sut.service(request, response);
+        
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        doThrow(IllegalStateException.class).when(interceptor).postHandle(any(), any());
+        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(2)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void responseDataIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -472,7 +824,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestDataNullHandler requestHandler = new GetRequestDataNullHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		
@@ -493,7 +845,7 @@ public class BlockingServletTest {
 	public void getRequestDeserializeValueException() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -521,7 +873,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestDeserializeValueExceptionHandler requestHandler = new GetRequestDeserializeValueExceptionHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -548,7 +900,7 @@ public class BlockingServletTest {
 	public void getRequestHttpRequestExceptionDataNotNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -576,7 +928,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHttpRequestExceptionnHandler requestHandler = new GetRequestHttpRequestExceptionnHandler("hello");
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -603,7 +955,7 @@ public class BlockingServletTest {
 	public void getRequestHttpRequestExceptionDataNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -631,7 +983,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetRequestHttpRequestExceptionnHandler requestHandler = new GetRequestHttpRequestExceptionnHandler(null);
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -658,7 +1010,7 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionContentTypeIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -691,7 +1043,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
         
 		componentManager.getExceptionHandlerManager();
 		
@@ -720,7 +1072,7 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionResultIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -753,7 +1105,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
         
 		componentManager.getExceptionHandlerManager();
 		
@@ -780,7 +1132,7 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionError() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -813,7 +1165,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
         
 		componentManager.getExceptionHandlerManager();
 		
@@ -841,7 +1193,7 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionNoHandler() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -873,7 +1225,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
         
 		componentManager.getExceptionHandlerManager();
 		
@@ -900,7 +1252,7 @@ public class BlockingServletTest {
 	public void doPostTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -916,6 +1268,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -923,12 +1276,15 @@ public class BlockingServletTest {
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
 		when(request.getCookies()).thenReturn(
-			new Cookie[] { new Cookie("cookie", "CookieValue") }
+			new Cookie[] { 
+		        new Cookie("cookie", "CookieValue"),
+		        new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "{}")
+	        }
 		);
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		PostRequestHandler requestHandler = new PostRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -969,7 +1325,7 @@ public class BlockingServletTest {
 	public void doPutTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -985,6 +1341,7 @@ public class BlockingServletTest {
 			Collections.enumeration(Arrays.asList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
+		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
 			Collections.enumeration(Arrays.asList("header"))
@@ -997,7 +1354,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		PutRequestHandler requestHandler = new PutRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -1026,10 +1383,72 @@ public class BlockingServletTest {
 	}
 	
 	@Test
+    public void doPutWithRedirectTest() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/put-with-redirect-attributes";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.PUT.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        PutWithRedirectAttributesRequestHandler requestHandler = 
+                new PutWithRedirectAttributesRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI, false), requestHandler);
+        
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        when(interceptor.preHandle(any(), any())).thenReturn(true);
+        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).sendRedirect("/home");
+        
+        verify(interceptor, times(1)).preHandle(any(), any());
+        verify(interceptor, times(1)).postHandle(any(), any());
+        
+        componentManager.destroy();
+    }
+	
+	@Test
 	public void doDeleteTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ViewContext viewContext = mock(ViewContext.class);
@@ -1063,7 +1482,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		DeleteRequestHandler requestHandler = new DeleteRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.DELETE, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.DELETE, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -1094,7 +1513,7 @@ public class BlockingServletTest {
 	public void doDeleteButViewContextIsNullTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		componentManager.setViewContext(null);
 		
@@ -1123,7 +1542,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		DeleteRequestHandler requestHandler = new DeleteRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.DELETE, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.DELETE, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -1153,7 +1572,7 @@ public class BlockingServletTest {
 	public void doGetButResponseBodyIsNullTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.setManagementURIs(Collections.emptySet());
+		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1181,7 +1600,7 @@ public class BlockingServletTest {
 		
 		RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
 		GetNoBodyRequestHandler requestHandler = new GetNoBodyRequestHandler();
-		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI), requestHandler);
+		requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
@@ -1332,7 +1751,7 @@ public class BlockingServletTest {
 
 		@Override
 		public String getResponseContentType() {
-			return ContentTypes.APPLICATION_JSON;
+			return null;
 		}
 	}
 	
@@ -1342,6 +1761,11 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return ResponseEntity.ASYNC;
+		}
+		
+		@Override
+		public boolean isAsync() {
+		    return true;
 		}
 
 		@Override
@@ -1476,6 +1900,35 @@ public class BlockingServletTest {
 		}
 	}
 	
+	public static class PutWithRedirectAttributesRequestHandler implements RequestHandler {
+
+        @Override
+        public Object handle(RequestArguments arguments) throws Exception {
+            return CONTROLLER.doPutWithRedirectAttributes(
+                arguments.getRequest(), 
+                arguments.getResponse(), 
+                arguments.getParameter(0), 
+                arguments.getHeader(0), 
+                arguments.getCookieValue(0)
+            );
+        }
+
+        @Override
+        public HttpMethod getMethod() {
+            return HttpMethod.PUT;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return "/put";
+        }
+
+        @Override
+        public String getResponseContentType() {
+            return ContentTypes.APPLICATION_JSON;
+        }
+    }
+	
 	public static class DeleteRequestHandler implements RequestHandler {
 
 		@Override
@@ -1553,6 +2006,22 @@ public class BlockingServletTest {
 					.uri("/home")
 					.build();
 		}
+		
+		@DoGet("/put-with-redirect-attributes")
+        public Redirect doPutWithRedirectAttributes(
+                HttpServletRequest request, 
+                HttpServletResponse response,
+                @RequestArgument("param") String param,
+                @RequestArgument("header") String header,
+                @RequestCookie("cookie") String cookie) {
+            return Redirect.builder()
+                    .addCookie("foo", "bar")
+                    .addHeader("hello", "world")
+                    .uri("/home")
+                    .addAttribute("error", Collections.singletonMap("hello", "world"))
+                    .addAttributes(Collections.singletonMap("foo", "bar"))
+                    .build();
+        }
 		
 		@DoGet("/delete")
 		public View doDelete(

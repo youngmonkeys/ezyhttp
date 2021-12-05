@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.asm;
 
+import static com.tvd12.ezyfox.io.EzyStrings.quote;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
@@ -11,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.tvd12.ezyfox.asm.EzyFunction;
 import com.tvd12.ezyfox.asm.EzyFunction.EzyBody;
 import com.tvd12.ezyfox.asm.EzyInstruction;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.reflect.EzyMethod;
@@ -44,6 +47,7 @@ public class RequestHandlerImplementer
 
 	@Setter
 	private static boolean debug;
+	protected final boolean isAsync;
 	protected final ControllerProxy controller;
 	
 	protected final static String PARAMETER_PREFIX = "param";
@@ -53,6 +57,7 @@ public class RequestHandlerImplementer
 			ControllerProxy controller, RequestHandlerMethod handlerMethod) {
 		super(handlerMethod);
 		this.controller = controller;
+		this.isAsync = handlerMethod.isAsync();
 	}
 	
 	public RequestHandler implement() {
@@ -77,6 +82,7 @@ public class RequestHandlerImplementer
 		String getHttpMethodMethodContent = makeGetHttpMethodMethodContent();
 		String getRequestURIMethodContent = makeGetRequestURIMethodContent();
 		String getResponseContentTypeMethodContent = makeGetResponseContentTypeMethodContent();
+		String isAsyncMethodContent = makeIsAsynceMethodContent();
 		printComponentContent(controllerFieldContent);
 		printComponentContent(setControllerMethodContent);
 		printComponentContent(handleRequestMethodContent);
@@ -84,6 +90,7 @@ public class RequestHandlerImplementer
 		printComponentContent(getHttpMethodMethodContent);
 		printComponentContent(getRequestURIMethodContent);
 		printComponentContent(getResponseContentTypeMethodContent);
+		printComponentContent(isAsyncMethodContent);
 		implClass.setSuperclass(pool.get(superClass.getName()));
 		implClass.addField(CtField.make(controllerFieldContent, implClass));
 		implClass.addMethod(CtNewMethod.make(setControllerMethodContent, implClass));
@@ -92,6 +99,7 @@ public class RequestHandlerImplementer
 		implClass.addMethod(CtNewMethod.make(getHttpMethodMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(getRequestURIMethodContent, implClass));
 		implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
+		implClass.addMethod(CtNewMethod.make(isAsyncMethodContent, implClass));
 		Class answerClass = implClass.toClass();
 		implClass.detach();
 		RequestHandler handler = (RequestHandler) answerClass.newInstance();
@@ -150,9 +158,13 @@ public class RequestHandlerImplementer
 			if(requestParamAnno != null) {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
+				String defaultValue = requestParamAnno.defaultValue();
+				String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getParameter(" + paramKey + ")"
+				   : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeParameter(" +
 						paramKey +
-						", arg0.getParameter(" + paramKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" + 
 						", " + genericTypeClass + ")" ;
 				instruction
@@ -164,9 +176,13 @@ public class RequestHandlerImplementer
 			if(requestHeaderAnno != null) {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
+				String defaultValue = requestHeaderAnno.defaultValue();
+                String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getHeader(" + headerKey + ")"
+                   : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeHeader(" +
 						headerKey +
-						", arg0.getHeader(" + headerKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" +
 						", " + genericTypeClass + ")" ;
 				instruction
@@ -192,9 +208,13 @@ public class RequestHandlerImplementer
 			if(requestCookieAnno != null) {
 				String cookieKey = RequestCookieAnnotations
 						.getCookieKeyString(requestCookieAnno, cookieCount);
+				String defaultValue = requestCookieAnno.defaultValue();
+                String getValueExpression = defaultValue.equals(EzyStrings.NULL)
+                   ? "arg0.getCookieValue(" + cookieKey + ")"
+                   : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
 				String valueExpression = "this.deserializeCookie(" +
 						cookieKey +
-						", arg0.getCookieValue(" + cookieKey + ")" + 
+						", " + getValueExpression + 
 						", " + parameterType.getTypeName() + ".class" +
 						", " + genericTypeClass + ")" ;
 				instruction
@@ -315,6 +335,16 @@ public class RequestHandlerImplementer
 				.toString();
 	}
 	
+	protected String makeIsAsynceMethodContent() {
+        return new EzyFunction(getIsAsyncMethod())
+                .body()
+                    .append(new EzyInstruction("\t", "\n")
+                            .answer()
+                            .append(isAsync))
+                    .function()
+                .toString();
+    }
+	
 	protected Class<?> getGenericType(Parameter parameter) {
 		Type parameterizedType = parameter.getParameterizedType();
 		if(parameterizedType instanceof ParameterizedType) {
@@ -362,6 +392,12 @@ public class RequestHandlerImplementer
 				AbstractRequestHandler.class, "getResponseContentType");
 		return new EzyMethod(method);
 	}
+	
+	protected EzyMethod getIsAsyncMethod() {
+        Method method = EzyMethods.getMethod(
+                AbstractRequestHandler.class, "isAsync");
+        return new EzyMethod(method);
+    }
 	
 	protected Class<?> getSuperClass() {
 		return AbstractRequestHandler.class;
