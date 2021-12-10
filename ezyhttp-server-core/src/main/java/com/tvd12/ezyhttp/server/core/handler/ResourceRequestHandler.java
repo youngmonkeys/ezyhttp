@@ -53,6 +53,7 @@ public class ResourceRequestHandler implements RequestHandler {
                 new EzyResultCallback<Boolean>() {
                     @Override
                     public void onResponse(Boolean response) {
+                        servletResponse.setContentType(getResponseContentType());
                         servletResponse.setStatus(StatusCodes.OK);
                         asyncContext.complete();
                         EzyProcessor.processWithLogException(() -> inputStream.close());
