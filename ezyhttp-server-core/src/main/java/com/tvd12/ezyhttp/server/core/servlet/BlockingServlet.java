@@ -288,12 +288,17 @@ public class BlockingServlet extends HttpServlet {
         int errorStatusCode,
         Exception exception
     ) {
-	    if (unhandledErrorHandler != null) {
-            Object data = (exception == null)
-                ? unhandledErrorHandler
-                              .handleError(method, request, response, errorStatusCode)
-                : unhandledErrorHandler
-                              .handleError(method, request, response, errorStatusCode, exception);
+		if (exception != null) {
+			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+		}
+		if (unhandledErrorHandler != null) {
+            Object data = unhandledErrorHandler.handleError(
+                method,
+                request,
+                response,
+                errorStatusCode,
+                exception
+            );
 	        if (data == null) {
 	            response.setStatus(errorStatusCode);
 	            return false;
@@ -307,9 +312,6 @@ public class BlockingServlet extends HttpServlet {
             return true;
 	    } else {
 	        response.setStatus(errorStatusCode);
-	        if (exception != null) {
-	            logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
-	        }
 	        return false;
 	    }
 	}

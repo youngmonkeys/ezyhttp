@@ -11,40 +11,6 @@ import com.tvd12.ezyhttp.server.core.view.View;
 
 public interface UnhandledErrorHandler {
 
-    default Object processError(int errorStatusCode) {
-        return null;
-    }
-
-	default Object processError(
-	    HttpMethod method,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        int errorStatusCode
-    ) {
-	    return processError(errorStatusCode);
-	}
-
-	default Object handleError(
-        HttpMethod method,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        int errorStatusCode
-    ) {
-	    Object result = processError(method, request, response, errorStatusCode);
-	    if (result != null) {
-	        if (result instanceof ResponseEntity) {
-	            response.setContentType(((ResponseEntity)result).getContentType());
-	        }
-	        else if (result instanceof View) {
-	            response.setContentType(ContentTypes.TEXT_HTML_UTF8);
-	        }
-	        if (EzyStrings.isNoContent(response.getContentType())) {
-	            response.setContentType(ContentTypes.APPLICATION_JSON);
-	        }
-	    }
-	    return result;
-	}
-
 	default Object processError(
 		HttpMethod method,
 		HttpServletRequest request,
@@ -52,7 +18,7 @@ public interface UnhandledErrorHandler {
 		int errorStatusCode,
 		Exception exception
 	) {
-		return processError(method, request, response, errorStatusCode);
+		return null;
 	}
 
 	default Object handleError(
@@ -62,6 +28,18 @@ public interface UnhandledErrorHandler {
 		int errorStatusCode,
 		Exception exception
 	) {
-		return handleError(method, request, response, errorStatusCode);
+		Object result = processError(method, request, response, errorStatusCode, exception);
+		if (result != null) {
+			if (result instanceof ResponseEntity) {
+				response.setContentType(((ResponseEntity)result).getContentType());
+			}
+			else if (result instanceof View) {
+				response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+			}
+			if (EzyStrings.isNoContent(response.getContentType())) {
+				response.setContentType(ContentTypes.APPLICATION_JSON);
+			}
+		}
+		return result;
 	}
 }
