@@ -14,7 +14,7 @@ public interface UnhandledErrorHandler {
     default Object processError(int errorStatusCode) {
         return null;
     }
-    
+
 	default Object processError(
 	    HttpMethod method,
         HttpServletRequest request,
@@ -23,7 +23,7 @@ public interface UnhandledErrorHandler {
     ) {
 	    return processError(errorStatusCode);
 	}
-	
+
 	default Object handleError(
         HttpMethod method,
         HttpServletRequest request,
@@ -43,5 +43,25 @@ public interface UnhandledErrorHandler {
 	        }
 	    }
 	    return result;
+	}
+
+	default Object processError(
+		HttpMethod method,
+		HttpServletRequest request,
+		HttpServletResponse response,
+		int errorStatusCode,
+		Exception exception
+	) {
+		return processError(method, request, response, errorStatusCode);
+	}
+
+	default Object handleError(
+		HttpMethod method,
+		HttpServletRequest request,
+		HttpServletResponse response,
+		int errorStatusCode,
+		Exception exception
+	) {
+		return handleError(method, request, response, errorStatusCode);
 	}
 }

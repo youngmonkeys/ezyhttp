@@ -5,9 +5,9 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 	</parent>
-	
+
 	<artifactId>ezyhttp-core</artifactId>
 	<name>ezyhttp-core</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
