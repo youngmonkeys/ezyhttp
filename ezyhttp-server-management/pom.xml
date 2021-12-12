@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.tvd12</groupId>
 		<artifactId>ezyhttp</artifactId>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 	</parent>
 	<artifactId>ezyhttp-server-management</artifactId>
 	<name>ezyhttp-server-management</name>
 	<description>Provider managment APIs for ezyhttp server</description>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.tvd12</groupId>

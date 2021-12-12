@@ -26,7 +26,13 @@ public class UnhandledErrorHandlerTest {
         ResponseEntity result = ResponseEntity.ok();
         UnhandledErrorHandler sut = new UnhandledErrorHandler() {
             @Override
-            public Object processError(int errorStatusCode) {
+            public Object processError(
+                HttpMethod method,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                int errorStatusCode,
+                Exception exception
+            ) {
                 return result;
             }
         };
@@ -36,10 +42,11 @@ public class UnhandledErrorHandlerTest {
         
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                StatusCodes.BAD_REQUEST
+                HttpMethod.GET,
+                request,
+                response,
+                StatusCodes.BAD_REQUEST,
+                null
         );
         
         // then
@@ -57,7 +64,13 @@ public class UnhandledErrorHandlerTest {
                 .build();
         UnhandledErrorHandler sut = new UnhandledErrorHandler() {
             @Override
-            public Object processError(int errorStatusCode) {
+            public Object processError(
+                HttpMethod method,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                int errorStatusCode,
+                Exception exception
+            ) {
                 return result;
             }
         };
@@ -69,10 +82,11 @@ public class UnhandledErrorHandlerTest {
         
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                StatusCodes.BAD_REQUEST
+                HttpMethod.GET,
+                request,
+                response,
+                StatusCodes.BAD_REQUEST,
+                null
         );
         
         // then
@@ -87,7 +101,13 @@ public class UnhandledErrorHandlerTest {
         String result = "bar";
         UnhandledErrorHandler sut = new UnhandledErrorHandler() {
             @Override
-            public Object processError(int errorStatusCode) {
+            public Object processError(
+                HttpMethod method,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                int errorStatusCode,
+                Exception exception
+            ) {
                 return result;
             }
         };
@@ -97,10 +117,11 @@ public class UnhandledErrorHandlerTest {
         
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                StatusCodes.BAD_REQUEST
+                HttpMethod.GET,
+                request,
+                response,
+                StatusCodes.BAD_REQUEST,
+                null
         );
         
         // then
@@ -119,10 +140,11 @@ public class UnhandledErrorHandlerTest {
         
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                StatusCodes.BAD_REQUEST
+                HttpMethod.GET,
+                request,
+                response,
+                StatusCodes.BAD_REQUEST,
+                null
         );
         
         // then

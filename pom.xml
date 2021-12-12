@@ -9,13 +9,13 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>ezyhttp</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<packaging>pom</packaging>
 
 	<name>ezyhttp</name>
 	<url>https://youngmonkeys.org/project/ezy-http/</url>
 	<description>
-		Support for HTTP interaction 
+		Support for HTTP interaction
 	</description>
 
 	<organization>

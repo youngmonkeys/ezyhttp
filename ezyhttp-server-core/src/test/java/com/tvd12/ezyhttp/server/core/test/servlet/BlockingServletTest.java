@@ -361,10 +361,11 @@ public class BlockingServletTest {
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
             unhandledErrorHandler.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                HttpServletResponse.SC_NOT_FOUND
+                HttpMethod.GET,
+                request,
+                response,
+                HttpServletResponse.SC_NOT_FOUND,
+				null
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
@@ -452,10 +453,11 @@ public class BlockingServletTest {
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
             unhandledErrorHandler.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+                HttpMethod.GET,
+                request,
+                response,
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+				null
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
@@ -505,10 +507,11 @@ public class BlockingServletTest {
         UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
         when(
             unhandledErrorHandler.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                HttpServletResponse.SC_NOT_FOUND
+                HttpMethod.GET,
+                request,
+                response,
+                HttpServletResponse.SC_NOT_FOUND,
+				null
             )
         ).thenReturn(null);
         componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
@@ -561,10 +564,11 @@ public class BlockingServletTest {
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
             unhandledErrorHandler.handleError(
-                HttpMethod.GET, 
-                request, 
-                response, 
-                HttpServletResponse.SC_METHOD_NOT_ALLOWED
+                HttpMethod.GET,
+                request,
+                response,
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+				null
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
@@ -1198,7 +1202,7 @@ public class BlockingServletTest {
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
 		exceptionHandlerManager.destroy();
-        
+  
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -1276,7 +1280,7 @@ public class BlockingServletTest {
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
 		when(request.getCookies()).thenReturn(
-			new Cookie[] { 
+			new Cookie[] {
 		        new Cookie("cookie", "CookieValue"),
 		        new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "{}")
 	        }
@@ -1414,7 +1418,7 @@ public class BlockingServletTest {
         );
         
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
-        PutWithRedirectAttributesRequestHandler requestHandler = 
+        PutWithRedirectAttributesRequestHandler requestHandler =
                 new PutWithRedirectAttributesRequestHandler();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI, false), requestHandler);
         
@@ -1789,10 +1793,10 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return CONTROLLER.doGet(
-				arguments.getRequest(), 
-				arguments.getResponse(), 
-				arguments.getParameter(0), 
-				arguments.getHeader(0), 
+				arguments.getRequest(),
+				arguments.getResponse(),
+				arguments.getParameter(0),
+				arguments.getHeader(0),
 				arguments.getCookieValue(0)
 			);
 		}
@@ -1818,10 +1822,10 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return CONTROLLER.doGetNoBody(
-				arguments.getRequest(), 
-				arguments.getResponse(), 
-				arguments.getParameter(0), 
-				arguments.getHeader(0), 
+				arguments.getRequest(),
+				arguments.getResponse(),
+				arguments.getParameter(0),
+				arguments.getHeader(0),
 				arguments.getCookieValue(0)
 			);
 		}
@@ -1847,10 +1851,10 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return CONTROLLER.doPost(
-				arguments.getRequest(), 
-				arguments.getResponse(), 
-				arguments.getParameter(0), 
-				arguments.getHeader(0), 
+				arguments.getRequest(),
+				arguments.getResponse(),
+				arguments.getParameter(0),
+				arguments.getHeader(0),
 				arguments.getCookieValue(0)
 			);
 		}
@@ -1876,10 +1880,10 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return CONTROLLER.doPut(
-				arguments.getRequest(), 
-				arguments.getResponse(), 
-				arguments.getParameter(0), 
-				arguments.getHeader(0), 
+				arguments.getRequest(),
+				arguments.getResponse(),
+				arguments.getParameter(0),
+				arguments.getHeader(0),
 				arguments.getCookieValue(0)
 			);
 		}
@@ -1905,10 +1909,10 @@ public class BlockingServletTest {
         @Override
         public Object handle(RequestArguments arguments) throws Exception {
             return CONTROLLER.doPutWithRedirectAttributes(
-                arguments.getRequest(), 
-                arguments.getResponse(), 
-                arguments.getParameter(0), 
-                arguments.getHeader(0), 
+                arguments.getRequest(),
+                arguments.getResponse(),
+                arguments.getParameter(0),
+                arguments.getHeader(0),
                 arguments.getCookieValue(0)
             );
         }
@@ -1934,10 +1938,10 @@ public class BlockingServletTest {
 		@Override
 		public Object handle(RequestArguments arguments) throws Exception {
 			return CONTROLLER.doDelete(
-				arguments.getRequest(), 
-				arguments.getResponse(), 
-				arguments.getParameter(0), 
-				arguments.getHeader(0), 
+				arguments.getRequest(),
+				arguments.getResponse(),
+				arguments.getParameter(0),
+				arguments.getHeader(0),
 				arguments.getCookieValue(0)
 			);
 		}
@@ -1962,7 +1966,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/get")
 		public ExResponse doGet(
-				HttpServletRequest request, 
+				HttpServletRequest request,
 				HttpServletResponse response,
 				@RequestArgument("param") String param,
 				@RequestArgument("header") String header,
@@ -1972,7 +1976,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/get-no-body")
 		public ResponseEntity doGetNoBody(
-				HttpServletRequest request, 
+				HttpServletRequest request,
 				HttpServletResponse response,
 				@RequestArgument("param") String param,
 				@RequestArgument("header") String header,
@@ -1982,7 +1986,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/post")
 		public ResponseEntity doPost(
-				HttpServletRequest request, 
+				HttpServletRequest request,
 				HttpServletResponse response,
 				@RequestArgument("param") String param,
 				@RequestArgument("header") String header,
@@ -1995,7 +1999,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/put")
 		public Redirect doPut(
-				HttpServletRequest request, 
+				HttpServletRequest request,
 				HttpServletResponse response,
 				@RequestArgument("param") String param,
 				@RequestArgument("header") String header,
@@ -2009,7 +2013,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/put-with-redirect-attributes")
         public Redirect doPutWithRedirectAttributes(
-                HttpServletRequest request, 
+                HttpServletRequest request,
                 HttpServletResponse response,
                 @RequestArgument("param") String param,
                 @RequestArgument("header") String header,
@@ -2025,7 +2029,7 @@ public class BlockingServletTest {
 		
 		@DoGet("/delete")
 		public View doDelete(
-				HttpServletRequest request, 
+				HttpServletRequest request,
 				HttpServletResponse response,
 				@RequestArgument("param") String param,
 				@RequestArgument("header") String header,
