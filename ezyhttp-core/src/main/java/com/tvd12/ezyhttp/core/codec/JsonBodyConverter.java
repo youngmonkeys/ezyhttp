@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.core.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.core.data.BodyData;
@@ -16,8 +17,9 @@ public class JsonBodyConverter implements BodyConverter {
 	
 	@Override
 	public byte[] serialize(Object body) throws IOException {
-		byte[] bytes = objectMapper.writeValueAsBytes(body);
-		return bytes;
+	    return body instanceof String
+	        ? ((String)body).getBytes(StandardCharsets.UTF_8)
+	        : objectMapper.writeValueAsBytes(body);
 	}
 	
 	@Override

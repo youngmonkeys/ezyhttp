@@ -35,8 +35,7 @@ public class JsonBodyConverterTest {
 		System.out.println(new String(actual));
 		
 		// then
-		byte[] expectation = "\"{\\\"hello\\\":\\\"world\\\",\\\"foo\\\":\\\"bar\\\"}\"".getBytes();
-		Asserts.assertEquals(expectation, actual);
+		Asserts.assertEquals(body.getBytes(), actual);
 	}
 	
 	@Test
