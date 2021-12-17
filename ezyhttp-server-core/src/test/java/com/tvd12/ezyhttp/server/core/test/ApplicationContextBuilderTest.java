@@ -117,6 +117,8 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertEquals(
 			packagesToScan,
 			Sets.newHashSet(
+			    "com.tvd12.ezyhttp.server",
+			    "com.tvd12.ezyhttp.server.core.test",
 				"com.tvd12.ezyhttp.server.core.test.component", 
 				"com.tvd12.ezyhttp.server.core.test.config", 
 				"com.tvd12.ezyhttp.server.core.test.controller",
@@ -164,6 +166,8 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertEquals(
 	        Sets.newHashSet(
                 "i_dont_know",
+                "com.tvd12.ezyhttp.server",
+                "com.tvd12.ezyhttp.server.core.test",
                 "com.tvd12.ezyhttp.server.core.test.config", 
                 "com.tvd12.ezyhttp.server.core.test.event",
                 "com.tvd12.ezyhttp.server.core.test.api"), 

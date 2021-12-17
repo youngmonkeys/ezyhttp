@@ -248,7 +248,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Map<String, Class> serviceClasses = getServiceClasses(reflection);
 		EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
 		EzyBeanContext beanContext = newBeanContextBuilder()
-				.scan(packageToScans)
+				.scan(allPackageToScans)
 				.addSingletonClasses(componentClasses)
 				.addSingletonClasses(serviceClasses)
 				.addSingletonClasses(controllerClasses)
