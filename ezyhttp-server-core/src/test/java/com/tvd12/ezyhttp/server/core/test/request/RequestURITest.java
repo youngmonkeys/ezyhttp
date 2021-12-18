@@ -18,6 +18,7 @@ public class RequestURITest {
 		RequestURI uri5 = new RequestURI(HttpMethod.PUT, "/api/v1", true);
 		RequestURI uri6 = new RequestURI(HttpMethod.GET, "", true);
 		RequestURI uri11 = new RequestURI(HttpMethod.GET, "/", false, true, "fullPath");
+		RequestURI uri12 = new RequestURI(HttpMethod.PUT, "/api/v1/", true);
 		
 		// when
 		// then
@@ -34,5 +35,8 @@ public class RequestURITest {
 		Asserts.assertNotEquals(uri1, uri11);
 		Asserts.assertTrue(uri11.isResource());
 		Asserts.assertEquals(uri11.getResourceFullPath(), "fullPath");
+		Asserts.assertEquals(uri1.getSameURI(), "/");
+		Asserts.assertEquals(uri5.getSameURI(), "/api/v1/");
+		Asserts.assertEquals(uri12.getSameURI(), "/api/v1");
 	}
 }

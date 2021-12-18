@@ -44,12 +44,14 @@ import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
+import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
+import com.tvd12.test.assertion.Asserts;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -136,6 +138,84 @@ public class BlockingServletTest {
 		
 		componentManager.destroy();
 	}
+	
+	@Test
+    public void doGetSecureTest() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.addManagementURIs(Collections.emptySet());
+        componentManager.setServerPort(PORT);
+        
+        RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+        componentManager.addRequestResponseWatchers(Arrays.asList(watcher));
+        
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+        
+        String requestURI = "/get";
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false, true), requestHandler);
+        
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        when(interceptor.preHandle(any(), any())).thenReturn(true);
+        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+        
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        
+        // when
+        sut.service(request, response);
+        
+        // then
+        RequestURIManager requestURIManager = requestHandlerManager.getRequestURIManager();
+        Asserts.assertTrue(requestURIManager.isAuthenticatedUri("/get"));
+        Asserts.assertTrue(requestURIManager.isAuthenticatedUri("/get/"));
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getServerPort();
+        
+        verify(response, times(1)).getContentType();
+        verify(response, times(1)).getOutputStream();
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        DataConverters dataConverters = componentManager.getDataConverters();
+        BodySerializer bodySerializer = dataConverters.getBodySerializer(ContentTypes.APPLICATION_JSON);
+        ExResponse responseData = new ExResponse(
+            "Hello ParameterValue, HeaderValue, CookieValue"
+        );
+        verify(outputStream, times(1)).write(bodySerializer.serialize(responseData));
+        
+        verify(interceptor, times(1)).preHandle(any(), any());
+        verify(interceptor, times(1)).postHandle(any(), any());
+        verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
+        verify(watcher, times(1)).watchResponse(HttpMethod.GET, request, response);
+        
+        componentManager.destroy();
+    }
 	
 	@Test
 	public void doGetManagementTest() throws Exception {

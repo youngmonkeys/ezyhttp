@@ -61,6 +61,20 @@ public class RequestURI {
 		return "/" + uri;
 	}
 	
+	public String getSameURI() {
+	    return getSameURI(uri);
+	}
+	
+	public static String getSameURI(String originalURI) {
+        if (originalURI.length() <= 1) {
+            return originalURI;
+        }
+        if (originalURI.endsWith("/")) {
+            return originalURI.substring(0, originalURI.length() - 1);
+        }
+        return originalURI + "/";
+    }
+	
 	@Override
 	public boolean equals(Object other) {
 		if(other == null)
