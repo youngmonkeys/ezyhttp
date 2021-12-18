@@ -44,10 +44,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
 			RequestHandlerImplementer implementer = newImplementer(proxy, method);
 			RequestHandler handler = implementer.implement();
 			HttpMethod httpMethod = handler.getMethod();
-			String requestURI = method.getRequestURI();
-			if (requestURIDecorator != null) {
-			    requestURI = requestURIDecorator.decorate(proxy.getClazz(), requestURI);
-			}
+			String requestURI = handler.getRequestURI();
 			boolean authen = authenticated || method.isAuthenticated();
 			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement, authen);
 			handlers.computeIfAbsent(uri, k -> new ArrayList<>())
@@ -58,7 +55,9 @@ public class RequestHandlersImplementer extends EzyLoggable {
 	
 	protected RequestHandlerImplementer newImplementer(
 			ControllerProxy controller, RequestHandlerMethod method) {
-		return new RequestHandlerImplementer(controller, method);
+	    RequestHandlerImplementer answer = new RequestHandlerImplementer(controller, method);
+	    answer.setRequestURIDecorator(requestURIDecorator);
+	    return answer;
 	}
 	
 }

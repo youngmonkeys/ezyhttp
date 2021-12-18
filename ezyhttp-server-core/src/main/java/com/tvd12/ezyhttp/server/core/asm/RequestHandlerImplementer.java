@@ -26,6 +26,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.handler.AbstractRequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
@@ -49,6 +50,8 @@ public class RequestHandlerImplementer
 	private static boolean debug;
 	protected final boolean isAsync;
 	protected final ControllerProxy controller;
+	@Setter
+	protected RequestURIDecorator requestURIDecorator;
 	
 	protected final static String PARAMETER_PREFIX = "param";
 	protected final static AtomicInteger COUNT = new AtomicInteger(0);
@@ -316,6 +319,9 @@ public class RequestHandlerImplementer
 	
 	protected String makeGetRequestURIMethodContent() {
 		String requestURI = handlerMethod.getRequestURI();
+		if (requestURIDecorator != null) {
+            requestURI = requestURIDecorator.decorate(controller.getClazz(), requestURI);
+        }
 		return new EzyFunction(getGetRequestURIMethod())
 				.body()
 					.append(new EzyInstruction("\t", "\n")
