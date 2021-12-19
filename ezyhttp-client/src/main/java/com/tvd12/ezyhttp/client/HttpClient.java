@@ -47,14 +47,14 @@ import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
 public class HttpClient extends EzyLoggable {
 
-	protected final int defatReadTimeout;
+	protected final int defaultReadTimeout;
 	protected final int defaultConnectTimeout;
 	protected final DataConverters dataConverters;
 	
 	public static final int NO_TIMEOUT = -1;
 	
 	protected HttpClient(Builder builder) {
-		this.defatReadTimeout = builder.readTimeout;
+		this.defaultReadTimeout = builder.readTimeout;
 		this.defaultConnectTimeout = builder.connectTimeout;
 		this.dataConverters = builder.dataConverters;
 	}
@@ -94,7 +94,7 @@ public class HttpClient extends EzyLoggable {
 		HttpURLConnection connection = connect(url);
 		try {
 			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
+			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
 			connection.setRequestMethod(method.toString());
 			connection.setDoInput(true);
 			connection.setDoOutput(method.hasOutput());
@@ -368,7 +368,7 @@ public class HttpClient extends EzyLoggable {
         int connectTimeout = request.getReadTimeout();
         int readTimeout = request.getReadTimeout();
         connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defatReadTimeout);
+        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
         MultiValueMap requestHeaders = request.getHeaders();
         if(requestHeaders != null) {
             Map<String, String> encodedHeaders = requestHeaders.toMap();
