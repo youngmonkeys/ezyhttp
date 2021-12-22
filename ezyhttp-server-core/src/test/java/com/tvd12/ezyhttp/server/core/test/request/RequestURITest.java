@@ -17,7 +17,7 @@ public class RequestURITest {
 		RequestURI uri4 = new RequestURI(HttpMethod.GET, "/api", true);
 		RequestURI uri5 = new RequestURI(HttpMethod.PUT, "/api/v1", true);
 		RequestURI uri6 = new RequestURI(HttpMethod.GET, "", true);
-		RequestURI uri11 = new RequestURI(HttpMethod.GET, "/", false, true, "fullPath");
+		RequestURI uri11 = new RequestURI(HttpMethod.GET, "/", false, true, false, "fullPath");
 		RequestURI uri12 = new RequestURI(HttpMethod.PUT, "/api/v1/", true);
 		
 		// when

@@ -175,7 +175,7 @@ public class BlockingServletTest {
         
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false, true), requestHandler);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false, true, true), requestHandler);
         
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);

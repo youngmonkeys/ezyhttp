@@ -427,6 +427,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			        resourceURI, 
 			        false,
 			        true,
+			        true,
 			        resource.getFullPath());
 			RequestHandler requestHandler = new ResourceRequestHandler(
 					resource.getPath(), 

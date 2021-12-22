@@ -66,6 +66,10 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
             .computeIfAbsent(uri, k -> new ArrayList<>())
             .add(handler);
 		this.requestURIManager.addHandledURI(uri.getUri());
+		if (uri.isApi()) {
+		    this.requestURIManager.addApiUri(uri.getUri());
+		    this.requestURIManager.addApiUri(uri.getSameURI());
+		}
 		if (uri.isAuthenticated()) {
 		    this.requestURIManager.addAuthenticatedUri(uri.getUri());
 		    this.requestURIManager.addAuthenticatedUri(uri.getSameURI());

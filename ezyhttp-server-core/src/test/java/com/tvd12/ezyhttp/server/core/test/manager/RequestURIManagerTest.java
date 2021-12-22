@@ -16,6 +16,7 @@ public class RequestURIManagerTest {
         RequestURIManager sut = new RequestURIManager();
         sut.addHandledURI("a");
         sut.addAuthenticatedUri("b");
+        sut.addApiUri("c");
         
         // when
         // then
@@ -23,5 +24,7 @@ public class RequestURIManagerTest {
         Asserts.assertEquals(sut.getHandledURIs(), Arrays.asList("a"), false);
         Assert.assertTrue(sut.isAuthenticatedUri("b"));
         Asserts.assertEquals(sut.getAuthenticatedUris(), Arrays.asList("b"), false);
+        Assert.assertTrue(sut.isApiUri("c"));
+        Asserts.assertEquals(sut.getApiUris(), Arrays.asList("c"), false);
     }
 }

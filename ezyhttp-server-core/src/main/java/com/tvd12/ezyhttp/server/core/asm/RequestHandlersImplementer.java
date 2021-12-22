@@ -38,6 +38,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
 	public Map<RequestURI, List<RequestHandler>> implement(Object controller) {
 		Map<RequestURI, List<RequestHandler>> handlers = new HashMap<>();
 		ControllerProxy proxy = new ControllerProxy(controller);
+		boolean isApi = proxy.isApi();
 		boolean isManagement = proxy.isManagement();
 		boolean authenticated = proxy.isAuthenticated();
 		for(RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
@@ -45,8 +46,9 @@ public class RequestHandlersImplementer extends EzyLoggable {
 			RequestHandler handler = implementer.implement();
 			HttpMethod httpMethod = handler.getMethod();
 			String requestURI = handler.getRequestURI();
+			boolean api = isApi || method.isApi();
 			boolean authen = authenticated || method.isAuthenticated();
-			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement, authen);
+			RequestURI uri = new RequestURI(httpMethod, requestURI, isManagement, authen, api);
 			handlers.computeIfAbsent(uri, k -> new ArrayList<>())
 			        .add(handler);
 		}
