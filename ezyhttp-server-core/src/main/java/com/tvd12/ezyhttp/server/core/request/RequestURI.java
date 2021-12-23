@@ -11,6 +11,7 @@ public class RequestURI {
 
 	protected final String uri;
 	protected final HttpMethod method;
+	protected final boolean api;
 	protected final boolean management;
 	protected final boolean resource;
 	protected final boolean authenticated;
@@ -20,15 +21,16 @@ public class RequestURI {
             HttpMethod method, 
             String uri, 
             boolean management) {
-        this(method, uri, management, false);
+        this(method, uri, management, false, true);
     }
 	
 	public RequestURI(
             HttpMethod method, 
             String uri, 
             boolean management, 
-            boolean authenticated) {
-	    this(method, uri, management, authenticated, false, null);
+            boolean authenticated,
+            boolean api) {
+	    this(method, uri, management, authenticated, false, api, null);
 	}
 	
 	public RequestURI(
@@ -36,19 +38,22 @@ public class RequestURI {
             String uri, 
             boolean management,
             boolean resource,
+            boolean api,
             String resourceFullPath) {
-	    this(method, uri, management, false, resource, resourceFullPath);
+	    this(method, uri, management, false, resource, api, resourceFullPath);
 	}
 	
-	public RequestURI(
+	private RequestURI(
 	        HttpMethod method, 
 	        String uri, 
 	        boolean management,
 	        boolean authenticated,
 	        boolean resource,
+	        boolean api,
 	        String resourceFullPath) {
 		this.method = method;
 		this.uri = standardizeURI(uri);
+		this.api = api;
 		this.management = management;
 		this.authenticated = authenticated;
 		this.resource = resource;

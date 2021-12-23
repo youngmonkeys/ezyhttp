@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyMethod;
+import com.tvd12.ezyhttp.server.core.annotation.Api;
 import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 import com.tvd12.ezyhttp.server.core.handler.ManagementController;
@@ -55,6 +56,10 @@ public class ControllerProxy {
 	public boolean isManagement() {
 	    return instance instanceof ManagementController;
 	}
+	
+	public boolean isApi() {
+        return clazz.getAnnotation(Api.class) != null;
+    }
 	
 	public boolean isAuthenticated() {
 	    return clazz.getAnnotation(Authenticated.class) != null;

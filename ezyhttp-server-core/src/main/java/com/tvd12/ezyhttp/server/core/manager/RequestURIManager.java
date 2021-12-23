@@ -9,10 +9,12 @@ import com.tvd12.ezyfox.util.EzyDestroyable;
 public class RequestURIManager implements EzyDestroyable {
     
     private final Set<String> handledURIs;
+    private final Set<String> apiUris;
     private final Set<String> authenticatedUris;
 
     public RequestURIManager() {
         this.handledURIs = ConcurrentHashMap.newKeySet();
+        this.apiUris = ConcurrentHashMap.newKeySet();
         this.authenticatedUris = ConcurrentHashMap.newKeySet();
     }
     
@@ -24,6 +26,14 @@ public class RequestURIManager implements EzyDestroyable {
         return this.handledURIs.contains(uri);
     }
 
+    public void addApiUri(String uri) {
+        this.apiUris.add(uri);
+    }
+
+    public boolean isApiUri(String uri) {
+        return apiUris.contains(uri);
+    }
+    
     public void addAuthenticatedUri(String uri) {
         this.authenticatedUris.add(uri);
     }
@@ -34,6 +44,10 @@ public class RequestURIManager implements EzyDestroyable {
     
     public Set<String> getHandledURIs() {
         return Collections.unmodifiableSet(handledURIs);
+    }
+    
+    public Set<String> getApiUris() {
+        return Collections.unmodifiableSet(apiUris);
     }
     
     public Set<String> getAuthenticatedUris() {
