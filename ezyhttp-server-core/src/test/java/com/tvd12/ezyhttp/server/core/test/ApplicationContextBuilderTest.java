@@ -27,6 +27,7 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.event.EventService;
 import com.tvd12.ezyhttp.server.core.test.event.SourceService;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
+import com.tvd12.ezyhttp.server.core.test.service.UserService0;
 import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
@@ -86,6 +87,7 @@ public class ApplicationContextBuilderTest {
 		Boolean resourceEnable = beanContext.getProperty("resources.enable", boolean.class);
 		Boolean resourceUploadEnable = beanContext.getProperty("resources.upload.enable", boolean.class);
 		UserService userService = beanContext.getSingleton(UserService.class);
+		UserService0 userService0 = beanContext.getSingleton(UserService0.class);
 		ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
 		ResourceResolver resourceResolver = beanContext.getSingleton(ResourceResolver.class);
 		ResourceDownloadManager resourceDownloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
@@ -104,6 +106,7 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertTrue(resourceEnable);
 		Asserts.assertTrue(resourceUploadEnable);
 		Asserts.assertNotNull(userService);
+		Asserts.assertNotNull(userService0);
 		Asserts.assertNotNull(viewContextBuilder);
 		Asserts.assertNotNull(resourceDownloadManager);
 		Asserts.assertEquals(4, resourceResolver.getResources().size());
