@@ -118,7 +118,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -196,7 +195,6 @@ public class BlockingServletTest {
         Asserts.assertTrue(requestURIManager.isAuthenticatedUri("/get/"));
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).getContentType();
         verify(response, times(1)).getOutputStream();
@@ -288,6 +286,10 @@ public class BlockingServletTest {
 		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
+		componentManager.getRequestHandlerManager().addHandler(
+		    new RequestURI(HttpMethod.GET, "/management", true),
+		    mock(RequestHandler.class)
+		);
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -336,6 +338,21 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
 		
+		when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		
 		// when
@@ -344,9 +361,8 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
-		verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
+		verify(response, times(1)).setStatus(StatusCodes.OK);
 
 		componentManager.destroy();
 	}
@@ -360,7 +376,7 @@ public class BlockingServletTest {
         componentManager.setManagmentPort(MANAGEMENT_POR);
         componentManager.setExposeMangementURIs(true);
         componentManager.getRequestHandlerManager().addHandler(
-            new RequestURI(HttpMethod.GET, "/management", false),
+            new RequestURI(HttpMethod.GET, "/management", true),
             mock(RequestHandler.class)
         );
         
@@ -374,6 +390,21 @@ public class BlockingServletTest {
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
         
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+        
+        when(request.getCookies()).thenReturn(
+            new Cookie[] { new Cookie("cookie", "CookieValue") }
+        );
+        
         HttpServletResponse response = mock(HttpServletResponse.class);
         
         // when
@@ -382,9 +413,10 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
-        verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        
+        Asserts.assertEquals(componentManager.getServerPort(), PORT);
 
         componentManager.destroy();
     }
@@ -509,7 +541,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getOutputStream();
 		verify(response, times(1)).setStatus(StatusCodes.METHOD_NOT_ALLOWED);
@@ -567,7 +598,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).setStatus(StatusCodes.OK);
         
@@ -620,7 +650,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).getOutputStream();
         verify(response, times(1)).setStatus(StatusCodes.METHOD_NOT_ALLOWED);
@@ -681,7 +710,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(2)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).setStatus(StatusCodes.OK);
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -737,7 +765,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).setStatus(StatusCodes.NOT_ACCEPTABLE);
 		
@@ -803,7 +830,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
 		
 		componentManager.destroy();
@@ -870,7 +896,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(2)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
         
         componentManager.destroy();
@@ -918,7 +943,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).setStatus(StatusCodes.OK);
 		
@@ -971,7 +995,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -1026,7 +1049,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -1081,7 +1103,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -1143,7 +1164,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -1205,7 +1225,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(2)).setStatus(StatusCodes.BAD_REQUEST);
 		
@@ -1265,7 +1284,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(2)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).setStatus(StatusCodes.BAD_REQUEST);
 		verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -1325,7 +1343,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(2)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
 		
@@ -1386,7 +1403,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).getContentType();
 		verify(response, times(1)).getOutputStream();
@@ -1456,7 +1472,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).sendRedirect("/home");
 		
@@ -1518,7 +1533,6 @@ public class BlockingServletTest {
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        verify(request, times(1)).getServerPort();
         
         verify(response, times(1)).sendRedirect("/home");
         
@@ -1584,7 +1598,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(interceptor, times(1)).preHandle(any(), any());
 		verify(interceptor, times(1)).postHandle(any(), any());
@@ -1644,7 +1657,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(2)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(interceptor, times(1)).preHandle(any(), any());
 		verify(interceptor, times(1)).postHandle(any(), any());
@@ -1702,7 +1714,6 @@ public class BlockingServletTest {
 		// then
 		verify(request, times(1)).getMethod();
 		verify(request, times(1)).getRequestURI();
-		verify(request, times(1)).getServerPort();
 		
 		verify(response, times(1)).setStatus(StatusCodes.OK);
 		
