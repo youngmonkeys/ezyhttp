@@ -320,6 +320,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		Map<String, Class> answer = new HashMap<>();
 		for(Class<?> clazz : classes) {
 			String serviceName = ServiceAnnotations.getServiceName(clazz);
+			if (answer.containsKey(serviceName)) {
+			    serviceName = clazz.getName();
+			}
 			answer.put(serviceName, clazz);
 		}
 		return answer;
