@@ -54,7 +54,6 @@ import com.tvd12.ezyhttp.server.core.view.ViewContext;
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
 
-	private int serverPort;
 	private int managmentPort;
 	private Set<String> managementURIs;
 	private boolean exposeMangementURIs;
@@ -75,7 +74,6 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
-		this.serverPort = componentManager.getServerPort();
 		this.managmentPort = componentManager.getManagmentPort();
 		this.managementURIs = componentManager.getManagementURIs();
 		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
@@ -175,19 +173,13 @@ public class BlockingServlet extends HttpServlet {
         }
 		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
 		boolean isManagementURI = managementURIs.contains(matchedURI);
-		if(isManagementURI && !exposeMangementURIs) {
-			if(request.getServerPort() != managmentPort) {
-			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
-				logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
-				return;
-			}
-		}
-		else {
-			if(request.getServerPort() != serverPort) {
-			    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
-				logger.warn("management server ({}) not allowed call to: {}, please check it", request.getRemoteHost(), requestURI);
-				return;
-			}
+		if(isManagementURI 
+		    && !exposeMangementURIs 
+		    && request.getServerPort() != managmentPort
+        ) {
+		    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
+			logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
+			return;
 		}
 		RequestHandler requestHandler =
 		        requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
