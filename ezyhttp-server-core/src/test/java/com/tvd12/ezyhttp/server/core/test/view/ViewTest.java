@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core.test.view;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -29,9 +30,14 @@ public class ViewTest {
 				.addCookie(new Cookie("cookie2", "cookie2Value"))
 				.addVariable("variable1", "variable1Value")
 				.addVariable("variable2", "variable2Value")
+				.appendToVariable("list", "a")
+				.appendToVariable("list", "b")
 				.build();
 		
 		// when
+		sut.setVariable("setValue", "value");
+        sut.appendToVariable("list", "c");
+		
 		// then
 		Asserts.assertEquals("index.html", sut.getTemplate());
 		Asserts.assertEquals(new Locale("vi"), sut.getLocale());
@@ -49,8 +55,12 @@ public class ViewTest {
 				EzyMapBuilder.mapBuilder()
 					.put("variable1", "variable1Value")
 					.put("variable2", "variable2Value")
+					.put("setValue", "value")
+					.put("list", Arrays.asList("a", "b", "c"))
 					.build(), 
 				sut.getVariables());
+		Asserts.assertEquals(sut.getVariable("setValue"), "value");
+		Asserts.assertEquals(sut.getVariable("list"), Arrays.asList("a", "b", "c"), false);
 	}
 	
 	@Test

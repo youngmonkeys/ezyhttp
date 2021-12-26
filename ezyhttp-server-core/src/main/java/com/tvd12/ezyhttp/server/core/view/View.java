@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.core.view;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,6 +46,26 @@ public class View {
 		return (T)variables.get(name);
 	}
 	
+	public void setVariable(String name, Object value) {
+	    this.variables.put(name, value);
+	}
+	
+	public void appendToVariable(String name, Object value) {
+	    appendToVariable(variables, name, value);
+	}
+	
+	@SuppressWarnings("unchecked")
+    public static void appendToVariable(
+	    Map<String, Object> variables,
+	    String variableName,
+	    Object value
+    ) {
+	    ((List<Object>)variables.computeIfAbsent(
+	        variableName, 
+	        k -> new ArrayList<>())
+        ).add(value);
+	}
+	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -85,6 +106,11 @@ public class View {
 			this.variables.putAll(variables);
 			return this;
 		}
+		
+		public Builder appendToVariable(String name, Object value) {
+            View.appendToVariable(variables, name, value);
+            return this;
+        }
 		
 		public Builder addHeader(String name, Object value) {
 			if(headers == null)
