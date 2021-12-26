@@ -23,27 +23,37 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 
     @Setter
     protected boolean allowOverrideURI;
-	protected final URITree uriTree;
 	protected final Set<String> handledURIs;
 	@Getter
 	protected final RequestURIManager requestURIManager;
+	protected final Map<HttpMethod, URITree> uriTreeByMethod;
 	protected final Map<RequestURI, RequestHandler> handlers;
 	protected final Map<RequestURI, List<RequestHandler>> handlerListByURI;
 	
 	public RequestHandlerManager() {
-		this.uriTree = new URITree();
 		this.handlers = new HashMap<>();
 		this.handledURIs = new HashSet<>();
 		this.handlerListByURI = new HashMap<>();
 		this.requestURIManager = new RequestURIManager();
+		this.uriTreeByMethod = this.newUriTreeByMethod();
 	}
 	
-	public String getMatchedURI(String requestURI) {
+	private Map<HttpMethod, URITree> newUriTreeByMethod() {
+	    Map<HttpMethod, URITree> answer = new HashMap<>();
+	    for (HttpMethod method : HttpMethod.values()) {
+	        answer.put(method, new URITree());
+	    }
+	    return answer;
+	}
+	
+	public String getMatchedURI(HttpMethod method, String requestURI) {
 	    String matchedURI = null;
         if(handledURIs.contains(requestURI))
             matchedURI = requestURI;
-        if(matchedURI == null)
+        if(matchedURI == null) {
+            URITree uriTree = uriTreeByMethod.get(method);
             matchedURI = uriTree.getMatchedURI(requestURI);
+        }
         return matchedURI;
 	}
 	
@@ -60,7 +70,6 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		    throw new DuplicateURIMappingHandlerException(uri, old, handler);
 		}
 		this.handledURIs.add(uri.getUri());
-		this.uriTree.addURI(uri.getUri());
 		this.logger.info("add mapping uri: {}", uri);
 		this.handlerListByURI
             .computeIfAbsent(uri, k -> new ArrayList<>())
@@ -74,6 +83,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		    this.requestURIManager.addAuthenticatedUri(uri.getUri());
 		    this.requestURIManager.addAuthenticatedUri(uri.getSameURI());
 		}
+		URITree uriTree = uriTreeByMethod.get(uri.getMethod());
+        uriTree.addURI(uri.getUri());
 	}
 	
 	public void addHandlers(Map<RequestURI, List<RequestHandler>> handlers) {

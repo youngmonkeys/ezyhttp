@@ -164,7 +164,7 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		preHandleRequest(method, request, response);
 		String requestURI = request.getRequestURI();
-		String matchedURI = requestHandlerManager.getMatchedURI(requestURI);
+		String matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
 		if(matchedURI == null) {
             if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
                 responseString(response, "uri " + requestURI + " not found");
