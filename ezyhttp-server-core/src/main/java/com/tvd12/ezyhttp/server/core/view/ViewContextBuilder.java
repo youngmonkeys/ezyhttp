@@ -31,6 +31,7 @@ public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
 	
 	public ViewContextBuilder viewDecorators(List<ViewDecorator> viewDecorators) {
 	    this.viewDecorators.addAll(viewDecorators);
+	    this.viewDecorators.sort((a, b) -> a.getPriority() - b.getPriority());
 	    return this;
 	}
 	

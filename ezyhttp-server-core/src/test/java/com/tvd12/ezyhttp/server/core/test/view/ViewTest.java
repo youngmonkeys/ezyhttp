@@ -61,6 +61,8 @@ public class ViewTest {
 				sut.getVariables());
 		Asserts.assertEquals(sut.getVariable("setValue"), "value");
 		Asserts.assertEquals(sut.getVariable("list"), Arrays.asList("a", "b", "c"), false);
+		Asserts.assertTrue(sut.containsVariable("variable1"));
+		Asserts.assertFalse(sut.containsVariable("i don't know"));
 	}
 	
 	@Test

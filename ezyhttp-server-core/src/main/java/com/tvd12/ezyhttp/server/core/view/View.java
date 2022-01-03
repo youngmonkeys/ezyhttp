@@ -41,6 +41,10 @@ public class View {
 		return View.builder().template(template).build();
 	}
 	
+	public boolean containsVariable(String name) {
+	    return variables.containsKey(name);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T> T getVariable(String name) {
 		return (T)variables.get(name);
