@@ -21,6 +21,8 @@ import lombok.Setter;
 @Getter
 public final class ComponentManager implements EzyDestroyable {
 	
+    @Setter
+    private boolean debug;
 	@Setter
 	private int serverPort;
 	@Setter

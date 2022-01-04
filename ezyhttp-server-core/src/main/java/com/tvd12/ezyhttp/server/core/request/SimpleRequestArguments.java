@@ -26,6 +26,8 @@ import lombok.Setter;
 @SuppressWarnings("unchecked")
 public class SimpleRequestArguments implements RequestArguments {
 
+    @Setter
+    protected boolean debug;
 	@Setter
 	@Getter
 	protected HttpMethod method;
@@ -52,9 +54,10 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public <T> T getArgument(Object key) {
-		if(arguments == null)
-			return null;
-		Object argument = arguments.get(key);
+		Object argument = arguments != null ? arguments.get(key) : null;
+		if (argument == null && debug) {
+		    throw new NullPointerException("there is no value for argment: " + key);
+		}
 		return (T)argument;
 	}
 	

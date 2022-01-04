@@ -54,6 +54,7 @@ import com.tvd12.ezyhttp.server.core.view.ViewContext;
 public class BlockingServlet extends HttpServlet {
 	private static final long serialVersionUID = -3874017929628817672L;
 
+	private boolean debug;
 	private int managmentPort;
 	private Set<String> managementURIs;
 	private boolean exposeMangementURIs;
@@ -74,6 +75,7 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
+		this.debug = componentManager.isDebug();
 		this.managmentPort = componentManager.getManagmentPort();
 		this.managementURIs = componentManager.getManagementURIs();
 		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
@@ -453,6 +455,7 @@ public class BlockingServlet extends HttpServlet {
 			HttpServletRequest request,
 			HttpServletResponse response) {
 		SimpleRequestArguments arguments = new SimpleRequestArguments();
+		arguments.setDebug(debug);
 		arguments.setMethod(method);
 		arguments.setRequest(request);
 		arguments.setResponse(response);

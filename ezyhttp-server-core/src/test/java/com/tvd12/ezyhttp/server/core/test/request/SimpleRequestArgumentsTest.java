@@ -90,6 +90,20 @@ public class SimpleRequestArgumentsTest {
 		sut.release();
 	}
 	
+	@Test
+    public void argumentButDebugTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        sut.setDebug(true);
+        
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.getArgument("unknown"));
+        
+        // then
+        Asserts.assertEqualsType(e, NullPointerException.class);
+        sut.release();
+    }
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void parameterTest() {

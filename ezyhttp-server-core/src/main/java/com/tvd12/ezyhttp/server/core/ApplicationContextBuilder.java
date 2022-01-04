@@ -329,6 +329,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected void setComponentProperties(EzyBeanContext beanContext) {
+	    componentManager.setDebug(
+	        beanContext.getProperty(PropertyNames.DEBUG, boolean.class, false)
+        );
 	    requestHandlerManager.setAllowOverrideURI(
             beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
         );
