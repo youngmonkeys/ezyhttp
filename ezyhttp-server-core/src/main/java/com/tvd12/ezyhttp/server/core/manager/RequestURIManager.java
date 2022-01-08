@@ -10,11 +10,13 @@ public class RequestURIManager implements EzyDestroyable {
     
     private final Set<String> handledURIs;
     private final Set<String> apiUris;
+    private final Set<String> managementUris;
     private final Set<String> authenticatedUris;
 
     public RequestURIManager() {
         this.handledURIs = ConcurrentHashMap.newKeySet();
         this.apiUris = ConcurrentHashMap.newKeySet();
+        this.managementUris = ConcurrentHashMap.newKeySet();
         this.authenticatedUris = ConcurrentHashMap.newKeySet();
     }
     
@@ -32,6 +34,14 @@ public class RequestURIManager implements EzyDestroyable {
 
     public boolean isApiUri(String uri) {
         return apiUris.contains(uri);
+    }
+    
+    public void addManagementUri(String uri) {
+        this.managementUris.add(uri);
+    }
+
+    public boolean isManagementUri(String uri) {
+        return managementUris.contains(uri);
     }
     
     public void addAuthenticatedUri(String uri) {
@@ -57,6 +67,7 @@ public class RequestURIManager implements EzyDestroyable {
     @Override
     public void destroy() {
         this.handledURIs.clear();
+        this.managementUris.clear();
         this.authenticatedUris.clear();
     }
 }

@@ -5,7 +5,6 @@ import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +21,6 @@ import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.bean.impl.EzyBeanKey;
 import com.tvd12.ezyfox.bean.impl.EzyBeanNameParser;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.reflect.EzyClasses;
 import com.tvd12.ezyfox.reflect.EzyPackages;
 import com.tvd12.ezyfox.reflect.EzyReflection;
@@ -357,7 +355,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		componentManager.setServerPort(getServerPort(beanContext));
 		componentManager.setExposeMangementURIs(isExposeManagementURIs(beanContext));
 		componentManager.setManagmentPort(getManagementPort(beanContext));
-		componentManager.addManagementURIs(getManagementURIs(beanContext));
 		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
 		componentManager.addRequestResponseWatchers(requestResponseWathcers);
 	}
@@ -376,15 +373,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		return managementEnable 
 				? beanContext.getProperty(PropertyNames.MANAGEMENT_PORT, int.class, 18080)
 				: 0;
-	}
-	
-	private Set<String> getManagementURIs(EzyBeanContext beanContext) {
-		boolean managementEnable = beanContext.getProperty(
-				PropertyNames.MANAGEMENT_ENABLE, boolean.class, false);
-		return managementEnable
-				? Sets.newHashSet(beanContext.getProperty(
-						PropertyNames.MANAGEMENT_URIS, String[].class, new String[0]))
-				: Collections.emptySet();
 	}
 	
 	protected ViewContext buildViewContext(EzyBeanContext beanContext) {
@@ -416,7 +404,6 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		implementer.setRequestURIDecorator(beanContext.getSingleton(RequestURIDecorator.class));
 		Map<RequestURI, List<RequestHandler>> requestHandlers = 
 		        implementer.implement(controllerList);
-		componentManager.appendManagementURIs(requestHandlers.keySet());
 		requestHandlerManager.addHandlers(requestHandlers);
 	}
 	

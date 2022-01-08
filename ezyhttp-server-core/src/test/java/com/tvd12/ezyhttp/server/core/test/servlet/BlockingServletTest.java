@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
@@ -68,7 +67,6 @@ public class BlockingServletTest {
 	public void doGetTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
@@ -142,7 +140,6 @@ public class BlockingServletTest {
     public void doGetSecureTest() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
@@ -219,7 +216,6 @@ public class BlockingServletTest {
 	public void doGetManagementTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Sets.newHashSet("/get"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
 		
@@ -283,7 +279,6 @@ public class BlockingServletTest {
 	public void doGetToManagementNotAllow() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
 		componentManager.getRequestHandlerManager().addHandler(
@@ -320,7 +315,6 @@ public class BlockingServletTest {
 	public void doGetFromManagement() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Sets.newHashSet("/management"));
 		componentManager.setServerPort(PORT);
 		componentManager.setManagmentPort(MANAGEMENT_POR);
 		componentManager.getRequestHandlerManager().addHandler(
@@ -371,7 +365,6 @@ public class BlockingServletTest {
     public void doGetFromManagementButExpose() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Sets.newHashSet("/management"));
         componentManager.setServerPort(PORT);
         componentManager.setManagmentPort(MANAGEMENT_POR);
         componentManager.setExposeMangementURIs(true);
@@ -425,7 +418,6 @@ public class BlockingServletTest {
 	public void requestHandlerNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -463,7 +455,6 @@ public class BlockingServletTest {
     public void requestHandlerNullAndHasErrorHandler() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -512,7 +503,6 @@ public class BlockingServletTest {
 	public void requestHandlerEmpty() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -554,7 +544,6 @@ public class BlockingServletTest {
     public void requestHandlerEmptyAndHasErrorHandler() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -608,7 +597,6 @@ public class BlockingServletTest {
     public void requestHandlerEmptyWithErrorHandlerButDataNull() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -663,7 +651,6 @@ public class BlockingServletTest {
     public void requestHandlerEmptyAndHasErrorHandlerButException() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -721,7 +708,6 @@ public class BlockingServletTest {
 	public void doGetNotAcceptable() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -777,7 +763,6 @@ public class BlockingServletTest {
 	public void doGetResponseContentTypeNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -839,7 +824,6 @@ public class BlockingServletTest {
     public void doGetResponseContentTypeNullAndPostHandleRequestError() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         BlockingServlet sut = new BlockingServlet();
@@ -905,7 +889,6 @@ public class BlockingServletTest {
 	public void responseDataIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -953,7 +936,6 @@ public class BlockingServletTest {
 	public void getRequestDeserializeValueException() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1007,7 +989,6 @@ public class BlockingServletTest {
 	public void getRequestHttpRequestExceptionDataNotNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1061,7 +1042,6 @@ public class BlockingServletTest {
 	public void getRequestHttpRequestExceptionDataNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1115,7 +1095,6 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionContentTypeIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1176,7 +1155,6 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionResultIsNull() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1235,7 +1213,6 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionError() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1295,7 +1272,6 @@ public class BlockingServletTest {
 	public void getRequestUnknownExceptionNoHandler() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1353,7 +1329,6 @@ public class BlockingServletTest {
 	public void doPostTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1425,7 +1400,6 @@ public class BlockingServletTest {
 	public void doPutTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();
@@ -1485,7 +1459,6 @@ public class BlockingServletTest {
     public void doPutWithRedirectTest() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.addManagementURIs(Collections.emptySet());
         componentManager.setServerPort(PORT);
         
         BlockingServlet sut = new BlockingServlet();
@@ -1546,7 +1519,6 @@ public class BlockingServletTest {
 	public void doDeleteTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		ViewContext viewContext = mock(ViewContext.class);
@@ -1610,7 +1582,6 @@ public class BlockingServletTest {
 	public void doDeleteButViewContextIsNullTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		componentManager.setViewContext(null);
 		
@@ -1668,7 +1639,6 @@ public class BlockingServletTest {
 	public void doGetButResponseBodyIsNullTest() throws Exception {
 		// given
 		ComponentManager componentManager = ComponentManager.getInstance();
-		componentManager.addManagementURIs(Collections.emptySet());
 		componentManager.setServerPort(PORT);
 		
 		BlockingServlet sut = new BlockingServlet();

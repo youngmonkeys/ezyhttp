@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -45,6 +44,7 @@ import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
+import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
@@ -56,13 +56,13 @@ public class BlockingServlet extends HttpServlet {
 
 	private boolean debug;
 	private int managmentPort;
-	private Set<String> managementURIs;
 	private boolean exposeMangementURIs;
 	protected ViewContext viewContext;
 	protected ObjectMapper objectMapper;
 	protected DataConverters dataConverters;
 	protected ComponentManager componentManager;
 	protected InterceptorManager interceptorManager;
+	protected RequestURIManager requestURIManager;
 	protected RequestHandlerManager requestHandlerManager;
 	protected ExceptionHandlerManager exceptionHandlerManager;
 	protected UnhandledErrorHandler unhandledErrorHandler;
@@ -77,13 +77,13 @@ public class BlockingServlet extends HttpServlet {
 		this.componentManager = ComponentManager.getInstance();
 		this.debug = componentManager.isDebug();
 		this.managmentPort = componentManager.getManagmentPort();
-		this.managementURIs = componentManager.getManagementURIs();
 		this.exposeMangementURIs = componentManager.isExposeMangementURIs();
 		this.viewContext = componentManager.getViewContext();
 		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
 		this.interceptorManager = componentManager.getInterceptorManager();
 		this.requestHandlerManager = componentManager.getRequestHandlerManager();
+		this.requestURIManager = requestHandlerManager.getRequestURIManager();
 		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
 		this.requestResponseWatchers = componentManager.getRequestResponseWatchers();
 		this.addDefaultExceptionHandlers();
@@ -174,7 +174,7 @@ public class BlockingServlet extends HttpServlet {
             return;
         }
 		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
-		boolean isManagementURI = managementURIs.contains(matchedURI);
+		boolean isManagementURI = requestURIManager.isManagementUri(matchedURI);
 		if(isManagementURI 
 		    && !exposeMangementURIs 
 		    && request.getServerPort() != managmentPort
