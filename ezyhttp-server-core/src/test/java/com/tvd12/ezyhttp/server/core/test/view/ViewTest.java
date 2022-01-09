@@ -28,6 +28,7 @@ public class ViewTest {
 				.addHeaders(Collections.singletonMap("header", "headerValue"))
 				.addCookie(new Cookie("cookie1", "cookie1Value"))
 				.addCookie(new Cookie("cookie2", "cookie2Value"))
+				.addCookie("cookie2", "cookie3Value", "/path")
 				.addVariable("variable1", "variable1Value")
 				.addVariable("variable2", "variable2Value")
 				.appendToVariable("list", "a")
@@ -63,6 +64,7 @@ public class ViewTest {
 		Asserts.assertEquals(sut.getVariable("list"), Arrays.asList("a", "b", "c"), false);
 		Asserts.assertTrue(sut.containsVariable("variable1"));
 		Asserts.assertFalse(sut.containsVariable("i don't know"));
+		Asserts.assertEquals(sut.getCookies().get(2).getPath(), "/path");
 	}
 	
 	@Test

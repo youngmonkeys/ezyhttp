@@ -40,6 +40,7 @@ public class RedirectTest {
 				.addParameters(Collections.singletonMap("param3", "three"))
 				.addCookie("cookie1", "cvalue1")
 				.addCookie("cookie2", "cvalue2")
+				.addCookie("cookie3", "cvalue3", "/path")
 				.build();
 		
 		// when
@@ -57,10 +58,14 @@ public class RedirectTest {
 		expectedHeaders.put("one", "1");
 		Asserts.assertEquals(expectedHeaders, headers, false);
 		
+		Cookie cookie3 = new Cookie("cookie3", "cvalue3");
+		cookie3.setPath("/path");
 		List<Cookie> expectedCookies = Lists.newArrayList(
 			new Cookie("cookie1", "cvalue1"),
-			new Cookie("cookie2", "cvalue2")
+			new Cookie("cookie2", "cvalue2"),
+			cookie3
 		);
 		Asserts.assertEquals(expectedCookies, cookies, false);
+		Asserts.assertEquals(sut.getCookies().get(2).getPath(), "/path");
 	}
 }

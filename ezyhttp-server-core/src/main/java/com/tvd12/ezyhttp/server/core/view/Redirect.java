@@ -131,6 +131,12 @@ public class Redirect {
 			return addCookie(new Cookie(name, value.toString()));
 		}
 		
+		public Builder addCookie(String name, Object value, String path) {
+            Cookie cookie = new Cookie(name, value.toString());
+            cookie.setPath(path);
+            return addCookie(cookie);
+        }
+		
 		@Override
 		public Redirect build() {
 			if(cookies == null)

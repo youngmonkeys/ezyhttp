@@ -140,6 +140,12 @@ public class View {
 			return addCookie(new Cookie(name, value.toString()));
 		}
 		
+		public Builder addCookie(String name, Object value, String path) {
+		    Cookie cookie = new Cookie(name, value.toString());
+		    cookie.setPath(path);
+            return addCookie(cookie);
+        }
+		
 		@Override
 		public View build() {
 			if(template == null)
