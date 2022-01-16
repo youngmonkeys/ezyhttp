@@ -7,13 +7,13 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.tvd12.ezyhttp.core.json.LongArrayDeserializer;
+import com.tvd12.ezyhttp.core.json.IntegerArrayDeserializer;
 import com.tvd12.test.assertion.Asserts;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-public class LongArrayDeserializerTest {
+public class IntegerArrayDeserializerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -26,7 +26,7 @@ public class LongArrayDeserializerTest {
         Value value = objectMapper.convertValue(map, Value.class);
         
         // then
-        Asserts.assertEquals(value, new Value(new Long[] { 1L, 2L, 3L }));
+        Asserts.assertEquals(value, new Value(new Integer[] { 1, 2, 3 }));
     }
     
     @Test
@@ -38,14 +38,14 @@ public class LongArrayDeserializerTest {
         Value value = objectMapper.convertValue(map, Value.class);
         
         // then
-        Asserts.assertEquals(value, new Value(new Long[] { 1L, 2L, 3L }));
+        Asserts.assertEquals(value, new Value(new Integer[] { 1, 2, 3 }));
     }
     
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Value {
         
-        @JsonDeserialize(using = LongArrayDeserializer.class)
-        public Long[] value;
+        @JsonDeserialize(using = IntegerArrayDeserializer.class)
+        public Integer[] value;
     }
 }

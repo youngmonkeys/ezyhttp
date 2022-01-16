@@ -9,22 +9,22 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.tvd12.ezyfox.io.EzyStringConveter;
 
-public class LongArrayDeserializer extends StdDeserializer<Long[]> {
+public class DoubleArrayDeserializer extends StdDeserializer<Double[]> {
     private static final long serialVersionUID = -4497810070359275209L;
     
-    public LongArrayDeserializer() {
-        super(Long[].class);
+    public DoubleArrayDeserializer() {
+        super(Double[].class);
     }
 
     @Override
-    public Long[] deserialize(
+    public Double[] deserialize(
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException, JsonProcessingException {
         if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-            return EzyStringConveter.stringToWrapperLongArray(p.getValueAsString());
+            return EzyStringConveter.stringToWrapperDoubleArray(p.getValueAsString());
         }
-        return ctxt.readValue(p, Long[].class);
+        return ctxt.readValue(p, Double[].class);
     }
 
 }
