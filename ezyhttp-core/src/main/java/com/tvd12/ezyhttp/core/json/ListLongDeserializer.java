@@ -9,8 +9,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import com.tvd12.reflections.util.Lists;
 
-public class ListLongDeserializer extends StdDeserializer<List<Number>> {
+public class ListLongDeserializer extends StdDeserializer<List<Long>> {
     private static final long serialVersionUID = -4497810070359275209L;
     
     public ListLongDeserializer() {
@@ -19,7 +20,7 @@ public class ListLongDeserializer extends StdDeserializer<List<Number>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Number> deserialize(
+    public List<Long> deserialize(
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException, JsonProcessingException {
@@ -30,7 +31,7 @@ public class ListLongDeserializer extends StdDeserializer<List<Number>> {
                     Long.class
             );
         }
-        return ctxt.readValue(p, List.class);
+        return Lists.newArrayList(ctxt.readValue(p, Long[].class));
     }
 
 }

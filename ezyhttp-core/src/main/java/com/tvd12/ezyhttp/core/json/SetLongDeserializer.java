@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 
 public class SetLongDeserializer extends StdDeserializer<Set<Long>> {
@@ -30,7 +31,7 @@ public class SetLongDeserializer extends StdDeserializer<Set<Long>> {
                     Long.class
             );
         }
-        return ctxt.readValue(p, Set.class);
+        return Sets.newHashSet(ctxt.readValue(p, Long[].class));
     }
 
 }

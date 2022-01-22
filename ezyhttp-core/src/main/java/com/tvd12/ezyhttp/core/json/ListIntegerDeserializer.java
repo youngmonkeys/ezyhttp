@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.tvd12.ezyfox.collect.Lists;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 
 public class ListIntegerDeserializer extends StdDeserializer<List<Integer>> {
@@ -30,7 +31,7 @@ public class ListIntegerDeserializer extends StdDeserializer<List<Integer>> {
                     Integer.class
             );
         }
-        return ctxt.readValue(p, List.class);
+        return Lists.newArrayList(ctxt.readValue(p, Integer[].class));
     }
 
 }

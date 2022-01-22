@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import com.tvd12.reflections.util.Lists;
 
 public class ListDoubleDeserializer extends StdDeserializer<List<Double>> {
     private static final long serialVersionUID = -4497810070359275209L;
@@ -30,7 +31,7 @@ public class ListDoubleDeserializer extends StdDeserializer<List<Double>> {
                     Double.class
             );
         }
-        return ctxt.readValue(p, List.class);
+        return Lists.newArrayList(ctxt.readValue(p, Double[].class));
     }
 
 }
