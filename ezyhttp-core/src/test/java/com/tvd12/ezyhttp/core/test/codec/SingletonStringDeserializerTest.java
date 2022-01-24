@@ -272,4 +272,103 @@ public class SingletonStringDeserializerTest {
 		// then
 		Asserts.assertEquals(exception.getClass(), IOException.class);
 	}
+	
+	@Test
+	public void deserializeNullStringToPrimitive() throws Exception {
+		// given
+		boolean booleanActual = false;
+		byte byteActual = (byte) 0;
+		char charActual = '\u0000';
+		double doubleActual = 0.0D;
+		float floatActual = 0.0F;
+		int intActual = 0;
+		long longActual = 0L;
+		short shortActual = (short) 0;
+
+		// when
+		boolean booleanValue = sut.deserialize(null, boolean.class);
+		byte byteValue = sut.deserialize(null, byte.class);
+		char charValue = sut.deserialize(null, char.class);
+		double doubleValue = sut.deserialize(null, double.class);
+		float floatValue = sut.deserialize(null, float.class);
+		int intValue = sut.deserialize(null, int.class);
+		long longValue = sut.deserialize(null, long.class);
+		short shortValue = sut.deserialize(null, short.class);
+		
+		// then
+		Asserts.assertEquals(booleanActual, booleanValue);
+		Asserts.assertEquals(byteActual, byteValue);
+		Asserts.assertEquals(charActual, charValue);
+		Asserts.assertEquals(doubleActual, doubleValue);
+		Asserts.assertEquals(floatActual, floatValue);
+		Asserts.assertEquals(intActual, intValue);
+		Asserts.assertEquals(longActual, longValue);
+		Asserts.assertEquals(shortActual, shortValue);
+	}
+	
+	@Test
+	public void deserializeNullStringToWrapper() throws Exception {
+		// given
+		Boolean booleanActual = null;
+		Byte byteActual = null;
+		Character charActual = null;
+		Double doubleActual = null;
+		Float floatActual = null;
+		Integer intActual = null;
+		Long longActual = null;
+		Short shortActual = null;
+		String stringActual = null;
+		
+		// when
+		Boolean booleanValue = sut.deserialize(null, Boolean.class);
+		Byte byteValue = sut.deserialize(null, Byte.class);
+		Character charValue = sut.deserialize(null, Character.class);
+		Double doubleValue = sut.deserialize(null, Double.class);
+		Float floatValue = sut.deserialize(null, Float.class);
+		Integer intValue = sut.deserialize(null, Integer.class);
+		Long longValue = sut.deserialize(null, Long.class);
+		Short shortValue = sut.deserialize(null, Short.class);
+		String stringValue = sut.deserialize(null, String.class);
+		
+		// then
+		Asserts.assertEquals(booleanActual, booleanValue);
+		Asserts.assertEquals(byteActual, byteValue);
+		Asserts.assertEquals(charActual, charValue);
+		Asserts.assertEquals(doubleActual, doubleValue);
+		Asserts.assertEquals(floatActual, floatValue);
+		Asserts.assertEquals(intActual, intValue);
+		Asserts.assertEquals(longActual, longValue);
+		Asserts.assertEquals(shortActual, shortValue);
+		Asserts.assertEquals(stringActual, stringValue);
+	}
+	
+	@Test
+	public void deserializeNullStringToSpecialValues() throws Exception {
+		// given
+		Date date = null;
+		Instant instant = null;
+		LocalDate localDate = null;
+		LocalTime localTime = null;
+		LocalDateTime localDateTime = null;
+		BigInteger bigInteger = null;
+		BigDecimal bigDecimal = null;
+		
+		// when
+		Date actualDate = sut.deserialize(null, Date.class);
+		Instant actualInstant = sut.deserialize(null, Instant.class);
+		LocalDate actualLocalDate = sut.deserialize(null, LocalDate.class);
+		LocalTime actualLocalTime = sut.deserialize(null, LocalTime.class);
+		LocalDateTime actualLocalDateTime = sut.deserialize(null, LocalDateTime.class);
+		BigInteger actualBigInteger = sut.deserialize(null, BigInteger.class);
+		BigDecimal actualBigDecimal = sut.deserialize(null, BigDecimal.class);
+		
+		// then
+		Asserts.assertEquals(date, actualDate);
+		Asserts.assertEquals(instant, actualInstant);
+		Asserts.assertEquals(localDate, actualLocalDate);
+		Asserts.assertEquals(localTime, actualLocalTime);
+		Asserts.assertEquals(localDateTime, actualLocalDateTime);
+		Asserts.assertEquals(bigInteger, actualBigInteger);
+		Asserts.assertEquals(bigDecimal, actualBigDecimal);
+	}
 }
