@@ -63,13 +63,13 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		Map<Class<?>, StringMapper> map = new HashMap<>();
 		map.put(String.class, v -> v);
 		map.put(boolean.class, v -> v != null ? Boolean.valueOf(v) : false);
-		map.put(byte.class, v -> v != null ? Byte.valueOf(v) : 0);
+		map.put(byte.class, v -> v != null ? Byte.valueOf(v) : (byte) 0);
 		map.put(char.class, v -> EzyDataConverter.stringToChar(v));
-		map.put(double.class, v -> v != null ? Double.valueOf(v) : 0);
-		map.put(float.class, v -> v != null ? Float.valueOf(v) : 0);
+		map.put(double.class, v -> v != null ? Double.valueOf(v) : 0.0D);
+		map.put(float.class, v -> v != null ? Float.valueOf(v) : 0.0F);
 		map.put(int.class, v -> v != null ? Integer.valueOf(v) : 0);
-		map.put(long.class, v -> v != null ? Long.valueOf(v) : 0);
-		map.put(short.class, v -> v != null ? Short.valueOf(v) : 0);
+		map.put(long.class, v -> v != null ? Long.valueOf(v) : 0L);
+		map.put(short.class, v -> v != null ? Short.valueOf(v) : (short) 0);
 
 		map.put(Boolean.class, v -> v != null ? Boolean.valueOf(v) : null);
 		map.put(Byte.class, v -> v != null ? Byte.valueOf(v) : null);
