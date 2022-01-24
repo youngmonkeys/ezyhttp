@@ -24,7 +24,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 
 public class DefaultStringDeserializer implements StringDeserializer {
 
-	protected final Map<Class<?>, StringMapper> mappers; 
+	protected final Map<Class<?>, StringMapper> mappers;
 	
 	public DefaultStringDeserializer() {
 		this.mappers = defaultMappers();
@@ -34,7 +34,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	@Override
 	public <T> T deserialize(
 			String value,
-			Class<T> outType, 
+			Class<T> outType,
 			Class<?> genericType) throws IOException {
 		if(genericType != null) {
 			if(Set.class.isAssignableFrom(outType))
@@ -62,23 +62,23 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	protected Map<Class<?>, StringMapper> defaultMappers() {
 		Map<Class<?>, StringMapper> map = new HashMap<>();
 		map.put(String.class, v -> v);
-		map.put(boolean.class, v -> Boolean.valueOf(v));
-		map.put(byte.class, v -> Byte.valueOf(v));
+		map.put(boolean.class, v -> v != null ? Boolean.valueOf(v) : false);
+		map.put(byte.class, v -> v != null ? Byte.valueOf(v) : 0);
 		map.put(char.class, v -> EzyDataConverter.stringToChar(v));
-		map.put(double.class, v -> Double.valueOf(v));
-		map.put(float.class, v -> Float.valueOf(v));
-		map.put(int.class, v -> Integer.valueOf(v));
-		map.put(long.class, v -> Long.valueOf(v));
-		map.put(short.class, v -> Short.valueOf(v));
+		map.put(double.class, v -> v != null ? Double.valueOf(v) : 0);
+		map.put(float.class, v -> v != null ? Float.valueOf(v) : 0);
+		map.put(int.class, v -> v != null ? Integer.valueOf(v) : 0);
+		map.put(long.class, v -> v != null ? Long.valueOf(v) : 0);
+		map.put(short.class, v -> v != null ? Short.valueOf(v) : 0);
 
-		map.put(Boolean.class, v -> Boolean.valueOf(v));
-		map.put(Byte.class, v -> Byte.valueOf(v));
-		map.put(Character.class, v -> EzyDataConverter.stringToChar(v));
-		map.put(Double.class, v -> Double.valueOf(v));
-		map.put(Float.class, v -> Float.valueOf(v));
-		map.put(Integer.class, v -> Integer.valueOf(v));
-		map.put(Long.class, v -> Long.valueOf(v));
-		map.put(Short.class, v -> Short.valueOf(v));
+		map.put(Boolean.class, v -> v != null ? Boolean.valueOf(v) : null);
+		map.put(Byte.class, v -> v != null ? Byte.valueOf(v) : null);
+		map.put(Character.class, v -> v != null ? EzyDataConverter.stringToChar(v) : null);
+		map.put(Double.class, v -> v != null ? Double.valueOf(v) : null);
+		map.put(Float.class, v -> v != null ? Float.valueOf(v) : null);
+		map.put(Integer.class, v -> v != null ? Integer.valueOf(v) : null);
+		map.put(Long.class, v -> v != null ? Long.valueOf(v) : null);
+		map.put(Short.class, v -> v != null ? Short.valueOf(v) : null);
 		
 		map.put(String[].class, v -> stringToStringArray(v));
 		map.put(List.class, v -> stringToList(v));
@@ -102,13 +102,13 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		map.put(Long[].class, v -> stringToWrapperLong(v));
 		map.put(Short[].class, v -> stringToWrapperShort(v));
 		
-		map.put(Date.class, v -> new Date(Long.valueOf(v)));
-		map.put(Instant.class, v -> Instant.ofEpochMilli(Long.valueOf(v)));
-		map.put(LocalDate.class, v -> EzyDates.parseDate(v));
-		map.put(LocalTime.class, v -> EzyDates.parseTime(v));
-		map.put(LocalDateTime.class, v -> EzyDates.parseDateTime(v));
-		map.put(BigInteger.class, v -> new BigInteger(v));
-		map.put(BigDecimal.class, v -> new BigDecimal(v));
+		map.put(Date.class, v -> v != null ? new Date(Long.valueOf(v)) : null);
+		map.put(Instant.class, v -> v != null ? Instant.ofEpochMilli(Long.valueOf(v)) : null);
+		map.put(LocalDate.class, v -> v != null ? EzyDates.parseDate(v) : null);
+		map.put(LocalTime.class, v -> v != null ? EzyDates.parseTime(v) : null);
+		map.put(LocalDateTime.class, v -> v != null ? EzyDates.parseDateTime(v) : null);
+		map.put(BigInteger.class, v -> v != null ? new BigInteger(v) : null);
+		map.put(BigDecimal.class, v -> v != null ? new BigDecimal(v) : null);
 		return map;
 	}
 
