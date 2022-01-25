@@ -37,6 +37,7 @@ public class ViewTest {
 		
 		// when
 		sut.setVariable("setValue", "value");
+		sut.setVariables(Collections.singletonMap("mapKey", "mapValue"));
         sut.appendToVariable("list", "c");
 		
 		// then
@@ -58,6 +59,7 @@ public class ViewTest {
 					.put("variable2", "variable2Value")
 					.put("setValue", "value")
 					.put("list", Arrays.asList("a", "b", "c"))
+					.put("mapKey", "mapValue")
 					.build(), 
 				sut.getVariables());
 		Asserts.assertEquals(sut.getVariable("setValue"), "value");
@@ -65,6 +67,7 @@ public class ViewTest {
 		Asserts.assertTrue(sut.containsVariable("variable1"));
 		Asserts.assertFalse(sut.containsVariable("i don't know"));
 		Asserts.assertEquals(sut.getCookies().get(2).getPath(), "/path");
+		Asserts.assertEquals(sut.getVariable("mapKey"), "mapValue");
 	}
 	
 	@Test

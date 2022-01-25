@@ -54,6 +54,10 @@ public class View {
 	    this.variables.put(name, value);
 	}
 	
+	public void setVariables(Map<String, Object> variables) {
+	    this.variables.putAll(variables);
+	}
+	
 	public void appendToVariable(String name, Object value) {
 	    appendToVariable(variables, name, value);
 	}
