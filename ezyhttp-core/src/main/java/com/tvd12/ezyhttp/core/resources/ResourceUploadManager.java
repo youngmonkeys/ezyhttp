@@ -3,14 +3,15 @@ package com.tvd12.ezyhttp.core.resources;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.tvd12.ezyfox.concurrent.EzyCallableFutureTask;
+import com.tvd12.ezyfox.concurrent.EzyExecutors;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
 import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureTask;
-import com.tvd12.ezyfox.concurrent.EzyThreadList;
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
@@ -27,7 +28,7 @@ public class ResourceUploadManager
 	protected final int capacity;
 	protected final int threadPoolSize;
 	protected final int bufferSize;
-	protected final EzyThreadList threadList;
+	protected final ExecutorService executorService;
 	protected final BlockingQueue<Entry> queue;
 	protected final EzyFutureMap<Entry> futureMap;
 	protected final static Entry POISON = new Entry();
@@ -37,7 +38,7 @@ public class ResourceUploadManager
 	public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
 	public static final long UNLIMIT_UPLOAD_SIZE = -1;
 	public static final int DEFAULT_THREAD_POOL_SIZE = 
-        Runtime.getRuntime().availableProcessors() * 2;
+	        Runtime.getRuntime().availableProcessors() * 2;
 	
 	public ResourceUploadManager() {
 		this(
@@ -55,20 +56,22 @@ public class ResourceUploadManager
 		this.bufferSize = bufferSize;
 		this.queue = new LinkedBlockingQueue<>(capacity);
 		this.futureMap = new EzyFutureConcurrentHashMap<>();
-		this.threadList = newThreadList(threadPoolSize);
+		this.executorService = newExecutorService(threadPoolSize);
 		this.start(threadPoolSize);
 	}
 	
-	private EzyThreadList newThreadList(int threadPoolSize) {
-		return new EzyThreadList(
-				threadPoolSize, 
-				() -> loop(), 
-				HttpThreadFactory.create("upload-manager"));
+	private ExecutorService newExecutorService(int threadPoolSize) {
+	    return EzyExecutors.newFixedThreadPool(
+	        threadPoolSize,
+	        HttpThreadFactory.create("upload-manager")
+        );
 	}
 	
 	private void start(int threadPoolSize) {
 		this.active = true;
-		this.threadList.execute();
+		for (int i = 0 ; i < threadPoolSize ; ++i) {
+		    executorService.execute(this::loop);
+		}
 	}
 	
 	private void loop() {
@@ -179,6 +182,7 @@ public class ResourceUploadManager
 		for(int i = 0 ; i < threadPoolSize ; ++i) {
 			queue.offer(POISON);
 		}
+		this.executorService.shutdown();
 	}
 	
 	@Override

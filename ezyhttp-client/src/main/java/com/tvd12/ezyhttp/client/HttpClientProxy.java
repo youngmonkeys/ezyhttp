@@ -5,14 +5,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.concurrent.EzyExecutors;
 import com.tvd12.ezyfox.concurrent.EzyFuture;
 import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyfox.concurrent.EzyFutureTask;
-import com.tvd12.ezyfox.concurrent.EzyThreadList;
 import com.tvd12.ezyfox.util.EzyCloseable;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyProcessor;
@@ -32,12 +33,12 @@ public class HttpClientProxy
 		extends EzyLoggable
 		implements EzyStartable, EzyStoppable, EzyCloseable {
 
-	protected EzyThreadList threadList;
 	protected volatile boolean active;
 	protected final HttpClient client;
 	protected final int threadPoolSize;
 	protected final AtomicBoolean started;
 	protected final RequestQueue requestQueue;
+	protected ExecutorService executorService;
 	protected final EzyFutureMap<Request> futures;
 	
 	public HttpClientProxy(
@@ -59,8 +60,9 @@ public class HttpClientProxy
 	}
 	
 	private void doStart(boolean autoStart) {
-		if(autoStart)
+		if(autoStart) {
 			EzyProcessor.processWithException(() -> start());
+		}
 	}
 	
 	@Override
@@ -68,10 +70,13 @@ public class HttpClientProxy
 		if(!started.compareAndSet(false, true))
 			return;
 		this.active = true;
-		this.threadList = new EzyThreadList(
-				threadPoolSize, 
-				() -> loop(), HttpThreadFactory.create("client"));
-		this.threadList.execute();
+		this.executorService = EzyExecutors.newFixedThreadPool(
+			threadPoolSize, 
+			HttpThreadFactory.create("client")
+		);
+		for (int i = 0 ; i < threadPoolSize ; ++i) {
+		    this.executorService.execute(this::loop);
+		}
 	}
 	
 	@Override
@@ -88,8 +93,9 @@ public class HttpClientProxy
 			EzyFuture undoneTask = undoneTasks.get(undoneRequest);
 			undoneTask.cancel("HttpClientProxy close, request to: " + undoneRequest.getURL() + " has cancelled");
 		}
-		if(threadList != null)
-			this.threadList.interrupt();
+		if (executorService != null) {
+		    this.executorService.shutdownNow();
+		}
 	}
 	
 	protected void loop() {
