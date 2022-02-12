@@ -240,7 +240,7 @@ public class HttpClientProxy
 		protected HttpClient.Builder clientBuilder;
 		
 		public Builder() {
-			this.threadPoolSize = 16;
+			this.threadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
 			this.requestQueueCapacity = 10000;
 			this.clientBuilder = HttpClient.builder();
 			

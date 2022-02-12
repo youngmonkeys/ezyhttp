@@ -203,7 +203,13 @@ public class SimpleRequestArgumentsTest {
 	public void cookieTest() {
 		// given
 		SimpleRequestArguments sut = new SimpleRequestArguments();
-		sut.setCookies(new Cookie[] { new Cookie("hello", "world") });
+		sut.setCookies(
+		    new Cookie[] { 
+		        new Cookie("hello", ""),
+		        new Cookie("hello", "world"),
+		        new Cookie("hello", "")
+	        }
+	    );
 		
 		// when
 		// then

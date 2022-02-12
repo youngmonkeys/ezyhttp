@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.sercurity.EzyBase64;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
@@ -200,15 +201,22 @@ public class SimpleRequestArguments implements RequestArguments {
 			return;
 		this.cookies = cookies;
 		this.cookieMap = new HashMap<>();
-		for(Cookie cookie : cookies)
-			cookieMap.put(cookie.getName(), cookie);
+		for(Cookie cookie : cookies) {
+		    Cookie old = cookieMap.get(cookie.getName());
+		    if (old == null || EzyStrings.isBlank(old.getValue())) {
+		        cookieMap.put(cookie.getName(), cookie);
+		    }
+		}
 	}
 	
 	@Override
 	public String getCookieValue(int index) {
-		if(cookies != null && cookies.length > index)
-			return cookies[index].getValue();
-		return null;
+		if(cookies == null || cookies.length <= index) {
+			return null;
+		}
+		String cookieName = cookies[index].getName();
+        Cookie cookie = cookieMap.get(cookieName);
+        return cookie.getValue();
 	}
 	
 	@Override

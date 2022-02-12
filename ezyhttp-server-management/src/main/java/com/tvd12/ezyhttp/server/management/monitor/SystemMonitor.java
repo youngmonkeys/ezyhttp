@@ -35,7 +35,7 @@ public class SystemMonitor extends EzyMonitor {
 	}
 	
 	public long getRequestPerSecond() {
-	    return requestPerSecond.getActions();
+	    return requestPerSecond.isExpired() ? 0L : requestPerSecond.getActions();
 	}
 	
 	public void increaseResponseCount() {
@@ -46,6 +46,6 @@ public class SystemMonitor extends EzyMonitor {
     }
 	
 	public long getResponsePerSecond() {
-        return reponsePerSecond.getActions();
+        return reponsePerSecond.isExpired() ? 0L : reponsePerSecond.getActions();
     }
 }
