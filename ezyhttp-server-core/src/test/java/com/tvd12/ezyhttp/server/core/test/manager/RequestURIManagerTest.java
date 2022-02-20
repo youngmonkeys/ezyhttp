@@ -18,6 +18,7 @@ public class RequestURIManagerTest {
         sut.addAuthenticatedURI("b");
         sut.addApiURI("c");
         sut.addPaymentURI("d");
+        sut.addManagementURI("e");
         
         // when
         // then
@@ -29,5 +30,7 @@ public class RequestURIManagerTest {
         Asserts.assertEquals(sut.getApiURIs(), Arrays.asList("c"), false);
         Assert.assertTrue(sut.isPaymentURI("d"));
         Asserts.assertEquals(sut.getPaymentURIs(), Arrays.asList("d"), false);
+        Assert.assertTrue(sut.isManagementURI("e"));
+        Asserts.assertEquals(sut.getManagementURIs(), Arrays.asList("e"), false);
     }
 }

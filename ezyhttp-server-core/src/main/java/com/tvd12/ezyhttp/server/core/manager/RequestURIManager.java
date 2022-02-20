@@ -75,6 +75,10 @@ public class RequestURIManager implements EzyDestroyable {
         return new ArrayList<>(authenticatedURIs);
     }
     
+    public List<String> getManagementURIs() {
+        return new ArrayList<>(managementURIs);
+    }
+    
     public List<String> getPaymentURIs() {
         return new ArrayList<>(paymentURIs);
     }
