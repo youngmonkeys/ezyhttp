@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.core.reflect;
 
+import com.tvd12.ezyfox.annotation.EzyFeature;
+import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.URIBuilder;
@@ -88,6 +90,15 @@ public class RequestHandlerMethod extends HandlerMethod {
 	public boolean isAsync() {
 	    return method.isAnnotated(Async.class);
 	}
+	
+	public boolean isPayment() {
+        return method.getAnnotation(EzyPayment.class) != null;
+    }
+    
+    public String getFeature() {
+        EzyFeature annotation = method.getAnnotation(EzyFeature.class);
+        return annotation != null ? annotation.value() : null;
+    }
 	
 	@Override
 	public String toString() {

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tvd12.ezyfox.annotation.EzyFeature;
+import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyhttp.server.core.annotation.Api;
@@ -64,6 +66,15 @@ public class ControllerProxy {
 	public boolean isAuthenticated() {
 	    return clazz.getAnnotation(Authenticated.class) != null;
 	}
+	
+	public boolean isPayment() {
+        return clazz.getAnnotation(EzyPayment.class) != null;
+    }
+	
+	public String getFeature() {
+	    EzyFeature annotation = clazz.getAnnotation(EzyFeature.class);
+	    return annotation != null ? annotation.value() : null;
+    }
 	
 	public List<ExceptionHandlerMethod> fetchExceptionHandlerMethods() {
 		List<ExceptionHandlerMethod> list = new ArrayList<>();

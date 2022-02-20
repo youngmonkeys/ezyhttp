@@ -46,6 +46,7 @@ import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
+import com.tvd12.ezyhttp.server.core.request.RequestURIMeta;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
@@ -171,7 +172,12 @@ public class BlockingServletTest {
         
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
-        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false, true, true), requestHandler);
+        RequestURIMeta uriMeta = RequestURIMeta.builder()
+            .management(false)
+            .authenticated(true)
+            .api(true)
+            .build();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, uriMeta), requestHandler);
         
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);

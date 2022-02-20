@@ -12,53 +12,77 @@ public class RequestURI {
 	protected final String uri;
 	protected final HttpMethod method;
 	protected final boolean api;
+	protected final boolean authenticated;
 	protected final boolean management;
 	protected final boolean resource;
-	protected final boolean authenticated;
+	protected final boolean payment;
+	protected final String feature;
 	protected final String resourceFullPath;
 	
 	public RequestURI(
-            HttpMethod method, 
-            String uri, 
-            boolean management) {
-        this(method, uri, management, false, true);
+        HttpMethod method, 
+        String uri, 
+        boolean management
+    ) {
+	    this.method = method;
+        this.uri = standardizeURI(uri);
+        this.management = management;
+        this.api = false;
+        this.authenticated = false;
+        this.resource = false;
+        this.payment = false;
+        this.feature = null;
+        this.resourceFullPath = null;
     }
 	
 	public RequestURI(
-            HttpMethod method, 
-            String uri, 
-            boolean management, 
-            boolean authenticated,
-            boolean api) {
-	    this(method, uri, management, authenticated, false, api, null);
-	}
-	
-	public RequestURI(
-            HttpMethod method, 
-            String uri, 
-            boolean management,
-            boolean resource,
-            boolean api,
-            String resourceFullPath) {
+        HttpMethod method, 
+        String uri, 
+        boolean management,
+        boolean resource,
+        boolean api,
+        String resourceFullPath
+    ) {
 	    this(method, uri, management, false, resource, api, resourceFullPath);
 	}
 	
 	private RequestURI(
-	        HttpMethod method, 
-	        String uri, 
-	        boolean management,
-	        boolean authenticated,
-	        boolean resource,
-	        boolean api,
-	        String resourceFullPath) {
-		this.method = method;
-		this.uri = standardizeURI(uri);
-		this.api = api;
-		this.management = management;
-		this.authenticated = authenticated;
-		this.resource = resource;
-		this.resourceFullPath = resourceFullPath;
+        HttpMethod method, 
+        String uri, 
+        boolean management,
+        boolean authenticated,
+        boolean resource,
+        boolean api,
+        String resourceFullPath
+    ) {
+		this(
+		    method,
+		    uri,
+		    RequestURIMeta.builder()
+		        .api(api)
+		        .authenticated(authenticated)
+		        .management(management)
+		        .resource(resource)
+		        .resourceFullPath(resourceFullPath)
+		        .build()
+	    );
 	}
+	
+	public RequestURI(
+        HttpMethod method, 
+        String uri, 
+        RequestURIMeta meta
+    ) {
+	    this.method = method;
+        this.uri = standardizeURI(uri);
+        this.api = meta.isApi();
+        this.authenticated = meta.isAuthenticated();
+        this.management = meta.isManagement();
+        this.resource = meta.isResource();
+        this.payment = meta.isPayment();
+        this.feature = meta.getFeature();
+        this.resourceFullPath = meta.getResourceFullPath();
+}
 	
 	protected String standardizeURI(String uri) {
 		if(uri.isEmpty() || uri.startsWith("/"))

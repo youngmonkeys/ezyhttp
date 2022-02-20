@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
@@ -25,6 +26,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     protected boolean allowOverrideURI;
 	protected final Set<String> handledURIs;
 	@Getter
+    protected final FeatureURIManager featureURIManager;
+	@Getter
 	protected final RequestURIManager requestURIManager;
 	protected final Map<HttpMethod, URITree> uriTreeByMethod;
 	protected final Map<RequestURI, RequestHandler> handlers;
@@ -34,6 +37,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handlers = new HashMap<>();
 		this.handledURIs = new HashSet<>();
 		this.handlerListByURI = new HashMap<>();
+		this.featureURIManager = new FeatureURIManager();
 		this.requestURIManager = new RequestURIManager();
 		this.uriTreeByMethod = this.newUriTreeByMethod();
 	}
@@ -87,6 +91,14 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		    this.requestURIManager.addManagementUri(uri.getUri());
 		    this.requestURIManager.addManagementUri(uri.getSameURI());
 		}
+		if (uri.isPayment()) {
+		    this.requestURIManager.addPaymentUri(uri.getUri());
+            this.requestURIManager.addPaymentUri(uri.getSameURI());
+		}
+		if (EzyStrings.isNotBlank(uri.getFeature())) {
+		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getUri());
+		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getSameURI());
+		}
 		URITree uriTree = uriTreeByMethod.get(uri.getMethod());
         uriTree.addURI(uri.getUri());
 	}
@@ -109,6 +121,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handledURIs.clear();
 		this.handlerListByURI.clear();
 		this.allowOverrideURI = false;
+		this.featureURIManager.destroy();
 		this.requestURIManager.destroy();
 	}
 }
