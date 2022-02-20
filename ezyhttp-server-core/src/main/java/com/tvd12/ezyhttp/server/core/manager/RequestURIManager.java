@@ -9,18 +9,18 @@ import com.tvd12.ezyfox.util.EzyDestroyable;
 
 public class RequestURIManager implements EzyDestroyable {
 
-    private final Set<String> apiUris;
-    private final Set<String> authenticatedUris;
+    private final Set<String> apiURIs;
+    private final Set<String> authenticatedURIs;
     private final Set<String> handledURIs;
-    private final Set<String> managementUris;
-    private final Set<String> paymentUris;
+    private final Set<String> managementURIs;
+    private final Set<String> paymentURIs;
 
     public RequestURIManager() {
-        this.apiUris = ConcurrentHashMap.newKeySet();
-        this.authenticatedUris = ConcurrentHashMap.newKeySet();
+        this.apiURIs = ConcurrentHashMap.newKeySet();
+        this.authenticatedURIs = ConcurrentHashMap.newKeySet();
         this.handledURIs = ConcurrentHashMap.newKeySet();
-        this.managementUris = ConcurrentHashMap.newKeySet();
-        this.paymentUris = ConcurrentHashMap.newKeySet();
+        this.managementURIs = ConcurrentHashMap.newKeySet();
+        this.paymentURIs = ConcurrentHashMap.newKeySet();
     }
     
     public void addHandledURI(String uri) {
@@ -31,58 +31,58 @@ public class RequestURIManager implements EzyDestroyable {
         return this.handledURIs.contains(uri);
     }
 
-    public void addApiUri(String uri) {
-        this.apiUris.add(uri);
+    public void addApiURI(String uri) {
+        this.apiURIs.add(uri);
     }
 
-    public boolean isApiUri(String uri) {
-        return apiUris.contains(uri);
+    public boolean isApiURI(String uri) {
+        return apiURIs.contains(uri);
     }
     
-    public void addManagementUri(String uri) {
-        this.managementUris.add(uri);
+    public void addManagementURI(String uri) {
+        this.managementURIs.add(uri);
     }
 
-    public boolean isManagementUri(String uri) {
-        return managementUris.contains(uri);
+    public boolean isManagementURI(String uri) {
+        return managementURIs.contains(uri);
     }
     
-    public void addAuthenticatedUri(String uri) {
-        this.authenticatedUris.add(uri);
+    public void addAuthenticatedURI(String uri) {
+        this.authenticatedURIs.add(uri);
     }
 
-    public boolean isAuthenticatedUri(String uri) {
-        return authenticatedUris.contains(uri);
+    public boolean isAuthenticatedURI(String uri) {
+        return authenticatedURIs.contains(uri);
     }
     
-    public void addPaymentUri(String uri) {
-        this.paymentUris.add(uri);
+    public void addPaymentURI(String uri) {
+        this.paymentURIs.add(uri);
     }
 
-    public boolean isPaymentUri(String uri) {
-        return paymentUris.contains(uri);
+    public boolean isPaymentURI(String uri) {
+        return paymentURIs.contains(uri);
     }
     
     public List<String> getHandledURIs() {
         return new ArrayList<>(handledURIs);
     }
     
-    public List<String> getApiUris() {
-        return new ArrayList<>(apiUris);
+    public List<String> getApiURIs() {
+        return new ArrayList<>(apiURIs);
     }
     
-    public List<String> getAuthenticatedUris() {
-        return new ArrayList<>(authenticatedUris);
+    public List<String> getAuthenticatedURIs() {
+        return new ArrayList<>(authenticatedURIs);
     }
     
-    public List<String> getPaymentUris() {
-        return new ArrayList<>(paymentUris);
+    public List<String> getPaymentURIs() {
+        return new ArrayList<>(paymentURIs);
     }
 
     @Override
     public void destroy() {
         this.handledURIs.clear();
-        this.managementUris.clear();
-        this.authenticatedUris.clear();
+        this.managementURIs.clear();
+        this.authenticatedURIs.clear();
     }
 }

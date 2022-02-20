@@ -194,8 +194,8 @@ public class BlockingServletTest {
         
         // then
         RequestURIManager requestURIManager = requestHandlerManager.getRequestURIManager();
-        Asserts.assertTrue(requestURIManager.isAuthenticatedUri("/get"));
-        Asserts.assertTrue(requestURIManager.isAuthenticatedUri("/get/"));
+        Asserts.assertTrue(requestURIManager.isAuthenticatedURI("/get"));
+        Asserts.assertTrue(requestURIManager.isAuthenticatedURI("/get/"));
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
         

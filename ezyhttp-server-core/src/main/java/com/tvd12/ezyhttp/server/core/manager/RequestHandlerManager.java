@@ -80,20 +80,20 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
             .add(handler);
 		this.requestURIManager.addHandledURI(uri.getUri());
 		if (uri.isApi()) {
-		    this.requestURIManager.addApiUri(uri.getUri());
-		    this.requestURIManager.addApiUri(uri.getSameURI());
+		    this.requestURIManager.addApiURI(uri.getUri());
+		    this.requestURIManager.addApiURI(uri.getSameURI());
 		}
 		if (uri.isAuthenticated()) {
-		    this.requestURIManager.addAuthenticatedUri(uri.getUri());
-		    this.requestURIManager.addAuthenticatedUri(uri.getSameURI());
+		    this.requestURIManager.addAuthenticatedURI(uri.getUri());
+		    this.requestURIManager.addAuthenticatedURI(uri.getSameURI());
 		}
 		if (uri.isManagement()) {
-		    this.requestURIManager.addManagementUri(uri.getUri());
-		    this.requestURIManager.addManagementUri(uri.getSameURI());
+		    this.requestURIManager.addManagementURI(uri.getUri());
+		    this.requestURIManager.addManagementURI(uri.getSameURI());
 		}
 		if (uri.isPayment()) {
-		    this.requestURIManager.addPaymentUri(uri.getUri());
-            this.requestURIManager.addPaymentUri(uri.getSameURI());
+		    this.requestURIManager.addPaymentURI(uri.getUri());
+            this.requestURIManager.addPaymentURI(uri.getSameURI());
 		}
 		if (EzyStrings.isNotBlank(uri.getFeature())) {
 		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getUri());

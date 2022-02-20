@@ -26,11 +26,11 @@ public class FeatureURIManagerTest {
             Sets.newHashSet("hello", "world"),
             false
         );
-        Asserts.assertEquals(sut.getFeatureByUri("/a"), "hello");
-        Asserts.assertEquals(sut.getFeatureByUri("/c"), "world");
-        Asserts.assertEquals(sut.getUrisByFeature("hello"), Arrays.asList("/a", "/b"), false);
+        Asserts.assertEquals(sut.getFeatureByURI("/a"), "hello");
+        Asserts.assertEquals(sut.getFeatureByURI("/c"), "world");
+        Asserts.assertEquals(sut.getURIsByFeature("hello"), Arrays.asList("/a", "/b"), false);
         Asserts.assertEquals(
-            sut.getFeatureByUriMap(),
+            sut.getFeatureByURIMap(),
             EzyMapBuilder.mapBuilder()
                 .put("/a", "hello")
                 .put("/b", "hello")
@@ -38,7 +38,7 @@ public class FeatureURIManagerTest {
                 .build()
         );
         Asserts.assertEquals(
-            sut.getUrisByFeatureMap(),
+            sut.getURIsByFeatureMap(),
             EzyMapBuilder.mapBuilder()
                 .put("hello", Arrays.asList("/a", "/b"))
                 .put("world", Collections.singletonList("/c"))

@@ -15,19 +15,19 @@ public class RequestURIManagerTest {
         // given
         RequestURIManager sut = new RequestURIManager();
         sut.addHandledURI("a");
-        sut.addAuthenticatedUri("b");
-        sut.addApiUri("c");
-        sut.addPaymentUri("d");
+        sut.addAuthenticatedURI("b");
+        sut.addApiURI("c");
+        sut.addPaymentURI("d");
         
         // when
         // then
         Asserts.assertTrue(sut.containsHandledURI("a"));
         Asserts.assertEquals(sut.getHandledURIs(), Arrays.asList("a"), false);
-        Assert.assertTrue(sut.isAuthenticatedUri("b"));
-        Asserts.assertEquals(sut.getAuthenticatedUris(), Arrays.asList("b"), false);
-        Assert.assertTrue(sut.isApiUri("c"));
-        Asserts.assertEquals(sut.getApiUris(), Arrays.asList("c"), false);
-        Assert.assertTrue(sut.isPaymentUri("d"));
-        Asserts.assertEquals(sut.getPaymentUris(), Arrays.asList("d"), false);
+        Assert.assertTrue(sut.isAuthenticatedURI("b"));
+        Asserts.assertEquals(sut.getAuthenticatedURIs(), Arrays.asList("b"), false);
+        Assert.assertTrue(sut.isApiURI("c"));
+        Asserts.assertEquals(sut.getApiURIs(), Arrays.asList("c"), false);
+        Assert.assertTrue(sut.isPaymentURI("d"));
+        Asserts.assertEquals(sut.getPaymentURIs(), Arrays.asList("d"), false);
     }
 }
