@@ -1,23 +1,26 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.tvd12.ezyfox.util.EzyDestroyable;
 
 public class RequestURIManager implements EzyDestroyable {
-    
-    private final Set<String> handledURIs;
+
     private final Set<String> apiUris;
-    private final Set<String> managementUris;
     private final Set<String> authenticatedUris;
+    private final Set<String> handledURIs;
+    private final Set<String> managementUris;
+    private final Set<String> paymentUris;
 
     public RequestURIManager() {
-        this.handledURIs = ConcurrentHashMap.newKeySet();
         this.apiUris = ConcurrentHashMap.newKeySet();
-        this.managementUris = ConcurrentHashMap.newKeySet();
         this.authenticatedUris = ConcurrentHashMap.newKeySet();
+        this.handledURIs = ConcurrentHashMap.newKeySet();
+        this.managementUris = ConcurrentHashMap.newKeySet();
+        this.paymentUris = ConcurrentHashMap.newKeySet();
     }
     
     public void addHandledURI(String uri) {
@@ -52,16 +55,28 @@ public class RequestURIManager implements EzyDestroyable {
         return authenticatedUris.contains(uri);
     }
     
-    public Set<String> getHandledURIs() {
-        return Collections.unmodifiableSet(handledURIs);
+    public void addPaymentUri(String uri) {
+        this.paymentUris.add(uri);
+    }
+
+    public boolean isPaymentUri(String uri) {
+        return paymentUris.contains(uri);
     }
     
-    public Set<String> getApiUris() {
-        return Collections.unmodifiableSet(apiUris);
+    public List<String> getHandledURIs() {
+        return new ArrayList<>(handledURIs);
     }
     
-    public Set<String> getAuthenticatedUris() {
-        return Collections.unmodifiableSet(authenticatedUris);
+    public List<String> getApiUris() {
+        return new ArrayList<>(apiUris);
+    }
+    
+    public List<String> getAuthenticatedUris() {
+        return new ArrayList<>(authenticatedUris);
+    }
+    
+    public List<String> getPaymentUris() {
+        return new ArrayList<>(paymentUris);
     }
 
     @Override
