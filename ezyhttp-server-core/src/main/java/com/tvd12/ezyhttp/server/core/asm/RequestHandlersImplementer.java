@@ -49,7 +49,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
 			RequestURIMeta uriMeta = RequestURIMeta.builder()
 			    .api(method.isApi() || proxy.isApi())
 			    .authenticated(method.isAuthenticated() || proxy.isAuthenticated())
-			    .management(proxy.isManagement())
+			    .management(method.isManagement() || proxy.isManagement())
 			    .payment(method.isPayment() || proxy.isPayment())
 			    .feature(methodFeature != null ? methodFeature : feature)
 			    .build();

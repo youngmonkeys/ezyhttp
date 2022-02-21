@@ -5,6 +5,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.annotation.EzyFeature;
+import com.tvd12.ezyfox.annotation.EzyManagement;
 import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
@@ -40,8 +41,19 @@ public class ControllerProxyTest extends BaseTest {
         Asserts.assertTrue(sut.isPayment());
         Asserts.assertEquals(sut.getFeature(), "hello.world");
 	}
+	
+	@Test
+    public void isManagementTest() {
+        // given
+        ControllerProxy sut = new ControllerProxy(new InternalController());
+        
+        // when
+        // then
+        Asserts.assertTrue(sut.isManagement());
+    }
 
 	@EzyPayment
+	@EzyManagement
 	@EzyFeature("hello.world")
 	public static class InternalController {}
 }

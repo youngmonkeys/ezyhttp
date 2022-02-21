@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.tvd12.ezyfox.annotation.EzyFeature;
+import com.tvd12.ezyfox.annotation.EzyManagement;
 import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyMethod;
@@ -56,19 +57,20 @@ public class ControllerProxy {
 	}
 	
 	public boolean isManagement() {
-	    return instance instanceof ManagementController;
+	    return instance instanceof ManagementController
+	        || clazz.isAnnotated(EzyManagement.class);
 	}
 	
 	public boolean isApi() {
-        return clazz.getAnnotation(Api.class) != null;
+        return clazz.isAnnotated(Api.class);
     }
 	
 	public boolean isAuthenticated() {
-	    return clazz.getAnnotation(Authenticated.class) != null;
+	    return clazz.isAnnotated(Authenticated.class);
 	}
 	
 	public boolean isPayment() {
-        return clazz.getAnnotation(EzyPayment.class) != null;
+        return clazz.isAnnotated(EzyPayment.class);
     }
 	
 	public String getFeature() {
