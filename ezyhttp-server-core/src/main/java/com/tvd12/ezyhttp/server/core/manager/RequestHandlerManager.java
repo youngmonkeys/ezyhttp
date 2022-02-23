@@ -78,26 +78,26 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 		this.handlerListByURI
             .computeIfAbsent(uri, k -> new ArrayList<>())
             .add(handler);
-		this.requestURIManager.addHandledURI(uri.getUri());
+		this.requestURIManager.addHandledURI(uri.getMethod(), uri.getUri());
 		if (uri.isApi()) {
-		    this.requestURIManager.addApiURI(uri.getUri());
-		    this.requestURIManager.addApiURI(uri.getSameURI());
+		    this.requestURIManager.addApiURI(uri.getMethod(), uri.getUri());
+		    this.requestURIManager.addApiURI(uri.getMethod(), uri.getSameURI());
 		}
 		if (uri.isAuthenticated()) {
-		    this.requestURIManager.addAuthenticatedURI(uri.getUri());
-		    this.requestURIManager.addAuthenticatedURI(uri.getSameURI());
+		    this.requestURIManager.addAuthenticatedURI(uri.getMethod(), uri.getUri());
+		    this.requestURIManager.addAuthenticatedURI(uri.getMethod(), uri.getSameURI());
 		}
 		if (uri.isManagement()) {
-		    this.requestURIManager.addManagementURI(uri.getUri());
-		    this.requestURIManager.addManagementURI(uri.getSameURI());
+		    this.requestURIManager.addManagementURI(uri.getMethod(), uri.getUri());
+		    this.requestURIManager.addManagementURI(uri.getMethod(), uri.getSameURI());
 		}
 		if (uri.isPayment()) {
-		    this.requestURIManager.addPaymentURI(uri.getUri());
-            this.requestURIManager.addPaymentURI(uri.getSameURI());
+		    this.requestURIManager.addPaymentURI(uri.getMethod(), uri.getUri());
+            this.requestURIManager.addPaymentURI(uri.getMethod(), uri.getSameURI());
 		}
 		if (EzyStrings.isNotBlank(uri.getFeature())) {
-		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getUri());
-		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getSameURI());
+		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(), uri.getUri());
+		    this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(), uri.getSameURI());
 		}
 		URITree uriTree = uriTreeByMethod.get(uri.getMethod());
         uriTree.addURI(uri.getUri());
