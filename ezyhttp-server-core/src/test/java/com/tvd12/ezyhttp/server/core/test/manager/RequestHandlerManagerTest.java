@@ -38,7 +38,7 @@ public class RequestHandlerManagerTest {
         FeatureURIManager featureURIManager = sut.getFeatureURIManager();
         
         // then
-        Asserts.assertEquals(featureURIManager.getFeatureByURI("/get"), "hello.world");
-        Asserts.assertEquals(featureURIManager.getFeatureByURI("/get/"), "hello.world");
+        Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get"), "hello.world");
+        Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get/"), "hello.world");
     }
 }
