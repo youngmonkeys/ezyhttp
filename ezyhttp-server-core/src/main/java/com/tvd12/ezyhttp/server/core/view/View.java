@@ -74,6 +74,36 @@ public class View {
         ).add(value);
 	}
 	
+	public void putKeyValueToVariable(
+        String variableName,
+        String key,
+        Object value
+    ) {
+        View.putKeyValueToVariable(variables, variableName, key, value);
+    }
+    
+    public void putKeyValuesToVariable(
+        String variableName,
+        Map<String, Object> keyValues
+    ) {
+        for (Map.Entry<String, Object> e : keyValues.entrySet()) {
+            putKeyValueToVariable(variableName, e.getKey(), e.getValue());
+        }
+    }
+	
+	@SuppressWarnings("unchecked")
+    public static void putKeyValueToVariable(
+        Map<String, Object> variables,
+        String variableName,
+        String key,
+        Object value
+    ) {
+        ((Map<String, Object>)variables.computeIfAbsent(
+            variableName, 
+            k -> new HashMap<>())
+        ).put(key, value);
+    }
+	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -115,8 +145,27 @@ public class View {
 			return this;
 		}
 		
-		public Builder appendToVariable(String name, Object value) {
-            View.appendToVariable(variables, name, value);
+		public Builder appendToVariable(String variableName, Object value) {
+            View.appendToVariable(variables, variableName, value);
+            return this;
+        }
+		
+		public Builder putKeyValueToVariable(
+		    String variableName,
+		    String key,
+		    Object value
+	    ) {
+		    View.putKeyValueToVariable(variables, variableName, key, value);
+		    return this;
+		}
+		
+		public Builder putKeyValuesToVariable(
+            String variableName,
+            Map<String, Object> keyValues
+        ) {
+            for (Map.Entry<String, Object> e : keyValues.entrySet()) {
+                putKeyValueToVariable(variableName, e.getKey(), e.getValue());
+            }
             return this;
         }
 		

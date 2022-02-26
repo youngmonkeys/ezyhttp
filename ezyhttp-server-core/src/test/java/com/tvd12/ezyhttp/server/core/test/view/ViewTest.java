@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.test.view;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
@@ -91,4 +92,38 @@ public class ViewTest {
 		// then
 		Asserts.assertThat(e).isEqualsType(NullPointerException.class);
 	}
+	
+	@Test
+	public void putKeyValuesToVariableBuilderTest() {
+	    // given
+	    Map<String, Object> map = EzyMapBuilder.mapBuilder()
+            .put("a", "1")
+            .put("b", 2)
+            .toMap();
+	    View sut = View.builder()
+	        .template("abc")
+	        .putKeyValuesToVariable("hello", map)
+	        .build();
+	    
+	    // when
+	    // then
+	    Asserts.assertEquals(sut.getVariable("hello"), map);
+	}
+	
+	@Test
+    public void putKeyValuesToVariableTest() {
+        // given
+        Map<String, Object> map = EzyMapBuilder.mapBuilder()
+            .put("a", "1")
+            .put("b", 2)
+            .toMap();
+        View sut = View.builder()
+            .template("abc")
+            .build();
+        sut.putKeyValuesToVariable("hello", map);
+        
+        // when
+        // then
+        Asserts.assertEquals(sut.getVariable("hello"), map);
+    }
 }
