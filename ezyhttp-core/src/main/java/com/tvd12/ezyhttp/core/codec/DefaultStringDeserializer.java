@@ -45,11 +45,15 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		return deserialize(value, outType);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
 		StringMapper mapper = mappers.get(outType);
-		if(mapper == null)
+		if(mapper == null) {
+			if (outType.isEnum()) {
+			    return (T)Enum.valueOf((Class)outType, value);
+			}
 			throw new IOException("has no deserializer for: " + outType.getName());
+		}
 		try {
 			T answer = (T) mapper.apply(value);
 			return answer;

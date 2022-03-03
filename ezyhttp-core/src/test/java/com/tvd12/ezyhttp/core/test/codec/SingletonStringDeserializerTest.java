@@ -371,4 +371,15 @@ public class SingletonStringDeserializerTest {
 		Asserts.assertEquals(bigInteger, actualBigInteger);
 		Asserts.assertEquals(bigDecimal, actualBigDecimal);
 	}
+	
+	@Test
+	public void deserializeEnumTest() throws Exception {
+	    MyEnum value = SingletonStringDeserializer.getInstance()
+	        .deserialize("HELLO", MyEnum.class);
+	    Asserts.assertEquals(value, MyEnum.HELLO);
+	}
+	
+	public static enum MyEnum {
+	    HELLO, WORLD
+	}
 }
