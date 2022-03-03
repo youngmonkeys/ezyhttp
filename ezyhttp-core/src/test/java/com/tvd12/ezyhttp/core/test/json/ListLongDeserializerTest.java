@@ -22,7 +22,7 @@ public class ListLongDeserializerTest {
     @Test
     public void testWithString() {
         // given
-        Map<String, String> map = Collections.singletonMap("value", "1,2,3");
+        Map<String, String> map = Collections.singletonMap("value", "1, 2, 3");
         
         // when
         Value value = objectMapper.convertValue(map, Value.class);

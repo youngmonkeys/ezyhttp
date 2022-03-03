@@ -117,6 +117,9 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		if(EzyStrings.isEmpty(value))
 			return new String[0];
 		String[] array = value.split(",");
+		for (int i = 0 ; i < array.length ; ++i) {
+		    array[i] = array[i].trim();
+		}
 		return array;
 	}
 	
