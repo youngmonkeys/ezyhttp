@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,12 +46,15 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		return deserialize(value, outType);
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
 		StringMapper mapper = mappers.get(outType);
 		if(mapper == null) {
+		    if (value == null) {
+		        return null;
+		    }
 			if (outType.isEnum()) {
-			    return (T)Enum.valueOf((Class)outType, value);
+			    return stringToEnum(value, outType);
 			}
 			throw new IOException("has no deserializer for: " + outType.getName());
 		}
@@ -61,6 +65,16 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		catch (Exception e) {
 			throw new IOException("can't deserialize value: " + value + " to: " + outType.getName(), e);
 		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+    private <T> T stringToEnum(String value, Class<T> outType) {
+	    try {
+	        return (T)Enum.valueOf((Class)outType, value);
+	        
+	    } catch (IllegalArgumentException e) {
+	        return (T)Enum.valueOf((Class)outType, value.toUpperCase());
+        }
 	}
 	
 	protected Map<Class<?>, StringMapper> defaultMappers() {
@@ -268,6 +282,9 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	// =============== collection ===============
 	protected <T> Set<T> stringToSet(
 			String value, Class<T> itemType) throws IOException {
+	    if (value == null) {
+	        return Collections.emptySet();
+	    }
 		String[] array = stringToStringArray(value);
 		Set<T> answer = new HashSet<>();
 		for(int i = 0 ; i < array.length ; ++i)
@@ -277,6 +294,9 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	
 	protected <T> List<T> stringToList(
 			String value, Class<T> itemType) throws IOException {
+	    if (value == null) {
+	        return Collections.emptyList();
+	    }
 		String[] array = stringToStringArray(value);
 		List<T> answer = new ArrayList<>();
 		for(int i = 0 ; i < array.length ; ++i)
