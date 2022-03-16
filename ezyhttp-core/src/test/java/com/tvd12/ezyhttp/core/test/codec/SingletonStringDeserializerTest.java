@@ -220,6 +220,14 @@ public class SingletonStringDeserializerTest {
 		// then
 		Asserts.assertEquals(Lists.newArrayList("1", "2", "3"), actualList);
 		Asserts.assertEquals(Sets.newHashSet("1", "2", "3"), actualSet);
+		Asserts.assertEmpty(
+		    SingletonStringDeserializer.getInstance()
+		        .deserialize(null, List.class, String.class)
+	    );
+		Asserts.assertEmpty(
+            SingletonStringDeserializer.getInstance()
+                .deserialize(null, Set.class, String.class)
+        );
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -377,6 +385,11 @@ public class SingletonStringDeserializerTest {
 	    MyEnum value = SingletonStringDeserializer.getInstance()
 	        .deserialize("HELLO", MyEnum.class);
 	    Asserts.assertEquals(value, MyEnum.HELLO);
+	    Asserts.assertNull(SingletonStringDeserializer.getInstance()
+            .deserialize(null, MyEnum.class));
+	    Asserts.assertEquals(SingletonStringDeserializer.getInstance()
+            .deserialize("hello", MyEnum.class), MyEnum.HELLO);
+	    
 	}
 	
 	public static enum MyEnum {
