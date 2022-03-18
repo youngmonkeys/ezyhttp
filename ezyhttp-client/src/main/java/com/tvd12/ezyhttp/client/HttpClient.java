@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
@@ -300,17 +301,6 @@ public class HttpClient extends EzyLoggable {
         return fileName;
     }
     
-    
-    private String getDownloadFileName(String fileURL, String contentDisposition) {
-        if (contentDisposition != null) {
-            int index = contentDisposition.indexOf("filename=");
-            if (index > 0) {
-                return contentDisposition.substring(index + 10, contentDisposition.length() - 1);
-            }
-        }
-        return fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
-    }
-    
     /**
      * Downloads a file from a URL and store to an output stream
      * 
@@ -396,6 +386,42 @@ public class HttpClient extends EzyLoggable {
         }
         logger.debug("download error: {} - {} - {}", fileURL, responseCode, responseBody);
         return translateErrorCode(responseCode, responseBody);
+    }
+    
+    public static String getDownloadFileName(String fileURL, String contentDisposition) {
+        String answer = null;
+        if (contentDisposition != null) {
+            String prefix = "filename=";
+            int startIndex = contentDisposition.indexOf(prefix);
+            if (startIndex >= 0) {
+                int quoteCount = 0;
+                int quotesCount = 0;
+                StringBuilder builder = new StringBuilder();
+                for (int i = startIndex + prefix.length(); i < contentDisposition.length(); ++i) {
+                    char ch = contentDisposition.charAt(i);
+                    if (ch == ';') {
+                        break;
+                    }
+                    if (ch == '\'') {
+                        if ((++ quoteCount) >= 2) {
+                            break;
+                        }
+                    }
+                    else if (ch == '\"') {
+                        if ((++ quotesCount) >= 2) {
+                            break;
+                        }
+                    } else {
+                        builder.append(ch);
+                    }
+                }
+                answer = builder.toString().trim();
+            }
+        }
+        if (EzyStrings.isBlank(answer)) {
+            answer = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+        }
+        return answer;
     }
 	
 	public static Builder builder() {

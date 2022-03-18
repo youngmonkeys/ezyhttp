@@ -554,6 +554,54 @@ public class HttpClientTest {
         Asserts.assertEqualsType(e, HttpNotFoundException.class);
         verify(connection, times(1)).getErrorStream();
     }
+    
+    @Test
+    public void getDownloadFileNameWithemiColonTest() {
+        // given
+        String contentDisposition = "filename=hello;";
+        
+        // when
+        String actual = HttpClient.getDownloadFileName("", contentDisposition);
+        
+        // then
+        Asserts.assertEquals(actual, "hello");
+    }
+    
+    @Test
+    public void getDownloadFileNameWithQuotesTest() {
+        // given
+        String contentDisposition = "filename=\"hello\";";
+        
+        // when
+        String actual = HttpClient.getDownloadFileName("", contentDisposition);
+        
+        // then
+        Asserts.assertEquals(actual, "hello");
+    }
+    
+    @Test
+    public void getDownloadFileNameWithQuoteTest() {
+        // given
+        String contentDisposition = "filename='hello';";
+        
+        // when
+        String actual = HttpClient.getDownloadFileName("", contentDisposition);
+        
+        // then
+        Asserts.assertEquals(actual, "hello");
+    }
+    
+    @Test
+    public void getDownloadFileNameWithMaxLengthTest() {
+        // given
+        String contentDisposition = "filename=hello";
+        
+        // when
+        String actual = HttpClient.getDownloadFileName("", contentDisposition);
+        
+        // then
+        Asserts.assertEquals(actual, "hello");
+    }
 	
 	@BeforeTest
 	public void setUp() {
