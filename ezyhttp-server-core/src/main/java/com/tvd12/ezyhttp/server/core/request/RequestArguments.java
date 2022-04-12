@@ -53,6 +53,16 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	
 	Map<String, Object> getRedirectionAttributes();
 	
+	default <T> T getRedirectionAttribute(String name, T defaultValue) {
+	    T value = getRedirectionAttribute(name);
+	    return value != null ? value : defaultValue;
+	}
+	
+	default <T> T getRedirectionAttribute(String name, Class<T> outType, T defaultValue) {
+	    T value = getRedirectionAttribute(name, outType);
+	    return value != null ? value : defaultValue;
+	}
+	
 	default String getParameter(int index, String defaultValue) {
 	    String answer = getParameter(index);
 	    return answer != null ? answer : defaultValue;

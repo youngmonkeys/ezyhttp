@@ -97,6 +97,10 @@ public class ResourceDownloadManager
 			    exception = e;
 				logger.debug("download error", e);
 			}
+			catch (Throwable e) {
+			    exception = new IllegalStateException(e);
+                logger.debug("download fatal error", e);
+			}
 			if (entry == null) {
 			    continue;
 			}

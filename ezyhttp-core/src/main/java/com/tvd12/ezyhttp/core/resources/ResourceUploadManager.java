@@ -102,6 +102,10 @@ public class ResourceUploadManager
 			    exception = e;
 				logger.debug("upload error", e);
 			}
+			catch (Throwable e) {
+			    exception = new IllegalStateException(e);
+                logger.debug("upload fatal error", e);
+			}
 			if (entry == null) {
 			    continue;
 			}
