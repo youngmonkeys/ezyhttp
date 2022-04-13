@@ -1,26 +1,24 @@
 package com.tvd12.ezyhttp.server.core.resources;
 
-import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
+import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
+import com.tvd12.ezyfox.function.EzyExceptionVoid;
+import com.tvd12.ezyfox.util.EzyFileUtil;
+import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
+import lombok.AllArgsConstructor;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
-import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
-import com.tvd12.ezyfox.function.EzyExceptionVoid;
-import com.tvd12.ezyfox.util.EzyFileUtil;
-import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyfox.util.EzyProcessor;
-import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
-import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
-
-import lombok.AllArgsConstructor;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
 
 @AllArgsConstructor
 public class FileUploader extends EzyLoggable {
@@ -63,14 +61,14 @@ public class FileUploader extends EzyLoggable {
             @Override
             public void onFailure(Exception e) {
                 if (e instanceof MaxUploadSizeException) {
-                    EzyProcessor.processWithLogException(() ->
+                    processWithLogException(() ->
                         response.getOutputStream().write(OVER_UPLOAD_SIZE_MESSAGE)
                     );
                     response.setStatus(StatusCodes.BAD_REQUEST);
                 } else {
                     response.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
                 }
-                logger.warn("FileUploader.accept request: {} error", asyncContext.getRequest(), e);
+                logger.info("accept request: {} error", asyncContext.getRequest(), e);
             }
         });
     }
@@ -126,13 +124,13 @@ public class FileUploader extends EzyLoggable {
                 new FileUploadCallback() {
                     @Override
                     public void onSuccess() {
-                        EzyProcessor.processWithLogException(outputStream::close);
+                        processWithLogException(outputStream::close);
                         callback.onSuccess();
                     }
                     
                     @Override
                     public void onFailure(Exception e) {
-                        EzyProcessor.processWithLogException(outputStream::close);
+                        processWithLogException(outputStream::close);
                         callback.onFailure(e);
                     }
             });
@@ -178,7 +176,7 @@ public class FileUploader extends EzyLoggable {
         }
         catch (Exception e) {
             callback.onFailure(e);
-            asyncContext.complete();
+            processWithLogException(asyncContext::complete);
         }
     }
 }

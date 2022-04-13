@@ -1,25 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test.resources;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
@@ -27,6 +7,19 @@ import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
 import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.ezyhttp.server.core.resources.FileUploadCallback;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
+import org.testng.annotations.Test;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class FileUploaderTest {
 
@@ -198,7 +191,6 @@ public class FileUploaderTest {
         verify(callback, times(1)).onFailure(any());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void acceptFourthFailed() {
         // given
@@ -210,8 +202,14 @@ public class FileUploaderTest {
         FileUploadCallback callback = mock(FileUploadCallback.class);
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
-        when(resourceUploadManager.drainAsync(any(), any(), any(long.class), any())).thenThrow(IllegalStateException.class);
-        
+        doThrow(IllegalStateException.class).when(resourceUploadManager)
+            .drainAsync(
+                any(),
+                any(),
+                any(long.class),
+                any()
+            );
+
         FileUploader sut = new FileUploader(resourceUploadManager);
         
         // when

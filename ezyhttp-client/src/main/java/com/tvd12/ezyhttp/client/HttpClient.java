@@ -261,7 +261,7 @@ public class HttpClient extends EzyLoggable {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
-            decoratConnection(connection, request);
+            decorateConnection(connection, request);
             connection.connect();
             return download(connection, fileURL, storeLocation);
         } finally {
@@ -323,7 +323,7 @@ public class HttpClient extends EzyLoggable {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
-            decoratConnection(connection, request);
+            decorateConnection(connection, request);
             connection.connect();
             download(connection, fileURL, outputStream);
         } finally {
@@ -351,7 +351,7 @@ public class HttpClient extends EzyLoggable {
         }
     }
     
-    private void decoratConnection(
+    private void decorateConnection(
         HttpURLConnection connection, 
         DownloadRequest request
     ) throws IOException {

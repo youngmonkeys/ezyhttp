@@ -310,13 +310,43 @@ public class SimpleRequestArgumentsTest {
 	    // then
 	    Map<String, Object> actualAttributes = sut.getRedirectionAttributes();
 	    Asserts.assertEquals(actualAttributes, data, false);
-	    Asserts.assertEquals(sut.getRedirectionAttribute("hello"), data.get("hello"), false);
-	    Asserts.assertEquals(sut.getRedirectionAttribute("world", Map.class), data.get("world"), false);
+	    Asserts.assertEquals(
+	    	sut.getRedirectionAttribute("hello"),
+			data.get("hello"), false
+		);
+	    Asserts.assertEquals(
+	    	sut.getRedirectionAttribute("world", Map.class),
+			data.get("world"),
+			false
+		);
+		Asserts.assertEquals(
+			sut.getRedirectionAttribute("world", Map.class, Collections.emptyMap()),
+			data.get("world"),
+			false
+		);
+		Asserts.assertEquals(
+			sut.getRedirectionAttribute("hello", "world"),
+			data.get("hello"),
+			false
+		);
+		Asserts.assertEquals(
+			sut.getRedirectionAttribute("hello"),
+			data.get("hello"),
+			false
+		);
+	    Asserts.assertEquals(
+	    	sut.getRedirectionAttribute("not found", true),
+			true
+		);
+		Asserts.assertEquals(
+			sut.getRedirectionAttribute("not found", int.class, 0),
+			0
+		);
 	    sut.release();
 	}
 	
 	@Test
-    public void setRedirectionAttributesFromCookieExceptionTest() throws IOException {
+    public void setRedirectionAttributesFromCookieExceptionTest() {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleRequestArguments sut = new SimpleRequestArguments();

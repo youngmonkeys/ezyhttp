@@ -21,6 +21,8 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+
 public abstract class AbstractRequestHandler implements RequestHandler {
 
 	@Setter
@@ -45,8 +47,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			}
 			finally {
                 if (arguments.isAsyncStarted()) {
-                    AsyncContext asynContext = arguments.getAsynContext();
-                    asynContext.complete();
+                    AsyncContext asyncContext = arguments.getAsynContext();
+					processWithLogException(asyncContext::complete);
                 }
             }
 		}
