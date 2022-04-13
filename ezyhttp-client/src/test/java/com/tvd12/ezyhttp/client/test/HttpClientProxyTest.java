@@ -22,6 +22,7 @@ import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,7 +42,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Mockito.*;
 
-public class HttpClientProxyTest {
+public class HttpClientProxyTest extends BaseTest {
 
 	public static void main(String[] args) throws Exception {
 		HttpClientProxy client = HttpClientProxy.builder()
@@ -144,6 +145,42 @@ public class HttpClientProxyTest {
 		sut.close();
 		sut.stop();
 	}
+
+	@Test
+	public void fireJsonButExceptionInCallbackTest() throws Exception {
+		// given
+		HttpClientProxy sut = newClientProxy();
+
+		GetRequest request = new GetRequest()
+			.setConnectTimeout(15000)
+			.setResponseType(TestResponse.class)
+			.setResponseType(StatusCodes.OK, TestResponse.class)
+			.setURL("http://127.0.0.1:18081/greet?who=Monkey");
+
+		// when
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		EzyWrap<TestResponse> wrap = new EzyWrap<>();
+		sut.fire(request, new RequestCallback<TestResponse>() {
+			@Override
+			public void onResponse(TestResponse response) {
+				wrap.setValue(response);
+				countDownLatch.countDown();
+				throw new RuntimeException("just test");
+			}
+
+			@Override
+			public void onException(Exception e) {
+			}
+		});
+		countDownLatch.await();
+		Thread.sleep(100);
+
+		// then
+		TestResponse expectation = new TestResponse("Greet Monkey!");
+		Asserts.assertEquals(expectation, wrap.getValue());
+		sut.close();
+		sut.stop();
+	}
 	
 	@Test
 	public void fireExceptionTest() throws Exception {
@@ -152,18 +189,18 @@ public class HttpClientProxyTest {
 		
 		GetRequest request = new GetRequest()
 				.setConnectTimeout(15000)
-				.setResponseType(TestResponse.class)
-				.setResponseType(StatusCodes.OK, TestResponse.class)
-				.setURL("http://127.0.0.1:18081/greet");
+				.setResponseType(String.class)
+				.setResponseType(StatusCodes.OK, String.class)
+				.setURL("http://unknow-host:18081/greet");
 		
 		// when
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 		EzyWrap<Exception> wrap = new EzyWrap<>();
-		sut.fire(request, new RequestCallback<TestResponse>() {
+		sut.fire(request, new RequestCallback<String>() {
 			@Override
-			public void onResponse(TestResponse response) {
+			public void onResponse(String response) {
 			}
-			
+
 			@Override
 			public void onException(Exception e) {
 				wrap.setValue(e);
@@ -271,7 +308,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void postWithExceptionTest() throws Exception {
+	public void postWithExceptionTest() {
 		// given
 		HttpClientProxy sut = newClientProxy();
 		
@@ -406,7 +443,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void clientWasNotActive() throws Exception {
+	public void clientWasNotActive() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder().build();
 		
@@ -427,7 +464,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void clientWasNotActiveAtExecute() throws Exception {
+	public void clientWasNotActiveAtExecute() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder().build();
 		
@@ -451,7 +488,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void maxCapacity() throws Exception {
+	public void maxCapacity() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder()
 				.autoStart(true)
@@ -524,7 +561,7 @@ public class HttpClientProxyTest {
 	}
 
 	@Test
-	public void downloadToFileButCancelTest() throws Exception {
+	public void downloadToFileButCancelTest() {
 		// given
 		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
 

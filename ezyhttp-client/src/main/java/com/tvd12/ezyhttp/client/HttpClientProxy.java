@@ -30,6 +30,8 @@ import com.tvd12.ezyhttp.client.request.RequestQueue;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithException;
+
 public class HttpClientProxy 
 		extends EzyLoggable
 		implements EzyStartable, EzyStoppable, EzyCloseable {
@@ -62,7 +64,7 @@ public class HttpClientProxy
 	
 	private void doStart(boolean autoStart) {
 		if(autoStart) {
-			EzyProcessor.processWithException(() -> start());
+			processWithException(this::start);
 		}
 	}
 	
@@ -86,7 +88,7 @@ public class HttpClientProxy
 	}
 	
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		this.active = false;
 		this.requestQueue.clear();
 		Map<Request, EzyFuture> undoneTasks = futures.clear();
@@ -118,17 +120,21 @@ public class HttpClientProxy
 		catch (Exception e) {
 			exception = e;
 		}
-		if(future != null) {
-			if(exception != null)
-				future.setException(exception);
-			else
-				future.setResult(response);
-		}
-		else {
-			if(exception != null)
-				logger.info("handled request: {} with exception, but there is no future", request, exception);
-			else
-				logger.info("handled request: {} with response: {}, but there is no future", request, response);
+		try {
+			if(future != null) {
+				if(exception != null)
+					future.setException(exception);
+				else
+					future.setResult(response);
+			}
+			else {
+				if(exception != null)
+					logger.info("handled request: {} with exception, but there is no future", request, exception);
+				else
+					logger.info("handled request: {} with response: {}, but there is no future", request, response);
+			}
+		} catch (Throwable e) {
+			logger.info("handle request result error", e);
 		}
 	}
 	
@@ -147,8 +153,7 @@ public class HttpClientProxy
 			futures.removeFuture(request);
 			throw e;
 		}
-		ResponseEntity response = future.get(timeout);
-		return response;
+		return future.get(timeout);
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -156,13 +161,7 @@ public class HttpClientProxy
 		execute(request, new RequestCallback<ResponseEntity>() {
 			@Override
 			public void onResponse(ResponseEntity response) {
-				try {
-					Object body = response.getBody();
-					callback.onResponse(body);
-				}
-				catch (Exception e) {
-					onException(e);
-				}
+				callback.onResponse(response.getBody());
 			}
 			@Override
 			public void onException(Exception e) {
@@ -380,13 +379,12 @@ public class HttpClientProxy
 		
 		@Override
 		public HttpClientProxy build() {
-			HttpClientProxy proxy = new HttpClientProxy(
+			return new HttpClientProxy(
 					threadPoolSize,
 					requestQueueCapacity,
 					autoStart,
 					clientBuilder.build()
 			);
-			return proxy;
 		}
 	}
 	
