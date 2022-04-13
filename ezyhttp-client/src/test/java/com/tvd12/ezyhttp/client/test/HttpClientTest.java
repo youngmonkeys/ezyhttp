@@ -1,20 +1,5 @@
 package com.tvd12.ezyhttp.client.test;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.request.GetRequest;
@@ -22,32 +7,40 @@ import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.client.test.request.HelloRequest;
 import com.tvd12.ezyhttp.client.test.server.TestApplicationBootstrap;
+import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
+import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import com.tvd12.ezyhttp.core.codec.TextBodyConverter;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpConflictException;
-import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
-import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
-import com.tvd12.ezyhttp.core.exception.HttpMethodNotAllowedException;
-import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
-import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.core.exception.HttpRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
-import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
-import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
+import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.reflect.MethodInvoker;
 import com.tvd12.test.util.RandomUtil;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Mockito.*;
 
 public class HttpClientTest {
 
 	public static void main(String[] args) throws Exception {
+		getTest();
 		postTest();
 	}
 	
@@ -78,6 +71,40 @@ public class HttpClientTest {
 				.setConnectTimeout(HttpClient.NO_TIMEOUT);
 		String response = client.call(request);
 		System.out.println(response);
+	}
+
+	@Test
+	public void httpClientBuilderTest() {
+		// given
+		int readTimeout = RandomUtil.randomInt();
+		int connectionTimeout = RandomUtil.randomInt();
+		Object stringConverter = SingletonStringDeserializer.getInstance();
+		Object bodyConverter = new MyTextBodyConverter();
+		HttpClient.Builder clientBuilder = HttpClient.builder()
+			.readTimeout(readTimeout)
+			.connectTimeout(connectionTimeout)
+			.setStringConverter(stringConverter)
+			.addBodyConverter(bodyConverter)
+			.addBodyConverters(Collections.singletonList(bodyConverter))
+			.addBodyConverters(
+				Collections.singletonMap(
+					ContentTypes.APPLICATION_JSON,
+					bodyConverter
+				)
+			);
+
+		// when
+		HttpClient client = clientBuilder.build();
+
+		// then
+		Asserts.assertEquals(
+			FieldUtil.getFieldValue(client, "defaultReadTimeout"),
+			readTimeout
+		);
+		Asserts.assertEquals(
+			FieldUtil.getFieldValue(client, "defaultConnectTimeout"),
+			connectionTimeout
+		);
 	}
 	
 	@Test
@@ -138,7 +165,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postwithNoBody() throws Exception {
+	public void postwithNoBody() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -156,7 +183,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodNotFound() throws Exception {
+	public void postMethodNotFound() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -174,7 +201,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodUnauthorized() throws Exception {
+	public void postMethodUnauthorized() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -192,7 +219,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodForbidden() throws Exception {
+	public void postMethodForbidden() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -210,7 +237,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodNotAcceptable() throws Exception {
+	public void postMethodNotAcceptable() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -228,7 +255,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodTimeout() throws Exception {
+	public void postMethodTimeout() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -246,7 +273,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodConflict() throws Exception {
+	public void postMethodConflict() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -264,7 +291,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodUnsupportedMediaType() throws Exception {
+	public void postMethodUnsupportedMediaType() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -282,7 +309,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodServerInternalError() throws Exception {
+	public void postMethodServerInternalError() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -300,7 +327,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodServer501() throws Exception {
+	public void postMethodServer501() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -318,7 +345,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postMethodNotAllow() throws Exception {
+	public void postMethodNotAllow() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -429,7 +456,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void tryDeserializeResponseBodyStringNull() throws Exception {
+	public void tryDeserializeResponseBodyStringNull() {
 		// given
 		String contentType = RandomUtil.randomShortAlphabetString();
 		int contentLength = RandomUtil.randomSmallInt();
@@ -457,7 +484,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-    public void downloadToFileNotFoundTest() throws Exception {
+    public void downloadToFileNotFoundTest() {
         // given
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
         
@@ -474,7 +501,7 @@ public class HttpClientTest {
     }
     
     @Test
-    public void downloadToOutputStreamNotFoundTest() throws Exception {
+    public void downloadToOutputStreamNotFoundTest() {
         // given
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
         
@@ -621,4 +648,7 @@ public class HttpClientTest {
 	public static class TestResponse {
 		private String message;
 	}
+
+	@BodyConvert(ContentTypes.APPLICATION_JSON)
+	public static class MyTextBodyConverter extends TextBodyConverter {}
 }

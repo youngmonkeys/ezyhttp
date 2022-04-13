@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
@@ -45,6 +47,8 @@ import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
+
+import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWAYS_RUN;
 
 public class HttpClient extends EzyLoggable {
 
@@ -162,15 +166,13 @@ public class HttpClient extends EzyLoggable {
 	
 	public HttpURLConnection connect(String url) throws Exception {
 		URL requestURL = new URL(url);
-		HttpURLConnection connection = (HttpURLConnection)requestURL.openConnection();
-		return connection;
+		return (HttpURLConnection)requestURL.openConnection();
 	}
 	
 	protected byte[] serializeRequestBody(
 			String contentType, Object requestBody) throws IOException {
 		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
-		byte[] bytes = serializer.serialize(requestBody);
-		return bytes;
+		return serializer.serialize(requestBody);
 	}
 	
 	protected Object deserializeResponseBody(
@@ -178,7 +180,7 @@ public class HttpClient extends EzyLoggable {
 			int contentLength,
 			InputStream inputStream, Class<?> responseType) throws IOException {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
-		Object body = null;
+		Object body;
 		if(responseType != null) {
 			if(responseType == String.class)
 				body = deserializer.deserializeToString(inputStream, contentLength);
@@ -186,12 +188,7 @@ public class HttpClient extends EzyLoggable {
 				body = deserializer.deserialize(inputStream, responseType);
 		}
 		else {
-			try {
-				body = deserializer.deserializeToString(inputStream, contentLength);
-			}
-			catch (IOException e) {
-				throw e;
-			}
+			body = deserializer.deserializeToString(inputStream, contentLength);
 			if(body != null) {
 				try {
 					body = deserializer.deserialize((String)body, Map.class);
@@ -236,34 +233,78 @@ public class HttpClient extends EzyLoggable {
             return new HttpInternalServerErrorException(body);
         return new HttpRequestException(statusCode, body);
 	}
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		String fileURL,
+		File storeLocation
+	) throws Exception {
+		return download(fileURL, storeLocation, ALWAYS_RUN);
+	}
 	
 	/**
      * Downloads a file from a URL and store to a file
      * 
      * @param fileURL HTTP URL of the file to be download
      * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(String fileURL, File storeLocation) throws Exception {
-        return download(new DownloadRequest(fileURL), storeLocation);
+    public String download(
+    	String fileURL,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+        return download(
+        	new DownloadRequest(fileURL),
+			storeLocation,
+			cancellationToken
+		);
     }
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param request the request of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		DownloadRequest request,
+		File storeLocation
+	) throws Exception {
+		return download(request, storeLocation, ALWAYS_RUN);
+	}
     
     /**
      * Downloads a file from a URL and store to a file
      * 
      * @param request the request of the file to be download
      * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(DownloadRequest request, File storeLocation) throws Exception {
+    public String download(
+    	DownloadRequest request,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
             decorateConnection(connection, request);
             connection.connect();
-            return download(connection, fileURL, storeLocation);
+            return download(connection, fileURL, storeLocation, cancellationToken);
         } finally {
             connection.disconnect();
         }
@@ -272,7 +313,8 @@ public class HttpClient extends EzyLoggable {
     private String download(
         HttpURLConnection connection,
         String fileURL,
-        File storeLocation
+        File storeLocation,
+		DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
         
@@ -293,39 +335,88 @@ public class HttpClient extends EzyLoggable {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
+                	if (cancellationToken.isCancelled()) {
+						Files.deleteIfExists(downloadingFilePath);
+						break;
+					}
                     outputStream.write(buffer, 0, bytesRead);
                 }
             }
         }
-        Files.move(downloadingFile.toPath(), storeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		if (cancellationToken.isCancelled()) {
+			throw new DownloadCancelledException(fileURL);
+		}
+        Files.move(
+        	downloadingFile.toPath(),
+			storeFile.toPath(),
+			StandardCopyOption.REPLACE_EXISTING
+		);
         return fileName;
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		String fileURL,
+		OutputStream outputStream
+	) throws Exception {
+		download(fileURL, outputStream, ALWAYS_RUN);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
      * 
      * @param fileURL HTTP URL of the file to be download
      * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
-    public void download(String fileURL, OutputStream outputStream) throws Exception {
-        download(new DownloadRequest(fileURL), outputStream);
+    public void download(
+    	String fileURL,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+        download(new DownloadRequest(fileURL), outputStream, cancellationToken);
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param request the request of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		DownloadRequest request,
+		OutputStream outputStream
+	) throws Exception {
+		download(request, outputStream, ALWAYS_RUN);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
      * 
      * @param request the request of the file to be download
      * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
-    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
+    public void download(
+    	DownloadRequest request,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
             decorateConnection(connection, request);
             connection.connect();
-            download(connection, fileURL, outputStream);
+            download(connection, fileURL, outputStream, cancellationToken);
         } finally {
             connection.disconnect();
         }
@@ -334,7 +425,8 @@ public class HttpClient extends EzyLoggable {
     private void download(
         HttpURLConnection connection,
         String fileURL,
-        OutputStream outputStream
+        OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
         
@@ -346,15 +438,21 @@ public class HttpClient extends EzyLoggable {
             int bytesRead;
             byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
+            	if (cancellationToken.isCancelled()) {
+            		break;
+				}
                 outputStream.write(buffer, 0, bytesRead);
             }
         }
+        if (cancellationToken.isCancelled()) {
+        	throw new DownloadCancelledException(fileURL);
+		}
     }
     
     private void decorateConnection(
         HttpURLConnection connection, 
         DownloadRequest request
-    ) throws IOException {
+    ) {
         int connectTimeout = request.getReadTimeout();
         int readTimeout = request.getReadTimeout();
         connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
@@ -498,5 +596,4 @@ public class HttpClient extends EzyLoggable {
 			return new HttpClient(this);
 		}
 	}
-	
 }

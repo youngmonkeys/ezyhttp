@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
+import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
@@ -200,6 +201,23 @@ public class HttpClientProxy
     public String download(String fileURL, File storeLocation) throws Exception {
         return client.download(fileURL, storeLocation);
     }
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		String fileURL,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		return client.download(fileURL, storeLocation, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to a file
@@ -209,9 +227,29 @@ public class HttpClientProxy
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(DownloadRequest request, File storeLocation) throws Exception {
+    public String download(
+    	DownloadRequest request,
+		File storeLocation
+	) throws Exception {
         return client.download(request, storeLocation);
     }
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param request the request of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		DownloadRequest request,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		return client.download(request, storeLocation, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
@@ -220,9 +258,28 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(String fileURL, OutputStream outputStream) throws Exception {
+    public void download(
+    	String fileURL,
+		OutputStream outputStream
+	) throws Exception {
         client.download(fileURL, outputStream);
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		String fileURL,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		client.download(fileURL, outputStream, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
@@ -231,9 +288,28 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
+    public void download(
+    	DownloadRequest request,
+		OutputStream outputStream
+	) throws Exception {
         client.download(request, outputStream);
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param request the request of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		DownloadRequest request,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		client.download(request, outputStream, cancellationToken);
+	}
 	
 	public static Builder builder() {
 		return new Builder();

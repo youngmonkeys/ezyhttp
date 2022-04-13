@@ -38,19 +38,20 @@ public class RequestEntityTest {
 		
 		// when
 		RequestEntity sut = RequestEntity.of(body)
-				.header("1", "hello")
-				.header("1", "world")
-				.header("2", Arrays.asList("foo", "bar"))
-				.headers(Collections.singletonMap("3", "monkey"))
-				.contentType(ContentTypes.APPLICATION_JSON)
-				.build();
+			.header("1", (String)null)
+			.header("1", "hello")
+			.header("1", "world")
+			.header("2", Arrays.asList("foo", "bar"))
+			.headers(Collections.singletonMap("3", "monkey"))
+			.contentType(ContentTypes.APPLICATION_JSON)
+			.build();
 		
 		// then
 		Map<String, List<String>> headers = new HashMap<>();
 		headers.put("1", Arrays.asList("hello", "world"));
 		headers.put("2", Arrays.asList("foo", "bar"));
-		headers.put("3", Arrays.asList("monkey"));
-		headers.put(Headers.CONTENT_TYPE, Arrays.asList(ContentTypes.APPLICATION_JSON));
+		headers.put("3", Collections.singletonList("monkey"));
+		headers.put(Headers.CONTENT_TYPE, Collections.singletonList(ContentTypes.APPLICATION_JSON));
 		Asserts.assertEquals(new MultiValueMap(headers), sut.getHeaders());
 		Asserts.assertEquals(body, sut.getBody());
 		
@@ -63,8 +64,7 @@ public class RequestEntityTest {
 	@Test
 	public void emptyHeadersTest() {
 		// given
-		String body = null;
-		RequestEntity sut = new RequestEntity((Map<String, List<String>>)null, body);
+		RequestEntity sut = new RequestEntity((Map<String, List<String>>)null, null);
 		
 		// when
 		// then
@@ -93,8 +93,8 @@ public class RequestEntityTest {
 		Map<String, List<String>> data = new HashMap<>();
 		data.put("1", Arrays.asList("hello", "world"));
 		data.put("2", Arrays.asList("foo", "bar"));
-		data.put("3", Arrays.asList("monkey"));
-		data.put(Headers.CONTENT_TYPE, Arrays.asList(ContentTypes.APPLICATION_JSON));
+		data.put("3", Collections.singletonList("monkey"));
+		data.put(Headers.CONTENT_TYPE, Collections.singletonList(ContentTypes.APPLICATION_JSON));
 		RequestEntity sut = RequestEntity.builder()
 				.body(new MultiValueMap(data))
 				.build();
