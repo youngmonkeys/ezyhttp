@@ -3,13 +3,8 @@ package com.tvd12.ezyhttp.server.core.test.controller;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.boot.test.service.FileUploadService;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.server.core.annotation.Async;
-import com.tvd12.ezyhttp.server.core.annotation.Controller;
-import com.tvd12.ezyhttp.server.core.annotation.DoGet;
-import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
-import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
+import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-
 import lombok.AllArgsConstructor;
 
 @Controller("/api/v1")
@@ -20,7 +15,7 @@ public class FileController {
     
     @Async
     @DoGet("/files/{file}")
-    public void uploadPost(
+    public void downloadGet(
         RequestArguments requestArguments,
         @PathVariable("file") String file,
         @RequestHeader("token") String token
@@ -29,5 +24,13 @@ public class FileController {
             throw new HttpBadRequestException("token can not be null");
         }
         fileUploadService.download(requestArguments, file);
+    }
+
+    @Async
+    @DoPost("/files/upload")
+    public void uploadPost(
+        RequestArguments requestArguments
+    ) throws Exception {
+        fileUploadService.accept(requestArguments.getRequest());
     }
 }
