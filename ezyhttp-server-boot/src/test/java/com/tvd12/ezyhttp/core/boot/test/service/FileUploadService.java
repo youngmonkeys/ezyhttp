@@ -26,17 +26,34 @@ public class FileUploadService {
 	
 	@EzyPostInit
 	public void postInit() {
-		new File("files").mkdir();
+		if (!new File("files").mkdir()) {
+			System.out.println("file existed");
+		}
 	}
 	
-	public void accept(HttpServletRequest request, Part part, EzyExceptionVoid callback) {
+	public void accept(HttpServletRequest request) throws Exception {
+		accept(
+			request,
+			request.getPart("file"),
+			() -> System.out.println("Upload finished")
+		);
+	}
+
+	public void accept(
+		HttpServletRequest request,
+		Part part,
+		EzyExceptionVoid callback
+	) {
 		String fileName = part.getSubmittedFileName();
 		File file = new File("files/" + fileName);
 		AsyncContext asyncContext = request.getAsyncContext();
 		fileUploadManager.accept(asyncContext, part, file, callback);
 	}
 	
-	public void download(RequestArguments requestArguments, String file) throws Exception {
+	public void download(
+		RequestArguments requestArguments,
+		String file
+	) throws Exception {
 	    ResourceRequestHandler handler = new ResourceRequestHandler(
             "files/" + file,
             "files/" + file,

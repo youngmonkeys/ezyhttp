@@ -2,11 +2,7 @@ package com.tvd12.ezyhttp.server.core.test.handler;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -124,14 +120,13 @@ public class ResourceRequestHandlerTest {
         String resourceURI = "/index.html";
         String resourceExtension = "html";
         ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
-        when(
-            downloadManager.drainAsync(
-                any(InputStream.class), 
+        doThrow(IllegalStateException.class).when(downloadManager)
+            .drainAsync(
+                any(InputStream.class),
                 any(OutputStream.class),
                 any(EzyResultCallback.class)
-            )
-        ).thenThrow(IllegalStateException.class);
-        
+            );
+
         ResourceRequestHandler sut = new ResourceRequestHandler(
             resourcePath,
             resourceURI,

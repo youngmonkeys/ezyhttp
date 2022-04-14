@@ -1,25 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test.resources;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
@@ -27,6 +7,20 @@ import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
 import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.ezyhttp.server.core.resources.FileUploadCallback;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
+import org.testng.annotations.Test;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class FileUploaderTest {
 
@@ -58,6 +52,7 @@ public class FileUploaderTest {
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(asyncContext, times(1)).complete();
     }
     
     @SuppressWarnings("unchecked")
@@ -65,6 +60,11 @@ public class FileUploaderTest {
     public void acceptFirstException() throws Exception {
         // given
         AsyncContext asyncContext = mock(AsyncContext.class);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("hello-world");
+        when(asyncContext.getRequest()).thenReturn(request);
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
         
@@ -89,6 +89,9 @@ public class FileUploaderTest {
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+        verify(request, times(1)).getRequestURI();
+        verify(asyncContext, times(1)).getRequest();
+        verify(asyncContext, times(1)).complete();
     }
     
     @SuppressWarnings("unchecked")
@@ -96,6 +99,11 @@ public class FileUploaderTest {
     public void acceptFirstMaxUploadSizeException() throws Exception {
         // given
         AsyncContext asyncContext = mock(AsyncContext.class);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("hello-world");
+        when(asyncContext.getRequest()).thenReturn(request);
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
         
@@ -125,15 +133,24 @@ public class FileUploaderTest {
         verify(response, times(1)).setStatus(StatusCodes.BAD_REQUEST);
         verify(response, times(1)).getOutputStream();
         verify(outputStream, times(1)).write(any(byte[].class));
+        verify(request, times(1)).getRequestURI();
+        verify(asyncContext, times(1)).getRequest();
+        verify(asyncContext, times(1)).complete();
     }
     
     @SuppressWarnings("unchecked")
     @Test
     public void acceptFirstFailed() throws Exception {
         // given
-        HttpServletResponse response = mock(HttpServletResponse.class);
         AsyncContext asyncContext = mock(AsyncContext.class);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("hello-world");
+        when(asyncContext.getRequest()).thenReturn(request);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
+
         Part part = mock(Part.class);
         File outputFile = new File("test-output/files");
         EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
@@ -154,6 +171,9 @@ public class FileUploaderTest {
         verify(callback, times(0)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+        verify(request, times(1)).getRequestURI();
+        verify(asyncContext, times(1)).getRequest();
+        verify(asyncContext, times(1)).complete();
     }
     
     @SuppressWarnings("unchecked")
@@ -175,6 +195,7 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).onFailure(any());
+        verify(asyncContext, times(1)).complete();
     }
     
     @Test
@@ -196,9 +217,9 @@ public class FileUploaderTest {
         
         // then
         verify(callback, times(1)).onFailure(any());
+        verify(asyncContext, times(1)).complete();
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void acceptFourthFailed() {
         // given
@@ -210,8 +231,14 @@ public class FileUploaderTest {
         FileUploadCallback callback = mock(FileUploadCallback.class);
         
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
-        when(resourceUploadManager.drainAsync(any(), any(), any(long.class), any())).thenThrow(IllegalStateException.class);
-        
+        doThrow(IllegalStateException.class).when(resourceUploadManager)
+            .drainAsync(
+                any(),
+                any(),
+                any(long.class),
+                any()
+            );
+
         FileUploader sut = new FileUploader(resourceUploadManager);
         
         // when
@@ -220,5 +247,6 @@ public class FileUploaderTest {
         // then
         verify(callback, times(1)).onFailure(any());
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
+        verify(asyncContext, times(1)).complete();
     }
 }

@@ -1,23 +1,5 @@
 package com.tvd12.ezyhttp.client.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyfox.exception.BadRequestException;
 import com.tvd12.ezyfox.util.EzyFileUtil;
@@ -26,16 +8,11 @@ import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.HttpClientProxy;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
+import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
+import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
-import com.tvd12.ezyhttp.client.request.DeleteRequest;
-import com.tvd12.ezyhttp.client.request.DownloadRequest;
-import com.tvd12.ezyhttp.client.request.GetRequest;
-import com.tvd12.ezyhttp.client.request.PostRequest;
-import com.tvd12.ezyhttp.client.request.PutRequest;
-import com.tvd12.ezyhttp.client.request.Request;
-import com.tvd12.ezyhttp.client.request.RequestEntity;
-import com.tvd12.ezyhttp.client.request.RequestQueue;
+import com.tvd12.ezyhttp.client.request.*;
 import com.tvd12.ezyhttp.client.test.request.HelloRequest;
 import com.tvd12.ezyhttp.client.test.server.TestApplicationBootstrap;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
@@ -45,14 +22,27 @@ import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
-public class HttpClientProxyTest {
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+
+import static org.mockito.Mockito.*;
+
+public class HttpClientProxyTest extends BaseTest {
 
 	public static void main(String[] args) throws Exception {
 		HttpClientProxy client = HttpClientProxy.builder()
@@ -70,6 +60,7 @@ public class HttpClientProxyTest {
 			}
 		}).start();
 		Thread.sleep(3);
+		getTest(client);
 		client.close();
 	}
 	
@@ -154,6 +145,42 @@ public class HttpClientProxyTest {
 		sut.close();
 		sut.stop();
 	}
+
+	@Test
+	public void fireJsonButExceptionInCallbackTest() throws Exception {
+		// given
+		HttpClientProxy sut = newClientProxy();
+
+		GetRequest request = new GetRequest()
+			.setConnectTimeout(15000)
+			.setResponseType(TestResponse.class)
+			.setResponseType(StatusCodes.OK, TestResponse.class)
+			.setURL("http://127.0.0.1:18081/greet?who=Monkey");
+
+		// when
+		CountDownLatch countDownLatch = new CountDownLatch(1);
+		EzyWrap<TestResponse> wrap = new EzyWrap<>();
+		sut.fire(request, new RequestCallback<TestResponse>() {
+			@Override
+			public void onResponse(TestResponse response) {
+				wrap.setValue(response);
+				countDownLatch.countDown();
+				throw new RuntimeException("just test");
+			}
+
+			@Override
+			public void onException(Exception e) {
+			}
+		});
+		countDownLatch.await();
+		Thread.sleep(100);
+
+		// then
+		TestResponse expectation = new TestResponse("Greet Monkey!");
+		Asserts.assertEquals(expectation, wrap.getValue());
+		sut.close();
+		sut.stop();
+	}
 	
 	@Test
 	public void fireExceptionTest() throws Exception {
@@ -162,18 +189,18 @@ public class HttpClientProxyTest {
 		
 		GetRequest request = new GetRequest()
 				.setConnectTimeout(15000)
-				.setResponseType(TestResponse.class)
-				.setResponseType(StatusCodes.OK, TestResponse.class)
-				.setURL("http://127.0.0.1:18081/greet");
+				.setResponseType(String.class)
+				.setResponseType(StatusCodes.OK, String.class)
+				.setURL("http://unknow-host:18081/greet");
 		
 		// when
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 		EzyWrap<Exception> wrap = new EzyWrap<>();
-		sut.fire(request, new RequestCallback<TestResponse>() {
+		sut.fire(request, new RequestCallback<String>() {
 			@Override
-			public void onResponse(TestResponse response) {
+			public void onResponse(String response) {
 			}
-			
+
 			@Override
 			public void onException(Exception e) {
 				wrap.setValue(e);
@@ -281,7 +308,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void postWithExceptionTest() throws Exception {
+	public void postWithExceptionTest() {
 		// given
 		HttpClientProxy sut = newClientProxy();
 		
@@ -416,7 +443,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void clientWasNotActive() throws Exception {
+	public void clientWasNotActive() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder().build();
 		
@@ -437,7 +464,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void clientWasNotActiveAtExecute() throws Exception {
+	public void clientWasNotActiveAtExecute() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder().build();
 		
@@ -450,10 +477,8 @@ public class HttpClientProxyTest {
 		
 		// when
 		Throwable e = Asserts.assertThrows(() -> sut.execute(request, new RequestCallback<ResponseEntity>() {
-			public void onException(Exception e) {
-			};
-			public void onResponse(ResponseEntity response) {
-			};
+			public void onException(Exception e) {}
+			public void onResponse(ResponseEntity response) {}
 		}));
 		
 		// then
@@ -463,7 +488,7 @@ public class HttpClientProxyTest {
 	}
 	
 	@Test
-	public void maxCapacity() throws Exception {
+	public void maxCapacity() {
 		// given
 		HttpClientProxy sut = HttpClientProxy.builder()
 				.autoStart(true)
@@ -510,6 +535,56 @@ public class HttpClientProxyTest {
         sut.close();
         sut.stop();
     }
+
+	@Test
+	public void downloadToFileWithCancellationTokenTest() throws Exception {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		// when
+		String fileName = sut.download(
+			fileUrl,
+			new File("test-output/no-commit"),
+			new DownloadCancellationToken()
+		);
+
+		// then
+		Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
+		Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
+		sut.close();
+		sut.stop();
+	}
+
+	@Test
+	public void downloadToFileButCancelTest() {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		// when
+		DownloadCancellationToken cancellationToken = new DownloadCancellationToken();
+		cancellationToken.cancel();
+		Throwable e = Asserts.assertThrows(() ->
+			sut.download(
+				fileUrl,
+				new File("test-output/no-commit"),
+				cancellationToken
+			));
+
+		// then
+		Asserts.assertEqualsType(e, DownloadCancelledException.class);
+		sut.close();
+		sut.stop();
+	}
 	
 	@Test
     public void downloadToFileByRequestTest() throws Exception {
@@ -539,6 +614,39 @@ public class HttpClientProxyTest {
         sut.close();
         sut.stop();
     }
+
+	@Test
+	public void downloadToFileByRequestWithCancellationTokenTest() throws Exception {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+		DownloadRequest request = new DownloadRequest()
+			.setFileURL(fileUrl)
+			.setConnectTimeout(5000)
+			.setReadTimeout(5000)
+			.setHeaders(
+				MultiValueMap.builder()
+					.setValue("hello", "world")
+					.build()
+			);
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		// when
+		String fileName = sut.download(
+			request,
+			new File("test-output/no-commit"),
+			new DownloadCancellationToken()
+		);
+
+		// then
+		Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
+		Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
+		sut.close();
+		sut.stop();
+	}
 	
 	@Test
     public void downloadToOutputStreamTest() throws Exception {
@@ -562,6 +670,57 @@ public class HttpClientProxyTest {
         sut.close();
         sut.stop();
     }
+
+	@Test
+	public void downloadToOutputStreamWithCancellationTokenTest() throws Exception {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		File outFile = new File("test-output/no-commit/download-test.xml");
+		EzyFileUtil.createFileIfNotExists(outFile);
+		OutputStream outputStream = new FileOutputStream(outFile);
+
+		// when
+		sut.download(fileUrl, outputStream, new DownloadCancellationToken());
+
+		// then
+		Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
+		sut.close();
+		sut.stop();
+	}
+
+	@Test
+	public void downloadToOutputStreamButCancelTest() throws Exception {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		File outFile = new File("test-output/no-commit/download-test.xml");
+		EzyFileUtil.createFileIfNotExists(outFile);
+		OutputStream outputStream = new FileOutputStream(outFile);
+
+		DownloadCancellationToken cancelledException = new DownloadCancellationToken();
+		cancelledException.cancel();
+
+		// when
+		Throwable e = Asserts.assertThrows(() ->
+			sut.download(fileUrl, outputStream, cancelledException)
+		);
+
+		// then
+		Asserts.assertEqualsType(e, DownloadCancelledException.class);
+		sut.close();
+		sut.stop();
+	}
 	
 	@Test
     public void downloadToOutputStreamByRequestTest() throws Exception {
@@ -594,7 +753,39 @@ public class HttpClientProxyTest {
         sut.close();
         sut.stop();
     }
-	
+
+	@Test
+	public void downloadToOutputStreamByRequestWithCancellationTokenTest() throws Exception {
+		// given
+		String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+		DownloadRequest request = new DownloadRequest()
+			.setFileURL(fileUrl)
+			.setConnectTimeout(5000)
+			.setReadTimeout(5000)
+			.setHeaders(
+				MultiValueMap.builder()
+					.setValue("hello", "world")
+					.build()
+			);
+
+		HttpClientProxy sut = HttpClientProxy.builder()
+			.requestQueueCapacity(1)
+			.threadPoolSize(1)
+			.build();
+
+		File outFile = new File("test-output/no-commit/download-test.xml");
+		EzyFileUtil.createFileIfNotExists(outFile);
+		OutputStream outputStream = new FileOutputStream(outFile);
+
+		// when
+		sut.download(request, outputStream, new DownloadCancellationToken());
+
+		// then
+		Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
+		sut.close();
+		sut.stop();
+	}
+
 	private HttpClientProxy newClientProxy() {
 		HttpClientProxy sut = HttpClientProxy.builder()
 				.autoStart(true)
@@ -602,7 +793,7 @@ public class HttpClientProxyTest {
 				.connectTimeout(15000)
 				.setStringConverter(SingletonStringDeserializer.getInstance())
 				.addBodyConverter(new TestBodyConverter())
-				.addBodyConverters(Arrays.asList(new TestBodyConverter()))
+				.addBodyConverters(Collections.singletonList(new TestBodyConverter()))
 				.addBodyConverter("world", new TestBodyConverter())
 				.addBodyConverters(Collections.singletonMap("foo", new TestBodyConverter()))
 				.threadPoolSize(1)
@@ -635,7 +826,7 @@ public class HttpClientProxyTest {
 	public static class TestBodyConverter implements BodyConverter {
 
 		@Override
-		public byte[] serialize(Object body) throws IOException {
+		public byte[] serialize(Object body) {
 			return body.toString().getBytes();
 		}
 		

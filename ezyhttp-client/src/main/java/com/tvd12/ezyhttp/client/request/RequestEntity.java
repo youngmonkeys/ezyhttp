@@ -85,6 +85,9 @@ public class RequestEntity {
 		}
 		
 		public Builder header(String name, String value) {
+		    if (value == null) {
+		        return this;
+		    }
 			if(this.headers == null)
 				this.headers = new HashMap<>();
 			List<String> values = headers.get(name);

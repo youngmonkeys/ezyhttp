@@ -95,58 +95,70 @@ public class ResourceDownloadManager
 			}
 			catch (Exception e) {
 			    exception = e;
-				logger.debug("download error", e);
+				logger.info("download error", e);
+			}
+			catch (Throwable e) {
+			    exception = new IllegalStateException(e);
+                logger.info("download fatal error", e);
 			}
 			if (entry == null) {
 			    continue;
 			}
-			if(done) {
-                EzyFuture future = futureMap.removeFuture(entry);
-                if (future == null) {
-                    continue;
-                }
-                if (exception != null) {
-                    future.setException(exception);
-                }
-                else {
-                    future.setResult(Boolean.TRUE);
-                }
-            }
-            else {
-                queue.offer(entry);
-            }
+			try {
+				if(done) {
+					EzyFuture future = futureMap.removeFuture(entry);
+					if (future == null) {
+						continue;
+					}
+					if (exception != null) {
+						future.setException(exception);
+					}
+					else {
+						future.setResult(Boolean.TRUE);
+					}
+				}
+				else {
+					if (!queue.offer(entry)) {
+						EzyFuture future = futureMap.removeFuture(entry);
+						if (future != null) {
+							future.setException(new MaxResourceDownloadCapacity(capacity));
+						}
+					}
+				}
+			}
+			catch (Throwable e) {
+				logger.info("handle download result error", e);
+			}
 		}
 	}
 	
 	public void drain(InputStream from, OutputStream to) throws Exception {
 	    Entry entry = new Entry(from, to);
 	    EzyFuture future = new EzyFutureTask();
-        drain(from, to, entry, future).get(DEFAULT_TIMEOUT);
+        drain(entry, future);
+		future.get(DEFAULT_TIMEOUT);
 	}
 	
-	public EzyFuture drainAsync(
+	public void drainAsync(
 	        InputStream from, 
 	        OutputStream to,
 	        EzyResultCallback<Boolean> callback
     ) {
         Entry entry = new Entry(from, to);
         EzyCallableFutureTask future = new EzyCallableFutureTask(callback);
-        return drain(from, to, entry, future);
+        drain(entry, future);
     }
 	
-	private EzyFuture drain(
-            InputStream from, 
-            OutputStream to,
-            Entry entry,
-            EzyFuture future
-    ) {
+	private void drain(
+		Entry entry,
+		EzyFuture future
+	) {
         futureMap.addFuture(entry, future);
         boolean success = this.queue.offer(entry);
         if(!success) {
             futureMap.removeFuture(entry);
             throw new MaxResourceDownloadCapacity(capacity);
         }
-        return future;
     }
 	
 	@Override

@@ -28,7 +28,7 @@ public class ResourceLoader extends EzyLoggable {
 	public List<String> listResources(String rootPath) {
 	    return EzyLists.newArrayList(
             listResourceFiles(rootPath),
-            it -> it.getRelativePath()
+			ResourceFile::getRelativePath
         );
 	}
 	
@@ -39,7 +39,7 @@ public class ResourceLoader extends EzyLoggable {
 	public List<String> listResources(String rootPath, Set<String> regexes) {
 	    return EzyLists.newArrayList(
             listResourceFiles(rootPath, regexes),
-            it -> it.getRelativePath()
+			ResourceFile::getRelativePath
         );
 	}
 	

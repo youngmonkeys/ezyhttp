@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.util.EzyProcessor;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
+import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
@@ -28,6 +29,8 @@ import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestQueue;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
+
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithException;
 
 public class HttpClientProxy 
 		extends EzyLoggable
@@ -61,7 +64,7 @@ public class HttpClientProxy
 	
 	private void doStart(boolean autoStart) {
 		if(autoStart) {
-			EzyProcessor.processWithException(() -> start());
+			processWithException(this::start);
 		}
 	}
 	
@@ -85,7 +88,7 @@ public class HttpClientProxy
 	}
 	
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		this.active = false;
 		this.requestQueue.clear();
 		Map<Request, EzyFuture> undoneTasks = futures.clear();
@@ -117,17 +120,21 @@ public class HttpClientProxy
 		catch (Exception e) {
 			exception = e;
 		}
-		if(future != null) {
-			if(exception != null)
-				future.setException(exception);
-			else
-				future.setResult(response);
-		}
-		else {
-			if(exception != null)
-				logger.info("handled request: {} with exception, but there is no future", request, exception);
-			else
-				logger.info("handled request: {} with response: {}, but there is no future", request, response);
+		try {
+			if(future != null) {
+				if(exception != null)
+					future.setException(exception);
+				else
+					future.setResult(response);
+			}
+			else {
+				if(exception != null)
+					logger.info("handled request: {} with exception, but there is no future", request, exception);
+				else
+					logger.info("handled request: {} with response: {}, but there is no future", request, response);
+			}
+		} catch (Throwable e) {
+			logger.info("handle request result error", e);
 		}
 	}
 	
@@ -146,8 +153,7 @@ public class HttpClientProxy
 			futures.removeFuture(request);
 			throw e;
 		}
-		ResponseEntity response = future.get(timeout);
-		return response;
+		return future.get(timeout);
 	}
 	
 	@SuppressWarnings({"rawtypes", "unchecked"})
@@ -155,13 +161,7 @@ public class HttpClientProxy
 		execute(request, new RequestCallback<ResponseEntity>() {
 			@Override
 			public void onResponse(ResponseEntity response) {
-				try {
-					Object body = response.getBody();
-					callback.onResponse(body);
-				}
-				catch (Exception e) {
-					onException(e);
-				}
+				callback.onResponse(response.getBody());
 			}
 			@Override
 			public void onException(Exception e) {
@@ -200,6 +200,23 @@ public class HttpClientProxy
     public String download(String fileURL, File storeLocation) throws Exception {
         return client.download(fileURL, storeLocation);
     }
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		String fileURL,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		return client.download(fileURL, storeLocation, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to a file
@@ -209,9 +226,29 @@ public class HttpClientProxy
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
-    public String download(DownloadRequest request, File storeLocation) throws Exception {
+    public String download(
+    	DownloadRequest request,
+		File storeLocation
+	) throws Exception {
         return client.download(request, storeLocation);
     }
+
+	/**
+	 * Downloads a file from a URL and store to a file
+	 *
+	 * @param request the request of the file to be download
+	 * @param storeLocation path of the directory to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 * @return the downloaded file name
+	 */
+	public String download(
+		DownloadRequest request,
+		File storeLocation,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		return client.download(request, storeLocation, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
@@ -220,9 +257,28 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(String fileURL, OutputStream outputStream) throws Exception {
+    public void download(
+    	String fileURL,
+		OutputStream outputStream
+	) throws Exception {
         client.download(fileURL, outputStream);
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param fileURL HTTP URL of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		String fileURL,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		client.download(fileURL, outputStream, cancellationToken);
+	}
     
     /**
      * Downloads a file from a URL and store to an output stream
@@ -231,9 +287,28 @@ public class HttpClientProxy
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
-    public void download(DownloadRequest request, OutputStream outputStream) throws Exception {
+    public void download(
+    	DownloadRequest request,
+		OutputStream outputStream
+	) throws Exception {
         client.download(request, outputStream);
     }
+
+	/**
+	 * Downloads a file from a URL and store to an output stream
+	 *
+	 * @param request the request of the file to be download
+	 * @param outputStream the output stream to save the file
+	 * @param cancellationToken the token to cancel
+	 * @throws IOException when there is any I/O error
+	 */
+	public void download(
+		DownloadRequest request,
+		OutputStream outputStream,
+		DownloadCancellationToken cancellationToken
+	) throws Exception {
+		client.download(request, outputStream, cancellationToken);
+	}
 	
 	public static Builder builder() {
 		return new Builder();
@@ -304,13 +379,12 @@ public class HttpClientProxy
 		
 		@Override
 		public HttpClientProxy build() {
-			HttpClientProxy proxy = new HttpClientProxy(
+			return new HttpClientProxy(
 					threadPoolSize,
 					requestQueueCapacity,
 					autoStart,
 					clientBuilder.build()
 			);
-			return proxy;
 		}
 	}
 	

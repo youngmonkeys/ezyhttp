@@ -1,27 +1,25 @@
 package com.tvd12.ezyhttp.core.test.resources;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.BlockingQueue;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.concurrent.EzyFutureMap;
+import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
+import com.tvd12.ezyfox.util.EzyThreads;
 import com.tvd12.ezyhttp.core.exception.MaxResourceDownloadCapacity;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
+import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.util.RandomUtil;
+import org.testng.annotations.Test;
+
+import java.io.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
 
 public class ResourceDownloadManagerTest extends BaseTest {
 	
@@ -46,6 +44,101 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		Asserts.assertEquals(inputBytes, outputBytes);
 		sut.stop();
 		info("end drainTest");
+	}
+
+	@Test
+	public void drainOfferAgainGetMaxQueueCapacityTest() throws Exception {
+		// given
+		ResourceDownloadManager sut = new ResourceDownloadManager(
+			1, 1, 1
+		);
+
+		InputStream inputStream = mock(InputStream.class);
+		when(inputStream.read(any())).thenReturn(1);
+
+		OutputStream outputStream = mock(OutputStream.class);
+
+		// when
+		AtomicReference<Exception> exceptionRef = new AtomicReference<>();
+		for (int i = 0 ; i < 100 ; ++i) {
+			try {
+				sut.drainAsync(inputStream, outputStream, new EzyResultCallback<Boolean>() {
+					@Override
+					public void onResponse(Boolean response) {
+					}
+
+					@Override
+					public void onException(Exception e) {
+						exceptionRef.set(e);
+					}
+				});
+			} catch (Exception ignored) {
+			}
+		}
+
+		// then
+		while (exceptionRef.get() == null) {
+			EzyThreads.sleep(3);
+		}
+		Asserts.assertEqualsType(exceptionRef.get(), MaxResourceDownloadCapacity.class);
+		sut.stop();
+		sut.destroy();
+		verify(inputStream, atLeastOnce()).read(any());
+		verify(outputStream, atLeastOnce()).write(any(), anyInt(), anyInt());
+	}
+
+	@Test
+	public void drainOfferAgainGetMaxQueueCapacityAndFutureNullTest() throws Exception {
+		// given
+		ResourceDownloadManager sut = new ResourceDownloadManager(
+			1, 1, 1
+		);
+
+		InputStream inputStream = mock(InputStream.class);
+		when(inputStream.read(any())).thenReturn(1);
+
+		OutputStream outputStream = mock(OutputStream.class);
+
+		EzyFutureMap<?> futureMap = FieldUtil.getFieldValue(sut, "futureMap");
+
+		// when
+		for (int i = 0 ; i < 1000 ; ++i) {
+			try {
+				sut.drainAsync(inputStream, outputStream, response -> {});
+			} catch (Exception ignored) {
+			}
+			futureMap.clear();
+		}
+
+		// then
+		sut.stop();
+		sut.destroy();
+		verify(inputStream, atLeastOnce()).read(any());
+		verify(outputStream, atLeastOnce()).write(any(), anyInt(), anyInt());
+	}
+
+	@Test
+	public void drainOfferAgainButErrorTest() throws Exception {
+		// given
+		ResourceDownloadManager sut = new ResourceDownloadManager();
+
+		InputStream inputStream = mock(InputStream.class);
+		OutputStream outputStream = mock(OutputStream.class);
+
+		// when
+		AtomicBoolean finished = new AtomicBoolean();
+		sut.drainAsync(inputStream, outputStream, response -> {
+			finished.set(true);
+			throw new RuntimeException("just test");
+		});
+
+		// then
+		while (!finished.get()) {
+			EzyThreads.sleep(3);
+		}
+		sut.stop();
+		sut.destroy();
+		verify(inputStream, times(1)).read(any());
 	}
 	
 	@Test
@@ -72,7 +165,7 @@ public class ResourceDownloadManagerTest extends BaseTest {
 		info("finish drainFailedDueToOutputStream");
 		sut.destroy();
 	}
-	
+
 	@Test
 	public void drainFailedDueToOutputStreamDueToError() throws Exception {
 		// given
@@ -166,4 +259,27 @@ public class ResourceDownloadManagerTest extends BaseTest {
         sut.stop();
         info("finsihed drainButFutureNull");
     }
+
+	@Test
+	public void drainFailedDueToOutputStreamThrowable() throws Exception {
+		// given
+		ResourceDownloadManager sut = new ResourceDownloadManager();
+
+		int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
+
+		byte[] inputBytes = RandomUtil.randomByteArray(size);
+		InputStream inputStream = new ByteArrayInputStream(inputBytes);
+
+		OutputStream outputStream = mock(OutputStream.class);
+		Throwable exception = new StackOverflowError("just test");
+		doThrow(exception).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
+
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
+
+		// then
+		Asserts.assertThat(e.getCause()).isEqualsType(StackOverflowError.class);
+		sut.stop();
+		verify(outputStream, times(1)).write(any(byte[].class), anyInt(), anyInt());
+	}
 }
