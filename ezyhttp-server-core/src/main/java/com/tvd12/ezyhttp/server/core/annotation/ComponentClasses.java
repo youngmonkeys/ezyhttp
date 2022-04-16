@@ -21,5 +21,5 @@ public @interface ComponentClasses {
      * 
      * @return array of component classes
      */
-	public Class<?>[] value();
+    Class<?>[] value();
 }

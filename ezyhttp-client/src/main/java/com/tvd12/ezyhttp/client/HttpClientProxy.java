@@ -69,7 +69,7 @@ public class HttpClientProxy
 	}
 	
 	@Override
-	public void start() throws Exception {
+	public void start() {
 		if(!started.compareAndSet(false, true))
 			return;
 		this.active = true;
@@ -192,7 +192,7 @@ public class HttpClientProxy
 	/**
      * Downloads a file from a URL and store to a file
      * 
-     * @param fileURL HTTP URL of the file to be download
+     * @param fileURL HTTP URL of the file to be downloaded
      * @param storeLocation path of the directory to save the file
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
@@ -204,7 +204,7 @@ public class HttpClientProxy
 	/**
 	 * Downloads a file from a URL and store to a file
 	 *
-	 * @param fileURL HTTP URL of the file to be download
+	 * @param fileURL HTTP URL of the file to be downloaded
 	 * @param storeLocation path of the directory to save the file
 	 * @param cancellationToken the token to cancel
 	 * @throws IOException when there is any I/O error
@@ -221,7 +221,7 @@ public class HttpClientProxy
     /**
      * Downloads a file from a URL and store to a file
      * 
-     * @param request the request of the file to be download
+     * @param request the request of the file to be downloaded
      * @param storeLocation path of the directory to save the file
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
@@ -236,7 +236,7 @@ public class HttpClientProxy
 	/**
 	 * Downloads a file from a URL and store to a file
 	 *
-	 * @param request the request of the file to be download
+	 * @param request the request of the file to be downloaded
 	 * @param storeLocation path of the directory to save the file
 	 * @param cancellationToken the token to cancel
 	 * @throws IOException when there is any I/O error
@@ -253,7 +253,7 @@ public class HttpClientProxy
     /**
      * Downloads a file from a URL and store to an output stream
      * 
-     * @param fileURL HTTP URL of the file to be download
+     * @param fileURL HTTP URL of the file to be downloaded
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
@@ -267,7 +267,7 @@ public class HttpClientProxy
 	/**
 	 * Downloads a file from a URL and store to an output stream
 	 *
-	 * @param fileURL HTTP URL of the file to be download
+	 * @param fileURL HTTP URL of the file to be downloaded
 	 * @param outputStream the output stream to save the file
 	 * @param cancellationToken the token to cancel
 	 * @throws IOException when there is any I/O error
@@ -283,7 +283,7 @@ public class HttpClientProxy
     /**
      * Downloads a file from a URL and store to an output stream
      * 
-     * @param request the request of the file to be download
+     * @param request the request of the file to be downloaded
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
@@ -297,7 +297,7 @@ public class HttpClientProxy
 	/**
 	 * Downloads a file from a URL and store to an output stream
 	 *
-	 * @param request the request of the file to be download
+	 * @param request the request of the file to be downloaded
 	 * @param outputStream the output stream to save the file
 	 * @param cancellationToken the token to cancel
 	 * @throws IOException when there is any I/O error
@@ -318,7 +318,7 @@ public class HttpClientProxy
 		protected boolean autoStart;
 		protected int threadPoolSize;
 		protected int requestQueueCapacity;
-		protected HttpClient.Builder clientBuilder;
+		protected final HttpClient.Builder clientBuilder;
 		
 		public Builder() {
 			this.threadPoolSize = Runtime.getRuntime().availableProcessors() * 2;

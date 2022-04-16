@@ -42,8 +42,7 @@ public class HomeController {
 	}
 	
 	@DoPut
-	public void doNothing() {
-	}
+	public void doNothing() {}
 	
 	@TryCatch({IllegalStateException.class, NullPointerException.class})
 	public String handleException2(Exception e) {
@@ -53,5 +52,4 @@ public class HomeController {
 	@TryCatch(java.lang.UnsupportedOperationException.class)
 	public void handleException3(Exception e) {
 	}
-	
 }

@@ -18,7 +18,5 @@ public class GlobalExceptionHandler {
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)
-	public void handleException3(Exception e) {
-	}
-	
+	public void handleException3(Exception e) {}
 }

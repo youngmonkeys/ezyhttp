@@ -18,8 +18,8 @@ public class ResourceResolver {
 	public final static String DEFAULT_RESOURCE_LOCATION = "static";
 	public final static String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
 	
-	public void register(String localtion) {
-		register(localtion, DEFAULT_FILE_PATH_PATTERN);
+	public void register(String location) {
+		register(location, DEFAULT_FILE_PATH_PATTERN);
 	}
 
 	public void register(String[] locations) {
@@ -39,7 +39,8 @@ public class ResourceResolver {
         );
 		for(ResourceFile res : resourceFiles) {
 		    String relativePath = res.getRelativePath();
-			String resourceURI = relativePath.substring(trimLocation.length() + 1);
+			String resourceURI = relativePath.substring(trimLocation.length() + 1)
+				.replace("\\", "/");
 			String extension = EzyFileUtil.getFileExtension(resourceURI);
 			Resource resource = new Resource(
 		        relativePath, 

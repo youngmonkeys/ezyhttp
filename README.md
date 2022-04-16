@@ -6,7 +6,7 @@
 
 # Synopsis
 
-EzyHttp is a library in EzyFox ecosystem, It support to interact to HTTP (both http server and http client)
+EzyHttp is a library in EzyFox ecosystem, It supports to interact to HTTP (both http server and http client)
 
 # Code Example
 
@@ -94,22 +94,21 @@ import com.tvd12.ezyhttp.core.boot.test.data.Customer;
 @EzySingleton
 public class CustomerService {
 
-	protected final Map<String, Customer> customers = new HashMap<>();
-	
-	public Customer getCustomer(String name) {
-		Customer customer = customers.get(name);
-		return customer;
-	}
-	
-	public void save(Customer customer) {
-		this.customers.put(customer.getName(), customer);
-	}
+    protected final Map<String, Customer> customers = new HashMap<>();
+
+    public Customer getCustomer(String name) {
+        return customers.get(name);
+    }
+
+    public void save(Customer customer) {
+        this.customers.put(customer.getName(), customer);
+    }
 }
 ```
 
 # Motivation
 
-In an effort to bring HTTP to EzyFox ecosystem and help everyone study one do everything
+In an effort to bring HTTP to EzyFox ecosystem and help everyone to study one do everything
 
 # API Reference
 

@@ -34,7 +34,7 @@ public class RedirectTest {
 				.uri("/home")
 				.addHeader("foo", "bar")
 				.addHeader("hello", "world")
-				.addHeaders(Collections.singletonMap("one", new Integer(1)))
+				.addHeaders(Collections.singletonMap("one", 1))
 				.addParameter("param1", "one")
 				.addParameter("param2", "two")
 				.addParameters(Collections.singletonMap("param3", "three"))

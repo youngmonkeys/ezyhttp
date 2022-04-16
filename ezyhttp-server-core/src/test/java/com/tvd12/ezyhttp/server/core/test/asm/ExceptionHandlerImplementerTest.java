@@ -22,13 +22,13 @@ public class ExceptionHandlerImplementerTest {
 				handlerMethod);
 		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.implement());
+		Throwable e = Asserts.assertThrows(sut::implement);
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
 	}
 	
-	private class ExceptionHandler {
+	private static class ExceptionHandler {
 		
 		@TryCatch(Exception.class)
 		private void handle(Exception e) {}

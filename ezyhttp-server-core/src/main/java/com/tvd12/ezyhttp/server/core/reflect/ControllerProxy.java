@@ -42,8 +42,7 @@ public class ControllerProxy {
 	}
 	
 	protected String getRequestURI() {
-		String uri = ControllerAnnotations.getURI(clazz.getClazz());
-		return uri;
+		return ControllerAnnotations.getURI(clazz.getClazz());
 	}
 	
 	protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {
@@ -112,14 +111,12 @@ public class ControllerProxy {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append(clazz.getName())
-				.append("(\n")
-					.append("\tinstance: ").append(instance).append(",\n")
-					.append("\trequestHandlerMethods: ").append(requestHandlerMethods).append(",\n")
-					.append("\texceptionHandlerMethods: ").append(exceptionHandlerMethods).append("\n")
-				.append(")")
-				.toString();
+		return clazz.getName() +
+			"(\n" +
+			"\tinstance: " + instance + ",\n" +
+			"\trequestHandlerMethods: " + requestHandlerMethods + ",\n" +
+			"\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
+			")";
 	}
 	
 }

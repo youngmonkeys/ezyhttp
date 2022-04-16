@@ -45,7 +45,7 @@ public class GraphQLControllerTest {
 	}
 	
 	@Test
-	public void testFetcherNotFoundException() throws Exception {
+	public void testFetcherNotFoundException() {
 		// given
 		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
 		GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder().build();

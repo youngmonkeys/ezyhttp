@@ -139,12 +139,10 @@ public class ExceptionHandlerImplementer
 	}
 	
 	protected String toThrowExceptionFunction(EzyMethod method, EzyFunction function) {
-		return new StringBuilder()
-				.append(method.getDeclaration(EzyReflections.MODIFIER_PUBLIC))
-				.append(" throws Exception {\n")
-				.append(function.body())
-				.append("}")
-				.toString();
+		return method.getDeclaration(EzyReflections.MODIFIER_PUBLIC) +
+			" throws Exception {\n" +
+			function.body() +
+			"}";
 	}
 	
 	protected EzyMethod getSetExceptionHandlerMethod() {

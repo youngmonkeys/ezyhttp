@@ -9,7 +9,7 @@ import com.tvd12.test.assertion.Asserts;
 public class EmptyRequestHandlerTest {
 
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		// given
 		EmptyRequestHandler sut = EmptyRequestHandler.getInstance();
 		sut.setController(new Object());

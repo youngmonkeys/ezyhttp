@@ -10,8 +10,7 @@ public final class InterceptorAnnotations {
 	private InterceptorAnnotations() {}
 	
 	public static int getPriority(Interceptor annotation) {
-		int priority = annotation.priority();
-		return priority;
+		return annotation.priority();
 	}
 	
 	public static int getPriority(RequestInterceptor interceptor) {

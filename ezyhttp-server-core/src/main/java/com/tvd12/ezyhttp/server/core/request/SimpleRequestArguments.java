@@ -75,16 +75,14 @@ public class SimpleRequestArguments implements RequestArguments {
 			return null;
 		if(parameterList.size() <= index)
 			return null;
-		String parameter = parameterList.get(index);
-		return parameter;
+		return parameterList.get(index);
 	}
 	
 	@Override
 	public String getParameter(String name) {
 		if(parameterMap == null)
 			return null;
-		String parameter = parameterMap.get(name);
-		return parameter;
+		return parameterMap.get(name);
 	}
 	
 	@Override
@@ -115,16 +113,14 @@ public class SimpleRequestArguments implements RequestArguments {
 			return null;
 		if(headerList.size() <= index)
 			return null;
-		String header = headerList.get(index);
-		return header;
+		return headerList.get(index);
 	}
 	
 	@Override
 	public String getHeader(String name) {
 		if(headerMap == null)
 			return null;
-		String header = headerMap.get(name);
-		return header;
+		return headerMap.get(name);
 	}
 	
 	public void setHeader(String name, String value) {
@@ -141,15 +137,13 @@ public class SimpleRequestArguments implements RequestArguments {
 		fetchPathVariables();
 		if(pathVariableList.size() <= index)
 			return null;
-		String varValue = pathVariableList.get(index).getValue();
-		return varValue;
+		return pathVariableList.get(index).getValue();
 	}
 	
 	@Override
 	public String getPathVariable(String name) {
 		fetchPathVariables();
-		String varValue = pathVariableMap.get(name);
-		return varValue;
+		return pathVariableMap.get(name);
 	}
 	
 	protected void fetchPathVariables() {
@@ -181,14 +175,12 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public String getRequestContentType() {
-		String type = request.getContentType();
-		return type;
+		return request.getContentType();
 	}
 	
 	@Override
 	public int getContentLength() {
-		int length = request.getContentLength();
-		return length;
+		return request.getContentLength();
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.core.boot.test.converter;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +14,9 @@ public class MyFormBodyDeserializer implements BodyDeserializer {
 	protected final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Override
-	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
+	public <T> T deserialize(BodyData data, Class<T> bodyType) {
 		Map<String, String> params = data.getParameters();
-		T answer = objectMapper.convertValue(params, bodyType);
-		return answer;
+        return objectMapper.convertValue(params, bodyType);
 	}
 	
 }

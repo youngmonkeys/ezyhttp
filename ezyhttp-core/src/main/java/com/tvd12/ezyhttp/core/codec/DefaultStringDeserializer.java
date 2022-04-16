@@ -59,8 +59,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 			throw new IOException("has no deserializer for: " + outType.getName());
 		}
 		try {
-			T answer = (T) mapper.apply(value);
-			return answer;
+			return (T) mapper.apply(value);
 		}
 		catch (Exception e) {
 			throw new IOException("can't deserialize value: " + value + " to: " + outType.getName(), e);
@@ -80,14 +79,14 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	protected Map<Class<?>, StringMapper> defaultMappers() {
 		Map<Class<?>, StringMapper> map = new HashMap<>();
 		map.put(String.class, v -> v);
-		map.put(boolean.class, v -> v != null ? Boolean.valueOf(v) : false);
-		map.put(byte.class, v -> v != null ? Byte.valueOf(v) : (byte) 0);
-		map.put(char.class, v -> EzyDataConverter.stringToChar(v));
-		map.put(double.class, v -> v != null ? Double.valueOf(v) : 0.0D);
-		map.put(float.class, v -> v != null ? Float.valueOf(v) : 0.0F);
-		map.put(int.class, v -> v != null ? Integer.valueOf(v) : 0);
-		map.put(long.class, v -> v != null ? Long.valueOf(v) : 0L);
-		map.put(short.class, v -> v != null ? Short.valueOf(v) : (short) 0);
+		map.put(boolean.class, Boolean::parseBoolean);
+		map.put(byte.class, v -> v != null ? Byte.parseByte(v) : (byte) 0);
+		map.put(char.class, EzyDataConverter::stringToChar);
+		map.put(double.class, v -> v != null ? Double.parseDouble(v) : 0.0D);
+		map.put(float.class, v -> v != null ? Float.parseFloat(v) : 0.0F);
+		map.put(int.class, v -> v != null ? Integer.parseInt(v) : 0);
+		map.put(long.class, v -> v != null ? Long.parseLong(v) : 0L);
+		map.put(short.class, v -> v != null ? Short.parseShort(v) : (short) 0);
 
 		map.put(Boolean.class, v -> v != null ? Boolean.valueOf(v) : null);
 		map.put(Byte.class, v -> v != null ? Byte.valueOf(v) : null);
@@ -98,30 +97,30 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		map.put(Long.class, v -> v != null ? Long.valueOf(v) : null);
 		map.put(Short.class, v -> v != null ? Short.valueOf(v) : null);
 		
-		map.put(String[].class, v -> stringToStringArray(v));
-		map.put(List.class, v -> stringToList(v));
-		map.put(Set.class, v -> stringToSet(v));
+		map.put(String[].class, this::stringToStringArray);
+		map.put(List.class, this::stringToList);
+		map.put(Set.class, this::stringToSet);
 		
-		map.put(boolean[].class, v -> stringToPrimitiveBoolean(v));
-		map.put(byte[].class, v -> stringToPrimitiveByte(v));
-		map.put(char[].class, v -> stringToPrimitiveChar(v));
-		map.put(double[].class, v -> stringToPrimitiveDouble(v));
-		map.put(float[].class, v -> stringToPrimitiveFloat(v));
-		map.put(int[].class, v -> stringToPrimitiveInteger(v));
-		map.put(long[].class, v -> stringToPrimitiveLong(v));
-		map.put(short[].class, v -> stringToPrimitiveShort(v));
+		map.put(boolean[].class, this::stringToPrimitiveBoolean);
+		map.put(byte[].class, this::stringToPrimitiveByte);
+		map.put(char[].class, this::stringToPrimitiveChar);
+		map.put(double[].class, this::stringToPrimitiveDouble);
+		map.put(float[].class, this::stringToPrimitiveFloat);
+		map.put(int[].class, this::stringToPrimitiveInteger);
+		map.put(long[].class, this::stringToPrimitiveLong);
+		map.put(short[].class, this::stringToPrimitiveShort);
 		
-		map.put(Boolean[].class, v -> stringToWrapperBoolean(v));
-		map.put(Byte[].class, v -> stringToWrapperByte(v));
-		map.put(Character[].class, v -> stringToWrapperChar(v));
-		map.put(Double[].class, v -> stringToWrapperDouble(v));
-		map.put(Float[].class, v -> stringToWrapperFloat(v));
-		map.put(Integer[].class, v -> stringToWrapperInteger(v));
-		map.put(Long[].class, v -> stringToWrapperLong(v));
-		map.put(Short[].class, v -> stringToWrapperShort(v));
+		map.put(Boolean[].class, this::stringToWrapperBoolean);
+		map.put(Byte[].class, this::stringToWrapperByte);
+		map.put(Character[].class, this::stringToWrapperChar);
+		map.put(Double[].class, this::stringToWrapperDouble);
+		map.put(Float[].class, this::stringToWrapperFloat);
+		map.put(Integer[].class, this::stringToWrapperInteger);
+		map.put(Long[].class, this::stringToWrapperLong);
+		map.put(Short[].class, this::stringToWrapperShort);
 		
-		map.put(Date.class, v -> v != null ? new Date(Long.valueOf(v)) : null);
-		map.put(Instant.class, v -> v != null ? Instant.ofEpochMilli(Long.valueOf(v)) : null);
+		map.put(Date.class, v -> v != null ? new Date(Long.parseLong(v)) : null);
+		map.put(Instant.class, v -> v != null ? Instant.ofEpochMilli(Long.parseLong(v)) : null);
 		map.put(LocalDate.class, v -> v != null ? EzyDates.parseDate(v) : null);
 		map.put(LocalTime.class, v -> v != null ? EzyDates.parseTime(v) : null);
 		map.put(LocalDateTime.class, v -> v != null ? EzyDates.parseDateTime(v) : null);
@@ -154,7 +153,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		boolean[] answer = new boolean[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Boolean.valueOf(array[i]);
+			answer[i] = Boolean.parseBoolean(array[i]);
 		return answer;
 	}
 	
@@ -162,7 +161,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		byte[] answer = new byte[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Byte.valueOf(array[i]);
+			answer[i] = Byte.parseByte(array[i]);
 		return answer;
 	}
 	
@@ -178,7 +177,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		double[] answer = new double[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Double.valueOf(array[i]);
+			answer[i] = Double.parseDouble(array[i]);
 		return answer;
 	}
 	
@@ -186,7 +185,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		float[] answer = new float[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Float.valueOf(array[i]);
+			answer[i] = Float.parseFloat(array[i]);
 		return answer;
 	}
 	
@@ -194,7 +193,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		int[] answer = new int[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Integer.valueOf(array[i]);
+			answer[i] = Integer.parseInt(array[i]);
 		return answer;
 	}
 	
@@ -202,7 +201,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		long[] answer = new long[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Long.valueOf(array[i]);
+			answer[i] = Long.parseLong(array[i]);
 		return answer;
 	}
 	
@@ -210,7 +209,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 		String[] array = stringToStringArray(value);
 		short[] answer = new short[array.length];
 		for(int i = 0 ; i < array.length ; ++i)
-			answer[i] = Short.valueOf(array[i]);
+			answer[i] = Short.parseShort(array[i]);
 		return answer;
 	}
 	
@@ -287,8 +286,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	    }
 		String[] array = stringToStringArray(value);
 		Set<T> answer = new HashSet<>();
-		for(int i = 0 ; i < array.length ; ++i)
-			answer.add(deserialize(array[i], itemType));
+		for (String s : array) answer.add(deserialize(s, itemType));
 		return answer;
 	}
 	
@@ -299,8 +297,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	    }
 		String[] array = stringToStringArray(value);
 		List<T> answer = new ArrayList<>();
-		for(int i = 0 ; i < array.length ; ++i)
-			answer.add(deserialize(array[i], itemType));
+		for (String s : array) answer.add(deserialize(s, itemType));
 		return answer;
 	}
 }

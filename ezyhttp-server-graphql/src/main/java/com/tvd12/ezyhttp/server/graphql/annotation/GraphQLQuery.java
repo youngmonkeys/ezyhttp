@@ -14,5 +14,5 @@ public @interface GraphQLQuery {
 	 *
 	 * @return name of query
 	 */
-	public String name();
+    String name();
 }

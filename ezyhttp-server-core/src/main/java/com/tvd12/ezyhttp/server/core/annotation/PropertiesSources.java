@@ -20,5 +20,5 @@ public @interface PropertiesSources {
      * 
      * @return array of package names
      */
-	public String[] value();
+    String[] value();
 }

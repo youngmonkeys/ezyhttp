@@ -19,27 +19,27 @@ public @interface DoGet {
 	 * 
 	 * @return the uri
 	 */
-	public String value() default "";
+    String value() default "";
 	
 	/**
 	 * request uri
 	 * 
 	 * @return the uri
 	 */
-	public String uri() default "";
+    String uri() default "";
 
 	/**
 	 * accepted request body types
 	 * 
 	 * @return the accepted request body types
 	 */
-	public String[] accept() default {};
+    String[] accept() default {};
 	
 	/**
 	 * request uri
 	 * 
 	 * @return the response body type
 	 */
-	public String responseType() default "";
+    String responseType() default "";
 
 }

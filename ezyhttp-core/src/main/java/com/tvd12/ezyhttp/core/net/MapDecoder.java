@@ -14,8 +14,7 @@ public final class MapDecoder {
 	
 	public static Map<String, String> decodeFromBytes(byte[] bytes) throws IOException {
 		String string = new String(bytes, StandardCharsets.UTF_8);
-		Map<String, String> map = decodeFromString(string);
-		return map;
+        return decodeFromString(string);
 	}
 	
 	public static Map<String, String> decodeFromString(String string) throws IOException {

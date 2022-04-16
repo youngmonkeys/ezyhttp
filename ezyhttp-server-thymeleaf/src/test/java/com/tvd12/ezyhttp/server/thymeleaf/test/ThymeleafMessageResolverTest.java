@@ -3,7 +3,6 @@ package com.tvd12.ezyhttp.server.thymeleaf.test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Properties;
@@ -31,7 +30,7 @@ public class ThymeleafMessageResolverTest {
 	    
 		ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
 		        .messageLocation("messages")
-		        .messageProviders(Arrays.asList(messageProvider))
+		        .messageProviders(Collections.singletonList(messageProvider))
 		        .build();
 		ITemplateContext context = mock(ITemplateContext.class);
 		when(context.getLocale()).thenReturn(new Locale("en", "US"));
@@ -66,7 +65,7 @@ public class ThymeleafMessageResolverTest {
         
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
                 .messageLocation("messages")
-                .messageProviders(Arrays.asList(messageProvider))
+                .messageProviders(Collections.singletonList(messageProvider))
                 .build();
 		ITemplateContext context = mock(ITemplateContext.class);
 		when(context.getLocale()).thenReturn(new Locale("unkown"));
@@ -99,7 +98,7 @@ public class ThymeleafMessageResolverTest {
         
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
                 .messageLocation("messages")
-                .messageProviders(Arrays.asList(messageProvider))
+                .messageProviders(Collections.singletonList(messageProvider))
                 .build();
 		ITemplateContext context = mock(ITemplateContext.class);
 		when(context.getLocale()).thenReturn(new Locale("unkown"));
@@ -124,7 +123,7 @@ public class ThymeleafMessageResolverTest {
         
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
                 .messageLocation("unknow")
-                .messageProviders(Arrays.asList(messageProvider))
+                .messageProviders(Collections.singletonList(messageProvider))
                 .build();
 		ITemplateContext context = mock(ITemplateContext.class);
 		when(context.getLocale()).thenReturn(new Locale("unkown"));
@@ -149,7 +148,7 @@ public class ThymeleafMessageResolverTest {
         
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
                 .messageLocation("unknow")
-                .messageProviders(Arrays.asList(messageProvider))
+                .messageProviders(Collections.singletonList(messageProvider))
                 .absentMessageResolver(new TestAbsentMessageResolver())
                 .build();
         ITemplateContext context = mock(ITemplateContext.class);

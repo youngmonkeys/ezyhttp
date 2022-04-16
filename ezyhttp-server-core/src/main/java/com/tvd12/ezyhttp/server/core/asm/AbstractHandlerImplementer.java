@@ -16,8 +16,6 @@ public class AbstractHandlerImplementer<H extends HandlerMethod>
 	
 	protected final H handlerMethod;
 	
-	protected final static String PARAMETER_PREFIX = "param";
-	
 	public AbstractHandlerImplementer(H handlerMethod) {
 		this.handlerMethod = handlerMethod;
 	}

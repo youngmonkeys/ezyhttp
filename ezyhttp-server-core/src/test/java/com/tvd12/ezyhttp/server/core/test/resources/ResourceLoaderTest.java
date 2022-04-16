@@ -3,10 +3,7 @@ package com.tvd12.ezyhttp.server.core.test.resources;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarFile;
 
 import org.testng.annotations.Test;
@@ -195,6 +192,6 @@ public class ResourceLoaderTest {
         List<String> listResources = sut.listResources("src/main/resources");
         
         // then
-        Asserts.assertEquals(new File("src/main/resources").list().length, listResources.size());
+        Asserts.assertEquals(Objects.requireNonNull(new File("src/main/resources").list()).length, listResources.size());
     }
 }

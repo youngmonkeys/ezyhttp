@@ -433,8 +433,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
-		ResourceResolver resourceResolver = 
-				(ResourceResolver)beanContext.getSingleton(ResourceResolver.class);
+		ResourceResolver resourceResolver =
+			beanContext.getSingleton(ResourceResolver.class);
 		if(resourceResolver == null) {
 			resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
 			if(resourceResolver != null)

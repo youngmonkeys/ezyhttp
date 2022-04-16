@@ -13,7 +13,7 @@ import lombok.Getter;
 public class InterceptorManager implements EzyDestroyable {
 
 	@Getter
-	public List<RequestInterceptor> requestInterceptors;
+	public final List<RequestInterceptor> requestInterceptors;
 	
 	public InterceptorManager() {
 		this.requestInterceptors = new ArrayList<>();

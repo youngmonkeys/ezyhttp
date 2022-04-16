@@ -22,7 +22,7 @@ public class EmptyRequestHandler implements RequestHandler {
 	public void setHandlerMethod(Method method) {}
 
 	@Override
-	public Object handle(RequestArguments arguments) throws Exception {
+	public Object handle(RequestArguments arguments) {
 		return null;
 	}
 

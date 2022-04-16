@@ -81,8 +81,7 @@ public class ResponseEntity {
 	public String getHeader(String name) {
 		if(headers == null)
 			return null;
-		String value = headers.getValue(name);
-		return value;
+		return headers.getValue(name);
 	}
 	
 	public String getContentType() {
@@ -91,13 +90,11 @@ public class ResponseEntity {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append("ResponseEntity(")
-				.append("status: ").append(status).append(", ")
-				.append("headers: ").append(headers).append(", ")
-				.append("body: ").append(body != null ? body.getClass().getSimpleName() : "null")
-				.append(")")
-				.toString();
+		return "ResponseEntity(" +
+			"status: " + status + ", " +
+			"headers: " + headers + ", " +
+			"body: " + (body != null ? body.getClass().getSimpleName() : "null") +
+			")";
 	}
 	
 	public static Builder builder() {
@@ -134,14 +131,12 @@ public class ResponseEntity {
 		}
 		
 		public Builder header(String name, String value) {
-			if(this.headers == null)
+			if(this.headers == null) {
 				this.headers = new HashMap<>();
-			List<String> values = headers.get(name);
-			if(values == null) {
-				values = new ArrayList<>();
-				headers.put(name, values);
 			}
-			values.add(value);
+			headers
+				.computeIfAbsent(name, k -> new ArrayList<>())
+				.add(value);
 			return this;
 		}
 		

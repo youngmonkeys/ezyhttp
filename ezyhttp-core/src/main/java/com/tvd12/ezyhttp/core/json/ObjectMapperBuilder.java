@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.Module;
@@ -59,7 +58,7 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
 		@Override
 		public Date deserialize(JsonParser p, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+				throws IOException {
 			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
 				return new Date(p.getValueAsLong());
 			}
@@ -81,7 +80,7 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
 		@Override
 		public Instant deserialize(JsonParser p, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+				throws IOException {
 			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
 				return Instant.ofEpochMilli(p.getValueAsLong());
 			}
@@ -103,7 +102,7 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
 		@Override
 		public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+				throws IOException {
 			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
 				return EzyDates.millisToDateTime(p.getValueAsLong())
 						.toLocalDate();
@@ -126,7 +125,7 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
 		@Override
 		public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+				throws IOException {
 			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
 				return EzyDates.millisToDateTime(p.getValueAsLong())
 						.toLocalTime();
@@ -149,7 +148,7 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
 		@Override
 		public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+				throws IOException {
 			if(p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
 				return EzyDates.millisToDateTime(p.getValueAsLong());
 			}

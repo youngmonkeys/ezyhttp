@@ -22,8 +22,7 @@ public class CustomerService {
 	}
 	
 	public Customer getCustomer(String name) {
-		Customer customer = customerByName.get(name);
-		return customer;
+		return customerByName.get(name);
 	}
 	
 	public void save(Customer customer) {

@@ -24,23 +24,20 @@ public class FormBodyConverter implements BodyConverter {
 		Map<String, Object> map = body instanceof String
 				? objectMapper.readValue(((String)body), Map.class)
 				: objectMapper.convertValue(body, Map.class);
-	    byte[] bytes = MapEncoder.encodeToBytes(map);
-	    return bytes;
+		return MapEncoder.encodeToBytes(map);
 	}
 	
 	@Override
 	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
 		Map<String, String> parameters = MapDecoder.decodeFromString(data);
-		T body = objectMapper.convertValue(parameters, bodyType);
-		return body;
+		return objectMapper.convertValue(parameters, bodyType);
 		
 	}
 	
 	@Override
-	public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
+	public <T> T deserialize(BodyData data, Class<T> bodyType) {
 		Map<String, String> parameters = data.getParameters();
-		T body = objectMapper.convertValue(parameters, bodyType);
-		return body;
+		return objectMapper.convertValue(parameters, bodyType);
 	}
 	
 	@Override

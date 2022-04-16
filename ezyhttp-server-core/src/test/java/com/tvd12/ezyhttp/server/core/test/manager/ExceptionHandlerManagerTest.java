@@ -31,7 +31,7 @@ public class ExceptionHandlerManagerTest {
 	public static class ExUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
 		@Override
-		public Object handleException(RequestArguments arguments, Exception exception) throws Exception {
+		public Object handleException(RequestArguments arguments, Exception exception) {
 			return null;
 		}
 		

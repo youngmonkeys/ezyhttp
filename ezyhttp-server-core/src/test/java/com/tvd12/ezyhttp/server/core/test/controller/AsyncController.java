@@ -9,7 +9,5 @@ public class AsyncController {
 
     @Async
     @DoGet("/async/call1")
-    public void asyncCall1() {
-        
-    }
+    public void asyncCall1() {}
 }

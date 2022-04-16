@@ -1,7 +1,5 @@
 package com.tvd12.ezyhttp.core.test.resources;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;

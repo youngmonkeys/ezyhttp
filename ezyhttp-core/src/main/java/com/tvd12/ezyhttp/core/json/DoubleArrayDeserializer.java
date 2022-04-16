@@ -3,7 +3,6 @@ package com.tvd12.ezyhttp.core.json;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -20,7 +19,7 @@ public class DoubleArrayDeserializer extends StdDeserializer<Double[]> {
     public Double[] deserialize(
             JsonParser p, 
             DeserializationContext ctxt
-    ) throws IOException, JsonProcessingException {
+    ) throws IOException {
         if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return EzyStringConveter.stringToWrapperDoubleArray(p.getValueAsString());
         }

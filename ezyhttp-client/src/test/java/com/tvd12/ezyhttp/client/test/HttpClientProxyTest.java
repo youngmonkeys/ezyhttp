@@ -377,7 +377,7 @@ public class HttpClientProxyTest extends BaseTest {
 	}
 	
 	@Test
-	public void startTest() throws Exception {
+	public void startTest() {
 		// given
 		HttpClientProxy proxy = HttpClientProxy.builder().build();
 		
@@ -389,7 +389,7 @@ public class HttpClientProxyTest extends BaseTest {
 	}
 	
 	@Test
-	public void closeWithRemainTasks() throws Exception {
+	public void closeWithRemainTasks() {
 		// given
 		HttpClientProxy sut = new HttpClientProxy(1, 100, HttpClient.builder().build());
 		EzyFutureMap<Request> futures = FieldUtil.getFieldValue(sut, "futures");

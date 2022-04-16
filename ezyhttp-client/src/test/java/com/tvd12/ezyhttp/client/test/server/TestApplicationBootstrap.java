@@ -76,7 +76,7 @@ public class TestApplicationBootstrap extends EzyLoggable {
         connector.setPort(port);
         List<Connector> connectors = new ArrayList<>();
         connectors.add(connector);
-        server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
+        server.setConnectors(connectors.toArray(new Connector[0]));
         ServletContextHandler servletHandler = newServletHandler();
         server.setHandler(servletHandler);
         EzyProcessor.processSilently(server::start);
@@ -92,7 +92,7 @@ public class TestApplicationBootstrap extends EzyLoggable {
         		FileSizes.toByteSize(multipartMaxFileSize),
         		(int)FileSizes.toByteSize(multipartMaxRequestSize),
         		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
-        	));;
-        return servletHandler;
+        	));
+		return servletHandler;
     }
 }

@@ -28,14 +28,14 @@ public final class ComponentManager implements EzyDestroyable {
 	
 	@Setter
 	private ViewContext viewContext;
-	private ObjectMapper objectMapper;
-	private DataConverters dataConverters;
-	private ControllerManager controllerManager;
-	private InterceptorManager interceptorManager;
-	private RequestHandlerManager requestHandlerManager;
-	private ExceptionHandlerManager exceptionHandlerManager;
+	private final ObjectMapper objectMapper;
+	private final DataConverters dataConverters;
+	private final ControllerManager controllerManager;
+	private final InterceptorManager interceptorManager;
+	private final RequestHandlerManager requestHandlerManager;
+	private final ExceptionHandlerManager exceptionHandlerManager;
 	private UnhandledErrorHandler unhandledErrorHandler;
-	private List<RequestResponseWatcher> requestResponseWatchers;
+	private final List<RequestResponseWatcher> requestResponseWatchers;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	

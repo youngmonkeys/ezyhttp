@@ -41,7 +41,7 @@ public class TestBlockingServlet extends HttpServlet {
 	
 	protected void doHandle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String uri = req.getRequestURI();
-		if(uri.equals("/greet")) {
+		if (uri.equals("/greet")) {
 			String who = req.getParameter("who");
 			if(who == null && !req.getMethod().equalsIgnoreCase("GET")) {
 				who = (String)jsonBodyConverter.deserialize(req.getInputStream(), Map.class)

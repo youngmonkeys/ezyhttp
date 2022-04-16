@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -23,7 +22,7 @@ public class ListDoubleDeserializer extends StdDeserializer<List<Double>> {
     public List<Double> deserialize(
             JsonParser p, 
             DeserializationContext ctxt
-    ) throws IOException, JsonProcessingException {
+    ) throws IOException {
         if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return SingletonStringDeserializer.getInstance().deserialize(
                     p.getValueAsString(),

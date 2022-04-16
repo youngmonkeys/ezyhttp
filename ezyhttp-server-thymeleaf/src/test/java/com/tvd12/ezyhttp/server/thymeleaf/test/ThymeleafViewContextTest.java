@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,7 +72,7 @@ public class ThymeleafViewContextTest {
         
         ViewContext viewContext = new ThymeleafViewContextBuilder()
                 .templateResolver(resolver)
-                .viewDecorators(Arrays.asList(viewDecorator))
+                .viewDecorators(Collections.singletonList(viewDecorator))
                 .build();
         
         ServletContext servletContext = mock(ServletContext.class);
@@ -102,7 +102,7 @@ public class ThymeleafViewContextTest {
         
         ViewContext viewContext = new ThymeleafViewContextBuilder()
                 .templateResolver(resolver)
-                .viewDialects(Arrays.asList(new VewHelloDialect()))
+                .viewDialects(Collections.singletonList(new VewHelloDialect()))
                 .build();
         
         ServletContext servletContext = mock(ServletContext.class);
@@ -132,7 +132,7 @@ public class ThymeleafViewContextTest {
         ViewDialect viewDialect = mock(ViewDialect.class);
         ViewContext viewContext = new ThymeleafViewContextBuilder()
                 .templateResolver(resolver)
-                .viewDialects(Arrays.asList(viewDialect))
+                .viewDialects(Collections.singletonList(viewDialect))
                 .build();
         
         ServletContext servletContext = mock(ServletContext.class);
@@ -170,7 +170,7 @@ public class ThymeleafViewContextTest {
 
 	    
 	    public Set<IProcessor> getProcessors(final String dialectPrefix) {
-	        final Set<IProcessor> processors = new HashSet<IProcessor>();
+	        final Set<IProcessor> processors = new HashSet<>();
 	        processors.add(new SayToAttributeTagProcessor(dialectPrefix));
 	        return processors;
 	    }

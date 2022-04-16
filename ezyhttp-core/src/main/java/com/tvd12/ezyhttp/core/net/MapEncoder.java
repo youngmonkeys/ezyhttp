@@ -14,8 +14,7 @@ public final class MapEncoder {
 	
 	public static byte[] encodeToBytes(Map<String, Object> map) throws IOException {
 		String str = encodeToString(map);
-		byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-	    return bytes;
+        return str.getBytes(StandardCharsets.UTF_8);
 	}
 	
 	public static String encodeToString(Map<String, Object> map) throws IOException {

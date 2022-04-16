@@ -8,9 +8,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
     
 	protected TemplateResolver templateResolver;
-	protected List<ViewDialect> viewDialects;
-	protected List<ViewDecorator> viewDecorators;
-	protected List<MessageProvider> messageProviders;
+	protected final List<ViewDialect> viewDialects;
+	protected final List<ViewDecorator> viewDecorators;
+	protected final List<MessageProvider> messageProviders;
 	protected AbsentMessageResolver absentMessageResolver;
 	
 	public ViewContextBuilder() {

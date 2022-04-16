@@ -95,7 +95,7 @@ public enum ContentType {
 	private final static Map<String, ContentType> VALUE_BY_EXTENSION =
 			EzyEnums.enumMap(ContentType.class, it -> it.extension);
 	
-	private ContentType(String value, String extension) {
+	ContentType(String value, String extension) {
 		this.value = value;
 		this.extension = extension;
 	}

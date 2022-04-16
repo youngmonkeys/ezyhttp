@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -23,7 +22,7 @@ public class SetStringDeserializer extends StdDeserializer<Set<String>> {
     public Set<String> deserialize(
             JsonParser p, 
             DeserializationContext ctxt
-    ) throws IOException, JsonProcessingException {
+    ) throws IOException {
         if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return SingletonStringDeserializer.getInstance().deserialize(
                     p.getValueAsString(),

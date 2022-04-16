@@ -19,19 +19,16 @@ public enum HttpMethod implements EzyConstant {
 	private final int id;
 	private final String name;
 	
-	private HttpMethod(int id, String name) {
+	HttpMethod(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 	
 	public boolean hasOutput() {
-		if(this == HttpMethod.POST ||
+		return this == HttpMethod.POST ||
 			this == HttpMethod.PUT ||
 			this == HttpMethod.PATCH ||
-			this == HttpMethod.DELETE) {
-			return true;
-		}
-		return false;
+			this == HttpMethod.DELETE;
 	}
 	
 }

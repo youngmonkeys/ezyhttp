@@ -310,7 +310,7 @@ public class BlockingServlet extends HttpServlet {
 		HttpMethod method,
 		RequestArguments arguments,
 		Exception e
-	) throws IOException {
+	) {
 		UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
 		HttpServletRequest request = arguments.getRequest();
 		HttpServletResponse response = arguments.getResponse();
