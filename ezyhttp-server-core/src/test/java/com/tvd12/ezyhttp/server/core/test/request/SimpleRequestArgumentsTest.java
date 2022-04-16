@@ -70,7 +70,7 @@ public class SimpleRequestArgumentsTest {
 		Asserts.assertNull(sut.getCookieValue(0));
 		Asserts.assertNull(sut.getCookieValue("unknown"));
 		Asserts.assertEquals(HttpMethod.HEAD, sut.getMethod());
-		Asserts.assertEquals(sut.getAsynContext(), asyncContext);
+		Asserts.assertEquals(sut.getAsyncContext(), asyncContext);
 		Asserts.assertFalse(sut.isAsyncStarted());
 		Asserts.assertEquals(sut.getUriTemplate(), "/");
 		

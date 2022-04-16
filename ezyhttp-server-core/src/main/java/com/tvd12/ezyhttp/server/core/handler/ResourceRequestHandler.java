@@ -12,7 +12,6 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,34 +20,54 @@ import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 @AllArgsConstructor
 public class ResourceRequestHandler implements RequestHandler {
-	
+
 	private final String resourcePath;
 	private final String resourceURI;
 	private final String resourceExtension;
 	private final EzyInputStreamLoader inputStreamLoader;
 	private final ResourceDownloadManager downloadManager;
+	private final int defaultTimeout;
+
+	public ResourceRequestHandler(
+		String resourcePath,
+		String resourceURI,
+		String resourceExtension,
+		ResourceDownloadManager downloadManager
+	) {
+		this(
+			resourcePath,
+			resourceURI,
+			resourceExtension,
+			downloadManager,
+			0
+		);
+	}
 	
 	public ResourceRequestHandler(
-			String resourcePath, 
-			String resourceURI,
-			String resourceExtension,
-			ResourceDownloadManager downloadManager
+		String resourcePath,
+		String resourceURI,
+		String resourceExtension,
+		ResourceDownloadManager downloadManager,
+		int defaultTimeout
 	) {
 		this(
 			resourcePath,
 			resourceURI,
 			resourceExtension,
 			new EzyAnywayInputStreamLoader(),
-			downloadManager
+			downloadManager,
+			defaultTimeout
 		);
 	}
-	
-	
+
 	@Override
 	public Object handle(RequestArguments arguments) throws Exception {
-	    HttpServletRequest servletRequest = arguments.getRequest();
-        AsyncContext asyncContext = servletRequest.getAsyncContext();
-        HttpServletResponse servletResponse = arguments.getResponse();
+        AsyncContext asyncContext = arguments.getAsyncContext();
+        if (defaultTimeout > 0) {
+        	asyncContext.setTimeout(defaultTimeout);
+		}
+        HttpServletResponse servletResponse =
+			(HttpServletResponse) asyncContext.getResponse();
         InputStream inputStream = inputStreamLoader.load(resourcePath);
         OutputStream outputStream = servletResponse.getOutputStream();
         try {

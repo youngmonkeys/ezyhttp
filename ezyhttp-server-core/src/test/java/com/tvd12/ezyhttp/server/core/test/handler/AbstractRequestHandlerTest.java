@@ -97,7 +97,7 @@ public class AbstractRequestHandlerTest {
         when(requestArguments.isAsyncStarted()).thenReturn(true);
         
         AsyncContext asyncContext = mock(AsyncContext.class);
-        when(requestArguments.getAsynContext()).thenReturn(asyncContext);
+        when(requestArguments.getAsyncContext()).thenReturn(asyncContext);
         
         // when
         Object actual = sut.handle(requestArguments);

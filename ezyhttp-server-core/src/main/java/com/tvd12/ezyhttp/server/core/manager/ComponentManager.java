@@ -22,10 +22,11 @@ public final class ComponentManager implements EzyDestroyable {
 	@Setter
 	private int serverPort;
 	@Setter
-	private int managmentPort;
+	private int managementPort;
 	@Setter 
 	private boolean exposeManagementURIs;
-	
+	@Setter
+	private int asyncDefaultTimeout;
 	@Setter
 	private ViewContext viewContext;
 	private final ObjectMapper objectMapper;

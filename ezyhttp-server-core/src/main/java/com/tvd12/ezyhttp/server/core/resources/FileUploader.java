@@ -25,9 +25,14 @@ import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMIT_UPL
 public class FileUploader extends EzyLoggable {
 
     private final ResourceUploadManager resourceUploadManager;
+    private final int defaultTimeout;
     
     private static final byte[] OVER_UPLOAD_SIZE_MESSAGE = 
             "{\"uploadSize\":\"over\"}".getBytes();
+
+    public FileUploader(ResourceUploadManager resourceUploadManager) {
+        this(resourceUploadManager, 0);
+    }
     
     public void accept(
         AsyncContext asyncContext,
@@ -204,6 +209,9 @@ public class FileUploader extends EzyLoggable {
         FileUploadCallback callback
     ) {
         try {
+            if (defaultTimeout > 0) {
+                asyncContext.setTimeout(defaultTimeout);
+            }
             resourceUploadManager.drainAsync(
                 inputStream,
                 outputStream,
