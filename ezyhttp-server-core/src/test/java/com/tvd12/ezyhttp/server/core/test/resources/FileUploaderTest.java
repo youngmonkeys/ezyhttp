@@ -7,6 +7,7 @@ import com.tvd12.ezyhttp.core.exception.MaxUploadSizeException;
 import com.tvd12.ezyhttp.core.resources.ResourceUploadManager;
 import com.tvd12.ezyhttp.server.core.resources.FileUploadCallback;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
+import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 
 import javax.servlet.AsyncContext;
@@ -238,7 +239,8 @@ public class FileUploaderTest {
                 any()
             );
 
-        FileUploader sut = new FileUploader(resourceUploadManager);
+        int timeout = RandomUtil.randomSmallInt() + 1;
+        FileUploader sut = new FileUploader(resourceUploadManager, timeout);
         
         // when
         sut.accept(asyncContext, inputStream, outputStream, callback);
@@ -246,6 +248,7 @@ public class FileUploaderTest {
         // then
         verify(callback, times(1)).onFailure(any());
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
+        verify(asyncContext, times(1)).setTimeout(timeout);
         verify(asyncContext, times(1)).complete();
     }
 }

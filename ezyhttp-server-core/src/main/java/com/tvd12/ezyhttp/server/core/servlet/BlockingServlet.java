@@ -56,6 +56,7 @@ public class BlockingServlet extends HttpServlet {
 	private boolean debug;
 	private int managementPort;
 	private boolean exposeManagementURIs;
+	private int asyncDefaultTimeout;
 	protected ViewContext viewContext;
 	protected ObjectMapper objectMapper;
 	protected DataConverters dataConverters;
@@ -75,8 +76,9 @@ public class BlockingServlet extends HttpServlet {
 	public void init() throws ServletException {
 		this.componentManager = ComponentManager.getInstance();
 		this.debug = componentManager.isDebug();
-		this.managementPort = componentManager.getManagmentPort();
+		this.managementPort = componentManager.getManagementPort();
 		this.exposeManagementURIs = componentManager.isExposeManagementURIs();
+		this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
 		this.viewContext = componentManager.getViewContext();
 		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();
@@ -199,6 +201,9 @@ public class BlockingServlet extends HttpServlet {
 			    if (requestHandler.isAsync()) {
 			        syncResponse = false;
                     AsyncContext asyncContext = request.startAsync(request, response);
+                    if (asyncDefaultTimeout > 0) {
+                    	asyncContext.setTimeout(asyncDefaultTimeout);
+					}
                     asyncContext.addListener(newAsyncListener(arguments, requestHandler));
                     requestHandler.handle(arguments);
 			    }

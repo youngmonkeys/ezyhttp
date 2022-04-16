@@ -77,6 +77,8 @@ public class ApplicationContextBuilderTest {
 			.addSingleton(new InternalSingleton2())
 			.addSingleton(Collections.singletonMap("internalSingleton3", new InternalSingleton3()))
 			.addSingleton(mock(AbsentMessageResolver.class))
+			.addComponentClass(InternalSingleton1.class)
+			.addPropertiesSources()
 			.build();
 		
 		EzyBeanContext beanContext = applicationContext.getBeanContext();
@@ -136,6 +138,10 @@ public class ApplicationContextBuilderTest {
 		Asserts.assertNotNull(internalSingleton1);
 		Asserts.assertNotNull(internalSingleton2);
 		Asserts.assertNotNull(internalSingleton3);
+
+		ComponentManager componentManager = ComponentManager.getInstance();
+		Asserts.assertEquals(componentManager.getAsyncDefaultTimeout(), 10000);
+
 		System.out.println(applicationContext);
 		applicationContext.destroy();
 	}

@@ -253,7 +253,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	}
 	
 	@Override
-	public AsyncContext getAsynContext() {
+	public AsyncContext getAsyncContext() {
 	    return request.getAsyncContext();
 	}
 	

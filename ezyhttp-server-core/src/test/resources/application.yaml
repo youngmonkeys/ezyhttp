@@ -5,3 +5,5 @@ resources:
   enable: true
   upload:
     enable: true
+async:
+  default_timeout: 10000

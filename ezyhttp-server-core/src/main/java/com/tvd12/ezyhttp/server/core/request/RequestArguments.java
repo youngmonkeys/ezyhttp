@@ -21,7 +21,7 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 	
 	String getUriTemplate();
 	
-	AsyncContext getAsynContext();
+	AsyncContext getAsyncContext();
 	
 	boolean isAsyncStarted();
 	

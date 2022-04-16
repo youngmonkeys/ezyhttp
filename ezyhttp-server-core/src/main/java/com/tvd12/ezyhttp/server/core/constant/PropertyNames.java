@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core.constant;
 
 public final class PropertyNames {
 
+	public static final String ASYNC_DEFAULT_TIMEOUT = "async.default_timeout";
     public static final String DEBUG = "server.debug";
     public static final String ALLOW_OVERRIDE_URI = "server.allow_override_uri";
 	public static final String SERVER_PORT = "server.port";

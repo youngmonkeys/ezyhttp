@@ -49,7 +49,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 			}
 			finally {
                 if (arguments.isAsyncStarted()) {
-                    AsyncContext asyncContext = arguments.getAsynContext();
+                    AsyncContext asyncContext = arguments.getAsyncContext();
 					processWithLogException(asyncContext::complete);
                 }
             }

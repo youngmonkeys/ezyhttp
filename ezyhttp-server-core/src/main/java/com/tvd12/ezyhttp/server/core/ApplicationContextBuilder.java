@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core;
 
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PACKAGE_TO_SCAN;
 import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_PROPERTIES_FILES;
+import static com.tvd12.ezyhttp.server.core.constant.PropertyNames.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -355,25 +356,30 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		componentManager.setViewContext(buildViewContext(beanContext));
 		componentManager.setServerPort(getServerPort(beanContext));
 		componentManager.setExposeManagementURIs(isExposeManagementURIs(beanContext));
-		componentManager.setManagmentPort(getManagementPort(beanContext));
+		componentManager.setManagementPort(getManagementPort(beanContext));
+		componentManager.setAsyncDefaultTimeout(getAsyncDefaultTimeout(beanContext));
 		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
 		componentManager.addRequestResponseWatchers(requestResponseWathcers);
 	}
 	
 	private int getServerPort(EzyBeanContext beanContext) {
-		return beanContext.getProperty(PropertyNames.SERVER_PORT, int.class, 0);
+		return beanContext.getProperty(SERVER_PORT, int.class, 0);
 	}
 	
 	private boolean isExposeManagementURIs(EzyBeanContext beanContext) {
-        return beanContext.getProperty(PropertyNames.MANAGEMENT_URIS_EXPOSE, boolean.class, false);
+        return beanContext.getProperty(MANAGEMENT_URIS_EXPOSE, boolean.class, false);
     }
 	
 	private int getManagementPort(EzyBeanContext beanContext) {
 		boolean managementEnable = beanContext.getProperty(
-				PropertyNames.MANAGEMENT_ENABLE, boolean.class, false);
+				MANAGEMENT_ENABLE, boolean.class, false);
 		return managementEnable 
-				? beanContext.getProperty(PropertyNames.MANAGEMENT_PORT, int.class, 18080)
+				? beanContext.getProperty(MANAGEMENT_PORT, int.class, 18080)
 				: 0;
+	}
+
+	private int getAsyncDefaultTimeout(EzyBeanContext beanContext) {
+		return beanContext.getProperty(ASYNC_DEFAULT_TIMEOUT, int.class, 0);
 	}
 	
 	protected ViewContext buildViewContext(EzyBeanContext beanContext) {
