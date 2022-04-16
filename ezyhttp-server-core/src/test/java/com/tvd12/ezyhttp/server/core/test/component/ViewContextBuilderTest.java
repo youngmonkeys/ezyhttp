@@ -1,7 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test.component;
 
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +21,10 @@ public class ViewContextBuilderTest extends ViewContextBuilder {
 
 		@Override
 		public void render(
-				ServletContext servletContext, 
-				HttpServletRequest request, 
-				HttpServletResponse response,
-				View view
-		) throws IOException {}
-		
+			ServletContext servletContext,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			View view
+		) {}
 	}
 }

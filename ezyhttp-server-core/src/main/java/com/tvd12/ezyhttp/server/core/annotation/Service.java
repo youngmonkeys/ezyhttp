@@ -19,14 +19,14 @@ public @interface Service {
 	 * 
 	 * @return the service name
 	 */
-	public String value() default "";
+    String value() default "";
 	
 	/**
 	 * the service name
 	 * 
 	 * @return the service name
 	 */
-	public String name() default "";
+    String name() default "";
 	
 	
 }

@@ -34,7 +34,7 @@ public class EzyHttpApplication
 		Set<Class<?>> classSet = new HashSet<>();
 		classSet.add(bootstrapClass);
 		classSet.addAll(Arrays.asList(componentClasses));
-		Class<?>[] classArray = classSet.toArray(new Class[classSet.size()]);
+		Class<?>[] classArray = classSet.toArray(new Class[0]);
 		return start(basePackage, classArray);
 	}
 	

@@ -47,8 +47,7 @@ public class URIBuilder implements EzyBuilder<URI> {
 		String query = buildQuery();
 		if(query != null)
 			buidler.append("?").append(query);
-		URI uri = URI.create(buidler.toString());
-		return uri;
+		return URI.create(buidler.toString());
 	}
 	
 	protected String buildPath() {

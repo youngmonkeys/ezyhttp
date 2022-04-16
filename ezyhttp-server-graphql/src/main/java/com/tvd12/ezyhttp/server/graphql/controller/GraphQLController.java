@@ -160,7 +160,6 @@ public class GraphQLController implements IRequestController {
 					stack.push(field);
 				} else if (value instanceof List) {
 					parentMap.put(field.getName(), filterDataList((List) value, field, query));
-					continue;
 				} else {
 					throw new GraphQLInvalidSchemeException("invalid schema: " + query + " at: " + field.getName());
 				}

@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.controller;
+package com.tvd12.ezyhttp.server.jetty.test.controller;
 
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
@@ -18,7 +18,5 @@ public class GlobalExceptionHandler {
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)
-	public void handleException3(Exception e) {
-	}
-	
+	public void handleException3(Exception e) {}
 }

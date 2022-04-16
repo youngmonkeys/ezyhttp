@@ -128,11 +128,15 @@ public class HttpClient extends EzyLoggable {
 			
 			connection.connect();
 			
-			if(requestBody != null) {
-				OutputStream outputStream = connection.getOutputStream();
-				outputStream.write(requestBodyBytes);
-				outputStream.flush();
-				outputStream.close();
+			if(requestBodyBytes != null) {
+				if (method.hasOutput()) {
+					OutputStream outputStream = connection.getOutputStream();
+					outputStream.write(requestBodyBytes);
+					outputStream.flush();
+					outputStream.close();
+				} else {
+					throw new IllegalArgumentException(method + " method can not have a payload body");
+				}
 			}
 			
 			int responseCode = connection.getResponseCode();
@@ -237,7 +241,7 @@ public class HttpClient extends EzyLoggable {
 	/**
 	 * Downloads a file from a URL and store to a file
 	 *
-	 * @param fileURL HTTP URL of the file to be download
+	 * @param fileURL HTTP URL of the file to be downloaded
 	 * @param storeLocation path of the directory to save the file
 	 * @throws IOException when there is any I/O error
 	 * @return the downloaded file name
@@ -252,7 +256,7 @@ public class HttpClient extends EzyLoggable {
 	/**
      * Downloads a file from a URL and store to a file
      * 
-     * @param fileURL HTTP URL of the file to be download
+     * @param fileURL HTTP URL of the file to be downloaded
      * @param storeLocation path of the directory to save the file
 	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
@@ -273,7 +277,7 @@ public class HttpClient extends EzyLoggable {
 	/**
 	 * Downloads a file from a URL and store to a file
 	 *
-	 * @param request the request of the file to be download
+	 * @param request the request of the file to be downloaded
 	 * @param storeLocation path of the directory to save the file
 	 * @throws IOException when there is any I/O error
 	 * @return the downloaded file name
@@ -288,7 +292,7 @@ public class HttpClient extends EzyLoggable {
     /**
      * Downloads a file from a URL and store to a file
      * 
-     * @param request the request of the file to be download
+     * @param request the request of the file to be downloaded
      * @param storeLocation path of the directory to save the file
 	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
@@ -357,7 +361,7 @@ public class HttpClient extends EzyLoggable {
 	/**
 	 * Downloads a file from a URL and store to an output stream
 	 *
-	 * @param fileURL HTTP URL of the file to be download
+	 * @param fileURL HTTP URL of the file to be downloaded
 	 * @param outputStream the output stream to save the file
 	 * @throws IOException when there is any I/O error
 	 */
@@ -371,7 +375,7 @@ public class HttpClient extends EzyLoggable {
     /**
      * Downloads a file from a URL and store to an output stream
      * 
-     * @param fileURL HTTP URL of the file to be download
+     * @param fileURL HTTP URL of the file to be downloaded
      * @param outputStream the output stream to save the file
 	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
@@ -387,7 +391,7 @@ public class HttpClient extends EzyLoggable {
 	/**
 	 * Downloads a file from a URL and store to an output stream
 	 *
-	 * @param request the request of the file to be download
+	 * @param request the request of the file to be downloaded
 	 * @param outputStream the output stream to save the file
 	 * @throws IOException when there is any I/O error
 	 */
@@ -401,7 +405,7 @@ public class HttpClient extends EzyLoggable {
     /**
      * Downloads a file from a URL and store to an output stream
      * 
-     * @param request the request of the file to be download
+     * @param request the request of the file to be downloaded
      * @param outputStream the output stream to save the file
 	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
@@ -517,7 +521,7 @@ public class HttpClient extends EzyLoggable {
             }
         }
         if (EzyStrings.isBlank(answer)) {
-            answer = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+            answer = fileURL.substring(fileURL.lastIndexOf("/") + 1);
         }
         return answer;
     }
@@ -532,9 +536,9 @@ public class HttpClient extends EzyLoggable {
 		protected int connectTimeout;
 		protected ObjectMapper objectMapper;
 		protected Object stringConverter;
-		protected List<Object> bodyConverterList;
-		protected Map<String, Object> bodyConverterMap;
 		protected DataConverters dataConverters;
+		protected final List<Object> bodyConverterList;
+		protected final Map<String, Object> bodyConverterMap;
 		
 		public Builder() {
 			this.readTimeout = 15 * 1000;

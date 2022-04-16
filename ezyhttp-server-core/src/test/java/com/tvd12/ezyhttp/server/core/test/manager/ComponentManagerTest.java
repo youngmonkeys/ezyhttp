@@ -11,11 +11,11 @@ public class ComponentManagerTest {
     public void test() {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
-        componentManager.setExposeMangementURIs(true);
+        componentManager.setExposeManagementURIs(true);
         
         // when
         // then
-        Asserts.assertTrue(componentManager.isExposeMangementURIs());
+        Asserts.assertTrue(componentManager.isExposeManagementURIs());
         componentManager.destroy();
     }
 }

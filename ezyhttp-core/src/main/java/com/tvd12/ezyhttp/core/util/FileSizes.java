@@ -25,7 +25,7 @@ public final class FileSizes {
 	
 	private static long subSizeStringToLong(String value, int suffixSize) {
 		try {
-			return Long.valueOf(value.substring(0, value.length() - suffixSize));
+			return Long.parseLong(value.substring(0, value.length() - suffixSize));
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException("size must follow template: [value][B|KB|MB|GB|TB]", e);

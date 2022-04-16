@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.interceptor;
+package com.tvd12.ezyhttp.server.jetty.test.interceptor;
 
 import java.lang.reflect.Method;
 
@@ -15,7 +15,7 @@ public class LogInterceptor
 	@Override
 	public boolean preHandle(
 			RequestArguments arguments, 
-			Method handler) throws Exception {
+			Method handler) {
 		logger.info("pre handle request uri: {}, method: {}, handler: {}", 
 				arguments.getRequest().getRequestURI(),
 				arguments.getMethod(),

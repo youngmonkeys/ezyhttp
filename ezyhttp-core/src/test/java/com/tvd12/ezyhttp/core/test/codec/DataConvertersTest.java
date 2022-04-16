@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.core.test.codec;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,14 +175,14 @@ public class DataConvertersTest {
 	private static class JsonConverter implements BodyConverter {
 
 		@Override
-		public byte[] serialize(Object body) throws IOException {
+		public byte[] serialize(Object body) {
 			return null;
 		}
 	}
 	
 	private static class MyStringDeserializer implements StringDeserializer {
 		@Override
-		public <T> T deserialize(String value, Class<T> outType, Class<?> genericType) throws IOException {
+		public <T> T deserialize(String value, Class<T> outType, Class<?> genericType) {
 			return null;
 		}
 		

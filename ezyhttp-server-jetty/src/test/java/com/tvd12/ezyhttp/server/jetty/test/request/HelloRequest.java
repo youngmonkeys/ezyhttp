@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.request;
+package com.tvd12.ezyhttp.server.jetty.test.request;
 
 import lombok.Data;
 

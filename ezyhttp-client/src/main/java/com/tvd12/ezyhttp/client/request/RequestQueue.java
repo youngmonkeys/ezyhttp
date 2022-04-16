@@ -19,13 +19,11 @@ public class RequestQueue implements EzyClearable {
 	}
 	
 	public boolean add(Request request) {
-		boolean success = this.queue.offer(request);
-		return success;
+        return this.queue.offer(request);
 	}
 	
 	public Request take() throws InterruptedException {
-		Request request = queue.take();
-		return request;
+        return queue.take();
 	}
 	
 	@Override

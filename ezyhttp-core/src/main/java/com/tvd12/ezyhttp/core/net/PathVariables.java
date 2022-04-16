@@ -26,13 +26,11 @@ public final class PathVariables {
 	}
 	
 	public static String getVariableName(String path) {
-		String varName = path.substring(1, path.length() - 1);
-		return varName;
+        return path.substring(1, path.length() - 1);
 	}
 	
 	public static boolean isPathVariable(String path) {
-		boolean answer = path.startsWith("{") && path.endsWith("}");
-		return answer;
+        return path.startsWith("{") && path.endsWith("}");
 	}
 	
 }

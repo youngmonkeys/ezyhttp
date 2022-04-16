@@ -30,7 +30,7 @@ public class RequestHandlerImplementerTest {
 		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
 	}
 	
-	private class Controller {
+	private static class Controller {
 		
 		@DoGet("/get")
 		private void doGet() {}

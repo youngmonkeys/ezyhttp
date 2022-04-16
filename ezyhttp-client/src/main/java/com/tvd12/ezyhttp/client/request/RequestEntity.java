@@ -44,25 +44,21 @@ public class RequestEntity {
 	public String getHeader(String name) {
 		if(headers == null)
 			return null;
-		String value = headers.getValue(name);
-		return value;
+		return headers.getValue(name);
 	}
 	
 	public String getContentType() {
 		if(headers == null)
 			return ContentTypes.APPLICATION_JSON;
-		String contentType = headers.getValue(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-		return contentType;
+		return headers.getValue(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 	}
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append("RequestEntity(")
-				.append("headers: ").append(headers).append(", ")
-				.append("body: ").append(body != null ? body.getClass().getSimpleName() : "null")
-				.append(")")
-				.toString();
+		return "RequestEntity(" +
+			"headers: " + headers + ", " +
+			"body: " + (body != null ? body.getClass().getSimpleName() : "null") +
+			")";
 	}
 	
 	public static Builder builder() {

@@ -24,18 +24,18 @@ public final class ComponentManager implements EzyDestroyable {
 	@Setter
 	private int managmentPort;
 	@Setter 
-	private boolean exposeMangementURIs;
+	private boolean exposeManagementURIs;
 	
 	@Setter
 	private ViewContext viewContext;
-	private ObjectMapper objectMapper;
-	private DataConverters dataConverters;
-	private ControllerManager controllerManager;
-	private InterceptorManager interceptorManager;
-	private RequestHandlerManager requestHandlerManager;
-	private ExceptionHandlerManager exceptionHandlerManager;
+	private final ObjectMapper objectMapper;
+	private final DataConverters dataConverters;
 	private UnhandledErrorHandler unhandledErrorHandler;
-	private List<RequestResponseWatcher> requestResponseWatchers;
+	private final ControllerManager controllerManager;
+	private final InterceptorManager interceptorManager;
+	private final RequestHandlerManager requestHandlerManager;
+	private final ExceptionHandlerManager exceptionHandlerManager;
+	private final List<RequestResponseWatcher> requestResponseWatchers;
 	
 	private static final ComponentManager INSTANCE = new ComponentManager();
 	
@@ -66,7 +66,7 @@ public final class ComponentManager implements EzyDestroyable {
 	@Override
 	public void destroy() {
 		this.viewContext = null;
-		this.exposeMangementURIs = false;
+		this.exposeManagementURIs = false;
 		this.unhandledErrorHandler = null;
 		this.dataConverters.destroy();
 		this.controllerManager.destroy();

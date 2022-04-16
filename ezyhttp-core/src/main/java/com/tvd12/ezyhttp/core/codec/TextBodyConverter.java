@@ -23,7 +23,7 @@ public class TextBodyConverter implements BodyConverter {
 	
 	@Override
 	public byte[] serialize(Object body) throws IOException {
-		byte[] bytes = null;
+		byte[] bytes;
 		try {
 			bytes = body.toString().getBytes(StandardCharsets.UTF_8);
 		}
@@ -38,8 +38,7 @@ public class TextBodyConverter implements BodyConverter {
 	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
 		if(bodyType == String.class)
 			return (T)data;
-		T body = objectMapper.readValue(data, bodyType);
-		return body;
+		return objectMapper.readValue(data, bodyType);
 	}
 	
 	@Override

@@ -19,5 +19,5 @@ public @interface RequestArgument {
 	 * 
 	 * @return the argument's name
 	 */
-	public String value();
+    String value();
 }

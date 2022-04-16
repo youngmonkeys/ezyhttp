@@ -105,10 +105,8 @@ public class GraphQLSchemaParserTest {
 		// given
 		GraphQLSchemaParser parser = new GraphQLSchemaParser();
 		
-		String query = null;
-		
 		// when
-		GraphQLSchema schema = parser.parseQuery(query);
+		GraphQLSchema schema = parser.parseQuery(null);
 		
 		// then
 		Asserts.assertEquals(schema.getQueryDefinitions().size(), 0);

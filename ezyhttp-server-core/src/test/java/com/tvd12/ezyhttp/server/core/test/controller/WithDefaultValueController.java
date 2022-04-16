@@ -12,9 +12,10 @@ public class WithDefaultValueController {
     
     @DoGet("/home")
     public Object home(
-            @RequestParam(name = "param", defaultValue = "1") byte paramValue,
-            @RequestHeader(name = "header", defaultValue = "2") int headerValue,
-            @RequestCookie(name = "cookie", defaultValue = "3") String cookieValue) {
+        @RequestParam(name = "param", defaultValue = "1") byte paramValue,
+        @RequestHeader(name = "header", defaultValue = "2") int headerValue,
+        @RequestCookie(name = "cookie", defaultValue = "3") String cookieValue
+    ) {
         return paramValue + headerValue + cookieValue;
     }
 }

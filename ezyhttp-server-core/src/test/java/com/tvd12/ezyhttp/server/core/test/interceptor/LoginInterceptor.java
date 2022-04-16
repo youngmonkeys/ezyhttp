@@ -15,7 +15,7 @@ public class LoginInterceptor
 	@Override
 	public boolean preHandle(
 			RequestArguments arguments, 
-			Method handler) throws Exception {
+			Method handler) {
 		logger.info("pre handle request uri: {}, method: {}, handler: {}", 
 				arguments.getRequest().getRequestURI(),
 				arguments.getMethod(),

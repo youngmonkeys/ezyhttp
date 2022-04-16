@@ -17,7 +17,7 @@ public class AuthenInterceptor
 	@Override
 	public boolean preHandle(
 			RequestArguments arguments, 
-			Method handler) throws Exception {
+			Method handler) {
 		boolean mustAuthen = AuthenticatedMethods.AUTHENTICATED_METHODS.contains(handler);
 		if(mustAuthen) {
 			String token = arguments.getHeader("token");

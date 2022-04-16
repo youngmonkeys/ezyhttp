@@ -13,7 +13,7 @@ public class RequestFutureTaskTest {
 		RequestFutureTask sut = new RequestFutureTask();
 		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.setResult((Object)null));
+		Throwable e = Asserts.assertThrows(() -> sut.setResult(null));
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(NullPointerException.class);
@@ -39,7 +39,7 @@ public class RequestFutureTaskTest {
 		RequestFutureTask sut = new RequestFutureTask();
 		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.setException((Exception)null));
+		Throwable e = Asserts.assertThrows(() -> sut.setException(null));
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(NullPointerException.class);

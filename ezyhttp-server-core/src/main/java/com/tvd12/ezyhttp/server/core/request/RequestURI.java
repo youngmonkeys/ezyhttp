@@ -43,31 +43,19 @@ public class RequestURI {
         boolean api,
         String resourceFullPath
     ) {
-	    this(method, uri, management, false, resource, api, resourceFullPath);
-	}
-	
-	private RequestURI(
-        HttpMethod method, 
-        String uri, 
-        boolean management,
-        boolean authenticated,
-        boolean resource,
-        boolean api,
-        String resourceFullPath
-    ) {
 		this(
-		    method,
-		    uri,
-		    RequestURIMeta.builder()
-		        .api(api)
-		        .authenticated(authenticated)
-		        .management(management)
-		        .resource(resource)
-		        .resourceFullPath(resourceFullPath)
-		        .build()
-	    );
+			method,
+			uri,
+			RequestURIMeta.builder()
+				.api(api)
+				.authenticated(false)
+				.management(management)
+				.resource(resource)
+				.resourceFullPath(resourceFullPath)
+				.build()
+		);
 	}
-	
+
 	public RequestURI(
         HttpMethod method, 
         String uri, 
@@ -113,12 +101,9 @@ public class RequestURI {
 		if(!other.getClass().equals(this.getClass()))
 			return false;
 		RequestURI t = (RequestURI)other;
-		if(uri.equals(t.uri) 
-		        && method.equals(t.method) 
-		        && management == t.management) {
-			return true;
-		}
-		return false;
+		return uri.equals(t.uri)
+			&& method.equals(t.method)
+			&& management == t.management;
 	}
 	
 	@Override
@@ -133,9 +118,7 @@ public class RequestURI {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append(uri).append(" - ").append(method)
-				.toString();
+		return uri + " - " + method;
 	}
 	
 }

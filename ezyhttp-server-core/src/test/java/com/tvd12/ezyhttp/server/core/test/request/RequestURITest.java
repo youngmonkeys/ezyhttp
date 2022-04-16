@@ -34,8 +34,7 @@ public class RequestURITest {
 		// when
 		// then
 		Asserts.assertEquals(uri1.getMethod(), HttpMethod.GET);
-		assert !uri1.equals(null);
-		assert uri1.equals(uri1);
+        assert uri1.equals(uri1);
 		assert !uri1.equals(new Object());
 		Asserts.assertEquals(uri1, uri1);
 		Asserts.assertEquals(uri1, uri2);

@@ -284,7 +284,6 @@ public class SingletonStringDeserializerTest {
 	@Test
 	public void deserializeNullStringToPrimitive() throws Exception {
 		// given
-		boolean booleanActual = false;
 		byte byteActual = (byte) 0;
 		char charActual = '\u0000';
 		double doubleActual = 0.0D;
@@ -304,7 +303,7 @@ public class SingletonStringDeserializerTest {
 		short shortValue = sut.deserialize(null, short.class);
 		
 		// then
-		Asserts.assertEquals(booleanActual, booleanValue);
+		Asserts.assertEquals(false, booleanValue);
 		Asserts.assertEquals(byteActual, byteValue);
 		Asserts.assertEquals(charActual, charValue);
 		Asserts.assertEquals(doubleActual, doubleValue);
@@ -325,7 +324,6 @@ public class SingletonStringDeserializerTest {
 		Integer intActual = null;
 		Long longActual = null;
 		Short shortActual = null;
-		String stringActual = null;
 		
 		// when
 		Boolean booleanValue = sut.deserialize(null, Boolean.class);
@@ -347,20 +345,12 @@ public class SingletonStringDeserializerTest {
 		Asserts.assertEquals(intActual, intValue);
 		Asserts.assertEquals(longActual, longValue);
 		Asserts.assertEquals(shortActual, shortValue);
-		Asserts.assertEquals(stringActual, stringValue);
+		Asserts.assertEquals(null, stringValue);
 	}
 	
 	@Test
 	public void deserializeNullStringToSpecialValues() throws Exception {
 		// given
-		Date date = null;
-		Instant instant = null;
-		LocalDate localDate = null;
-		LocalTime localTime = null;
-		LocalDateTime localDateTime = null;
-		BigInteger bigInteger = null;
-		BigDecimal bigDecimal = null;
-		
 		// when
 		Date actualDate = sut.deserialize(null, Date.class);
 		Instant actualInstant = sut.deserialize(null, Instant.class);
@@ -371,13 +361,13 @@ public class SingletonStringDeserializerTest {
 		BigDecimal actualBigDecimal = sut.deserialize(null, BigDecimal.class);
 		
 		// then
-		Asserts.assertEquals(date, actualDate);
-		Asserts.assertEquals(instant, actualInstant);
-		Asserts.assertEquals(localDate, actualLocalDate);
-		Asserts.assertEquals(localTime, actualLocalTime);
-		Asserts.assertEquals(localDateTime, actualLocalDateTime);
-		Asserts.assertEquals(bigInteger, actualBigInteger);
-		Asserts.assertEquals(bigDecimal, actualBigDecimal);
+		Asserts.assertEquals(null, actualDate);
+		Asserts.assertEquals(null, actualInstant);
+		Asserts.assertEquals(null, actualLocalDate);
+		Asserts.assertEquals(null, actualLocalTime);
+		Asserts.assertEquals(null, actualLocalDateTime);
+		Asserts.assertEquals(null, actualBigInteger);
+		Asserts.assertEquals(null, actualBigDecimal);
 	}
 	
 	@Test
@@ -392,7 +382,7 @@ public class SingletonStringDeserializerTest {
 	    
 	}
 	
-	public static enum MyEnum {
+	public enum MyEnum {
 	    HELLO, WORLD
 	}
 }

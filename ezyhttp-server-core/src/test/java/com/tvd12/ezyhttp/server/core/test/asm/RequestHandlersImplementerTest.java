@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.asm;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.testng.annotations.Test;
 
@@ -26,7 +27,7 @@ public class RequestHandlersImplementerTest {
         // when
         Throwable e = Asserts.assertThrows(() ->
             manager.addHandlers(sut.implement(
-                    Arrays.asList(controller)
+				Collections.singletonList(controller)
             ))
         );
 		
@@ -62,7 +63,7 @@ public class RequestHandlersImplementerTest {
         manager.setAllowOverrideURI(true);
         
         // when
-        manager.addHandlers(sut.implement(Arrays.asList(controller)));
+        manager.addHandlers(sut.implement(Collections.singletonList(controller)));
         
         // then
         RequestURI uri = new RequestURI(HttpMethod.GET, "/get", false);
@@ -82,7 +83,7 @@ public class RequestHandlersImplementerTest {
         sut.setRequestURIDecorator(requestURIDecorator);
         
         // when
-        manager.addHandlers(sut.implement(Arrays.asList(controller)));
+        manager.addHandlers(sut.implement(Collections.singletonList(controller)));
         
         // then
         RequestURI uri = new RequestURI(HttpMethod.GET, "/hello-world", false);

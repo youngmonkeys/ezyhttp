@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.manager;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -48,13 +49,13 @@ public class RequestURIManagerTest {
         Assert.assertTrue(sut.isPaymentURI(HttpMethod.DELETE, "d"));
         Asserts.assertFalse(sut.isPaymentURI(HttpMethod.DELETE, "I don't know"));
         Asserts.assertFalse(sut.isPaymentURI(HttpMethod.PATCH, "I don't know"));
-        Asserts.assertEquals(sut.getPaymentURIs(HttpMethod.DELETE), Arrays.asList("d"), false);
+        Asserts.assertEquals(sut.getPaymentURIs(HttpMethod.DELETE), Collections.singletonList("d"), false);
         Asserts.assertEmpty(sut.getPaymentURIs(HttpMethod.PATCH));
         
         Assert.assertTrue(sut.isManagementURI(HttpMethod.DELETE, "e"));
         Asserts.assertFalse(sut.isManagementURI(HttpMethod.DELETE, "I don't know"));
         Asserts.assertFalse(sut.isManagementURI(HttpMethod.PATCH, "I don't know"));
-        Asserts.assertEquals(sut.getManagementURIs(HttpMethod.DELETE), Arrays.asList("e"), false);
+        Asserts.assertEquals(sut.getManagementURIs(HttpMethod.DELETE), Collections.singletonList("e"), false);
         Asserts.assertEmpty(sut.getManagementURIs(HttpMethod.PATCH));
     }
 }

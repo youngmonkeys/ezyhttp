@@ -68,7 +68,7 @@ public class ThymeleafViewContext implements ViewContext {
         templateResolver.setTemplateMode(templateMode);
         templateResolver.setPrefix(metadata.getPrefix());
         templateResolver.setSuffix(metadata.getSuffix());
-        templateResolver.setCacheTTLMs(Long.valueOf(metadata.getCacheTTLMs()));
+        templateResolver.setCacheTTLMs((long) metadata.getCacheTTLMs());
         templateResolver.setCacheable(metadata.isCacheable());
         
         ThymeleafMessageResolver messageResolver = ThymeleafMessageResolver.builder()

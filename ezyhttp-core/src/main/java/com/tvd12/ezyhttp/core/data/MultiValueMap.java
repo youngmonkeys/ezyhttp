@@ -31,8 +31,7 @@ public class MultiValueMap {
 		List<String> values = map.get(key);
 		if(values == null || values.isEmpty())
 			return null;
-		String value = values.get(0);
-		return value;
+        return values.get(0);
 	}
 	
 	public String getValue(String key, String defaultValue) {

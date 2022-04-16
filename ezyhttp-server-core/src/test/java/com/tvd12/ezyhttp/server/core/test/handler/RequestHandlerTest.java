@@ -22,7 +22,7 @@ public class RequestHandlerTest {
 	private static class ExRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return null;
 		}
 

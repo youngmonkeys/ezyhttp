@@ -91,7 +91,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         	managementConnector.setPort(managementPort);
         	connectors.add(managementConnector);
         }
-        server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
+        server.setConnectors(connectors.toArray(new Connector[0]));
         ServletContextHandler servletHandler = newServletHandler();
         server.setHandler(servletHandler);
         server.start();
@@ -109,8 +109,8 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         		FileSizes.toByteSize(multipartMaxFileSize),
         		(int)FileSizes.toByteSize(multipartMaxRequestSize),
         		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
-        	));;
-        logger.info("cors.enable = {}", corsEnable);
+        	));
+		logger.info("cors.enable = {}", corsEnable);
         if(corsEnable) {
 	        FilterHolder crossOriginFilter = newCrossOriginFilter();
 	        addFilter(servletHandler, crossOriginFilter);

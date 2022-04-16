@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import javax.servlet.AsyncContext;
@@ -71,7 +70,7 @@ public class BlockingServletTest {
 		componentManager.setServerPort(PORT);
 		
 		RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
-		componentManager.addRequestResponseWatchers(Arrays.asList(watcher));
+		componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
 		
 		BlockingServlet sut = new BlockingServlet();
 		sut.init();
@@ -83,13 +82,13 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -103,7 +102,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -144,7 +143,7 @@ public class BlockingServletTest {
         componentManager.setServerPort(PORT);
         
         RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
-        componentManager.addRequestResponseWatchers(Arrays.asList(watcher));
+        componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
         
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -156,13 +155,13 @@ public class BlockingServletTest {
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
         when(request.getParameterNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("param"))
+            Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
         when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("header"))
+            Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
         
@@ -181,7 +180,7 @@ public class BlockingServletTest {
         
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);
-        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
         
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -235,13 +234,13 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -339,13 +338,13 @@ public class BlockingServletTest {
 		when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
 		
 		when(request.getParameterNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("param"))
+            Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
         when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("header"))
+            Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
         
@@ -373,7 +372,7 @@ public class BlockingServletTest {
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
         componentManager.setManagmentPort(MANAGEMENT_POR);
-        componentManager.setExposeMangementURIs(true);
+        componentManager.setExposeManagementURIs(true);
         componentManager.getRequestHandlerManager().addHandler(
             new RequestURI(HttpMethod.GET, "/management", true),
             mock(RequestHandler.class)
@@ -390,13 +389,13 @@ public class BlockingServletTest {
         when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
         
         when(request.getParameterNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("param"))
+            Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
         when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("header"))
+            Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
         
@@ -477,7 +476,7 @@ public class BlockingServletTest {
 				null
             )
         ).thenReturn(responseEntity);
-        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
         
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -566,7 +565,7 @@ public class BlockingServletTest {
 				null
             )
         ).thenReturn(responseEntity);
-        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
         
 
         BlockingServlet sut = new BlockingServlet();
@@ -618,7 +617,7 @@ public class BlockingServletTest {
 				null
             )
         ).thenReturn(null);
-        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
         
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -673,7 +672,7 @@ public class BlockingServletTest {
 				null
             )
         ).thenReturn(responseEntity);
-        componentManager.setUnhandledErrorHandler(Arrays.asList(unhandledErrorHandler));
+        componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
         
 
         BlockingServlet sut = new BlockingServlet();
@@ -727,13 +726,13 @@ public class BlockingServletTest {
 		when(request.getServerPort()).thenReturn(PORT);
 		
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -747,7 +746,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(false);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		
@@ -781,13 +780,13 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -842,13 +841,13 @@ public class BlockingServletTest {
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
         when(request.getParameterNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("param"))
+            Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
         when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("header"))
+            Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
         
@@ -880,7 +879,7 @@ public class BlockingServletTest {
         
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         doThrow(IllegalStateException.class).when(interceptor).postHandle(any(), any());
-        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
         asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
         
         // then
@@ -907,12 +906,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -954,12 +953,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1007,12 +1006,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1060,12 +1059,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1118,12 +1117,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1178,12 +1177,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1236,12 +1235,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1294,12 +1293,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1347,13 +1346,13 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1370,7 +1369,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1418,13 +1417,13 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1438,7 +1437,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1477,13 +1476,13 @@ public class BlockingServletTest {
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
         when(request.getParameterNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("param"))
+            Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
         when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
         
         when(request.getHeaderNames()).thenReturn(
-            Collections.enumeration(Arrays.asList("header"))
+            Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
         
@@ -1498,7 +1497,7 @@ public class BlockingServletTest {
         
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);
-        componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+        componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
         
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1543,12 +1542,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1562,7 +1561,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1601,12 +1600,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1620,7 +1619,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1657,12 +1656,12 @@ public class BlockingServletTest {
 		when(request.getRequestURI()).thenReturn(requestURI);
 		when(request.getServerPort()).thenReturn(PORT);
 		when(request.getParameterNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("param"))
+			Collections.enumeration(Collections.singletonList("param"))
 		);
 		when(request.getParameter("param")).thenReturn("ParameterValue");
 		
 		when(request.getHeaderNames()).thenReturn(
-			Collections.enumeration(Arrays.asList("header"))
+			Collections.enumeration(Collections.singletonList("header"))
 		);
 		when(request.getHeader("header")).thenReturn("HeaderValue");
 		
@@ -1676,7 +1675,7 @@ public class BlockingServletTest {
 		
 		RequestInterceptor interceptor = mock(RequestInterceptor.class);
 		when(interceptor.preHandle(any(), any())).thenReturn(true);
-		componentManager.getInterceptorManager().addRequestInterceptors(Arrays.asList(interceptor));
+		componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
 		
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
@@ -1706,7 +1705,7 @@ public class BlockingServletTest {
 		private final String contentType;
 		
 		@Override
-		public Object handleException(RequestArguments arguments, Exception exception) throws Exception {
+		public Object handleException(RequestArguments arguments, Exception exception) {
 			arguments.getResponse().setStatus(StatusCodes.BAD_REQUEST);
 			if(data == "")
 				throw new IllegalArgumentException("data can not be null");
@@ -1729,7 +1728,7 @@ public class BlockingServletTest {
         }
         
         @Override
-        public Object handle(RequestArguments arguments) throws Exception {
+        public Object handle(RequestArguments arguments) {
             throw new IllegalStateException("just test");
         }
 
@@ -1760,7 +1759,7 @@ public class BlockingServletTest {
 		}
 		
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			throw new HttpRequestException(StatusCodes.BAD_REQUEST, data);
 		}
 
@@ -1806,7 +1805,7 @@ public class BlockingServletTest {
 	public static class GetRequestDataNullHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return null;
 		}
 
@@ -1830,7 +1829,7 @@ public class BlockingServletTest {
 	public static class GetRequestHandlerContentTypeNull implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return ResponseEntity.ASYNC;
 		}
 		
@@ -1858,7 +1857,7 @@ public class BlockingServletTest {
 	public static class GetRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return CONTROLLER.doGet(
 				arguments.getRequest(),
 				arguments.getResponse(),
@@ -1887,7 +1886,7 @@ public class BlockingServletTest {
 	public static class GetNoBodyRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return CONTROLLER.doGetNoBody(
 				arguments.getRequest(),
 				arguments.getResponse(),
@@ -1916,7 +1915,7 @@ public class BlockingServletTest {
 	public static class PostRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return CONTROLLER.doPost(
 				arguments.getRequest(),
 				arguments.getResponse(),
@@ -1945,7 +1944,7 @@ public class BlockingServletTest {
 	public static class PutRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return CONTROLLER.doPut(
 				arguments.getRequest(),
 				arguments.getResponse(),
@@ -1974,7 +1973,7 @@ public class BlockingServletTest {
 	public static class PutWithRedirectAttributesRequestHandler implements RequestHandler {
 
         @Override
-        public Object handle(RequestArguments arguments) throws Exception {
+        public Object handle(RequestArguments arguments) {
             return CONTROLLER.doPutWithRedirectAttributes(
                 arguments.getRequest(),
                 arguments.getResponse(),
@@ -2003,7 +2002,7 @@ public class BlockingServletTest {
 	public static class DeleteRequestHandler implements RequestHandler {
 
 		@Override
-		public Object handle(RequestArguments arguments) throws Exception {
+		public Object handle(RequestArguments arguments) {
 			return CONTROLLER.doDelete(
 				arguments.getRequest(),
 				arguments.getResponse(),

@@ -19,5 +19,5 @@ public @interface PathVariable {
 	 * 
 	 * @return the variable's name
 	 */
-	public String value() default "";
+    String value() default "";
 }

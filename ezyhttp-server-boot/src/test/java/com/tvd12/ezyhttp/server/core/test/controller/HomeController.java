@@ -50,8 +50,7 @@ public class HomeController {
 	}
 	
 	@DoPut
-	public void doNothing() {
-	}
+	public void doNothing() {}
 	
 	@SuppressWarnings("unchecked")
 	@DoGet("bye")

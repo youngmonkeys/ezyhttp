@@ -35,7 +35,7 @@ public class TextBodyConverterTest {
 	}
 	
 	@Test
-	public void serializeFailedDueToException() throws Exception {
+	public void serializeFailedDueToException() {
 		// given
 		TextBodyConverter sut = new TextBodyConverter();
 		

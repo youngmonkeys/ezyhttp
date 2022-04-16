@@ -21,5 +21,5 @@ public @interface ComponentsScan {
      * 
      * @return array of package names
      */
-	public String[] value() default {};
+    String[] value() default {};
 }

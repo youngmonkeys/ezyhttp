@@ -38,13 +38,11 @@ public class ExceptionHandlerProxy {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append(clazz.getName())
-				.append("(\n")
-					.append("\tinstance: ").append(instance).append(",\n")
-					.append("\texceptionHandlerMethods: ").append(exceptionHandlerMethods).append("\n")
-				.append(")")
-				.toString();
+		return clazz.getName() +
+			"(\n" +
+			"\tinstance: " + instance + ",\n" +
+			"\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
+			")";
 	}
 	
 }

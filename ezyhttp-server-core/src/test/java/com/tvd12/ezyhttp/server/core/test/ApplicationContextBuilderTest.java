@@ -67,8 +67,8 @@ public class ApplicationContextBuilderTest {
 					"com.tvd12.ezyhttp.server.core.test.service"
 				)
 			)
-			.addComponentClasses(Arrays.asList(SourceService.class))
-			.addPropertiesSources(Arrays.asList("application3.yaml"))
+			.addComponentClasses(Collections.singletonList(SourceService.class))
+			.addPropertiesSources(Collections.singletonList("application3.yaml"))
 			.addPropertiesSource("application-enable.yaml")
 			.addProperty("a", "1")
 			.addProperties(properties)
@@ -277,17 +277,17 @@ public class ApplicationContextBuilderTest {
 		when(beanContext.getSingletonFactory()).thenReturn(singletonFactory);
 		
 		ViewDialect viewDialect = mock(ViewDialect.class);
-		List<ViewDialect> viewDialects = Arrays.asList(viewDialect);
+		List<ViewDialect> viewDialects = Collections.singletonList(viewDialect);
 		when(beanContext.getSingletonsOf(ViewDialect.class)).thenReturn(viewDialects);
 		when(viewContextBuilder.viewDialects(viewDialects)).thenReturn(viewContextBuilder);
 		
 		ViewDecorator viewDecorator = mock(ViewDecorator.class);
-		List<ViewDecorator> viewDecorators = Arrays.asList(viewDecorator);
+		List<ViewDecorator> viewDecorators = Collections.singletonList(viewDecorator);
 		when(beanContext.getSingletonsOf(ViewDecorator.class)).thenReturn(viewDecorators);
 		when(viewContextBuilder.viewDecorators(viewDecorators)).thenReturn(viewContextBuilder);
 		
 		MessageProvider messageProvider = mock(MessageProvider.class);
-		List<MessageProvider> messageProviders = Arrays.asList(messageProvider);
+		List<MessageProvider> messageProviders = Collections.singletonList(messageProvider);
 		when(beanContext.getSingletonsOf(MessageProvider.class)).thenReturn(messageProviders);
 		when(viewContextBuilder.messageProviders(messageProviders)).thenReturn(viewContextBuilder);
 		

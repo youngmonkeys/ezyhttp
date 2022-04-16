@@ -19,19 +19,19 @@ public @interface RequestCookie {
 	 * 
 	 * @return the parameter's name
 	 */
-	public String value() default "";
+    String value() default "";
 	
 	/**
      * name or cookie
      * 
      * @return the cookie's name
      */
-    public String name() default "";
+    String name() default "";
     
     /**
      * default or cookie
      * 
      * @return the default value of the cookie
      */
-    public String defaultValue() default "null";
+    String defaultValue() default "null";
 }

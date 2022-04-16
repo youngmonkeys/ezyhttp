@@ -49,10 +49,8 @@ public class ObjectMapperBuilderTest {
 	@Test
 	public void instantFailedDueToBoolean() {
 		// given
-		boolean source = true;
-		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Instant.class));
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(true, Instant.class));
 		
 		// then
 		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
@@ -85,10 +83,8 @@ public class ObjectMapperBuilderTest {
 	@Test
 	public void dateFailedDueToBoolean() {
 		// given
-		boolean source = true;
-		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, Date.class));
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(true, Date.class));
 		
 		// then
 		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
@@ -121,10 +117,8 @@ public class ObjectMapperBuilderTest {
 	@Test
 	public void localDateFailedDueToBoolean() {
 		// given
-		boolean source = true;
-		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDate.class));
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(true, LocalDate.class));
 		
 		// then
 		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
@@ -157,10 +151,8 @@ public class ObjectMapperBuilderTest {
 	@Test
 	public void localTimeFailedDueToBoolean() {
 		// given
-		boolean source = true;
-		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalTime.class));
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(true, LocalTime.class));
 		
 		// then
 		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);
@@ -193,10 +185,8 @@ public class ObjectMapperBuilderTest {
 	@Test
 	public void localDateTimeFailedDueToBoolean() {
 		// given
-		boolean source = true;
-		
 		// when
-		Throwable e = Asserts.assertThrows(() -> sut.convertValue(source, LocalDateTime.class));
+		Throwable e = Asserts.assertThrows(() -> sut.convertValue(true, LocalDateTime.class));
 		
 		// then
 		Asserts.assertThat(e.getCause()).isEqualsType(IOException.class);

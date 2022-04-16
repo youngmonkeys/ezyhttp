@@ -13,9 +13,9 @@ public class HttpMethodTest {
 		Asserts.assertEquals("get", HttpMethod.GET.getName());
 		
 		Asserts.assertFalse(HttpMethod.GET.hasOutput());
+		Asserts.assertFalse(HttpMethod.DELETE.hasOutput());
 		Asserts.assertTrue(HttpMethod.POST.hasOutput());
 		Asserts.assertTrue(HttpMethod.PUT.hasOutput());
 		Asserts.assertTrue(HttpMethod.PATCH.hasOutput());
-		Asserts.assertTrue(HttpMethod.DELETE.hasOutput());
 	}
 }

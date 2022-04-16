@@ -114,7 +114,7 @@ public class View {
 		private Map<String, String> headers;
 		private Locale locale = Locale.ENGLISH;
 		private String contentType = ContentTypes.TEXT_HTML_UTF8;
-		private Map<String, Object> variables = new HashMap<>();
+		private final Map<String, Object> variables = new HashMap<>();
 		
 		public Builder template(String template) {
 			this.template = template;

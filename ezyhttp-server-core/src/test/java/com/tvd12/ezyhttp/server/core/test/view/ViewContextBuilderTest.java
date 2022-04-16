@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test.view;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class ViewContextBuilderTest {
             HttpServletRequest request, 
             HttpServletResponse response,
             View view
-        ) throws IOException {
+        ) {
         }
         
     }

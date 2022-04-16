@@ -10,7 +10,7 @@ import java.util.List;
 public class GraphQLSchema {
 	
 	@Getter
-	private List<GraphQLQueryDefinition> queryDefinitions;
+	private final List<GraphQLQueryDefinition> queryDefinitions;
 	
 	public GraphQLSchema(Builder builder) {
 		this.queryDefinitions = builder.queryDefinitions != null ? builder.queryDefinitions : Collections.emptyList();

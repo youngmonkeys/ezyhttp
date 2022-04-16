@@ -22,8 +22,7 @@ public class ExceptionHandlerMethod extends HandlerMethod {
 	
 	protected Class<?>[] fetchExceptionClasses() {
 		TryCatch annotation = method.getAnnotation(TryCatch.class);
-		Class<?>[] classes = TryCatchAnnotations.getExceptionClasses(annotation);
-		return classes;
+        return TryCatchAnnotations.getExceptionClasses(annotation);
 	}
 	
 	protected String fetchResponseType() {
@@ -33,12 +32,10 @@ public class ExceptionHandlerMethod extends HandlerMethod {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append(method.getName())
-				.append("(")
-					.append("exceptionClasses: ").append(EzyStrings.join(exceptionClasses, ", "))
-				.append(")")
-				.toString();
+		return method.getName() +
+			"(" +
+			"exceptionClasses: " + EzyStrings.join(exceptionClasses, ", ") +
+			")";
 	}
 	
 }

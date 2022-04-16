@@ -33,8 +33,7 @@ public class ExceptionHandlerManager extends EzyLoggable implements EzyDestroyab
 	
 	public UncaughtExceptionHandler getUncaughtExceptionHandler(
 			Class<?> exceptionClass) {
-		UncaughtExceptionHandler hanlder = uncaughtExceptionHandlers.get(exceptionClass);
-		return hanlder;
+        return uncaughtExceptionHandlers.get(exceptionClass);
 	}
 	
 	public void addUncaughtExceptionHandler(

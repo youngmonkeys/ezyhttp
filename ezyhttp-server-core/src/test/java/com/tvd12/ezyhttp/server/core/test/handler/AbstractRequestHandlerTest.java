@@ -37,7 +37,7 @@ public class AbstractRequestHandlerTest {
 		ExResponse response = new ExResponse("Hello World");
 		
 		ExRequestHandler sut = new ExRequestHandler() {
-			public Object handleRequest(RequestArguments arguments) throws Exception {
+			public Object handleRequest(RequestArguments arguments) {
 				return response;
 			}
 		};
@@ -63,7 +63,7 @@ public class AbstractRequestHandlerTest {
 				throw new Exception("just test");
 			}
 			@Override
-			protected Object handleException(RequestArguments arguments, Exception e) throws Exception {
+			protected Object handleException(RequestArguments arguments, Exception e) {
 				return response;
 			}
 		};
@@ -88,7 +88,7 @@ public class AbstractRequestHandlerTest {
                 throw new Exception("just test");
             }
             @Override
-            protected Object handleException(RequestArguments arguments, Exception e) throws Exception {
+            protected Object handleException(RequestArguments arguments, Exception e) {
                 return response;
             }
         };
@@ -113,7 +113,6 @@ public class AbstractRequestHandlerTest {
 		int index = 0;
 		String value = "1";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -124,7 +123,7 @@ public class AbstractRequestHandlerTest {
 				.param(int.class, index)
 				.param(String.class, value)
 				.param(Class.class, type)
-				.param(Class.class, genericType)
+				.param(Class.class, null)
 				.invoke();
 		
 		// then
@@ -137,7 +136,6 @@ public class AbstractRequestHandlerTest {
 		int index = 0;
 		String value = "abc";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -149,7 +147,7 @@ public class AbstractRequestHandlerTest {
 			.param(int.class, index)
 			.param(String.class, value)
 			.param(Class.class, type)
-			.param(Class.class, genericType)
+			.param(Class.class, null)
 			.invoke();
 		});
 		
@@ -163,7 +161,6 @@ public class AbstractRequestHandlerTest {
 		String name = "name";
 		String value = "1";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -174,7 +171,7 @@ public class AbstractRequestHandlerTest {
 				.param(String.class, name)
 				.param(String.class, value)
 				.param(Class.class, type)
-				.param(Class.class, genericType)
+				.param(Class.class, null)
 				.invoke();
 		
 		// then
@@ -187,7 +184,6 @@ public class AbstractRequestHandlerTest {
 		String name = "name";
 		String value = "abc";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -199,7 +195,7 @@ public class AbstractRequestHandlerTest {
 			.param(String.class, name)
 			.param(String.class, value)
 			.param(Class.class, type)
-			.param(Class.class, genericType)
+			.param(Class.class, null)
 			.invoke();
 		});
 		
@@ -213,7 +209,6 @@ public class AbstractRequestHandlerTest {
 		int index = 0;
 		String value = "1";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -224,7 +219,7 @@ public class AbstractRequestHandlerTest {
 				.param(int.class, index)
 				.param(String.class, value)
 				.param(Class.class, type)
-				.param(Class.class, genericType)
+				.param(Class.class, null)
 				.invoke();
 		
 		// then
@@ -237,7 +232,6 @@ public class AbstractRequestHandlerTest {
 		int index = 0;
 		String value = "abc";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -249,7 +243,7 @@ public class AbstractRequestHandlerTest {
 			.param(int.class, index)
 			.param(String.class, value)
 			.param(Class.class, type)
-			.param(Class.class, genericType)
+			.param(Class.class, null)
 			.invoke();
 		});
 		
@@ -263,7 +257,6 @@ public class AbstractRequestHandlerTest {
 		String name = "name";
 		String value = "1";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -274,7 +267,7 @@ public class AbstractRequestHandlerTest {
 				.param(String.class, name)
 				.param(String.class, value)
 				.param(Class.class, type)
-				.param(Class.class, genericType)
+				.param(Class.class, null)
 				.invoke();
 		
 		// then
@@ -287,7 +280,6 @@ public class AbstractRequestHandlerTest {
 		String name = "name";
 		String value = "abc";
 		Class<?> type = int.class;
-		Class<?> genericType = null;
 		
 		ExRequestHandler sut = new ExRequestHandler();
 		
@@ -299,7 +291,7 @@ public class AbstractRequestHandlerTest {
 			.param(String.class, name)
 			.param(String.class, value)
 			.param(Class.class, type)
-			.param(Class.class, genericType)
+			.param(Class.class, null)
 			.invoke();
 		});
 		
@@ -313,7 +305,6 @@ public class AbstractRequestHandlerTest {
         int index = 0;
         String value = "1";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -324,7 +315,7 @@ public class AbstractRequestHandlerTest {
                 .param(int.class, index)
                 .param(String.class, value)
                 .param(Class.class, type)
-                .param(Class.class, genericType)
+                .param(Class.class, null)
                 .invoke();
         
         // then
@@ -337,7 +328,6 @@ public class AbstractRequestHandlerTest {
         int index = 0;
         String value = "abc";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -349,7 +339,7 @@ public class AbstractRequestHandlerTest {
             .param(int.class, index)
             .param(String.class, value)
             .param(Class.class, type)
-            .param(Class.class, genericType)
+            .param(Class.class, null)
             .invoke();
         });
         
@@ -363,7 +353,6 @@ public class AbstractRequestHandlerTest {
     	String name = "name";
         String value = "1";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -374,7 +363,7 @@ public class AbstractRequestHandlerTest {
                 .param(String.class, name)
                 .param(String.class, value)
                 .param(Class.class, type)
-                .param(Class.class, genericType)
+                .param(Class.class, null)
                 .invoke();
         
         // then
@@ -387,7 +376,6 @@ public class AbstractRequestHandlerTest {
         String name = "name";
         String value = "abc";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -399,7 +387,7 @@ public class AbstractRequestHandlerTest {
             .param(String.class, name)
             .param(String.class, value)
             .param(Class.class, type)
-            .param(Class.class, genericType)
+            .param(Class.class, null)
             .invoke();
         });
         
@@ -413,7 +401,6 @@ public class AbstractRequestHandlerTest {
         int index = 0;
         String value = "1";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -424,7 +411,7 @@ public class AbstractRequestHandlerTest {
                 .param(int.class, index)
                 .param(String.class, value)
                 .param(Class.class, type)
-                .param(Class.class, genericType)
+                .param(Class.class, null)
                 .invoke();
         
         // then
@@ -437,7 +424,6 @@ public class AbstractRequestHandlerTest {
         int index = 0;
         String value = "abc";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -449,7 +435,7 @@ public class AbstractRequestHandlerTest {
             .param(int.class, index)
             .param(String.class, value)
             .param(Class.class, type)
-            .param(Class.class, genericType)
+            .param(Class.class, null)
             .invoke();
         });
         
@@ -463,7 +449,6 @@ public class AbstractRequestHandlerTest {
         String name = "name";
         String value = "1";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -474,7 +459,7 @@ public class AbstractRequestHandlerTest {
                 .param(String.class, name)
                 .param(String.class, value)
                 .param(Class.class, type)
-                .param(Class.class, genericType)
+                .param(Class.class, null)
                 .invoke();
         
         // then
@@ -487,7 +472,6 @@ public class AbstractRequestHandlerTest {
         String name = "name";
         String value = "abc";
         Class<?> type = int.class;
-        Class<?> genericType = null;
         
         ExRequestHandler sut = new ExRequestHandler();
         
@@ -499,7 +483,7 @@ public class AbstractRequestHandlerTest {
             .param(String.class, name)
             .param(String.class, value)
             .param(Class.class, type)
-            .param(Class.class, genericType)
+            .param(Class.class, null)
             .invoke();
         });
         
@@ -614,7 +598,7 @@ public class AbstractRequestHandlerTest {
 		}
 
 		@Override
-		protected Object handleException(RequestArguments arguments, Exception e) throws Exception {
+		protected Object handleException(RequestArguments arguments, Exception e) {
 			return null;
 		}
 	}

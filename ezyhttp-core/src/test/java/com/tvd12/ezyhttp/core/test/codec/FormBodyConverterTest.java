@@ -83,7 +83,7 @@ public class FormBodyConverterTest {
 	}
 	
 	@Test
-	public void deserializeFromBodyData() throws Exception {
+	public void deserializeFromBodyData() {
 		// given
 		FormBodyConverter sut = new FormBodyConverter(new ObjectMapper());
 		

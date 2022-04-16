@@ -354,7 +354,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 		dataConverters.setStringConverters(stringConverters);
 		componentManager.setViewContext(buildViewContext(beanContext));
 		componentManager.setServerPort(getServerPort(beanContext));
-		componentManager.setExposeMangementURIs(isExposeManagementURIs(beanContext));
+		componentManager.setExposeManagementURIs(isExposeManagementURIs(beanContext));
 		componentManager.setManagmentPort(getManagementPort(beanContext));
 		componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
 		componentManager.addRequestResponseWatchers(requestResponseWathcers);
@@ -433,8 +433,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
-		ResourceResolver resourceResolver = 
-				(ResourceResolver)beanContext.getSingleton(ResourceResolver.class);
+		ResourceResolver resourceResolver =
+			beanContext.getSingleton(ResourceResolver.class);
 		if(resourceResolver == null) {
 			resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
 			if(resourceResolver != null)

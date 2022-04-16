@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test;
+package com.tvd12.ezyhttp.server.jetty.test;
 
 import java.util.ArrayList;
 import java.util.List;

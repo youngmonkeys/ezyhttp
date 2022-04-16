@@ -8,12 +8,10 @@ public final class TryCatchAnnotations {
 	private TryCatchAnnotations() {}
 	
 	public static Class<?>[] getExceptionClasses(TryCatch tryCatch) {
-		Class<?>[] classes = tryCatch.value();
-		return classes;
+        return tryCatch.value();
 	}
 	
 	public static String getResponseType(TryCatch annotation) {
-		String responseType = ContentTypes.APPLICATION_JSON;
-		return responseType;
+        return ContentTypes.APPLICATION_JSON;
 	}
 }

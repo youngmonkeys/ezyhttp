@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.annotation;
+package com.tvd12.ezyhttp.server.jetty.test.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

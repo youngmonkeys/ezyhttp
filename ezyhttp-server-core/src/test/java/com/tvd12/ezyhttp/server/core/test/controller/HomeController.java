@@ -56,8 +56,7 @@ public class HomeController {
 	}
 	
 	@DoPut
-	public void doNothing() {
-	}
+	public void doNothing() {}
 	
 	@DoGet("bye")
 	public String bye(@RequestParam List<String> messages) {
@@ -100,7 +99,5 @@ public class HomeController {
 	}
 	
 	@TryCatch(java.lang.UnsupportedOperationException.class)
-	public void handleException3(Exception e) {
-	}
-	
+	public void handleException3(Exception e) {}
 }

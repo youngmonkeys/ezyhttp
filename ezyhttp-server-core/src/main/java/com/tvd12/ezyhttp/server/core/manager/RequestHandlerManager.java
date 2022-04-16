@@ -54,9 +54,9 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
 	    String matchedURI = null;
         if(handledURIs.contains(requestURI))
             matchedURI = requestURI;
-        if(matchedURI == null) {
+        if(matchedURI == null && requestURI != null) {
             URITree uriTree = uriTreeByMethod.get(method);
-            matchedURI = uriTree.getMatchedURI(requestURI);
+			matchedURI = uriTree.getMatchedURI(requestURI);
         }
         return matchedURI;
 	}
