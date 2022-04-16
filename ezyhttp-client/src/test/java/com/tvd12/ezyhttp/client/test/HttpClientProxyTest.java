@@ -351,7 +351,7 @@ public class HttpClientProxyTest extends BaseTest {
 		sut.close();
 		sut.stop();
 	}
-	
+
 	@Test
 	public void deleteJsonTest() throws Exception {
 		// given
@@ -367,11 +367,12 @@ public class HttpClientProxyTest extends BaseTest {
 				.setURL(URI.create("http://127.0.0.1:18081/greet"));
 		
 		// when
-		TestResponse actual = sut.call(request, 15000);
+		Throwable e = Asserts.assertThrows(() ->
+			sut.call(request, 15000)
+		);
 		
 		// then
-		TestResponse expectation = new TestResponse("Greet Monkey!");
-		Asserts.assertEquals(expectation, actual);
+		Asserts.assertEqualsType(e, IllegalArgumentException.class);
 		sut.close();
 		sut.stop();
 	}

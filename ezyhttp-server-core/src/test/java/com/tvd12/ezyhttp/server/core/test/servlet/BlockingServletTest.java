@@ -372,7 +372,7 @@ public class BlockingServletTest {
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
         componentManager.setManagmentPort(MANAGEMENT_POR);
-        componentManager.setExposeMangementURIs(true);
+        componentManager.setExposeManagementURIs(true);
         componentManager.getRequestHandlerManager().addHandler(
             new RequestURI(HttpMethod.GET, "/management", true),
             mock(RequestHandler.class)

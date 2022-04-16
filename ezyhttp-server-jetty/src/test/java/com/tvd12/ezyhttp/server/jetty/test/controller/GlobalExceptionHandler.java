@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.controller;
+package com.tvd12.ezyhttp.server.jetty.test.controller;
 
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;

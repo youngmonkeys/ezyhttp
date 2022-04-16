@@ -1,7 +1,7 @@
-package com.tvd12.ezyhttp.server.core.test.reflect;
+package com.tvd12.ezyhttp.server.jetty.test.reflect;
 
 import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
-import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
+import com.tvd12.ezyhttp.server.jetty.test.controller.HomeController;
 
 import org.testng.annotations.Test;
 

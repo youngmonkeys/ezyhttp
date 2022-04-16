@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.controller;
+package com.tvd12.ezyhttp.server.jetty.test.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,8 +12,8 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
-import com.tvd12.ezyhttp.server.core.test.annotation.NickName;
-import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
+import com.tvd12.ezyhttp.server.jetty.test.annotation.NickName;
+import com.tvd12.ezyhttp.server.jetty.test.request.HelloRequest;
 
 @Controller("/")
 public class HomeController {

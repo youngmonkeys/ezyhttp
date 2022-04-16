@@ -6,8 +6,6 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public interface RequestInterceptor {
 	
-	RequestInterceptor EMPTY = new RequestInterceptor() {};
-	
 	default boolean preHandle(
 		RequestArguments arguments,
 		Method handler

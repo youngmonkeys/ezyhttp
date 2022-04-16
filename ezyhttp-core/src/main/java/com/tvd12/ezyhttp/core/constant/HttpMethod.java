@@ -23,12 +23,16 @@ public enum HttpMethod implements EzyConstant {
 		this.id = id;
 		this.name = name;
 	}
-	
+
+	/**
+	 * Check whether the method has a request body or not
+	 *
+	 * @return true if the method has a request body
+	 */
 	public boolean hasOutput() {
 		return this == HttpMethod.POST ||
 			this == HttpMethod.PUT ||
-			this == HttpMethod.PATCH ||
-			this == HttpMethod.DELETE;
+			this == HttpMethod.PATCH;
 	}
 	
 }

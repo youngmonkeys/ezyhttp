@@ -76,7 +76,7 @@ public class BlockingServlet extends HttpServlet {
 		this.componentManager = ComponentManager.getInstance();
 		this.debug = componentManager.isDebug();
 		this.managementPort = componentManager.getManagmentPort();
-		this.exposeManagementURIs = componentManager.isExposeMangementURIs();
+		this.exposeManagementURIs = componentManager.isExposeManagementURIs();
 		this.viewContext = componentManager.getViewContext();
 		this.objectMapper = componentManager.getObjectMapper();
 		this.dataConverters = componentManager.getDataConverters();

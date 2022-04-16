@@ -1,11 +1,11 @@
-package com.tvd12.ezyhttp.server.core.test.reflect;
+package com.tvd12.ezyhttp.server.jetty.test.reflect;
 
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlerImplementer;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerMethod;
 import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerProxy;
-import com.tvd12.ezyhttp.server.core.test.controller.GlobalExceptionHandler;
+import com.tvd12.ezyhttp.server.jetty.test.controller.GlobalExceptionHandler;
 import com.tvd12.test.base.BaseTest;
 
 public class ExceptionHandlerImplementerTest extends BaseTest {

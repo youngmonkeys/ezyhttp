@@ -286,7 +286,9 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	    }
 		String[] array = stringToStringArray(value);
 		Set<T> answer = new HashSet<>();
-		for (String s : array) answer.add(deserialize(s, itemType));
+		for (String s : array) {
+			answer.add(deserialize(s, itemType));
+		}
 		return answer;
 	}
 	

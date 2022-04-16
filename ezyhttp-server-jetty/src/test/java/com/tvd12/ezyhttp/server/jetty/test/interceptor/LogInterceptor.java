@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.core.test.interceptor;
+package com.tvd12.ezyhttp.server.jetty.test.interceptor;
 
 import java.lang.reflect.Method;
 

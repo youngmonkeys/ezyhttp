@@ -128,11 +128,15 @@ public class HttpClient extends EzyLoggable {
 			
 			connection.connect();
 			
-			if(requestBody != null) {
-				OutputStream outputStream = connection.getOutputStream();
-				outputStream.write(requestBodyBytes);
-				outputStream.flush();
-				outputStream.close();
+			if(requestBodyBytes != null) {
+				if (method.hasOutput()) {
+					OutputStream outputStream = connection.getOutputStream();
+					outputStream.write(requestBodyBytes);
+					outputStream.flush();
+					outputStream.close();
+				} else {
+					throw new IllegalArgumentException(method + " method can not have a payload body");
+				}
 			}
 			
 			int responseCode = connection.getResponseCode();
@@ -532,9 +536,9 @@ public class HttpClient extends EzyLoggable {
 		protected int connectTimeout;
 		protected ObjectMapper objectMapper;
 		protected Object stringConverter;
+		protected DataConverters dataConverters;
 		protected final List<Object> bodyConverterList;
 		protected final Map<String, Object> bodyConverterMap;
-		protected DataConverters dataConverters;
 		
 		public Builder() {
 			this.readTimeout = 15 * 1000;
