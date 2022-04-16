@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.handler;
 
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
+import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
@@ -77,6 +78,7 @@ public class ResourceRequestHandlerTest {
             resourcePath,
             resourceURI,
             resourceExtension,
+            new EzyAnywayInputStreamLoader(),
             downloadManager
         );
         

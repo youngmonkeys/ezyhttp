@@ -42,6 +42,23 @@ public class ResourceRequestHandler implements RequestHandler {
 			0
 		);
 	}
+
+	public ResourceRequestHandler(
+		String resourcePath,
+		String resourceURI,
+		String resourceExtension,
+		EzyInputStreamLoader inputStreamLoader,
+		ResourceDownloadManager downloadManager
+	) {
+		this(
+			resourcePath,
+			resourceURI,
+			resourceExtension,
+			inputStreamLoader,
+			downloadManager,
+			0
+		);
+	}
 	
 	public ResourceRequestHandler(
 		String resourcePath,
