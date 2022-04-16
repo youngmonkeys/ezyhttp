@@ -40,7 +40,7 @@ public class ResourceResolver {
 		for(ResourceFile res : resourceFiles) {
 		    String relativePath = res.getRelativePath();
 			String resourceURI = relativePath.substring(trimLocation.length() + 1)
-				.replace("\\", "/");
+				.replace('\\', '/');
 			String extension = EzyFileUtil.getFileExtension(resourceURI);
 			Resource resource = new Resource(
 		        relativePath, 

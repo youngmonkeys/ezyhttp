@@ -16,4 +16,14 @@ public class ResourceFile {
     public boolean isFileNameMatches(String pattern) {
         return EzyFileUtil.getFileName(relativePath).matches(pattern);
     }
+
+    public static boolean isResourcePathMatch(
+        String resourcePath,
+        String regex
+    ) {
+        if (resourcePath.matches(regex)) {
+            return true;
+        }
+        return resourcePath.replace('\\', '/').matches(regex);
+    }
 }

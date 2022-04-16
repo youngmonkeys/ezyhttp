@@ -19,6 +19,8 @@ import com.tvd12.ezyfox.io.EzyLists;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
+import static com.tvd12.ezyhttp.server.core.resources.ResourceFile.isResourcePathMatch;
+
 public class ResourceLoader extends EzyLoggable {
     
     private static final String PROTOCOL_FILE = "file";
@@ -105,7 +107,7 @@ public class ResourceLoader extends EzyLoggable {
                 String relativePath = rootPath + "/" + resourcePath;
                 boolean addable = regexes.isEmpty();
                 for(String regex : regexes) {
-                    if(relativePath.matches(regex)) {
+                    if(isResourcePathMatch(relativePath, regex)) {
                         addable = true;
                         break;
                     }
@@ -138,7 +140,7 @@ public class ResourceLoader extends EzyLoggable {
             if(name.startsWith(rootPath)) {
                 boolean addable = regexes.isEmpty();
                 for(String regex : regexes) {
-                    if(name.matches(regex)) {
+                    if(isResourcePathMatch(name, regex)) {
                         addable = true;
                         break;
                     }
@@ -210,5 +212,4 @@ public class ResourceLoader extends EzyLoggable {
 	private ClassLoader getContextClassLoader() {
 		return Thread.currentThread().getContextClassLoader();
 	}
-	
 }

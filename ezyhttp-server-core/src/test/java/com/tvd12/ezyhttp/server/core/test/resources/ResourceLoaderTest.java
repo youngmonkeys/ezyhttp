@@ -56,7 +56,10 @@ public class ResourceLoaderTest {
 		ResourceLoader sut = new ResourceLoader();
 		
 		// when
-		List<String> listResources = sut.listResources("static", Sets.newHashSet("^static/css/.+"));
+		List<String> listResources = sut.listResources(
+			"static",
+			Sets.newHashSet("^static/css/.+")
+		);
 		
 		// then
 		Asserts.assertEquals(2, listResources.size());
