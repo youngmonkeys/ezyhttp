@@ -20,7 +20,7 @@ public class LongArrayDeserializer extends StdDeserializer<Long[]> {
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException {
-        if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+        if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return EzyStringConveter.stringToWrapperLongArray(p.getValueAsString());
         }
         return ctxt.readValue(p, Long[].class);

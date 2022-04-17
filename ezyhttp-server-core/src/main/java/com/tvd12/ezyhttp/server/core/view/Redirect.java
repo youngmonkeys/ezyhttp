@@ -44,7 +44,7 @@ public class Redirect {
 	}
 	
 	public String getQueryString() throws IOException {
-		if(parameters.isEmpty())
+		if (parameters.isEmpty())
 			return "";
 		char concatChar = '?';
 		StringBuilder builder = new StringBuilder();
@@ -77,7 +77,7 @@ public class Redirect {
 		}
 		
 		public Builder addHeader(String name, Object value) {
-			if(headers == null)
+			if (headers == null)
 				this.headers = new HashMap<>();
 			this.headers.put(name, value.toString());
 			return this;
@@ -114,14 +114,14 @@ public class Redirect {
 		}
 		
 		public Builder addParameter(String name, Object value) {
-			if(parameters == null)
+			if (parameters == null)
 				parameters = new ArrayList<>();
 			this.parameters.add(new EzyPair<>(name, value));
 			return this;
 		}
 		
 		public Builder addCookie(Cookie cookie) {
-			if(cookies == null)
+			if (cookies == null)
 				this.cookies = new ArrayList<>();
 			this.cookies.add(cookie);
 			return this;
@@ -139,11 +139,11 @@ public class Redirect {
 		
 		@Override
 		public Redirect build() {
-			if(cookies == null)
+			if (cookies == null)
 				cookies = Collections.emptyList();
-			if(headers == null)
+			if (headers == null)
 				headers = Collections.emptyMap();
-			if(parameters == null)
+			if (parameters == null)
 				parameters = Collections.emptyList();
 			return new Redirect(this);
 		}

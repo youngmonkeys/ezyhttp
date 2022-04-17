@@ -67,7 +67,7 @@ public class TestApplicationBootstrap extends EzyLoggable {
 	}
 	 
     public void start() {
-    	if(!started.compareAndSet(false, true))
+    	if (!started.compareAndSet(false, true))
     		return;
     	QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         server = new Server(threadPool);

@@ -8,5 +8,4 @@ public class HttpUnauthorizedException extends HttpRequestException {
 	public HttpUnauthorizedException(Object data) {
 		super(StatusCodes.UNAUTHORIZED, data);
 	}
-	
 }

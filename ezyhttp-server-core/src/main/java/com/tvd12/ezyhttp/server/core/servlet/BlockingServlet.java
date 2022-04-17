@@ -167,7 +167,7 @@ public class BlockingServlet extends HttpServlet {
 	) throws IOException {
 		String requestURI = request.getRequestURI();
 		String matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
-		if(matchedURI == null) {
+		if (matchedURI == null) {
             if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
                 responseString(response, "uri " + requestURI + " not found");
             }
@@ -175,7 +175,7 @@ public class BlockingServlet extends HttpServlet {
         }
 		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
 		boolean isManagementURI = requestURIManager.isManagementURI(method, matchedURI);
-		if(isManagementURI 
+		if (isManagementURI 
 		    && !exposeManagementURIs
 		    && request.getServerPort() != managementPort
         ) {
@@ -185,7 +185,7 @@ public class BlockingServlet extends HttpServlet {
 		}
 		RequestHandler requestHandler =
 		        requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
-		if(requestHandler == RequestHandler.EMPTY) {
+		if (requestHandler == RequestHandler.EMPTY) {
 		    if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
 		        responseString(response, "method " + method + " not allowed");
 		    }
@@ -197,7 +197,7 @@ public class BlockingServlet extends HttpServlet {
 		RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
 		try {
 			acceptableRequest = preHandleRequest(arguments, requestHandler);
-			if(acceptableRequest) {
+			if (acceptableRequest) {
 			    if (requestHandler.isAsync()) {
 			        syncResponse = false;
                     AsyncContext asyncContext = request.startAsync(request, response);
@@ -210,10 +210,10 @@ public class BlockingServlet extends HttpServlet {
 			    else {
     				Object responseData = requestHandler.handle(arguments);
     				String responseContentType = requestHandler.getResponseContentType();
-    				if(responseContentType != null) {
+    				if (responseContentType != null) {
     					response.setContentType(responseContentType);
     				}
-    				if(responseData != null) {
+    				if (responseData != null) {
     				    handleResponseData(request, response, responseData);
     				}
     				else {
@@ -320,12 +320,12 @@ public class BlockingServlet extends HttpServlet {
 		HttpServletRequest request = arguments.getRequest();
 		HttpServletResponse response = arguments.getResponse();
 		Exception exception = e;
-		if(handler != null) {
+		if (handler != null) {
 			try {
 				Object result = handler.handleException(arguments, e);
-				if(result != null) {
+				if (result != null) {
 					String responseContentType = handler.getResponseContentType();
-					if(responseContentType != null) {
+					if (responseContentType != null) {
 						response.setContentType(responseContentType);
 					}
 					handleResponseData(request, response, result);
@@ -339,14 +339,14 @@ public class BlockingServlet extends HttpServlet {
 				exception = ex;
 			}
 		}
-		if(exception != null) {
+		if (exception != null) {
 		    handleError(method, request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception);
 		}
 	}
 
 	protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
 		for(Class<?> exc : handledExceptionClasses) {
-			if(exc.isAssignableFrom(exceptionClass)) {
+			if (exc.isAssignableFrom(exceptionClass)) {
 				return uncaughtExceptionHandlers.get(exc);
 			}
 		}
@@ -360,7 +360,7 @@ public class BlockingServlet extends HttpServlet {
 		Method handler = requestHandler.getHandlerMethod();
 		for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
 			boolean passed = interceptor.preHandle(arguments, handler);
-			if(!passed)
+			if (!passed)
 				return false;
 		}
 		return true;
@@ -381,18 +381,18 @@ public class BlockingServlet extends HttpServlet {
 		Object data
 	) throws Exception {
 		Object body = data;
-		if(data instanceof ResponseEntity) {
+		if (data instanceof ResponseEntity) {
 			ResponseEntity entity = (ResponseEntity)body;
 			body = entity.getBody();
 			response.setStatus(entity.getStatus());
 			MultiValueMap headers = entity.getHeaders();
-			if(headers != null) {
+			if (headers != null) {
 				Map<String, String> encodedHeaders = headers.toMap();
 				for(Entry<String, String> entry : encodedHeaders.entrySet())
 					response.addHeader(entry.getKey(), entry.getValue());
 			}
 		}
-		else if(data instanceof Redirect) {
+		else if (data instanceof Redirect) {
 			Redirect redirect = (Redirect)data;
 			for(Cookie cookie : redirect.getCookies())
 				response.addCookie(cookie);
@@ -410,8 +410,8 @@ public class BlockingServlet extends HttpServlet {
 			response.sendRedirect(redirect.getUri() + redirect.getQueryString());
 			return;
 		}
-		else if(data instanceof View) {
-			if(viewContext == null) {
+		else if (data instanceof View) {
+			if (viewContext == null) {
 				throw new IllegalStateException(
 					"viewContext is null, " +
 					"you must add ezyhttp-server-thymeleaf to your dependencies" +
@@ -430,7 +430,7 @@ public class BlockingServlet extends HttpServlet {
 		else {
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
-		if(body != null)
+		if (body != null)
 			responseBody(response, body);
 	}
 
@@ -510,7 +510,7 @@ public class BlockingServlet extends HttpServlet {
 				HttpRequestException requestException = (HttpRequestException)e;
 				int errorStatus = requestException.getCode();
 				Object errorData = requestException.getData();
-				if(errorData == null)
+				if (errorData == null)
 					errorData = Collections.emptyMap();
 				return ResponseEntity.create(errorStatus, errorData);
 			});

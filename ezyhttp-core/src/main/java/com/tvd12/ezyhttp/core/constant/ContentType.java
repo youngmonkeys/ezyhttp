@@ -102,8 +102,9 @@ public enum ContentType {
 	
 	public static ContentType ofExtension(String extension) {
 		ContentType value = VALUE_BY_EXTENSION.get(extension);
-		if(value == null)
-			value = APPLICATION_OCTET_STREAM;
+		if (value == null) {
+            value = APPLICATION_OCTET_STREAM;
+        }
 		return value;
 	}
 }

@@ -1704,7 +1704,7 @@ public class BlockingServletTest {
 		@Override
 		public Object handleException(RequestArguments arguments, Exception exception) {
 			arguments.getResponse().setStatus(StatusCodes.BAD_REQUEST);
-			if(data == "")
+			if (data == "")
 				throw new IllegalArgumentException("data can not be null");
 			return data;
 		}

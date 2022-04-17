@@ -170,7 +170,7 @@ public class View {
         }
 		
 		public Builder addHeader(String name, Object value) {
-			if(headers == null)
+			if (headers == null)
 				this.headers = new HashMap<>();
 			this.headers.put(name, value.toString());
 			return this;
@@ -183,7 +183,7 @@ public class View {
 		}
 		
 		public Builder addCookie(Cookie cookie) {
-			if(cookies == null)
+			if (cookies == null)
 				this.cookies = new LinkedList<>();
 			this.cookies.add(cookie);
 			return this;
@@ -201,11 +201,11 @@ public class View {
 		
 		@Override
 		public View build() {
-			if(template == null)
+			if (template == null)
 				throw new NullPointerException("template can not be null");
-			if(cookies == null)
+			if (cookies == null)
 				cookies = Collections.emptyList();
-			if(headers == null)
+			if (headers == null)
 				headers = Collections.emptyMap();
 			return new View(this);
 		}

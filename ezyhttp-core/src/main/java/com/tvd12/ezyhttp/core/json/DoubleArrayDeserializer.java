@@ -20,7 +20,7 @@ public class DoubleArrayDeserializer extends StdDeserializer<Double[]> {
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException {
-        if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+        if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return EzyStringConveter.stringToWrapperDoubleArray(p.getValueAsString());
         }
         return ctxt.readValue(p, Double[].class);

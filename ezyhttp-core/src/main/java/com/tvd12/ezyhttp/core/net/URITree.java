@@ -46,7 +46,7 @@ public class URITree {
 	
 	@Override
 	public String toString() {
-		if(children == null)
+		if (children == null)
 			return uri;
 		return children.toString();
 		

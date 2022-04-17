@@ -34,17 +34,7 @@ import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
-import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpConflictException;
-import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
-import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
-import com.tvd12.ezyhttp.core.exception.HttpMethodNotAllowedException;
-import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
-import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.core.exception.HttpRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
-import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
-import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
+import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
@@ -66,35 +56,37 @@ public class HttpClient extends EzyLoggable {
 	
 	public <T> T call(Request request) throws Exception {
 		ResponseEntity response = request(
-				request.getMethod(),
-				request.getURL(),
-				request.getEntity(),
-				request.getResponseTypes(),
-				request.getConnectTimeout(),
-				request.getReadTimeout()
+			request.getMethod(),
+			request.getURL(),
+			request.getEntity(),
+			request.getResponseTypes(),
+			request.getConnectTimeout(),
+			request.getReadTimeout()
 		);
 		return getResponseBody(response);
 	}
 	
 	public ResponseEntity request(Request request) throws Exception {
 		return request(
-				request.getMethod(),
-				request.getURL(),
-				request.getEntity(),
-				request.getResponseTypes(),
-				request.getConnectTimeout(),
-				request.getReadTimeout()
+			request.getMethod(),
+			request.getURL(),
+			request.getEntity(),
+			request.getResponseTypes(),
+			request.getConnectTimeout(),
+			request.getReadTimeout()
 		);
 	}
 	
 	public ResponseEntity request(
-			HttpMethod method, 
-			String url, 
-			RequestEntity entity, 
-			Map<Integer, Class<?>> responseTypes, 
-			int connectTimeout, int readTimeout) throws Exception {
-		if(url == null)
+		HttpMethod method,
+		String url,
+		RequestEntity entity,
+		Map<Integer, Class<?>> responseTypes,
+		int connectTimeout, int readTimeout
+	) throws Exception {
+		if (url == null) {
 			throw new IllegalArgumentException("url can not be null");
+		}
 		logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
 		HttpURLConnection connection = connect(url);
 		try {
@@ -105,19 +97,19 @@ public class HttpClient extends EzyLoggable {
 			connection.setDoOutput(method.hasOutput());
 			connection.setInstanceFollowRedirects(method == HttpMethod.GET);
 			MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
-			if(requestHeaders != null) {
+			if (requestHeaders != null) {
 				Map<String, String> encodedHeaders = requestHeaders.toMap();
 				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
 					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
 			}
 			Object requestBody = null;
-			if(method != HttpMethod.GET && entity != null) {
+			if (method != HttpMethod.GET && entity != null) {
 				requestBody = entity.getBody();
 			}
 			byte[] requestBodyBytes = null;
-			if(requestBody != null) {
+			if (requestBody != null) {
 				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
-				if(requestContentType == null) {
+				if (requestContentType == null) {
 					requestContentType = ContentTypes.APPLICATION_JSON;
 					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 				}
@@ -128,7 +120,7 @@ public class HttpClient extends EzyLoggable {
 			
 			connection.connect();
 			
-			if(requestBodyBytes != null) {
+			if (requestBodyBytes != null) {
 				if (method.hasOutput()) {
 					OutputStream outputStream = connection.getOutputStream();
 					outputStream.write(requestBodyBytes);
@@ -143,13 +135,13 @@ public class HttpClient extends EzyLoggable {
 			Map<String, List<String>> headerFields = connection.getHeaderFields();
 			MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
 			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
-			if(responseContentType == null)
+			if (responseContentType == null)
 				responseContentType = ContentTypes.APPLICATION_JSON;
 			InputStream inputStream = responseCode >= 400 
 					? connection.getErrorStream()
 					: connection.getInputStream();
 			Object responseBody = null;
-			if(inputStream != null) {
+			if (inputStream != null) {
 				try {
 					int responseContentLength = connection.getContentLength();
 					Class<?> responseType = responseTypes.get(responseCode);
@@ -174,26 +166,29 @@ public class HttpClient extends EzyLoggable {
 	}
 	
 	protected byte[] serializeRequestBody(
-			String contentType, Object requestBody) throws IOException {
+		String contentType,
+		Object requestBody
+	) throws IOException {
 		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
 		return serializer.serialize(requestBody);
 	}
 	
 	protected Object deserializeResponseBody(
-			String contentType,
-			int contentLength,
-			InputStream inputStream, Class<?> responseType) throws IOException {
+		String contentType,
+		int contentLength,
+		InputStream inputStream, Class<?> responseType
+	) throws IOException {
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		Object body;
-		if(responseType != null) {
-			if(responseType == String.class)
+		if (responseType != null) {
+			if (responseType == String.class)
 				body = deserializer.deserializeToString(inputStream, contentLength);
 			else
 				body = deserializer.deserialize(inputStream, responseType);
 		}
 		else {
 			body = deserializer.deserializeToString(inputStream, contentLength);
-			if(body != null) {
+			if (body != null) {
 				try {
 					body = deserializer.deserialize((String)body, Map.class);
 				}
@@ -209,32 +204,48 @@ public class HttpClient extends EzyLoggable {
 	public <T> T getResponseBody(ResponseEntity entity) throws Exception {
 		int statusCode = entity.getStatus();
 		Object body = entity.getBody();
-		if(statusCode < 400)
+		if (statusCode < 400)
 			return (T)body;
 		throw translateErrorCode(statusCode, body);
 	}
 	
 	private Exception translateErrorCode(int statusCode, Object body) {
-	    if(statusCode == StatusCodes.BAD_REQUEST)
-            return new HttpBadRequestException(body);
-        if(statusCode == StatusCodes.NOT_FOUND)
-            return new HttpNotFoundException(body);
-        if(statusCode == StatusCodes.UNAUTHORIZED)
-            return new HttpUnauthorizedException(body);
-        if(statusCode == StatusCodes.FORBIDDEN)
-            return new HttpForbiddenException(body);
-        if(statusCode == StatusCodes.METHOD_NOT_ALLOWED)
-            return new HttpMethodNotAllowedException(body);
-        if(statusCode == StatusCodes.NOT_ACCEPTABLE)
-            return new HttpNotAcceptableException(body);
-        if(statusCode == StatusCodes.REQUEST_TIMEOUT)
-            return new HttpRequestTimeoutException(body);
-        if(statusCode == StatusCodes.CONFLICT)
-            return new HttpConflictException(body);
-        if(statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
-            return new HttpUnsupportedMediaTypeException(body);
-        if(statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
-            return new HttpInternalServerErrorException(body);
+	    if (statusCode == StatusCodes.BAD_REQUEST) {
+			return new HttpBadRequestException(body);
+		}
+        if (statusCode == StatusCodes.NOT_FOUND) {
+			return new HttpNotFoundException(body);
+		}
+        if (statusCode == StatusCodes.UNAUTHORIZED) {
+			return new HttpUnauthorizedException(body);
+		}
+		if (statusCode == StatusCodes.PAYMENT_REQUIRED) {
+			return new HttpPaymentRequiredException(body);
+		}
+        if (statusCode == StatusCodes.FORBIDDEN) {
+			return new HttpForbiddenException(body);
+		}
+        if (statusCode == StatusCodes.METHOD_NOT_ALLOWED) {
+			return new HttpMethodNotAllowedException(body);
+		}
+        if (statusCode == StatusCodes.NOT_ACCEPTABLE) {
+			return new HttpNotAcceptableException(body);
+		}
+        if (statusCode == StatusCodes.REQUEST_TIMEOUT) {
+			return new HttpRequestTimeoutException(body);
+		}
+        if (statusCode == StatusCodes.CONFLICT) {
+			return new HttpConflictException(body);
+		}
+        if (statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE) {
+			return new HttpUnsupportedMediaTypeException(body);
+		}
+		if (statusCode == StatusCodes.TOO_MANY_REQUESTS) {
+			return new HttpTooManyRequestsException(body);
+		}
+        if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
+			return new HttpInternalServerErrorException(body);
+		}
         return new HttpRequestException(statusCode, body);
 	}
 
@@ -462,7 +473,7 @@ public class HttpClient extends EzyLoggable {
         connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
         connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
         MultiValueMap requestHeaders = request.getHeaders();
-        if(requestHeaders != null) {
+        if (requestHeaders != null) {
             Map<String, String> encodedHeaders = requestHeaders.toMap();
             for(Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
                 connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
@@ -477,7 +488,7 @@ public class HttpClient extends EzyLoggable {
     ) throws Exception {
         InputStream inputStream = connection.getErrorStream();
         Object responseBody = "";
-        if(inputStream != null) {
+        if (inputStream != null) {
             try {
                 int contentLength = connection.getContentLength();
                 responseBody = deserializeResponseBody(null, contentLength, inputStream, null);
@@ -558,7 +569,7 @@ public class HttpClient extends EzyLoggable {
 		}
 		
 		public Builder objectMapper(Object objectMapper) {
-			if(objectMapper instanceof ObjectMapper)
+			if (objectMapper instanceof ObjectMapper)
 				this.objectMapper = (ObjectMapper)objectMapper;
 			return this;
 		}
@@ -590,10 +601,10 @@ public class HttpClient extends EzyLoggable {
 		
 		@Override
 		public HttpClient build() {
-			if(objectMapper == null)
+			if (objectMapper == null)
 				this.objectMapper = new ObjectMapperBuilder().build();
 			this.dataConverters = new DataConverters(objectMapper);
-			if(stringConverter != null)
+			if (stringConverter != null)
 				this.dataConverters.setStringConverter(stringConverter);
 			this.dataConverters.addBodyConverters(bodyConverterList);
 			this.dataConverters.addBodyConverters(bodyConverterMap);

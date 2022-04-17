@@ -83,7 +83,7 @@ public final class ContentTypes {
 	private ContentTypes() {}
 
 	public static String getContentType(String contentTypeCharset) {
-		if(contentTypeCharset == null)
+		if (contentTypeCharset == null)
 			return null;
 		int index = contentTypeCharset.indexOf(';');
 		return index > 0 ? contentTypeCharset.substring(0, index) : contentTypeCharset;

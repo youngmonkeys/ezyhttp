@@ -79,7 +79,7 @@ public class ResponseEntity {
 	}
 	
 	public String getHeader(String name) {
-		if(headers == null)
+		if (headers == null)
 			return null;
 		return headers.getValue(name);
 	}
@@ -131,7 +131,7 @@ public class ResponseEntity {
 		}
 		
 		public Builder header(String name, String value) {
-			if(this.headers == null) {
+			if (this.headers == null) {
 				this.headers = new HashMap<>();
 			}
 			headers

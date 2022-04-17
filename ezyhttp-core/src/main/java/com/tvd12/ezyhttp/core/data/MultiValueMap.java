@@ -29,7 +29,7 @@ public class MultiValueMap {
 	
 	public String getValue(String key) {
 		List<String> values = map.get(key);
-		if(values == null || values.isEmpty())
+		if (values == null || values.isEmpty())
 			return null;
         return values.get(0);
 	}
@@ -41,7 +41,7 @@ public class MultiValueMap {
 	
 	public List<String> getValues(String key) {
 		List<String> values = map.get(key);
-		if(values == null)
+		if (values == null)
 			return Collections.emptyList();
 		return values;
 	}
@@ -50,7 +50,7 @@ public class MultiValueMap {
 		List<String> values = getValues(name);
 		Map<String, String> map = new HashMap<>();
 		for(String item : values) {
-			if(EzyStrings.isNoContent(item))
+			if (EzyStrings.isNoContent(item))
 				continue;
 			String[] kvs = item.split(";");
 			for(String kv : kvs) {
@@ -77,7 +77,7 @@ public class MultiValueMap {
 			List<String> values = entry.getValue();
 			StringBuilder valueString = new StringBuilder();
 			for(int i = 0 ; i < values.size() ; ++i) {
-				if(i > 0) 
+				if (i > 0) 
 					valueString.append(";");
 				valueString.append(values.get(i));
 			}
@@ -91,7 +91,7 @@ public class MultiValueMap {
 		for(Entry<String, Object> e : map.entrySet()) {
 			String key = e.getKey();
 			Object value = e.getValue();
-			if(value == null) {
+			if (value == null) {
 				answer.add(key);
 			}
 			else {
@@ -115,7 +115,7 @@ public class MultiValueMap {
 		
 		public Builder setValue(String key, String value) {
 			List<String> v = map.get(key);
-			if(v == null) {
+			if (v == null) {
 				v = new ArrayList<>();
 				map.put(key, v);
 			}

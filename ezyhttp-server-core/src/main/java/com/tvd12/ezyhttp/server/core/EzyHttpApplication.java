@@ -59,12 +59,12 @@ public class EzyHttpApplication
 	@Override
 	public void start() throws Exception {
 		ApplicationEntry entry = applicationContext.getAnnotatedSingleton(ApplicationBootstrap.class);
-		if(entry == null)
+		if (entry == null)
 			throw new IllegalStateException("Failed to start application, the ApplicationEntry not found, let's use EzyHttpApplicationBootstrap.start(...)");
 		entry.init();
 		entry.start();
 		boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class, true);
-		if(printBanner)
+		if (printBanner)
 			logger.info("\n{}\n", new BannerPrinter().getBannerText());
 	}
 	

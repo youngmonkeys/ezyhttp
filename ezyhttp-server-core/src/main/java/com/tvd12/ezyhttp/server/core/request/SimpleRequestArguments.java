@@ -64,23 +64,23 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public void setArgument(Object key, Object value) {
-		if(arguments == null)
+		if (arguments == null)
 			arguments = new HashMap<>();
 		arguments.put(key, value);
 	}
 	
 	@Override
 	public String getParameter(int index) {
-		if(parameterList == null)
+		if (parameterList == null)
 			return null;
-		if(parameterList.size() <= index)
+		if (parameterList.size() <= index)
 			return null;
 		return parameterList.get(index);
 	}
 	
 	@Override
 	public String getParameter(String name) {
-		if(parameterMap == null)
+		if (parameterMap == null)
 			return null;
 		return parameterMap.get(name);
 	}
@@ -109,24 +109,24 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public String getHeader(int index) {
-		if(headerList == null)
+		if (headerList == null)
 			return null;
-		if(headerList.size() <= index)
+		if (headerList.size() <= index)
 			return null;
 		return headerList.get(index);
 	}
 	
 	@Override
 	public String getHeader(String name) {
-		if(headerMap == null)
+		if (headerMap == null)
 			return null;
 		return headerMap.get(name);
 	}
 	
 	public void setHeader(String name, String value) {
-		if(headerList == null)
+		if (headerList == null)
 			headerList = new ArrayList<>();
-		if(headerMap == null)
+		if (headerMap == null)
 			headerMap = new HashMap<>();
 		headerList.add(value);
 		headerMap.put(name, value);
@@ -135,7 +135,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	@Override
 	public String getPathVariable(int index) {
 		fetchPathVariables();
-		if(pathVariableList.size() <= index)
+		if (pathVariableList.size() <= index)
 			return null;
 		return pathVariableList.get(index).getValue();
 	}
@@ -147,7 +147,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	}
 	
 	protected void fetchPathVariables() {
-		if(pathVariableList == null) {
+		if (pathVariableList == null) {
 			pathVariableList = PathVariables.getVariables(
 		        uriTemplate, 
 		        request.getRequestURI()
@@ -189,7 +189,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	}
 	
 	public void setCookies(Cookie[] cookies) {
-		if(cookies == null || cookies.length == 0)
+		if (cookies == null || cookies.length == 0)
 			return;
 		this.cookies = cookies;
 		this.cookieMap = new HashMap<>();
@@ -203,7 +203,7 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public String getCookieValue(int index) {
-		if(cookies == null || cookies.length <= index) {
+		if (cookies == null || cookies.length <= index) {
 			return null;
 		}
 		String cookieName = cookies[index].getName();
@@ -264,15 +264,15 @@ public class SimpleRequestArguments implements RequestArguments {
 	
 	@Override
 	public void release() {
-		if(arguments != null)
+		if (arguments != null)
 			arguments.clear();
-		if(headerList != null)
+		if (headerList != null)
 			headerList.clear();
-		if(headerMap != null)
+		if (headerMap != null)
 			headerMap.clear();
-		if(parameterList != null)
+		if (parameterList != null)
 			parameterList.clear();
-		if(parameterMap != null)
+		if (parameterMap != null)
 			parameterMap.clear();
 		if (cookieMap != null)
 		    cookieMap.clear();

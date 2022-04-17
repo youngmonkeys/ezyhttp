@@ -9,7 +9,7 @@ public interface GraphQLDataFetcher<A,D> {
 	D getData(A argument);
 
 	default String getQueryName() {
-		if(getClass().isAnnotationPresent(GraphQLQuery.class)) {
+		if (getClass().isAnnotationPresent(GraphQLQuery.class)) {
 			return getClass().getAnnotation(GraphQLQuery.class).name();
 		}
 		throw new EzyNotImplementedException("you must implement " + 

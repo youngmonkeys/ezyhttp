@@ -7,5 +7,4 @@ public class DeserializeHeaderException extends DeserializeValueException {
 			String name, Object value, Class<?> outType, Exception e) {
 		super(name, value, outType, e);
 	}
-
 }

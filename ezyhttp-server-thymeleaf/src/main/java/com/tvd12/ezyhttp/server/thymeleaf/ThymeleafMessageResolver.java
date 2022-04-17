@@ -75,15 +75,15 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 	private Map<Locale, Properties> mapMessagesToLocal() {
 		Map<Locale, Properties> messagesByLocale = new HashMap<>();
 		for(String lang : messagesByLanguage.keySet()) {
-			if(lang.length() > 0) {
+			if (lang.length() > 0) {
 				Locale locale;
-				if(lang.contains("_")) {
+				if (lang.contains("_")) {
 					int index = lang.indexOf('_');
 					String language = lang.substring(0, index);
 					String country = lang.substring(index + 1);
 					locale = new Locale(language, country);
 				}
-				else if(lang.contains("-")) {
+				else if (lang.contains("-")) {
 					int index = lang.indexOf('-');
 					String language = lang.substring(0, index);
 					String country = lang.substring(index + 1);
@@ -107,15 +107,15 @@ public class ThymeleafMessageResolver implements IMessageResolver {
 		Locale locale = context.getLocale();
 		String message;
 		Properties messages = messagesByLocale.get(locale);
-		if(messages == null) {
+		if (messages == null) {
 			messages = messagesByLanguage.get(locale.getLanguage());
 		}
-		if(messages == null) {
+		if (messages == null) {
 			message = defaultMessages.getProperty(key);
 		}
 		else {
 			message = messages.getProperty(key);
-			if(message == null) {
+			if (message == null) {
 				message = defaultMessages.getProperty(key);
 			}
 		}

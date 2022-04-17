@@ -23,7 +23,7 @@ public class ResourceDownloadManagerConfiguration
 	
 	@Override
 	public void config() {
-		if(resourcesEnable) {
+		if (resourcesEnable) {
 			context.getSingletonFactory().addSingleton(createDownloadManager(context));
 		}
 	}

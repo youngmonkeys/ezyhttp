@@ -35,7 +35,7 @@ public class CustomerController {
 	@DoGet("/{zone}/{name}")
 	public Customer getCustomer(@PathVariable("name") String name) {
 		Customer customer = customerService.getCustomer(name);
-		if(customer == null)
+		if (customer == null)
 			throw new HttpNotFoundException("customer: " + name + " not found");
 		return customer;
 	}
@@ -72,16 +72,16 @@ public class CustomerController {
 	
 	protected void validateCustomer(Customer customer) {
 		Map<String, String> errors = new HashMap<>();
-		if(customer == null) {
+		if (customer == null) {
 			errors.put("customer", "required");
 		}
 		else {
-			if(customer.getName() == null)
+			if (customer.getName() == null)
 				errors.put("name", "required");
-			if(customer.getAge() < 1)
+			if (customer.getAge() < 1)
 				errors.put("age", "invalid");
 		}
-		if(errors.size() > 0)
+		if (errors.size() > 0)
 			throw new HttpBadRequestException(errors);
 	}
 	

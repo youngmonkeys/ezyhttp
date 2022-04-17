@@ -99,7 +99,7 @@ public class ControllerProxy {
 	protected boolean isRequestHandlerMethod(EzyMethod method) {
 		for(Class annClass : REQUEST_HANDLER_ANNOTATIONS) {
 			Annotation annotation = method.getAnnotation(annClass);
-			if(annotation != null)
+			if (annotation != null)
 				return true;
 		}
 		return false;

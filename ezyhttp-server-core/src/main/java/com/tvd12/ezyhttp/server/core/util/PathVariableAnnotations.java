@@ -9,7 +9,7 @@ public final class PathVariableAnnotations {
 	
 	public static String getVariableNameKeyString(PathVariable annotation, int index) {
 		String keyString = annotation.value();
-		if(EzyStrings.isNoContent(keyString))
+		if (EzyStrings.isNoContent(keyString))
 			keyString = String.valueOf(index);
 		else
 			keyString = EzyStrings.quote(keyString);

@@ -8,5 +8,4 @@ public class HttpForbiddenException extends HttpRequestException {
 	public HttpForbiddenException(Object data) {
 		super(StatusCodes.FORBIDDEN, data);
 	}
-	
 }

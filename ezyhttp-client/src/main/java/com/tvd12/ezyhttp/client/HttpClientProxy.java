@@ -63,14 +63,14 @@ public class HttpClientProxy
 	}
 	
 	private void doStart(boolean autoStart) {
-		if(autoStart) {
+		if (autoStart) {
 			processWithException(this::start);
 		}
 	}
 	
 	@Override
 	public void start() {
-		if(!started.compareAndSet(false, true))
+		if (!started.compareAndSet(false, true))
 			return;
 		this.active = true;
 		this.executorService = EzyExecutors.newFixedThreadPool(
@@ -121,14 +121,14 @@ public class HttpClientProxy
 			exception = e;
 		}
 		try {
-			if(future != null) {
-				if(exception != null)
+			if (future != null) {
+				if (exception != null)
 					future.setException(exception);
 				else
 					future.setResult(response);
 			}
 			else {
-				if(exception != null)
+				if (exception != null)
 					logger.info("handled request: {} with exception, but there is no future", request, exception);
 				else
 					logger.info("handled request: {} with response: {}, but there is no future", request, response);
@@ -183,9 +183,9 @@ public class HttpClientProxy
 	}
 	
 	protected void addRequest(Request request) {
-		if(!active)
+		if (!active)
 			throw new ClientNotActiveException();
-		if(!requestQueue.add(request))
+		if (!requestQueue.add(request))
 			throw new RequestQueueFullException(requestQueue.getCapacity());
 	}
 	

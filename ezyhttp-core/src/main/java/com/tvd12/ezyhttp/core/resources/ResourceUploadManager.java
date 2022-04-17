@@ -78,14 +78,14 @@ public class ResourceUploadManager
             Exception exception = null;
 			try {
 				entry = queue.take();
-				if(entry == POISON) {
+				if (entry == POISON) {
 					break;
 				}
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				int read = inputStream.read(buffer);
 				if (entry.increaseUploadedSize(read)) {
-                    if(read > 0) {
+                    if (read > 0) {
                         outputStream.write(buffer, 0, read);
                         done = false;
                     }
@@ -108,12 +108,12 @@ public class ResourceUploadManager
 			    exception = new MaxUploadSizeException(entry.maxUploadSize);
 			}
             try {
-				if(done) {
+				if (done) {
 					EzyFuture future = futureMap.removeFuture(entry);
 					if (future == null) {
 						continue;
 					}
-					if(exception != null) {
+					if (exception != null) {
 						future.setException(exception);
 					}
 					else {
@@ -175,7 +175,7 @@ public class ResourceUploadManager
 	) {
         futureMap.addFuture(entry, future);
         boolean success = this.queue.offer(entry);
-        if(!success) {
+        if (!success) {
             futureMap.removeFuture(entry);
             throw new MaxResourceUploadCapacity(capacity);
         }

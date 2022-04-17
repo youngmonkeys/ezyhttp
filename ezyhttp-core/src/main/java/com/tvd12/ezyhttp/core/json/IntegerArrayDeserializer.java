@@ -20,7 +20,7 @@ public class IntegerArrayDeserializer extends StdDeserializer<Integer[]> {
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException {
-        if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+        if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return EzyStringConveter.stringToWrapperIntArray(p.getValueAsString());
         }
         return ctxt.readValue(p, Integer[].class);

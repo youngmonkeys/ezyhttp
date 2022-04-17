@@ -28,7 +28,7 @@ public interface BodyDeserializer {
 			InputStream inputStream, int contentLength) throws IOException {
 		byte[] bytes;
 		int readBytes;
-		if(contentLength > 0) {
+		if (contentLength > 0) {
 			bytes = new byte[contentLength];
 			readBytes = inputStream.read(bytes);
 		}

@@ -36,7 +36,7 @@ public class TextBodyConverter implements BodyConverter {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
-		if(bodyType == String.class)
+		if (bodyType == String.class)
 			return (T)data;
 		return objectMapper.readValue(data, bodyType);
 	}

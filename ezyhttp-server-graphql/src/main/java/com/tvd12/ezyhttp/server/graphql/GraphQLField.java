@@ -48,7 +48,7 @@ public class GraphQLField {
 		}
 		
 		public Builder addField(GraphQLField field) {
-			if(fields == null)
+			if (fields == null)
 				fields = new ArrayList<>();
 			this.fields.add(field);
 			return this;
