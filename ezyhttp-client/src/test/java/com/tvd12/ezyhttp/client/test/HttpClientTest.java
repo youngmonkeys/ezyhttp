@@ -165,7 +165,7 @@ public class HttpClientTest {
 	}
 	
 	@Test
-	public void postwithNoBody() {
+	public void postWithNoBody() {
 		// given
 		HttpClient sut = HttpClient.builder()
 				.build();
@@ -216,6 +216,24 @@ public class HttpClientTest {
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(HttpUnauthorizedException.class);
+	}
+
+	@Test
+	public void postMethodPaymentRequired() {
+		// given
+		HttpClient sut = HttpClient.builder()
+			.build();
+
+		PostRequest request = new PostRequest()
+			.setResponseType(TestResponse.class)
+			.setResponseType(StatusCodes.OK, TestResponse.class)
+			.setURL(URI.create("http://127.0.0.1:18081/402"));
+
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.call(request));
+
+		// then
+		Asserts.assertThat(e).isEqualsType(HttpPaymentRequiredException.class);
 	}
 	
 	@Test
@@ -360,6 +378,24 @@ public class HttpClientTest {
 		
 		// then
 		Asserts.assertThat(e).isEqualsType(HttpMethodNotAllowedException.class);
+	}
+
+	@Test
+	public void postMethodTooManyRequests() {
+		// given
+		HttpClient sut = HttpClient.builder()
+			.build();
+
+		PostRequest request = new PostRequest()
+			.setResponseType(TestResponse.class)
+			.setResponseType(StatusCodes.OK, TestResponse.class)
+			.setURL(URI.create("http://127.0.0.1:18081/429"));
+
+		// when
+		Throwable e = Asserts.assertThrows(() -> sut.call(request));
+
+		// then
+		Asserts.assertThat(e).isEqualsType(HttpTooManyRequestsException.class);
 	}
 	
 	@Test
