@@ -16,7 +16,7 @@ public final class PathVariables {
 		List<Entry<String, String>> answer = new ArrayList<>();
 		for(int i = 0 ; i < tPaths.length ; ++i) {
 			String tPath = tPaths[i];
-			if(isPathVariable(tPath)) {
+			if (isPathVariable(tPath)) {
 				String varName = getVariableName(tPath);
 				String varValue = uPaths[i];
 				answer.add(EzyEntry.of(varName, varValue));

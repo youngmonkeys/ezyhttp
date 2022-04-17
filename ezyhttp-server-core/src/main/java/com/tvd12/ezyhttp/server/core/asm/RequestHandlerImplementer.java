@@ -158,7 +158,7 @@ public class RequestHandlerImplementer
 					.equal();
 			boolean hasAnnotation = false;
 			RequestParam requestParamAnno = parameter.getAnnotation(RequestParam.class);
-			if(requestParamAnno != null) {
+			if (requestParamAnno != null) {
 				String paramKey = RequestParamAnnotations
 						.getParamKeyString(requestParamAnno, parameterCount);
 				String defaultValue = requestParamAnno.defaultValue();
@@ -176,7 +176,7 @@ public class RequestHandlerImplementer
 				hasAnnotation = true;
 			}
 			RequestHeader requestHeaderAnno = parameter.getAnnotation(RequestHeader.class);
-			if(requestHeaderAnno != null) {
+			if (requestHeaderAnno != null) {
 				String headerKey = RequestHeaderAnnotations
 						.getHeaderKeyString(requestHeaderAnno, headerCount);
 				String defaultValue = requestHeaderAnno.defaultValue();
@@ -194,7 +194,7 @@ public class RequestHandlerImplementer
 				hasAnnotation = true;
 			}
 			PathVariable pathVariableAnno = parameter.getAnnotation(PathVariable.class);
-			if(pathVariableAnno != null) {
+			if (pathVariableAnno != null) {
 				String varNameKey = PathVariableAnnotations
 						.getVariableNameKeyString(pathVariableAnno, pathVariableCount);
 				String valueExpression = "this.deserializePathVariable(" +
@@ -208,7 +208,7 @@ public class RequestHandlerImplementer
 				hasAnnotation = true;
 			}
 			RequestCookie requestCookieAnno = parameter.getAnnotation(RequestCookie.class);
-			if(requestCookieAnno != null) {
+			if (requestCookieAnno != null) {
 				String cookieKey = RequestCookieAnnotations
 						.getCookieKeyString(requestCookieAnno, cookieCount);
 				String defaultValue = requestCookieAnno.defaultValue();
@@ -226,7 +226,7 @@ public class RequestHandlerImplementer
 				hasAnnotation = true;
 			}
 			RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);
-			if(requestBodyAnno != null) {
+			if (requestBodyAnno != null) {
 				instruction
 					.brackets(parameterType)
 					.append("this.deserializeBody(")
@@ -234,9 +234,9 @@ public class RequestHandlerImplementer
 					.append(")");
 				hasAnnotation = true;
 			}
-			if(!hasAnnotation) {
+			if (!hasAnnotation) {
 				String valueExpression = "arg0";
-				if(parameterType != RequestArguments.class) {
+				if (parameterType != RequestArguments.class) {
 					String argumentKey = RequestParameters.getArgumentKeyString(parameter);
 					valueExpression = "arg0.getArgument(" + argumentKey + ")";
 				}
@@ -248,23 +248,23 @@ public class RequestHandlerImplementer
 		}
 		EzyInstruction instruction = new EzyInstruction("\t", "\n");
 		Class<?> returnType = handlerMethod.getReturnType();
-		if(returnType != void.class)
+		if (returnType != void.class)
 			instruction.answer();
 		StringBuilder answerExpression = new StringBuilder();
 		answerExpression.append("this.controller.").append(handlerMethod.getName())
 				.append("(");
 		for(int i = 0 ; i < paramCount ; ++i) {
 			answerExpression.append(PARAMETER_PREFIX).append(i);
-			if(i < paramCount - 1)
+			if (i < paramCount - 1)
 				answerExpression.append(", ");
 		}
 		answerExpression.append(")");
-		if(returnType != void.class)
+		if (returnType != void.class)
 			instruction.valueOf(returnType, answerExpression.toString());
 		else
 			instruction.append(answerExpression);
 		body.append(instruction);
-		if(returnType == void.class)
+		if (returnType == void.class)
 			body.append(new EzyInstruction("\t", "\n").append("return null"));
 		return function.toString();
 	}
@@ -281,13 +281,13 @@ public class RequestHandlerImplementer
 		for(Class<?> exceptionClass : exceptionTree.toList()) {
 			ExceptionHandlerMethod m = exceptionHandlerMethodMap.get(exceptionClass);
 			EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
-					.append("if(arg1 instanceof ")
+					.append("if (arg1 instanceof ")
 						.append(exceptionClass.getName())
 					.append(") {");
 			body.append(instructionIf);
 			EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
 			Class<?> returnType = m.getReturnType();
-			if(returnType != void.class)
+			if (returnType != void.class)
 				instructionHandle.answer();
 			instructionHandle
 					.append("this.controller.").append(m.getName())
@@ -296,7 +296,7 @@ public class RequestHandlerImplementer
 			instructionHandle
 					.bracketclose();
 			body.append(instructionHandle);
-			if(returnType == void.class)
+			if (returnType == void.class)
 				body.append(new EzyInstruction("\t\t", "\n").append("return null"));
 			body.append(new EzyInstruction("\t", "\n", false).append("}"));
 		}
@@ -353,7 +353,7 @@ public class RequestHandlerImplementer
 	
 	protected Class<?> getGenericType(Parameter parameter) {
 		Type parameterizedType = parameter.getParameterizedType();
-		if(parameterizedType instanceof ParameterizedType) {
+		if (parameterizedType instanceof ParameterizedType) {
 			ParameterizedType aType = (ParameterizedType) parameterizedType;
 	        Type[] parameterArgTypes = aType.getActualTypeArguments();
 	        return (Class<?>)parameterArgTypes[0];
@@ -415,7 +415,7 @@ public class RequestHandlerImplementer
 	}
 	
 	protected void printComponentContent(String componentContent) {
-		if(debug) 
+		if (debug) 
 			logger.debug("component content: \n{}", componentContent);
 	}
 	

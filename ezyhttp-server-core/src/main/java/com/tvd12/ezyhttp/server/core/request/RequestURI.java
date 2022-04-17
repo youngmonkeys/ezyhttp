@@ -73,7 +73,7 @@ public class RequestURI {
 }
 	
 	protected String standardizeURI(String uri) {
-		if(uri.isEmpty() || uri.startsWith("/"))
+		if (uri.isEmpty() || uri.startsWith("/"))
 			return uri;
 		return "/" + uri;
 	}
@@ -94,11 +94,11 @@ public class RequestURI {
 	
 	@Override
 	public boolean equals(Object other) {
-		if(other == null)
+		if (other == null)
 			return false;
-		if(other == this)
+		if (other == this)
 			return true;
-		if(!other.getClass().equals(this.getClass()))
+		if (!other.getClass().equals(this.getClass()))
 			return false;
 		RequestURI t = (RequestURI)other;
 		return uri.equals(t.uri)

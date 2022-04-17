@@ -181,7 +181,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 		Class<T> type
 	) throws IOException {
 		String contentType = bodyData.getContentType();
-		if(contentType == null)
+		if (contentType == null)
 			throw new HttpBadRequestException("contentType is null");
 		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
 		try {

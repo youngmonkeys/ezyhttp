@@ -27,7 +27,7 @@ public class GraphQLDataFetcherManager {
 		private final Map<String, GraphQLDataFetcher> dataFetchers = new HashMap<>();
 		
 		public Builder addDataFetcher(Object fetcher) {
-			if(fetcher instanceof GraphQLDataFetcher) {
+			if (fetcher instanceof GraphQLDataFetcher) {
 				GraphQLDataFetcher f = (GraphQLDataFetcher)fetcher;
 				return addDataFetcher(f.getQueryName(), f);
 			}

@@ -9,12 +9,12 @@ public final class ControllerAnnotations {
 	private ControllerAnnotations() {}
 
 	public static String getURI(Controller annotation) {
-		if(annotation == null)
+		if (annotation == null)
 			return Constants.DEFAULT_URI;
 		String uri = annotation.value();
-		if(EzyStrings.isNoContent(uri))
+		if (EzyStrings.isNoContent(uri))
 			uri = annotation.uri();
-		if(EzyStrings.isNoContent(uri))
+		if (EzyStrings.isNoContent(uri))
 			uri = Constants.DEFAULT_URI;
 		return uri;
 	}
@@ -22,7 +22,7 @@ public final class ControllerAnnotations {
 	public static String getURI(Class<?> controllerClass) {
 		Controller annotation = controllerClass.getAnnotation(Controller.class);
 		String uri = ControllerAnnotations.getURI(annotation);
-		if(!uri.startsWith("/"))
+		if (!uri.startsWith("/"))
 			uri = "/" + uri;
 		return uri;
 	}

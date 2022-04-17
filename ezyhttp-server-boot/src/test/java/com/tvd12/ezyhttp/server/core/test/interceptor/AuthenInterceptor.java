@@ -19,9 +19,9 @@ public class AuthenInterceptor
 			RequestArguments arguments, 
 			Method handler) {
 		boolean mustAuthen = AuthenticatedMethods.AUTHENTICATED_METHODS.contains(handler);
-		if(mustAuthen) {
+		if (mustAuthen) {
 			String token = arguments.getHeader("token");
-			if(token == null)
+			if (token == null)
 				throw new HttpUnauthorizedException("invalid token");
 		}
 		return true;

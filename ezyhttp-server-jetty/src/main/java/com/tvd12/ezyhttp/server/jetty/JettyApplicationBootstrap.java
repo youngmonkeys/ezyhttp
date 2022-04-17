@@ -85,7 +85,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         connector.setPort(port);
         List<Connector> connectors = new ArrayList<>();
         connectors.add(connector);
-        if(managementEnable) {
+        if (managementEnable) {
         	ServerConnector managementConnector = new ServerConnector(server);
         	managementConnector.setHost(managementHost);
         	managementConnector.setPort(managementPort);
@@ -96,7 +96,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
-        if(managementEnable)
+        if (managementEnable)
         	logger.info("management started on: {}:{}", managementHost, managementPort);
     }
 	
@@ -111,7 +111,7 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         		(int)FileSizes.toByteSize(multipartFileSizeThreshold)
         	));
 		logger.info("cors.enable = {}", corsEnable);
-        if(corsEnable) {
+        if (corsEnable) {
 	        FilterHolder crossOriginFilter = newCrossOriginFilter();
 	        addFilter(servletHandler, crossOriginFilter);
         }

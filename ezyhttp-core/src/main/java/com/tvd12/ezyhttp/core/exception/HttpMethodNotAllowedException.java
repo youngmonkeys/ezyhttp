@@ -8,5 +8,4 @@ public class HttpMethodNotAllowedException extends HttpRequestException {
 	public HttpMethodNotAllowedException(Object data) {
 		super(StatusCodes.METHOD_NOT_ALLOWED, data);
 	}
-	
 }

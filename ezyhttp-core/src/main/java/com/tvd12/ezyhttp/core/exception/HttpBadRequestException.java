@@ -8,5 +8,4 @@ public class HttpBadRequestException extends HttpRequestException {
 	public HttpBadRequestException(Object data) {
 		super(StatusCodes.BAD_REQUEST, data);
 	}
-	
 }

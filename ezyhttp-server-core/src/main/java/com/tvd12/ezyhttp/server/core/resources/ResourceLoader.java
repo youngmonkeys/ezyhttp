@@ -48,7 +48,7 @@ public class ResourceLoader extends EzyLoggable {
 	public List<ResourceFile> listResourceFiles(String rootPath, Set<String> regexes) {
 		List<ResourceFile> answer = new ArrayList<>();
 		Set<URL> resourceURLs = getResourceURLs(rootPath);
-        if(resourceURLs.isEmpty()) {
+        if (resourceURLs.isEmpty()) {
             listResourcesByFolder(new File(rootPath), regexes, rootPath, answer);
         }
         else {
@@ -68,7 +68,7 @@ public class ResourceLoader extends EzyLoggable {
 	    if (url.getProtocol().equals(PROTOCOL_FILE)) {
 	        listResourcesByFileURL(url, regexes, rootPath, answer);
 	    }
-	    else if(url.getProtocol().equals(PROTOCOL_JAR)) {
+	    else if (url.getProtocol().equals(PROTOCOL_JAR)) {
 	        listResourcesByJarURL(url, regexes, rootPath, answer);
 	    }
 	}
@@ -107,15 +107,15 @@ public class ResourceLoader extends EzyLoggable {
                 String relativePath = rootPath + "/" + resourcePath;
                 boolean addable = regexes.isEmpty();
                 for(String regex : regexes) {
-                    if(isResourcePathMatch(relativePath, regex)) {
+                    if (isResourcePathMatch(relativePath, regex)) {
                         addable = true;
                         break;
                     }
                 }
-                if(addable && resource.isFile()) {
+                if (addable && resource.isFile()) {
                     answer.add(new ResourceFile(relativePath, resource.toString(), false));
                 }
-                if(resource.isDirectory()) {
+                if (resource.isDirectory()) {
                     folders.offer(resource);
                 }
             }
@@ -137,15 +137,15 @@ public class ResourceLoader extends EzyLoggable {
         
         while(entries.hasMoreElements()) {
             String name = entries.nextElement().getName();
-            if(name.startsWith(rootPath)) {
+            if (name.startsWith(rootPath)) {
                 boolean addable = regexes.isEmpty();
                 for(String regex : regexes) {
-                    if(isResourcePathMatch(name, regex)) {
+                    if (isResourcePathMatch(name, regex)) {
                         addable = true;
                         break;
                     }
                 }
-                if(addable && isFileElement(name)) {
+                if (addable && isFileElement(name)) {
                     answer.add(new ResourceFile(name, jarPath + "!/" + name, true));
                 }
             }
@@ -197,7 +197,7 @@ public class ResourceLoader extends EzyLoggable {
 	}
 	
 	private void addURLsToSet(Set<URL> answer, Enumeration<URL> urls) {
-	    if(urls != null) {
+	    if (urls != null) {
 	        while(urls.hasMoreElements()) {
 	            answer.add(urls.nextElement());
 	        }
@@ -205,7 +205,7 @@ public class ResourceLoader extends EzyLoggable {
 	}
 	
 	private void addURLToSet(Set<URL> answer, URL url) {
-	    if(url != null)
+	    if (url != null)
 	        answer.add(url);
 	}
 

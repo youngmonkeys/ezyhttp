@@ -6,5 +6,4 @@ public class RequestQueueFullException extends RuntimeException {
 	public RequestQueueFullException(int capacity) {
 		super("request queue got max capacity: " + capacity);
 	}
-	
 }

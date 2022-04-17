@@ -12,7 +12,7 @@ public final class RequestHeaderAnnotations {
         if (EzyStrings.isNoContent(keyString)) {
             keyString = annotation.name();
         }
-		if(EzyStrings.isNoContent(keyString)) {
+		if (EzyStrings.isNoContent(keyString)) {
 			keyString = String.valueOf(index);
 		} else {
 			keyString = EzyStrings.quote(keyString);

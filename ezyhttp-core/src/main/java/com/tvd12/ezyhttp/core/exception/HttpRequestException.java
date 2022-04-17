@@ -19,5 +19,4 @@ public class HttpRequestException extends RuntimeException {
 	public <T> T getData() {
 		return (T)data;
 	}
-	
 }

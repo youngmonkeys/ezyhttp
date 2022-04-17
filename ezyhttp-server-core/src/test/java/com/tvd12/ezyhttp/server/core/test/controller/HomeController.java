@@ -43,7 +43,7 @@ public class HomeController {
 			@RequestBody HelloRequest body,
 			@NickName String nickName) {
 		System.out.println("request uri: " + request.getRequestURI());
-		if(who == null)
+		if (who == null)
 			throw new IllegalArgumentException("who cannot be null");
 		return "welcome " + who + " " + body.getWho();
 	}

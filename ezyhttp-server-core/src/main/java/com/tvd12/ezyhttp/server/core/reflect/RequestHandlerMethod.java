@@ -41,13 +41,13 @@ public class RequestHandlerMethod extends HandlerMethod {
 	
 	protected String fetchRequestURIFragment() {
 		DoGet doGet = method.getAnnotation(DoGet.class);
-		if(doGet != null)
+		if (doGet != null)
 			return DoGetAnnotations.getURI(doGet);
 		DoPost doPost = method.getAnnotation(DoPost.class);
-		if(doPost != null)
+		if (doPost != null)
 			return DoPostAnnotations.getURI(doPost);
 		DoPut doPut = method.getAnnotation(DoPut.class);
-		if(doPut != null)
+		if (doPut != null)
 			return DoPutAnnotations.getURI(doPut);
 		DoDelete doDelete = method.getAnnotation(DoDelete.class);
 		return DoDeleteAnnotations.getURI(doDelete);
@@ -55,26 +55,26 @@ public class RequestHandlerMethod extends HandlerMethod {
 	
 	protected HttpMethod fetchHttpMethod() {
 		DoGet doGet = method.getAnnotation(DoGet.class);
-		if(doGet != null)
+		if (doGet != null)
 			return HttpMethod.GET;
 		DoPost doPost = method.getAnnotation(DoPost.class);
-		if(doPost != null)
+		if (doPost != null)
 			return HttpMethod.POST;
 		DoPut doPut = method.getAnnotation(DoPut.class);
-		if(doPut != null)
+		if (doPut != null)
 			return HttpMethod.PUT;
 		return HttpMethod.DELETE;
 	}
 	
 	protected String fetchResponseType() {
 		DoGet doGet = method.getAnnotation(DoGet.class);
-		if(doGet != null)
+		if (doGet != null)
 			return DoGetAnnotations.getResponseType(doGet);
 		DoPost doPost = method.getAnnotation(DoPost.class);
-		if(doPost != null)
+		if (doPost != null)
 			return DoPostAnnotations.getResponseType(doPost);
 		DoPut doPut = method.getAnnotation(DoPut.class);
-		if(doPut != null)
+		if (doPut != null)
 			return DoPutAnnotations.getResponseType(doPut);
 		DoDelete doDelete = method.getAnnotation(DoDelete.class);
 		return DoDeleteAnnotations.getResponseType(doDelete);

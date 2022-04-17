@@ -29,11 +29,11 @@ public class DataConverters implements EzyDestroyable {
 	
 	public BodySerializer getBodySerializer(String contentType) {
 		BodySerializer serializer = bodySerializers.get(contentType);
-		if(serializer == null) {
+		if (serializer == null) {
 			String realContentType = ContentTypes.getContentType(contentType);
 			serializer = bodySerializers.get(realContentType);
 		}
-		if(serializer == null) {
+		if (serializer == null) {
 			serializer = defaultBodyConverter;
 		}
 		return serializer;
@@ -41,11 +41,11 @@ public class DataConverters implements EzyDestroyable {
 	
 	public BodyDeserializer getBodyDeserializer(String contentType) {
 		BodyDeserializer deserializer = bodyDeserializers.get(contentType);
-		if(deserializer == null) {
+		if (deserializer == null) {
 			String realContentType = ContentTypes.getContentType(contentType);
 			deserializer = bodyDeserializers.get(realContentType);
 		}
-		if(deserializer == null) {
+		if (deserializer == null) {
 			deserializer = defaultBodyConverter;
 		}
 		return deserializer;
@@ -57,21 +57,21 @@ public class DataConverters implements EzyDestroyable {
 	}
 	
 	public void addBodyConverter(Object converter) {
-		if(converter instanceof BodySerializer) {
+		if (converter instanceof BodySerializer) {
 			String contentType = BodyConvertAnnotations.getContentType(converter);
 			this.bodySerializers.put(contentType, (BodySerializer) converter);
 		}
-		if(converter instanceof BodyDeserializer) {
+		if (converter instanceof BodyDeserializer) {
 			String contentType = BodyConvertAnnotations.getContentType(converter);
 			this.bodyDeserializers.put(contentType, (BodyDeserializer) converter);
 		}
 	}
 	
 	public void addBodyConverter(String contentType, Object converter) {
-		if(converter instanceof BodySerializer) {
+		if (converter instanceof BodySerializer) {
 			this.bodySerializers.put(contentType, (BodySerializer) converter);
 		}
-		if(converter instanceof BodyDeserializer) {
+		if (converter instanceof BodyDeserializer) {
 			this.bodyDeserializers.put(contentType, (BodyDeserializer) converter);
 		}
 	}
@@ -83,7 +83,7 @@ public class DataConverters implements EzyDestroyable {
 	}
 	
 	public void setStringConverter(Object converter) {
-		if(converter instanceof StringDeserializer)
+		if (converter instanceof StringDeserializer)
 			this.stringDeserializer = (StringDeserializer) converter;
 	}
 	

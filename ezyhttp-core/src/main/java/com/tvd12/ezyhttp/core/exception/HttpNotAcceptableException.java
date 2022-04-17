@@ -8,5 +8,4 @@ public class HttpNotAcceptableException extends HttpRequestException {
 	public HttpNotAcceptableException(Object data) {
 		super(StatusCodes.NOT_ACCEPTABLE, data);
 	}
-	
 }

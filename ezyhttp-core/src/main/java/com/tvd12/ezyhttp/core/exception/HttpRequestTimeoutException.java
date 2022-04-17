@@ -8,5 +8,4 @@ public class HttpRequestTimeoutException extends HttpRequestException {
 	public HttpRequestTimeoutException(Object data) {
 		super(StatusCodes.REQUEST_TIMEOUT, data);
 	}
-	
 }

@@ -82,13 +82,13 @@ public class ResourceDownloadManager
 		    Exception exception = null;
 			try {
 				entry = queue.take();
-				if(entry == POISON) {
+				if (entry == POISON) {
 					break;
 				}
 				InputStream inputStream = entry.inputStream;
 				OutputStream outputStream = entry.outputStream;
 				int read = inputStream.read(buffer);
-                if(read > 0) {
+                if (read > 0) {
                     outputStream.write(buffer, 0, read);
                     done = false;
                 }
@@ -105,7 +105,7 @@ public class ResourceDownloadManager
 			    continue;
 			}
 			try {
-				if(done) {
+				if (done) {
 					EzyFuture future = futureMap.removeFuture(entry);
 					if (future == null) {
 						continue;
@@ -155,7 +155,7 @@ public class ResourceDownloadManager
 	) {
         futureMap.addFuture(entry, future);
         boolean success = this.queue.offer(entry);
-        if(!success) {
+        if (!success) {
             futureMap.removeFuture(entry);
             throw new MaxResourceDownloadCapacity(capacity);
         }

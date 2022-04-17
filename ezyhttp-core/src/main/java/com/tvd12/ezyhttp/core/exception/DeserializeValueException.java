@@ -30,5 +30,4 @@ public class DeserializeValueException extends IOException {
 				? value + "(" + value.getClass().getSimpleName() + ")" 
 				: "null";
 	}
-	
 }

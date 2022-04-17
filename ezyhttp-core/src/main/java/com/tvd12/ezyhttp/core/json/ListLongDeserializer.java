@@ -23,7 +23,7 @@ public class ListLongDeserializer extends StdDeserializer<List<Long>> {
             JsonParser p, 
             DeserializationContext ctxt
     ) throws IOException {
-        if(p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+        if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return SingletonStringDeserializer.getInstance().deserialize(
                     p.getValueAsString(),
                     List.class,

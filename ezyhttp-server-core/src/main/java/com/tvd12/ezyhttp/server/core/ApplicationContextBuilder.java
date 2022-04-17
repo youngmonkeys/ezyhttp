@@ -126,7 +126,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	public ApplicationContextBuilder addComponentClass(Class<?> componentClass) {
 		ComponentsScan componentsScan = componentClass.getAnnotation(ComponentsScan.class);
-		if(componentsScan != null) {
+		if (componentsScan != null) {
 			scan(
 				componentsScan.value().length != 0
 					? componentsScan.value()
@@ -135,7 +135,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			);
 		}
 		EzyPackagesToScan packagesToScan = componentClass.getAnnotation(EzyPackagesToScan.class);
-        if(packagesToScan != null) {
+        if (packagesToScan != null) {
             scan(
                  packagesToScan.value().length != 0
                     ? packagesToScan.value()
@@ -144,10 +144,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
             );
         }
 		ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
-		if(componentClasses != null)
+		if (componentClasses != null)
 			addComponentClasses(componentClasses.value());
 		PropertiesSources propertiesSources = componentClass.getAnnotation(PropertiesSources.class);
-		if(propertiesSources != null)
+		if (propertiesSources != null)
 			addPropertiesSources(propertiesSources.value());
 		this.componentClasses.add(componentClass);
 		return this;
@@ -228,7 +228,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	}
 	
 	protected EzyBeanContext createBeanContext() {
-		if(packageToScans.isEmpty())
+		if (packageToScans.isEmpty())
 			throw new IllegalStateException("must scan at least one package");
 		Set<String> allPackageToScans = new HashSet<>();
 		allPackageToScans.add(DEFAULT_PACKAGE_TO_SCAN);
@@ -310,7 +310,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected EzyPropertiesMap getPropertiesMap(EzyReflection reflection) {
 		Class propertiesMapClass = reflection.getExtendsClass(EzyPropertiesMap.class);
-		if(propertiesMapClass == null)
+		if (propertiesMapClass == null)
 			return null;
 		return (EzyPropertiesMap)EzyClasses.newInstance(propertiesMapClass);
 	}
@@ -384,11 +384,11 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected ViewContext buildViewContext(EzyBeanContext beanContext) {
 		ViewContext viewContext = beanContext.getSingleton(ViewContext.class);
-		if(viewContext == null) {
+		if (viewContext == null) {
 			ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
-			if(viewContextBuilder != null) {
+			if (viewContextBuilder != null) {
 				TemplateResolver templateResolver = beanContext.getSingleton(TemplateResolver.class);
-				if(templateResolver == null) {
+				if (templateResolver == null) {
 					templateResolver = TemplateResolver.of(beanContext);
 				}
 				viewContext = viewContextBuilder
@@ -400,7 +400,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 			        .build();
 			}
 		}
-		if(viewContext != null)
+		if (viewContext != null)
 			beanContext.getSingletonFactory().addSingleton(viewContext);
 		return viewContext;
 	}
@@ -416,7 +416,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	
 	protected void addResourceRequestHandlers(EzyBeanContext beanContext) {
 		ResourceResolver resourceResolver = getResourceResolver(beanContext);
-		if(resourceResolver == null)
+		if (resourceResolver == null)
 			return;
 		ResourceDownloadManager downloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
 		Map<String, Resource> resources = resourceResolver.getResources();
@@ -441,9 +441,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 	protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
 		ResourceResolver resourceResolver =
 			beanContext.getSingleton(ResourceResolver.class);
-		if(resourceResolver == null) {
+		if (resourceResolver == null) {
 			resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
-			if(resourceResolver != null)
+			if (resourceResolver != null)
 				beanContext.getSingletonFactory().addSingleton(resourceResolver);
 		}
 		return resourceResolver;

@@ -20,11 +20,11 @@ public final class ResourceResolvers {
 	public static ResourceResolver createResourdeResolver(EzyPropertyFetcher propertyFetcher) {
 		boolean resourceEnable = propertyFetcher
 				.getProperty(RESOURCE_ENABLE, boolean.class, false);
-		if(!resourceEnable)
+		if (!resourceEnable)
 			return null;
 		String[] resourceLocations = propertyFetcher
 				.getProperty(RESOURCE_LOCATIONS, String[].class);
-		if(resourceLocations == null) {
+		if (resourceLocations == null) {
 			String resourceLocation = propertyFetcher
 					.getProperty(RESOURCE_LOCATION, String.class, DEFAULT_RESOURCE_LOCATION);
 			resourceLocations = new String[] { resourceLocation };

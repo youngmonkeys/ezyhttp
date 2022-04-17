@@ -6,5 +6,4 @@ public class MaxResourceUploadCapacity extends IllegalStateException {
 	public MaxResourceUploadCapacity(int capacity) {
 		super("max resource upload capacity: " + capacity);
 	}
-
 }

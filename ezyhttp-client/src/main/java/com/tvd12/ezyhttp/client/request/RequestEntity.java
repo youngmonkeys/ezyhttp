@@ -42,13 +42,13 @@ public class RequestEntity {
 	}
 	
 	public String getHeader(String name) {
-		if(headers == null)
+		if (headers == null)
 			return null;
 		return headers.getValue(name);
 	}
 	
 	public String getContentType() {
-		if(headers == null)
+		if (headers == null)
 			return ContentTypes.APPLICATION_JSON;
 		return headers.getValue(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 	}
@@ -71,8 +71,8 @@ public class RequestEntity {
 		protected Map<String, List<String>> headers;
 		
 		public Builder body(Object body) {
-			if(body != null) {
-				if(body instanceof MultiValueMap)
+			if (body != null) {
+				if (body instanceof MultiValueMap)
 					this.body = ((MultiValueMap)body).toMap();
 				else
 					this.body = body;
@@ -84,10 +84,10 @@ public class RequestEntity {
 		    if (value == null) {
 		        return this;
 		    }
-			if(this.headers == null)
+			if (this.headers == null)
 				this.headers = new HashMap<>();
 			List<String> values = headers.get(name);
-			if(values == null) {
+			if (values == null) {
 				values = new ArrayList<>();
 				headers.put(name, values);
 			}

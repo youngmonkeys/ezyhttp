@@ -8,5 +8,4 @@ public class DeserializeBodyException extends IOException {
 	public DeserializeBodyException(String msg, Exception e) {
 		super(msg, e);
 	}
-	
 }

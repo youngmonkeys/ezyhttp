@@ -46,7 +46,7 @@ public class MessageReader {
 					String fileName = getFileName(it.getRelativePath());
 					int index = fileName.indexOf('_');
 					String lang = "";
-					if(index > 0)
+					if (index > 0)
 						lang = fileName.substring(index + 1, fileName.lastIndexOf('.'));
 					return new MessagesFile(lang, it);
 				})

@@ -37,10 +37,10 @@ public class DefaultStringDeserializer implements StringDeserializer {
 			String value,
 			Class<T> outType,
 			Class<?> genericType) throws IOException {
-		if(genericType != null) {
-			if(Set.class.isAssignableFrom(outType))
+		if (genericType != null) {
+			if (Set.class.isAssignableFrom(outType))
 				return (T)stringToSet(value, genericType);
-			else if(Collection.class.isAssignableFrom(outType))
+			else if (Collection.class.isAssignableFrom(outType))
 				return (T)stringToList(value, genericType);
 		}
 		return deserialize(value, outType);
@@ -49,7 +49,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 	@SuppressWarnings({ "unchecked" })
 	public <T> T deserialize(String value, Class<T> outType) throws IOException {
 		StringMapper mapper = mappers.get(outType);
-		if(mapper == null) {
+		if (mapper == null) {
 		    if (value == null) {
 		        return null;
 		    }
@@ -131,7 +131,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
 
 	// =============== array, collection ===============
 	protected String[] stringToStringArray(String value) {
-		if(EzyStrings.isEmpty(value))
+		if (EzyStrings.isEmpty(value))
 			return new String[0];
 		String[] array = value.split(",");
 		for (int i = 0 ; i < array.length ; ++i) {

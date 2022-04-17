@@ -10,9 +10,9 @@ public final class ServiceAnnotations {
 	
 	public static String getServiceName(Class<?> serviceClass) {
 		Service annotation = serviceClass.getAnnotation(Service.class);
-		if(!EzyStrings.isNoContent(annotation.value()))
+		if (!EzyStrings.isNoContent(annotation.value()))
 			return annotation.value();
-		if(!EzyStrings.isNoContent(annotation.name()))
+		if (!EzyStrings.isNoContent(annotation.name()))
 			return annotation.name();
 		return EzyClasses.getVariableName(serviceClass, "Impl");
 	}

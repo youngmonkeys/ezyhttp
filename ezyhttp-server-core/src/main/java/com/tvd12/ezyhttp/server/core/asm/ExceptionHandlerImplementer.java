@@ -106,13 +106,13 @@ public class ExceptionHandlerImplementer
 		EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
 		for(Class<?> exceptionClass : exceptionTree.toList()) {
 			EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
-					.append("if(arg1 instanceof ")
+					.append("if (arg1 instanceof ")
 						.append(exceptionClass.getName())
 					.append(") {");
 			body.append(instructionIf);
 			EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
 			Class<?> returnType = handlerMethod.getReturnType();
-			if(returnType != void.class)
+			if (returnType != void.class)
 				instructionHandle.answer();
 			instructionHandle
 					.append("this.exceptionHandler.").append(handlerMethod.getName())
@@ -120,7 +120,7 @@ public class ExceptionHandlerImplementer
 			appendHandleExceptionMethodArguments(handlerMethod, instructionHandle, exceptionClass);
 			instructionHandle.bracketclose();
 			body.append(instructionHandle);
-			if(returnType == void.class)
+			if (returnType == void.class)
 				body.append(new EzyInstruction("\t\t", "\n").append("return null"));
 			body.append(new EzyInstruction("\t", "\n", false).append("}"));
 		}
@@ -175,7 +175,7 @@ public class ExceptionHandlerImplementer
 	}
 	
 	protected void printComponentContent(String componentContent) {
-		if(debug) 
+		if (debug) 
 			logger.debug("component content: \n{}", componentContent);
 	}
 	

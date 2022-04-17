@@ -11,16 +11,16 @@ public final class DoGetAnnotations {
 	
 	public static String getURI(DoGet annotation) {
 		String uri = annotation.value();
-		if(EzyStrings.isNoContent(uri))
+		if (EzyStrings.isNoContent(uri))
 			uri = annotation.uri();
-		if(EzyStrings.isNoContent(uri))
+		if (EzyStrings.isNoContent(uri))
 			uri = Constants.EMPTY_STRING;
 		return uri;
 	}
 	
 	public static String getResponseType(DoGet annotation) {
 		String responseType = annotation.responseType();
-		if(EzyStrings.isNoContent(responseType))
+		if (EzyStrings.isNoContent(responseType))
 			responseType = ContentTypes.APPLICATION_JSON;
 		return responseType;
 	}

@@ -8,5 +8,4 @@ public class HttpUnsupportedMediaTypeException extends HttpRequestException {
 	public HttpUnsupportedMediaTypeException(Object data) {
 		super(StatusCodes.UNSUPPORTED_MEDIA_TYPE, data);
 	}
-	
 }

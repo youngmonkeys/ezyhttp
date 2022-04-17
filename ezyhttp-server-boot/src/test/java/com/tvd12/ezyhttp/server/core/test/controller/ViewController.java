@@ -58,7 +58,7 @@ public class ViewController {
 			RequestArguments requestArguments
 	) throws Exception {
 		Part filePart = request.getPart("file");
-		if(filePart.getSize() > 0) {
+		if (filePart.getSize() > 0) {
 			fileUploadService.accept(request, filePart, () -> {
 			    try {
                     response.sendRedirect("/view/upload");
