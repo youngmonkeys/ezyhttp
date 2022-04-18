@@ -31,7 +31,7 @@ public class ResourceUploadManager
 	public static final int DEFAULT_CAPACITY = 100000;
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 	public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
-	public static final long UNLIMIT_UPLOAD_SIZE = -1;
+	public static final long UNLIMITED_UPLOAD_SIZE = -1;
 	public static final int DEFAULT_THREAD_POOL_SIZE = 
 	        Runtime.getRuntime().availableProcessors() * 2;
 	
@@ -147,7 +147,7 @@ public class ResourceUploadManager
 	}
 	
 	public void drain(InputStream from, OutputStream to) throws Exception {
-	    drain(from, to, UNLIMIT_UPLOAD_SIZE);
+	    drain(from, to, UNLIMITED_UPLOAD_SIZE);
 	}
 	
 	public void drainAsync(
@@ -166,7 +166,7 @@ public class ResourceUploadManager
         OutputStream to,
         EzyResultCallback<Boolean> callback
     ) {
-	    drainAsync(from, to, UNLIMIT_UPLOAD_SIZE, callback);
+	    drainAsync(from, to, UNLIMITED_UPLOAD_SIZE, callback);
 	}
 	
 	private void drain(
