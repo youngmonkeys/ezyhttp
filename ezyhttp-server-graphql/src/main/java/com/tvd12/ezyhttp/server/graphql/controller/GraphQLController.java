@@ -1,11 +1,5 @@
 package com.tvd12.ezyhttp.server.graphql.controller;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
@@ -14,33 +8,28 @@ import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
 import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
-import com.tvd12.ezyhttp.server.graphql.GraphQLField;
-import com.tvd12.ezyhttp.server.graphql.GraphQLQueryDefinition;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
+import com.tvd12.ezyhttp.server.graphql.*;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 
+import java.util.*;
+
 public class GraphQLController implements IRequestController {
-    
+
     private final ObjectMapper objectMapper;
     private final GraphQLSchemaParser schemaParser;
     private final GraphQLDataFetcherManager dataFetcherManager;
-    
+
     public GraphQLController(Builder builder) {
         this.objectMapper = builder.objectMapper;
         this.schemaParser = builder.schemaParser;
         this.dataFetcherManager = builder.dataFetcherManager;
     }
-    
+
     /**
-     * Follow by this suggestion: https://graphql.org/learn/serving-over-http/
-     * <p>
+     * Follow by this suggestion: <a href="https://graphql.org/learn/serving-over-http/">https://graphql.org/learn/serving-over-http/</a>.
      * Example:
-     *
      * <code>
      * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{id+name+friends{name}}}&amp;variables={"id" : 1}'
      * </code>
@@ -52,17 +41,15 @@ public class GraphQLController implements IRequestController {
      */
     @DoGet("/graphql")
     public Object doGet(
-            @RequestParam("query") String query,
-            @RequestParam("variables") String variables
+        @RequestParam("query") String query,
+        @RequestParam("variables") String variables
     ) throws Exception {
         return fetch(query, variables);
     }
-    
+
     /**
-     * Follow by this suggestion: https://graphql.org/learn/serving-over-http/
-     * <p>
+     * Follow by this suggestion: <a href="https://graphql.org/learn/serving-over-http/">https://graphql.org/learn/serving-over-http/</a>.
      * Example:
-     *
      * <pre>
      * curl --location --request POST 'http://localhost:8083/graphql' \
      *     --header 'Content-Type: application/json' \
@@ -79,36 +66,40 @@ public class GraphQLController implements IRequestController {
     @DoPost("/graphql")
     public Object doPost(@RequestBody GraphQLRequest request) throws Exception {
         return fetch(
-                request.getQuery(),
-                request.getVariables()
+            request.getQuery(),
+            request.getVariables()
         );
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Object fetch(
-            String query,
-            Object variables
+        String query,
+        Object variables
     ) throws Exception {
         GraphQLSchema schema = schemaParser.parseQuery(query);
         List<GraphQLQueryDefinition> queryDefinitions = schema.getQueryDefinitions();
         Map answer = new HashMap<>();
-        
+
         for (GraphQLQueryDefinition queryDefinition : queryDefinitions) {
             String queryName = queryDefinition.getName();
             GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(queryName);
             if (dataFetcher == null) {
-                throw new HttpNotFoundException("not found data fetcher with queryName: " + queryName);
+                throw new HttpNotFoundException(
+                    "not found data fetcher with queryName: " + queryName
+                );
             }
             Class<?> argumentType = dataFetcher.getArgumentType();
             Object argument = variables;
             if (argumentType != null) {
-                if (variables instanceof String)
+                if (variables instanceof String) {
                     argument = objectMapper.readValue((String) variables, argumentType);
-                else
+                } else {
                     argument = objectMapper.convertValue(variables, argumentType);
+                }
             } else {
-                if (variables instanceof String)
+                if (variables instanceof String) {
                     argument = objectMapper.readValue((String) variables, Map.class);
+                }
             }
             Object data = dataFetcher.getData(argument);
             try {
@@ -120,21 +111,31 @@ public class GraphQLController implements IRequestController {
         }
         return answer;
     }
-    
+
     @SuppressWarnings({"rawtypes"})
-    private Map mapToResponse(Object data, GraphQLQueryDefinition queryDefinition, String query) {
+    private Map mapToResponse(
+        Object data,
+        GraphQLQueryDefinition queryDefinition,
+        String query
+    ) {
         Map dataMap;
         try {
             dataMap = objectMapper.convertValue(data, Map.class);
         } catch (Exception e) {
-            throw new GraphQLObjectMapperException("Could not convert: " + data.getClass() + " to Map");
+            throw new GraphQLObjectMapperException(
+                "Could not convert: " + data.getClass() + " to Map"
+            );
         }
         return filterDataMap(dataMap, queryDefinition, query);
     }
-    
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Map filterDataMap(Map dataMap, GraphQLField queryDefinition, String query) {
-        
+    private Map filterDataMap(
+        Map dataMap,
+        GraphQLField queryDefinition,
+        String query
+    ) {
+
         Map answer = new HashMap<>();
         Map parentMap = null;
         Stack<GraphQLField> stack = new Stack<>();
@@ -142,9 +143,9 @@ public class GraphQLController implements IRequestController {
         while (stack.size() > 0) {
             GraphQLField parent = stack.pop();
             parentMap = parentMap == null
-                    ? answer
-                    : (Map) parentMap.get(parent.getName());
-            
+                ? answer
+                : (Map) parentMap.get(parent.getName());
+
             for (GraphQLField field : parent.getFields()) {
                 Object value = dataMap.get(field.getName());
                 if (value == null) {
@@ -159,48 +160,56 @@ public class GraphQLController implements IRequestController {
                     parentMap.put(field.getName(), newItem);
                     stack.push(field);
                 } else if (value instanceof List) {
-                    parentMap.put(field.getName(), filterDataList((List) value, field, query));
+                    parentMap.put(
+                        field.getName(),
+                        filterDataList((List) value, field, query)
+                    );
                 } else {
-                    throw new GraphQLInvalidSchemeException("invalid schema: " + query + " at: " + field.getName());
+                    throw new GraphQLInvalidSchemeException(
+                        "invalid schema: " + query + " at: " + field.getName()
+                    );
                 }
             }
         }
         return answer;
     }
-    
+
     @SuppressWarnings({"rawtypes"})
-    private List<Map> filterDataList(List<Map> dataList, GraphQLField queryDefinition, String query) {
+    private List<Map> filterDataList(
+        List<Map> dataList,
+        GraphQLField queryDefinition, String query
+    ) {
         List<Map> answer = new LinkedList<>();
         for (Map map : dataList) {
             answer.add(filterDataMap(map, queryDefinition, query));
         }
         return answer;
     }
-    
+
     public static Builder builder() {
         return new Builder();
     }
-    
+
     public static class Builder implements EzyBuilder<GraphQLController> {
         private ObjectMapper objectMapper;
         private GraphQLSchemaParser schemaParser;
         private GraphQLDataFetcherManager dataFetcherManager;
-        
+
         public Builder objectMapper(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
             return this;
         }
-        
+
         public Builder schemaParser(GraphQLSchemaParser schemaParser) {
             this.schemaParser = schemaParser;
             return this;
         }
-        
+
         public Builder dataFetcherManager(GraphQLDataFetcherManager dataFetcherManager) {
             this.dataFetcherManager = dataFetcherManager;
             return this;
         }
-        
+
         @Override
         public GraphQLController build() {
             return new GraphQLController(this);

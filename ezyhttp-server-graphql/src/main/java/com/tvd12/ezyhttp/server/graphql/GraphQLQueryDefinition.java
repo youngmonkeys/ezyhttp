@@ -10,7 +10,6 @@ public class GraphQLQueryDefinition extends GraphQLField {
         if (this.name == null) {
             throw new IllegalArgumentException("Must provide queryName!");
         }
-
         return this.name;
     }
 
@@ -22,12 +21,12 @@ public class GraphQLQueryDefinition extends GraphQLField {
 
         @Override
         public Builder name(String name) {
-            return (Builder)super.name(name);
+            return (Builder) super.name(name);
         }
 
         @Override
         public Builder addField(GraphQLField field) {
-            return (Builder)super.addField(field);
+            return (Builder) super.addField(field);
         }
 
         @Override

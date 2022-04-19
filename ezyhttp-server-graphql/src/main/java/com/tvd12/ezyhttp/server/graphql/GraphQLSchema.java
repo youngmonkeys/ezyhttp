@@ -13,7 +13,9 @@ public class GraphQLSchema {
     private final List<GraphQLQueryDefinition> queryDefinitions;
 
     public GraphQLSchema(Builder builder) {
-        this.queryDefinitions = builder.queryDefinitions != null ? builder.queryDefinitions : Collections.emptyList();
+        this.queryDefinitions = builder.queryDefinitions != null
+            ? builder.queryDefinitions
+            : Collections.emptyList();
     }
 
     public static Builder builder() {
@@ -24,8 +26,9 @@ public class GraphQLSchema {
         private List<GraphQLQueryDefinition> queryDefinitions;
 
         public Builder addQueryDefinition(GraphQLQueryDefinition queryDefinition) {
-            if (queryDefinitions == null)
+            if (queryDefinitions == null) {
                 queryDefinitions = new LinkedList<>();
+            }
             this.queryDefinitions.add(queryDefinition);
             return this;
         }
@@ -35,5 +38,4 @@ public class GraphQLSchema {
             return new GraphQLSchema(this);
         }
     }
-
 }

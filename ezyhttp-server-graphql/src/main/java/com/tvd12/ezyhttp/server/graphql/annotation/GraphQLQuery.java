@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public @interface GraphQLQuery {
     
     /**
-     * Query name
+     * Query name.
      *
      * @return name of query
      */
