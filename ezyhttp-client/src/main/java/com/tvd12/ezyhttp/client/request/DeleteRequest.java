@@ -8,5 +8,4 @@ public class DeleteRequest extends AbstractRequest<DeleteRequest> {
     public HttpMethod getMethod() {
         return HttpMethod.DELETE;
     }
-    
 }

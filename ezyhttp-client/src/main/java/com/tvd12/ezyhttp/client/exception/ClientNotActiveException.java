@@ -6,5 +6,4 @@ public class ClientNotActiveException extends RuntimeException {
     public ClientNotActiveException() {
         super("client has not actived or has stopped");
     }
-
 }

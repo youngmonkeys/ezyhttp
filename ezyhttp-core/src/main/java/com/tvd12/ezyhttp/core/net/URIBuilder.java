@@ -9,7 +9,6 @@ import java.util.Map;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyStrings;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class URIBuilder implements EzyBuilder<URI> {
 
     protected List<String> paths;

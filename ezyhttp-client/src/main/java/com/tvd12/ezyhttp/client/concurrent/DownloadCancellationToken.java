@@ -7,8 +7,7 @@ public class DownloadCancellationToken {
     public static final DownloadCancellationToken ALWAYS_RUN =
         new DownloadCancellationToken() {
             @Override
-            public void cancel() {
-            }
+            public void cancel() {}
         };
 
     public void cancel() {

@@ -29,22 +29,22 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 
     public R setURL(URI uri) {
         this.url = uri.toString();
-        return (R)this;
+        return (R) this;
     }
 
     public R setURL(URL url) {
         this.url = url.toString();
-        return (R)this;
+        return (R) this;
     }
 
     public R setURL(String url) {
         this.url = url;
-        return (R)this;
+        return (R) this;
     }
 
     public R setEntity(RequestEntity entity) {
         this.entity = entity;
-        return (R)this;
+        return (R) this;
     }
 
     public R setEntity(Object requestBody) {
@@ -53,12 +53,12 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 
     public R setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
-        return (R)this;
+        return (R) this;
     }
 
     public R setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
-        return (R)this;
+        return (R) this;
     }
 
     public R setResponseType(Class<?> responseType) {
@@ -67,6 +67,6 @@ public abstract class AbstractRequest<R extends AbstractRequest<R>> implements R
 
     public R setResponseType(int statusCode, Class<?> responseType) {
         this.responseTypes.put(statusCode, responseType);
-        return (R)this;
+        return (R) this;
     }
 }

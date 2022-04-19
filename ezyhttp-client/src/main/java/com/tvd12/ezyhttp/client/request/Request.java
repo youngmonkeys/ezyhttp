@@ -7,15 +7,14 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 public interface Request {
 
     String getURL();
-    
-    HttpMethod getMethod(); 
-    
+
+    HttpMethod getMethod();
+
     int getReadTimeout();
-    
+
     int getConnectTimeout();
-    
+
     RequestEntity getEntity();
-    
+
     Map<Integer, Class<?>> getResponseTypes();
-    
 }

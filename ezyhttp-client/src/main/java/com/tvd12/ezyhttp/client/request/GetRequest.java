@@ -8,5 +8,4 @@ public class GetRequest extends AbstractRequest<GetRequest> {
     public HttpMethod getMethod() {
         return HttpMethod.GET;
     }
-
 }

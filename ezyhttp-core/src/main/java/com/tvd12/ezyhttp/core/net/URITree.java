@@ -3,7 +3,6 @@ package com.tvd12.ezyhttp.core.net;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class URITree {
 
     protected String uri;
