@@ -3,7 +3,7 @@
 <suite name="AllTests">
     <test name="All">
         <packages>
-            <package name="com.tvd12.ezyhttp.core.boot.test"></package>
+            <package name="com.tvd12.ezyhttp.server.boot.test"></package>
         </packages>
     </test>
 </suite>
