@@ -46,15 +46,14 @@ public class HttpClientProxyTest extends BaseTest {
 
     public static void main(String[] args) throws Exception {
         HttpClientProxy client = HttpClientProxy.builder()
-                .build();
+            .build();
         client.start();
         postTest(client);
         new Thread(() -> {
-            for (int i = 0 ; i < 100 ; ++i) {
+            for (int i = 0; i < 100; ++i) {
                 try {
                     postTest(client);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -66,11 +65,11 @@ public class HttpClientProxyTest extends BaseTest {
 
     protected static void getTest(HttpClientProxy client) throws Exception {
         GetRequest request = new GetRequest()
-                .setURL("http://localhost:8081/bye?messages=a,b,c&numbers=1,2,3")
-                .setEntity(null)
-                .setResponseType(String.class)
-                .setReadTimeout(HttpClient.NO_TIMEOUT)
-                .setConnectTimeout(HttpClient.NO_TIMEOUT);
+            .setURL("http://localhost:8081/bye?messages=a,b,c&numbers=1,2,3")
+            .setEntity(null)
+            .setResponseType(String.class)
+            .setReadTimeout(HttpClient.NO_TIMEOUT)
+            .setConnectTimeout(HttpClient.NO_TIMEOUT);
         String response = client.call(request, 1000);
         System.out.println(response);
     }
@@ -80,11 +79,11 @@ public class HttpClientProxyTest extends BaseTest {
         body.setWho("dzung");
         RequestEntity entity = RequestEntity.body(body);
         PostRequest request = new PostRequest()
-                .setURL("http://localhost:8081/")
-                .setEntity(entity)
-                .setResponseType(String.class)
-                .setReadTimeout(HttpClient.NO_TIMEOUT)
-                .setConnectTimeout(HttpClient.NO_TIMEOUT);
+            .setURL("http://localhost:8081/")
+            .setEntity(entity)
+            .setResponseType(String.class)
+            .setReadTimeout(HttpClient.NO_TIMEOUT)
+            .setConnectTimeout(HttpClient.NO_TIMEOUT);
         String response = client.call(request, 1000);
         System.out.println(response);
     }
@@ -95,12 +94,12 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet?who=Monkey")
-                .setURL(new URL("http://127.0.0.1:18081/greet?who=Monkey"))
-                .setURL(URI.create("http://127.0.0.1:18081/greet?who=Monkey"));
+            .setConnectTimeout(15000)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet?who=Monkey")
+            .setURL(new URL("http://127.0.0.1:18081/greet?who=Monkey"))
+            .setURL(URI.create("http://127.0.0.1:18081/greet?who=Monkey"));
 
         // when
         TestResponse actual = sut.call(request, 15000);
@@ -118,10 +117,10 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet?who=Monkey");
+            .setConnectTimeout(15000)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet?who=Monkey");
 
         // when
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -188,10 +187,10 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(String.class)
-                .setResponseType(StatusCodes.OK, String.class)
-                .setURL("http://unknow-host:18081/greet");
+            .setConnectTimeout(15000)
+            .setResponseType(String.class)
+            .setResponseType(StatusCodes.OK, String.class)
+            .setURL("http://unknow-host:18081/greet");
 
         // when
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -221,10 +220,10 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet?who=Monkey");
+            .setConnectTimeout(15000)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet?who=Monkey");
 
         // when
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -255,10 +254,10 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1.0:18081/greet");
+            .setConnectTimeout(15000)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1.0:18081/greet");
 
         // when
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -289,13 +288,13 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(new TestRequest("Monkey"))
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet")
-                .setURL(new URL("http://127.0.0.1:18081/greet"))
-                .setURL(URI.create("http://127.0.0.1:18081/greet"));
+            .setConnectTimeout(15000)
+            .setEntity(new TestRequest("Monkey"))
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet")
+            .setURL(new URL("http://127.0.0.1:18081/greet"))
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
 
         // when
         TestResponse actual = sut.call(request, 15000);
@@ -313,11 +312,11 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(boolean.class)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1.0:18081/greet");
+            .setConnectTimeout(15000)
+            .setEntity(boolean.class)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1.0:18081/greet");
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request, 150000));
@@ -334,13 +333,13 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         PutRequest request = new PutRequest()
-                .setConnectTimeout(15000)
-                .setEntity(new TestRequest("Monkey"))
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet")
-                .setURL(new URL("http://127.0.0.1:18081/greet"))
-                .setURL(URI.create("http://127.0.0.1:18081/greet"));
+            .setConnectTimeout(15000)
+            .setEntity(new TestRequest("Monkey"))
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet")
+            .setURL(new URL("http://127.0.0.1:18081/greet"))
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
 
         // when
         TestResponse actual = sut.call(request, 15000);
@@ -358,13 +357,13 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = newClientProxy();
 
         DeleteRequest request = new DeleteRequest()
-                .setConnectTimeout(15000)
-                .setEntity(new TestRequest("Monkey"))
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet")
-                .setURL(new URL("http://127.0.0.1:18081/greet"))
-                .setURL(URI.create("http://127.0.0.1:18081/greet"));
+            .setConnectTimeout(15000)
+            .setEntity(new TestRequest("Monkey"))
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet")
+            .setURL(new URL("http://127.0.0.1:18081/greet"))
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
 
         // when
         Throwable e = Asserts.assertThrows(() ->
@@ -430,10 +429,10 @@ public class HttpClientProxyTest extends BaseTest {
         RequestQueue queue = FieldUtil.getFieldValue(sut, "requestQueue");
 
         GetRequest request = new GetRequest()
-                .setConnectTimeout(15000)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet?who=Monkey");
+            .setConnectTimeout(15000)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet?who=Monkey");
 
         // when
         queue.add(request);
@@ -449,11 +448,11 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = HttpClientProxy.builder().build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(String.class)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet");
+            .setConnectTimeout(15000)
+            .setEntity(String.class)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet");
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request, 150000));
@@ -470,16 +469,19 @@ public class HttpClientProxyTest extends BaseTest {
         HttpClientProxy sut = HttpClientProxy.builder().build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(String.class)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet");
+            .setConnectTimeout(15000)
+            .setEntity(String.class)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet");
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.execute(request, new RequestCallback<ResponseEntity>() {
-            public void onException(Exception e) {}
-            public void onResponse(ResponseEntity response) {}
+            public void onException(Exception e) {
+            }
+
+            public void onResponse(ResponseEntity response) {
+            }
         }));
 
         // then
@@ -492,20 +494,20 @@ public class HttpClientProxyTest extends BaseTest {
     public void maxCapacity() {
         // given
         HttpClientProxy sut = HttpClientProxy.builder()
-                .autoStart(true)
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
+            .autoStart(true)
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(String.class)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet");
+            .setConnectTimeout(15000)
+            .setEntity(String.class)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet");
 
         RequestQueue queue = FieldUtil.getFieldValue(sut, "requestQueue");
-        for (int i = 0 ; i < 1000; ++i)
+        for (int i = 0; i < 1000; ++i)
             queue.add(request);
 
         // when
@@ -523,13 +525,13 @@ public class HttpClientProxyTest extends BaseTest {
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
-        
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
         // when
         String fileName = sut.download(fileUrl, new File("test-output/no-commit"));
-        
+
         // then
         Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
         Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
@@ -600,15 +602,15 @@ public class HttpClientProxyTest extends BaseTest {
                     .setValue("hello", "world")
                     .build()
             );
-        
+
         HttpClientProxy sut = HttpClientProxy.builder()
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
-        
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
         // when
         String fileName = sut.download(request, new File("test-output/no-commit"));
-        
+
         // then
         Asserts.assertEquals(fileName, "ezy-settings-1.0.0.xsd");
         Asserts.assertTrue(new File("test-output/no-commit/ezy-settings-1.0.0.xsd").exists());
@@ -653,19 +655,19 @@ public class HttpClientProxyTest extends BaseTest {
     public void downloadToOutputStreamTest() throws Exception {
         // given
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
-        
+
         HttpClientProxy sut = HttpClientProxy.builder()
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
-        
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
         File outFile = new File("test-output/no-commit/download-test.xml");
         EzyFileUtil.createFileIfNotExists(outFile);
         OutputStream outputStream = new FileOutputStream(outFile);
-        
+
         // when
         sut.download(fileUrl, outputStream);
-        
+
         // then
         Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
         sut.close();
@@ -736,19 +738,19 @@ public class HttpClientProxyTest extends BaseTest {
                     .setValue("hello", "world")
                     .build()
             );
-        
+
         HttpClientProxy sut = HttpClientProxy.builder()
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
-        
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
         File outFile = new File("test-output/no-commit/download-test.xml");
         EzyFileUtil.createFileIfNotExists(outFile);
         OutputStream outputStream = new FileOutputStream(outFile);
-        
+
         // when
         sut.download(request, outputStream);
-        
+
         // then
         Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
         sut.close();
@@ -789,17 +791,17 @@ public class HttpClientProxyTest extends BaseTest {
 
     private HttpClientProxy newClientProxy() {
         HttpClientProxy sut = HttpClientProxy.builder()
-                .autoStart(true)
-                .readTimeout(15000)
-                .connectTimeout(15000)
-                .setStringConverter(SingletonStringDeserializer.getInstance())
-                .addBodyConverter(new TestBodyConverter())
-                .addBodyConverters(Collections.singletonList(new TestBodyConverter()))
-                .addBodyConverter("world", new TestBodyConverter())
-                .addBodyConverters(Collections.singletonMap("foo", new TestBodyConverter()))
-                .threadPoolSize(1)
-                .requestQueueCapacity(10)
-                .build();
+            .autoStart(true)
+            .readTimeout(15000)
+            .connectTimeout(15000)
+            .setStringConverter(SingletonStringDeserializer.getInstance())
+            .addBodyConverter(new TestBodyConverter())
+            .addBodyConverters(Collections.singletonList(new TestBodyConverter()))
+            .addBodyConverter("world", new TestBodyConverter())
+            .addBodyConverters(Collections.singletonMap("foo", new TestBodyConverter()))
+            .threadPoolSize(1)
+            .requestQueueCapacity(10)
+            .build();
         EzyProcessor.processWithLogException(sut::start);
         return sut;
     }
@@ -830,6 +832,5 @@ public class HttpClientProxyTest extends BaseTest {
         public byte[] serialize(Object body) {
             return body.toString().getBytes();
         }
-
     }
 }

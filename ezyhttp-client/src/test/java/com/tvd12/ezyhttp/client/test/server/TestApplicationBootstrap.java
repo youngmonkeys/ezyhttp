@@ -58,9 +58,10 @@ public class TestApplicationBootstrap extends EzyLoggable {
 
     protected final AtomicBoolean started = new AtomicBoolean();
 
-    private static final  TestApplicationBootstrap INSTANCE = new TestApplicationBootstrap();
+    private static final TestApplicationBootstrap INSTANCE = new TestApplicationBootstrap();
 
-    private TestApplicationBootstrap() {}
+    private TestApplicationBootstrap() {
+    }
 
     public static TestApplicationBootstrap getInstance() {
         return INSTANCE;
@@ -90,8 +91,8 @@ public class TestApplicationBootstrap extends EzyLoggable {
             .setMultipartConfig(new MultipartConfigElement(
                 multipartLocation,
                 FileSizes.toByteSize(multipartMaxFileSize),
-                (int)FileSizes.toByteSize(multipartMaxRequestSize),
-                (int)FileSizes.toByteSize(multipartFileSizeThreshold)
+                (int) FileSizes.toByteSize(multipartMaxRequestSize),
+                (int) FileSizes.toByteSize(multipartFileSizeThreshold)
             ));
         return servletHandler;
     }

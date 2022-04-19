@@ -19,18 +19,18 @@ public class DownloadRequestTest {
         int readTimeout = RandomUtil.randomInt();
         int connectionTimeout = RandomUtil.randomInt();
         DownloadRequest sut = new DownloadRequest();
-        
+
         MultiValueMap headers = MultiValueMap.builder()
             .setValue("hello", "world")
             .build();
-        
+
         sut.setFileURL(fileURL);
         sut.setFileURL(new URL(fileURL));
         sut.setFileURL(URI.create(fileURL));
         sut.setReadTimeout(readTimeout);
         sut.setConnectTimeout(connectionTimeout);
         sut.setHeaders(headers);
-        
+
         // when
         // then
         Asserts.assertEquals(fileURL, sut.getFileURL());

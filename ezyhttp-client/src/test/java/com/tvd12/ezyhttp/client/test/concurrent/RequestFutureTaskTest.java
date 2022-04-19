@@ -56,7 +56,7 @@ public class RequestFutureTaskTest {
         sut.setException(exception);
 
         // then
-        Throwable e = Asserts.assertThrows(() -> sut.get());
+        Throwable e = Asserts.assertThrows(sut::get);
         Asserts.assertThat(e).isEqualsTo(exception);
     }
 }

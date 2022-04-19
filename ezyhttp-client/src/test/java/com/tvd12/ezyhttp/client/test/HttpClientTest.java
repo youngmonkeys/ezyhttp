@@ -46,29 +46,29 @@ public class HttpClientTest {
 
     protected static void getTest() throws Exception {
         HttpClient client = HttpClient.builder()
-                .build();
+            .build();
         GetRequest request = new GetRequest()
-                .setURL("http://localhost:8081/bye?messages=a,b,c&numbers=1,2,3")
-                .setEntity(null)
-                .setResponseType(String.class)
-                .setReadTimeout(HttpClient.NO_TIMEOUT)
-                .setConnectTimeout(HttpClient.NO_TIMEOUT);
+            .setURL("http://localhost:8081/bye?messages=a,b,c&numbers=1,2,3")
+            .setEntity(null)
+            .setResponseType(String.class)
+            .setReadTimeout(HttpClient.NO_TIMEOUT)
+            .setConnectTimeout(HttpClient.NO_TIMEOUT);
         String response = client.call(request);
         System.out.println(response);
     }
 
     protected static void postTest() throws Exception {
         HttpClient client = HttpClient.builder()
-                .build();
+            .build();
         HelloRequest body = new HelloRequest();
         body.setWho("dzung");
         RequestEntity entity = RequestEntity.body(body);
         PostRequest request = new PostRequest()
-                .setURL("http://localhost:8081/")
-                .setEntity(entity)
-                .setResponseType(String.class)
-                .setReadTimeout(HttpClient.NO_TIMEOUT)
-                .setConnectTimeout(HttpClient.NO_TIMEOUT);
+            .setURL("http://localhost:8081/")
+            .setEntity(entity)
+            .setResponseType(String.class)
+            .setReadTimeout(HttpClient.NO_TIMEOUT)
+            .setConnectTimeout(HttpClient.NO_TIMEOUT);
         String response = client.call(request);
         System.out.println(response);
     }
@@ -111,23 +111,23 @@ public class HttpClientTest {
     public void callTest() throws Exception {
         // given
         HttpClient sut = HttpClient.builder()
-                .objectMapper(new Object())
-                .objectMapper(new ObjectMapper())
-                .build();
+            .objectMapper(new Object())
+            .objectMapper(new ObjectMapper())
+            .build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(-1)
-                .setReadTimeout(15000)
-                .setEntity(
-                    RequestEntity.builder()
-                        .body(new TestRequest("Monkey"))
-                        .header("hello", "world")
-                        .header("foo", "bar")
-                        .build()
-                )
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/greet"));
+            .setConnectTimeout(-1)
+            .setReadTimeout(15000)
+            .setEntity(
+                RequestEntity.builder()
+                    .body(new TestRequest("Monkey"))
+                    .header("hello", "world")
+                    .header("foo", "bar")
+                    .build()
+            )
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
 
         // when
         TestResponse actual = sut.call(request);
@@ -141,20 +141,20 @@ public class HttpClientTest {
     public void callPostFormTest() throws Exception {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(-1)
-                .setReadTimeout(15000)
-                .setEntity(
-                    RequestEntity.builder()
-                        .body(new TestRequest("Young Monkey"))
-                        .contentType(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED)
-                        .build()
-                )
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/form"));
+            .setConnectTimeout(-1)
+            .setReadTimeout(15000)
+            .setEntity(
+                RequestEntity.builder()
+                    .body(new TestRequest("Young Monkey"))
+                    .contentType(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED)
+                    .build()
+            )
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/form"));
 
         // when
         TestResponse actual = sut.call(request);
@@ -168,12 +168,12 @@ public class HttpClientTest {
     public void postWithNoBody() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/form"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/form"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -186,12 +186,12 @@ public class HttpClientTest {
     public void postMethodNotFound() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/404"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/404"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -204,12 +204,12 @@ public class HttpClientTest {
     public void postMethodUnauthorized() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/401"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/401"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -240,12 +240,12 @@ public class HttpClientTest {
     public void postMethodForbidden() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/403"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/403"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -258,12 +258,12 @@ public class HttpClientTest {
     public void postMethodNotAcceptable() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/406"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/406"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -276,12 +276,12 @@ public class HttpClientTest {
     public void postMethodTimeout() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/408"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/408"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -294,12 +294,12 @@ public class HttpClientTest {
     public void postMethodConflict() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/409"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/409"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -312,12 +312,12 @@ public class HttpClientTest {
     public void postMethodUnsupportedMediaType() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/415"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/415"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -330,12 +330,12 @@ public class HttpClientTest {
     public void postMethodServerInternalError() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/500"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/500"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -348,12 +348,12 @@ public class HttpClientTest {
     public void postMethodServer501() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/501"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/501"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -366,12 +366,12 @@ public class HttpClientTest {
     public void postMethodNotAllow() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL(URI.create("http://127.0.0.1:18081/405"));
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/405"));
 
         // when
         Throwable e = Asserts.assertThrows(() -> sut.call(request));
@@ -402,17 +402,17 @@ public class HttpClientTest {
     public void deserializeResponseBodyString() throws Exception {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
+            .build();
 
         PostRequest request = new PostRequest()
-                .setResponseType(TestResponse.class)
-                .setEntity(
-                    RequestEntity.builder()
-                        .body(new TestRequest("Monkey"))
-                        .build()
-                )
-                .setResponseType(StatusCodes.OK, String.class)
-                .setURL(URI.create("http://127.0.0.1:18081/greet"));
+            .setResponseType(TestResponse.class)
+            .setEntity(
+                RequestEntity.builder()
+                    .body(new TestRequest("Monkey"))
+                    .build()
+            )
+            .setResponseType(StatusCodes.OK, String.class)
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
 
         // when
         String actual = sut.call(request);
@@ -437,8 +437,8 @@ public class HttpClientTest {
         ).thenThrow(exception);
 
         HttpClient sut = HttpClient.builder()
-                .addBodyConverter(contentType, deserializer)
-                .build();
+            .addBodyConverter(contentType, deserializer)
+            .build();
 
         // when
         Throwable e = Asserts.assertThrows(() ->
@@ -474,18 +474,18 @@ public class HttpClientTest {
         when(deserializer.deserialize(data, Map.class)).thenReturn(map);
 
         HttpClient sut = HttpClient.builder()
-                .addBodyConverter(contentType, deserializer)
-                .build();
+            .addBodyConverter(contentType, deserializer)
+            .build();
 
         // when
         Map<String, String> actual = MethodInvoker.create()
-                .object(sut)
-                .method("deserializeResponseBody")
-                .param(String.class, contentType)
-                .param(int.class, contentLength)
-                .param(InputStream.class, inputStream)
-                .param(Class.class, null)
-                .call();
+            .object(sut)
+            .method("deserializeResponseBody")
+            .param(String.class, contentType)
+            .param(int.class, contentLength)
+            .param(InputStream.class, inputStream)
+            .param(Class.class, null)
+            .call();
 
         // then
         Asserts.assertEquals(map, actual);
@@ -502,18 +502,18 @@ public class HttpClientTest {
         BodyDeserializer deserializer = mock(BodyDeserializer.class);
 
         HttpClient sut = HttpClient.builder()
-                .addBodyConverter(contentType, deserializer)
-                .build();
+            .addBodyConverter(contentType, deserializer)
+            .build();
 
         // when
         Map<String, String> actual = MethodInvoker.create()
-                .object(sut)
-                .method("deserializeResponseBody")
-                .param(String.class, contentType)
-                .param(int.class, contentLength)
-                .param(InputStream.class, inputStream)
-                .param(Class.class, null)
-                .call();
+            .object(sut)
+            .method("deserializeResponseBody")
+            .param(String.class, contentType)
+            .param(int.class, contentLength)
+            .param(InputStream.class, inputStream)
+            .param(Class.class, null)
+            .call();
 
         // then
         Asserts.assertNull(actual);
@@ -523,87 +523,87 @@ public class HttpClientTest {
     public void downloadToFileNotFoundTest() {
         // given
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
-        
+
         HttpClient sut = HttpClient.builder()
-                .build();
-        
+            .build();
+
         // when
         Throwable e = Asserts.assertThrows(
-                () -> sut.download(fileUrl, new File("test-output/no-commit"))
+            () -> sut.download(fileUrl, new File("test-output/no-commit"))
         );
-        
+
         // then
         Asserts.assertEqualsType(e, HttpNotFoundException.class);
     }
-    
+
     @Test
     public void downloadToOutputStreamNotFoundTest() {
         // given
         String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
-        
+
         HttpClient sut = HttpClient.builder()
-                .build();
-        
+            .build();
+
         OutputStream outputStream = mock(OutputStream.class);
-        
+
         // when
         Throwable e = Asserts.assertThrows(
-                () -> sut.download(fileUrl, outputStream)
+            () -> sut.download(fileUrl, outputStream)
         );
-        
+
         // then
         Asserts.assertEqualsType(e, HttpNotFoundException.class);
     }
-    
+
     @Test
     public void getDownloadFileNameTest() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
-        
+            .build();
+
         String contentDisposition = "Content-Disposition: attachment; filename=\"filename.jpg\"";
-        
+
         // when
         String actual = MethodInvoker.create()
-                .object(sut)
-                .method("getDownloadFileName")
-                .param("fileUrl")
-                .param(contentDisposition)
-                .call();
-        
+            .object(sut)
+            .method("getDownloadFileName")
+            .param("fileUrl")
+            .param(contentDisposition)
+            .call();
+
         // then
         Asserts.assertEquals(actual, "filename.jpg");
     }
-    
+
     @Test
     public void getDownloadFileNameWithEmptyDispositionTest() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
-        
+            .build();
+
         String contentDisposition = "";
-        
+
         // when
         String actual = MethodInvoker.create()
-                .object(sut)
-                .method("getDownloadFileName")
-                .param("https://example.com/file.jpg")
-                .param(contentDisposition)
-                .call();
-        
+            .object(sut)
+            .method("getDownloadFileName")
+            .param("https://example.com/file.jpg")
+            .param(contentDisposition)
+            .call();
+
         // then
         Asserts.assertEquals(actual, "file.jpg");
     }
-    
+
     @Test
     public void processDownloadErrorInputStreamIsNull() {
         // given
         HttpClient sut = HttpClient.builder()
-                .build();
-        
+            .build();
+
         HttpURLConnection connection = mock(HttpURLConnection.class);
-        
-        
+
+
         // when
         Exception e = MethodInvoker.create()
             .object(sut)
@@ -612,56 +612,56 @@ public class HttpClientTest {
             .param(String.class, "https://example.com/file.jpg")
             .param(int.class, 404)
             .call();
-        
+
         // then
         Asserts.assertEqualsType(e, HttpNotFoundException.class);
         verify(connection, times(1)).getErrorStream();
     }
-    
+
     @Test
     public void getDownloadFileNameWithemiColonTest() {
         // given
         String contentDisposition = "filename=hello;";
-        
+
         // when
         String actual = HttpClient.getDownloadFileName("", contentDisposition);
-        
+
         // then
         Asserts.assertEquals(actual, "hello");
     }
-    
+
     @Test
     public void getDownloadFileNameWithQuotesTest() {
         // given
         String contentDisposition = "filename=\"hello\";";
-        
+
         // when
         String actual = HttpClient.getDownloadFileName("", contentDisposition);
-        
+
         // then
         Asserts.assertEquals(actual, "hello");
     }
-    
+
     @Test
     public void getDownloadFileNameWithQuoteTest() {
         // given
         String contentDisposition = "filename='hello';";
-        
+
         // when
         String actual = HttpClient.getDownloadFileName("", contentDisposition);
-        
+
         // then
         Asserts.assertEquals(actual, "hello");
     }
-    
+
     @Test
     public void getDownloadFileNameWithMaxLengthTest() {
         // given
         String contentDisposition = "filename=hello";
-        
+
         // when
         String actual = HttpClient.getDownloadFileName("", contentDisposition);
-        
+
         // then
         Asserts.assertEquals(actual, "hello");
     }
@@ -686,5 +686,6 @@ public class HttpClientTest {
     }
 
     @BodyConvert(ContentTypes.APPLICATION_JSON)
-    public static class MyTextBodyConverter extends TextBodyConverter {}
+    public static class MyTextBodyConverter extends TextBodyConverter {
+    }
 }

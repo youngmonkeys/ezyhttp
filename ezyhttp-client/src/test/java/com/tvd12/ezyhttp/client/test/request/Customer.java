@@ -6,8 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Customer {
-
     protected String name;
     protected int age;
-
 }

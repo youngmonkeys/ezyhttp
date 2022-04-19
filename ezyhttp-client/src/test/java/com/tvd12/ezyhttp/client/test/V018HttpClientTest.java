@@ -12,29 +12,28 @@ public class V018HttpClientTest {
 
     public static void main(String[] args) throws Exception {
         HttpClient client = HttpClient.builder()
-                .build();
+            .build();
         PostRequest loveRequest = new PostRequest()
-                .setURL("http://localhost:8083/love");
+            .setURL("http://localhost:8083/love");
         System.out.println(client.request(loveRequest));
-        
+
         DeleteRequest deleteRequest = new DeleteRequest()
-                .setURL("http://localhost:8083/api/v1/customer/delete")
-                .setEntity(
-                    RequestEntity.builder()
-                        .header("token", "123456")
-                        .build()
-                );
+            .setURL("http://localhost:8083/api/v1/customer/delete")
+            .setEntity(
+                RequestEntity.builder()
+                    .header("token", "123456")
+                    .build()
+            );
         System.out.println(client.request(deleteRequest));
         System.out.println(client.request(deleteRequest).getBody().toString());
-        
+
         GetRequest textRequest = new GetRequest()
-                .setURL("http://localhost:8083/text");
-        System.out.println((String)client.call(textRequest));
-        
+            .setURL("http://localhost:8083/text");
+        System.out.println((String) client.call(textRequest));
+
         GetRequest listRequest = new GetRequest()
-                .setResponseType(List.class)
-                .setURL("http://localhost:8083/list");
+            .setResponseType(List.class)
+            .setURL("http://localhost:8083/list");
         System.out.println(client.call(listRequest).toString());
     }
-    
 }

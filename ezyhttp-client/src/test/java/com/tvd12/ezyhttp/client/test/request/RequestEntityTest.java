@@ -38,7 +38,7 @@ public class RequestEntityTest {
 
         // when
         RequestEntity sut = RequestEntity.of(body)
-            .header("1", (String)null)
+            .header("1", (String) null)
             .header("1", "hello")
             .header("1", "world")
             .header("2", Arrays.asList("foo", "bar"))
@@ -64,7 +64,7 @@ public class RequestEntityTest {
     @Test
     public void emptyHeadersTest() {
         // given
-        RequestEntity sut = new RequestEntity((Map<String, List<String>>)null, null);
+        RequestEntity sut = new RequestEntity((Map<String, List<String>>) null, null);
 
         // when
         // then
@@ -77,8 +77,8 @@ public class RequestEntityTest {
     public void buildWithBodyNull() {
         // given
         RequestEntity sut = RequestEntity.builder()
-                .body(null)
-                .build();
+            .body(null)
+            .build();
 
         // when
         // then
@@ -96,8 +96,8 @@ public class RequestEntityTest {
         data.put("3", Collections.singletonList("monkey"));
         data.put(Headers.CONTENT_TYPE, Collections.singletonList(ContentTypes.APPLICATION_JSON));
         RequestEntity sut = RequestEntity.builder()
-                .body(new MultiValueMap(data))
-                .build();
+            .body(new MultiValueMap(data))
+            .build();
 
         // when
         // then

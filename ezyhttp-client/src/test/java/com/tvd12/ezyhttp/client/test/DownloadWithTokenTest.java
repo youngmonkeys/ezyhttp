@@ -20,19 +20,18 @@ public class DownloadWithTokenTest {
                     .setValue("token", "")
                     .build()
             );
-        
+
         HttpClientProxy sut = HttpClientProxy.builder()
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
-        
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
         // when
         String fileName = sut.download(request, new File("test-output/no-commit"));
         System.out.println(fileName);
-        
+
         // then
         sut.close();
         sut.stop();
     }
-    
 }
