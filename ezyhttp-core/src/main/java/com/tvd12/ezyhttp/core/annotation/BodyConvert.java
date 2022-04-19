@@ -7,11 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
  * Annotated for body converter class.
- *
- * @author tavandung12
- *
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

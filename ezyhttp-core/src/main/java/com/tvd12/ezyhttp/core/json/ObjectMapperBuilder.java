@@ -110,7 +110,9 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parseDate(p.getValueAsString());
             } else {
-                throw new IOException("can deserialize value: " + p.getValueAsString() + " to LocalDate");
+                throw new IOException(
+                    "can deserialize value: " + p.getValueAsString() + " to LocalDate"
+                );
             }
         }
     }
@@ -153,7 +155,9 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parseDateTime(p.getValueAsString());
             } else {
-                throw new IOException("can deserialize value: " + p.getValueAsString() + " to LocalDateTime");
+                throw new IOException(
+                    "can deserialize value: " + p.getValueAsString() + " to LocalDateTime"
+                );
             }
         }
     }

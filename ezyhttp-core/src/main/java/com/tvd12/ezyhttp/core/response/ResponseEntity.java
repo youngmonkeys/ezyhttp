@@ -42,7 +42,7 @@ public class ResponseEntity {
     }
 
     public static ResponseEntity create(int status, Object body) {
-        return new ResponseEntity(status, (MultiValueMap)null, body);
+        return new ResponseEntity(status, (MultiValueMap) null, body);
     }
 
     public static ResponseEntity ok() {
@@ -75,12 +75,13 @@ public class ResponseEntity {
 
     @SuppressWarnings("unchecked")
     public <T> T getBody() {
-        return (T)body;
+        return (T) body;
     }
 
     public String getHeader(String name) {
-        if (headers == null)
+        if (headers == null) {
             return null;
+        }
         return headers.getValue(name);
     }
 
@@ -140,15 +141,17 @@ public class ResponseEntity {
             return this;
         }
 
-        public Builder headers(Map<String, String> headers) {
-            for (Entry<String, String> header : headers.entrySet())
-                header(header.getKey(), header.getValue());
+        public Builder header(String name, List<String> values) {
+            for (String value : values) {
+                header(name, value);
+            }
             return this;
         }
 
-        public Builder header(String name, List<String> values) {
-            for (String value : values)
-                header(name, value);
+        public Builder headers(Map<String, String> headers) {
+            for (Entry<String, String> header : headers.entrySet()) {
+                header(header.getKey(), header.getValue());
+            }
             return this;
         }
 

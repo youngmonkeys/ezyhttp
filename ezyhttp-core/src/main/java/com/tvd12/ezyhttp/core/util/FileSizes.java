@@ -2,8 +2,7 @@ package com.tvd12.ezyhttp.core.util;
 
 public final class FileSizes {
 
-    private FileSizes() {
-    }
+    private FileSizes() {}
 
     public static long toByteSize(String value) {
         String lowercase = value.toLowerCase();
@@ -26,15 +25,19 @@ public final class FileSizes {
                 return subSizeStringToLong(value, 1);
             }
         }
-        throw new IllegalArgumentException("size must follow template: [value][B|KB|MB|GB|TB]");
+        throw new IllegalArgumentException(
+            "size must follow template: [value][B|KB|MB|GB|TB]"
+        );
     }
 
     private static long subSizeStringToLong(String value, int suffixSize) {
         try {
             return Long.parseLong(value.substring(0, value.length() - suffixSize));
         } catch (Exception e) {
-            throw new IllegalArgumentException("size must follow template: [value][B|KB|MB|GB|TB]", e);
+            throw new IllegalArgumentException(
+                "size must follow template: [value][B|KB|MB|GB|TB]",
+                e
+            );
         }
     }
-
 }

@@ -8,18 +8,20 @@ import com.tvd12.ezyfox.util.EzyEntry;
 
 public final class PathVariables {
 
-    private PathVariables() {
-    }
+    private PathVariables() {}
 
-    public static List<Entry<String, String>> getVariables(String template, String uri) {
-        String[] tPaths = template.split("/");
-        String[] uPaths = uri.split("/");
+    public static List<Entry<String, String>> getVariables(
+        String template,
+        String uri
+    ) {
+        String[] templatePaths = template.split("/");
+        String[] uriPaths = uri.split("/");
         List<Entry<String, String>> answer = new ArrayList<>();
-        for (int i = 0; i < tPaths.length; ++i) {
-            String tPath = tPaths[i];
-            if (isPathVariable(tPath)) {
-                String varName = getVariableName(tPath);
-                String varValue = uPaths[i];
+        for (int i = 0; i < templatePaths.length; ++i) {
+            String templatePath = templatePaths[i];
+            if (isPathVariable(templatePath)) {
+                String varName = getVariableName(templatePath);
+                String varValue = uriPaths[i];
                 answer.add(EzyEntry.of(varName, varValue));
             }
         }

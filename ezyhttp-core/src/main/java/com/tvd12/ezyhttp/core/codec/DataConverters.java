@@ -57,6 +57,12 @@ public class DataConverters implements EzyDestroyable {
         }
     }
 
+    public void addBodyConverters(Map<String, Object> converterByContentType) {
+        for (Entry<String, Object> e : converterByContentType.entrySet()) {
+            addBodyConverter(e.getKey(), e.getValue());
+        }
+    }
+
     public void addBodyConverter(Object converter) {
         if (converter instanceof BodySerializer) {
             String contentType = BodyConvertAnnotations.getContentType(converter);
@@ -77,12 +83,6 @@ public class DataConverters implements EzyDestroyable {
         }
     }
 
-    public void addBodyConverters(Map<String, Object> converterByContentType) {
-        for (Entry<String, Object> e : converterByContentType.entrySet()) {
-            addBodyConverter(e.getKey(), e.getValue());
-        }
-    }
-
     public void setStringConverter(Object converter) {
         if (converter instanceof StringDeserializer) {
             this.stringDeserializer = (StringDeserializer) converter;
@@ -99,10 +99,16 @@ public class DataConverters implements EzyDestroyable {
         JsonBodyConverter jsonBodyConverter = new JsonBodyConverter(objectMapper);
         FormBodyConverter formBodyConverter = new FormBodyConverter(objectMapper);
         this.bodySerializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
-        this.bodySerializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
+        this.bodySerializers.put(
+            ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED,
+            formBodyConverter
+        );
         this.bodySerializers.put(ContentTypes.TEXT_PLAIN, defaultBodyConverter);
         this.bodyDeserializers.put(ContentTypes.APPLICATION_JSON, jsonBodyConverter);
-        this.bodyDeserializers.put(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, formBodyConverter);
+        this.bodyDeserializers.put(
+            ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED,
+            formBodyConverter
+        );
         this.bodyDeserializers.put(ContentTypes.MULTIPART_FORM_DATA, formBodyConverter);
         this.stringDeserializer = new DefaultStringDeserializer();
         this.bodyDeserializers.put(ContentTypes.TEXT_PLAIN, defaultBodyConverter);

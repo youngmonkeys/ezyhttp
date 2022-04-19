@@ -31,9 +31,9 @@ public class ContentTypeTest {
         Asserts.assertEquals(ContentType.ofExtension("txt"), ContentType.TEXT_PLAIN);
         Asserts.assertEquals(ContentType.ofExtension(null), ContentType.APPLICATION_OCTET_STREAM);
     }
-    
+
     @Test
-    public void commontTest() {
+    public void commonTest() {
         Asserts.assertEquals("json", ContentType.APPLICATION_JSON.getExtension());
         Asserts.assertEquals(ContentTypes.APPLICATION_JSON, ContentType.APPLICATION_JSON.getValue());
     }

@@ -21,10 +21,11 @@ public final class MapEncoder {
         boolean first = true;
         StringBuilder builder = new StringBuilder();
         for (Entry<String, Object> entry : map.entrySet()) {
-            if (first)
+            if (first) {
                 first = false;
-            else
+            } else {
                 builder.append("&");
+            }
             builder.append(URLEncoder.encode(entry.getKey(), EzyStrings.UTF_8));
             builder.append("=");
             builder.append(URLEncoder.encode(entry.getValue().toString(), EzyStrings.UTF_8));

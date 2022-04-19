@@ -19,8 +19,9 @@ public final class MapDecoder {
 
     public static Map<String, String> decodeFromString(String string) throws IOException {
         Map<String, String> map = new HashMap<>();
-        if (EzyStrings.isNoContent(string))
+        if (EzyStrings.isNoContent(string)) {
             return map;
+        }
         String[] keyValues = string.split("&");
         for (String keyValue : keyValues) {
             String[] kv = keyValue.split("=");

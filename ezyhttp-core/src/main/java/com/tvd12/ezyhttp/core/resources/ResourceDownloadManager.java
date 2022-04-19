@@ -32,7 +32,7 @@ public class ResourceDownloadManager
     protected final ExecutorService executorService;
     protected final BlockingQueue<Entry> queue;
     protected final EzyFutureMap<Entry> futureMap;
-    protected final static Entry POISON = new Entry();
+    protected static final Entry POISON = new Entry();
 
     public static final int DEFAULT_CAPACITY = 100000;
     public static final int DEFAULT_BUFFER_SIZE = 1024;
@@ -134,16 +134,6 @@ public class ResourceDownloadManager
         future.get(DEFAULT_TIMEOUT);
     }
 
-    public void drainAsync(
-        InputStream from,
-        OutputStream to,
-        EzyResultCallback<Boolean> callback
-    ) {
-        Entry entry = new Entry(from, to);
-        EzyCallableFutureTask future = new EzyCallableFutureTask(callback);
-        drain(entry, future);
-    }
-
     private void drain(
         Entry entry,
         EzyFuture future
@@ -154,6 +144,16 @@ public class ResourceDownloadManager
             futureMap.removeFuture(entry);
             throw new MaxResourceDownloadCapacity(capacity);
         }
+    }
+
+    public void drainAsync(
+        InputStream from,
+        OutputStream to,
+        EzyResultCallback<Boolean> callback
+    ) {
+        Entry entry = new Entry(from, to);
+        EzyCallableFutureTask future = new EzyCallableFutureTask(callback);
+        drain(entry, future);
     }
 
     @Override

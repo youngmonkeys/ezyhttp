@@ -26,7 +26,7 @@ public class ResourceUploadManager
     protected final ExecutorService executorService;
     protected final BlockingQueue<Entry> queue;
     protected final EzyFutureMap<Entry> futureMap;
-    protected final static Entry POISON = new Entry();
+    protected static final Entry POISON = new Entry();
 
     public static final int DEFAULT_CAPACITY = 100000;
     public static final int DEFAULT_BUFFER_SIZE = 1024;

@@ -9,6 +9,7 @@ import java.util.Map;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyStrings;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class URIBuilder implements EzyBuilder<URI> {
 
     protected List<String> paths;
@@ -63,8 +64,9 @@ public class URIBuilder implements EzyBuilder<URI> {
     }
 
     protected String buildQuery() {
-        if (queryParams == null)
+        if (queryParams == null) {
             return null;
+        }
         int index = 0;
         int lastIndex = queryParams.size() - 1;
         StringBuilder b = new StringBuilder();
@@ -79,8 +81,9 @@ public class URIBuilder implements EzyBuilder<URI> {
     }
 
     public static String normalizePath(String path) {
-        if (EzyStrings.isEmpty(path))
+        if (EzyStrings.isEmpty(path)) {
             return "";
+        }
         int lastIndex = path.length() - 1;
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < path.length(); ++i) {
