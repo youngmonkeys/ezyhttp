@@ -14,19 +14,19 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Service {
     
-	/**
-	 * the service name
-	 * 
-	 * @return the service name
-	 */
+    /**
+     * the service name
+     *
+     * @return the service name
+     */
     String value() default "";
-	
-	/**
-	 * the service name
-	 * 
-	 * @return the service name
-	 */
+
+    /**
+     * the service name
+     *
+     * @return the service name
+     */
     String name() default "";
-	
-	
+
+
 }

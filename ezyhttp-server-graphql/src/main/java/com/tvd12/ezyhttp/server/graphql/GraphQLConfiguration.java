@@ -16,35 +16,35 @@ import lombok.Setter;
 @Setter
 @EzyConfigurationAfter
 public class GraphQLConfiguration implements 
-		EzyBeanConfig,
-		EzySingletonFactoryAware {
+        EzyBeanConfig,
+        EzySingletonFactoryAware {
 
-	@EzyProperty("graphql.enable")
-	private boolean graphQLEnable;
-	
-	@EzyAutoBind
-	private ObjectMapper objectMapper;
-	
-	private EzySingletonFactory singletonFactory;
-	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void config() {
-		GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
-		
-		GraphQLDataFetcherManager.Builder dataFetcherManagerBuilder = 
-				GraphQLDataFetcherManager.builder();
-		List singletons = singletonFactory.getSingletons();
-		for(Object singleton : singletons) {
-			dataFetcherManagerBuilder.addDataFetcher(singleton);
-		}
-		GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder
-				.build();
-		GraphQLController controller = GraphQLController.builder()
-				.objectMapper(objectMapper)
-				.dataFetcherManager(dataFetcherManager)
-				.schemaParser(schemaParser)
-				.build();
-		singletonFactory.addSingleton(controller);
-	}
+    @EzyProperty("graphql.enable")
+    private boolean graphQLEnable;
+    
+    @EzyAutoBind
+    private ObjectMapper objectMapper;
+    
+    private EzySingletonFactory singletonFactory;
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void config() {
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        
+        GraphQLDataFetcherManager.Builder dataFetcherManagerBuilder = 
+                GraphQLDataFetcherManager.builder();
+        List singletons = singletonFactory.getSingletons();
+        for (Object singleton : singletons) {
+            dataFetcherManagerBuilder.addDataFetcher(singleton);
+        }
+        GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder
+                .build();
+        GraphQLController controller = GraphQLController.builder()
+                .objectMapper(objectMapper)
+                .dataFetcherManager(dataFetcherManager)
+                .schemaParser(schemaParser)
+                .build();
+        singletonFactory.addSingleton(controller);
+    }
 }

@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
-import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMIT_UPLOAD_SIZE;
+import static com.tvd12.ezyhttp.core.resources.ResourceUploadManager.UNLIMITED_UPLOAD_SIZE;
 
 @AllArgsConstructor
 public class FileUploader extends EzyLoggable {
@@ -44,7 +44,7 @@ public class FileUploader extends EzyLoggable {
             asyncContext,
             part,
             outputFile,
-            UNLIMIT_UPLOAD_SIZE,
+            UNLIMITED_UPLOAD_SIZE,
             callback
         );
     }
@@ -103,7 +103,7 @@ public class FileUploader extends EzyLoggable {
             asyncContext,
             part,
             outputFile,
-            UNLIMIT_UPLOAD_SIZE,
+            UNLIMITED_UPLOAD_SIZE,
             callback
         );
     }
@@ -143,7 +143,7 @@ public class FileUploader extends EzyLoggable {
             asyncContext,
             inputStream,
             outputFile,
-            UNLIMIT_UPLOAD_SIZE,
+            UNLIMITED_UPLOAD_SIZE,
             callback
         );
     }
@@ -196,7 +196,7 @@ public class FileUploader extends EzyLoggable {
             asyncContext,
             inputStream,
             outputStream,
-            UNLIMIT_UPLOAD_SIZE,
+            UNLIMITED_UPLOAD_SIZE,
             callback
         );
     }

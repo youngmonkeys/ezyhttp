@@ -51,242 +51,233 @@ import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
 public class BlockingServlet extends HttpServlet {
-	private static final long serialVersionUID = -3874017929628817672L;
+    private static final long serialVersionUID = -3874017929628817672L;
 
-	private boolean debug;
-	private int managementPort;
-	private boolean exposeManagementURIs;
-	private int asyncDefaultTimeout;
-	protected ViewContext viewContext;
-	protected ObjectMapper objectMapper;
-	protected DataConverters dataConverters;
-	protected ComponentManager componentManager;
-	protected InterceptorManager interceptorManager;
-	protected RequestURIManager requestURIManager;
-	protected RequestHandlerManager requestHandlerManager;
-	protected ExceptionHandlerManager exceptionHandlerManager;
-	protected UnhandledErrorHandler unhandledErrorHandler;
-	protected List<Class<?>> handledExceptionClasses;
-	protected List<RequestResponseWatcher> requestResponseWatchers;
-	protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
+    private boolean debug;
+    private int managementPort;
+    private boolean exposeManagementURIs;
+    private int asyncDefaultTimeout;
+    protected ViewContext viewContext;
+    protected ObjectMapper objectMapper;
+    protected DataConverters dataConverters;
+    protected ComponentManager componentManager;
+    protected InterceptorManager interceptorManager;
+    protected RequestURIManager requestURIManager;
+    protected RequestHandlerManager requestHandlerManager;
+    protected ExceptionHandlerManager exceptionHandlerManager;
+    protected UnhandledErrorHandler unhandledErrorHandler;
+    protected List<Class<?>> handledExceptionClasses;
+    protected List<RequestResponseWatcher> requestResponseWatchers;
+    protected Map<Class<?>, UncaughtExceptionHandler> uncaughtExceptionHandlers;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Override
-	public void init() throws ServletException {
-		this.componentManager = ComponentManager.getInstance();
-		this.debug = componentManager.isDebug();
-		this.managementPort = componentManager.getManagementPort();
-		this.exposeManagementURIs = componentManager.isExposeManagementURIs();
-		this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
-		this.viewContext = componentManager.getViewContext();
-		this.objectMapper = componentManager.getObjectMapper();
-		this.dataConverters = componentManager.getDataConverters();
-		this.interceptorManager = componentManager.getInterceptorManager();
-		this.requestHandlerManager = componentManager.getRequestHandlerManager();
-		this.requestURIManager = requestHandlerManager.getRequestURIManager();
-		this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
-		this.requestResponseWatchers = componentManager.getRequestResponseWatchers();
-		this.addDefaultExceptionHandlers();
-		this.unhandledErrorHandler = componentManager.getUnhandledErrorHandler();
-		this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
-		this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
-	}
+    @Override
+    public void init() throws ServletException {
+        this.componentManager = ComponentManager.getInstance();
+        this.debug = componentManager.isDebug();
+        this.managementPort = componentManager.getManagementPort();
+        this.exposeManagementURIs = componentManager.isExposeManagementURIs();
+        this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
+        this.viewContext = componentManager.getViewContext();
+        this.objectMapper = componentManager.getObjectMapper();
+        this.dataConverters = componentManager.getDataConverters();
+        this.interceptorManager = componentManager.getInterceptorManager();
+        this.requestHandlerManager = componentManager.getRequestHandlerManager();
+        this.requestURIManager = requestHandlerManager.getRequestURIManager();
+        this.exceptionHandlerManager = componentManager.getExceptionHandlerManager();
+        this.requestResponseWatchers = componentManager.getRequestResponseWatchers();
+        this.addDefaultExceptionHandlers();
+        this.unhandledErrorHandler = componentManager.getUnhandledErrorHandler();
+        this.uncaughtExceptionHandlers = exceptionHandlerManager.getUncaughtExceptionHandlers();
+        this.handledExceptionClasses = new EzyClassTree(uncaughtExceptionHandlers.keySet()).toList();
+    }
 
-	@Override
-	protected void doGet(
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws ServletException, IOException {
-	    doHandleRequest(HttpMethod.GET, request, response);
-	}
+    @Override
+    protected void doGet(
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws ServletException, IOException {
+        doHandleRequest(HttpMethod.GET, request, response);
+    }
 
-	@Override
-	protected void doPost(
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws ServletException, IOException {
-	    doHandleRequest(HttpMethod.POST, request, response);
-	}
+    @Override
+    protected void doPost(
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws ServletException, IOException {
+        doHandleRequest(HttpMethod.POST, request, response);
+    }
 
-	@Override
-	protected void doPut(
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws IOException {
-	    doHandleRequest(HttpMethod.PUT, request, response);
-	}
+    @Override
+    protected void doPut(
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws IOException {
+        doHandleRequest(HttpMethod.PUT, request, response);
+    }
 
-	@Override
-	protected void doDelete(
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws ServletException, IOException {
-	    doHandleRequest(HttpMethod.DELETE, request, response);
-	}
+    @Override
+    protected void doDelete(
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws ServletException, IOException {
+        doHandleRequest(HttpMethod.DELETE, request, response);
+    }
 
-	private void doHandleRequest(
-		HttpMethod method,
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws IOException {
+    private void doHandleRequest(
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws IOException {
         try {
             watchRequest(method, request);
             handleRequest(method, request, response);
-        }
-        finally {
+        } finally {
             if (!request.isAsyncStarted()) {
                 watchResponse(method, request, response);
             }
         }
     }
 
-	private void watchRequest(
-		HttpMethod method,
-		HttpServletRequest request
-	) {
-	    for (RequestResponseWatcher watcher : requestResponseWatchers) {
-	        watcher.watchRequest(method, request);
-	    }
+    private void watchRequest(
+        HttpMethod method,
+        HttpServletRequest request
+    ) {
+        for (RequestResponseWatcher watcher : requestResponseWatchers) {
+            watcher.watchRequest(method, request);
+        }
     }
 
-	private void watchResponse(
-		HttpMethod method,
-		HttpServletRequest request,
-		HttpServletResponse response
-	) {
+    private void watchResponse(
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) {
         for (RequestResponseWatcher watcher : requestResponseWatchers) {
             watcher.watchResponse(method, request, response);
         }
     }
 
-	protected void handleRequest(
-		HttpMethod method,
-		HttpServletRequest request,
-		HttpServletResponse response
-	) throws IOException {
-		String requestURI = request.getRequestURI();
-		String matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
-		if (matchedURI == null) {
+    protected void handleRequest(
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws IOException {
+        String requestURI = request.getRequestURI();
+        String matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
+        if (matchedURI == null) {
             if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
                 responseString(response, "uri " + requestURI + " not found");
             }
             return;
         }
-		request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
-		boolean isManagementURI = requestURIManager.isManagementURI(method, matchedURI);
-		if (isManagementURI 
-		    && !exposeManagementURIs
-		    && request.getServerPort() != managementPort
+        request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
+        boolean isManagementURI = requestURIManager.isManagementURI(method, matchedURI);
+        if (isManagementURI
+            && !exposeManagementURIs
+            && request.getServerPort() != managementPort
         ) {
-		    handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
-			logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
-			return;
-		}
-		RequestHandler requestHandler =
-		        requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
-		if (requestHandler == RequestHandler.EMPTY) {
-		    if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
-		        responseString(response, "method " + method + " not allowed");
-		    }
-			return;
-		}
-		boolean acceptableRequest = false;
-		boolean syncResponse = true;
-		String uriTemplate = requestHandler.getRequestURI();
-		RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
-		try {
-			acceptableRequest = preHandleRequest(arguments, requestHandler);
-			if (acceptableRequest) {
-			    if (requestHandler.isAsync()) {
-			        syncResponse = false;
+            handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND);
+            logger.warn("a normal client's not allowed call to: {}, please check your proxy configuration", requestURI);
+            return;
+        }
+        RequestHandler requestHandler =
+                requestHandlerManager.getHandler(method, matchedURI, isManagementURI);
+        if (requestHandler == RequestHandler.EMPTY) {
+            if (!handleError(method, request, response, HttpServletResponse.SC_METHOD_NOT_ALLOWED)) {
+                responseString(response, "method " + method + " not allowed");
+            }
+            return;
+        }
+        boolean acceptableRequest = false;
+        boolean syncResponse = true;
+        String uriTemplate = requestHandler.getRequestURI();
+        RequestArguments arguments = newRequestArguments(method, uriTemplate, request, response);
+        try {
+            acceptableRequest = preHandleRequest(arguments, requestHandler);
+            if (acceptableRequest) {
+                if (requestHandler.isAsync()) {
+                    syncResponse = false;
                     AsyncContext asyncContext = request.startAsync(request, response);
                     if (asyncDefaultTimeout > 0) {
-                    	asyncContext.setTimeout(asyncDefaultTimeout);
-					}
+                        asyncContext.setTimeout(asyncDefaultTimeout);
+                    }
                     asyncContext.addListener(newAsyncListener(arguments, requestHandler));
                     requestHandler.handle(arguments);
-			    }
-			    else {
-    				Object responseData = requestHandler.handle(arguments);
-    				String responseContentType = requestHandler.getResponseContentType();
-    				if (responseContentType != null) {
-    					response.setContentType(responseContentType);
-    				}
-    				if (responseData != null) {
-    				    handleResponseData(request, response, responseData);
-    				}
-    				else {
-    				    response.setStatus(HttpServletResponse.SC_OK);
-    				}
-			    }
-			}
-			else {
-			    handleError(method, request, response, HttpServletResponse.SC_NOT_ACCEPTABLE);
-			}
-		}
-		catch (Exception e) {
-			handleException(method, arguments, e);
-		}
-		finally {
-		    if (syncResponse) {
-		        if (acceptableRequest) {
-		            postHandleRequest(arguments, requestHandler);
-		        }
-		        arguments.release();
-		    }
-		}
-	}
+                }  else {
+                    Object responseData = requestHandler.handle(arguments);
+                    String responseContentType = requestHandler.getResponseContentType();
+                    if (responseContentType != null) {
+                        response.setContentType(responseContentType);
+                    }
+                    if (responseData != null) {
+                        handleResponseData(request, response, responseData);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    }
+                }
+            } else {
+                handleError(method, request, response, HttpServletResponse.SC_NOT_ACCEPTABLE);
+            }
+        } catch (Exception e) {
+            handleException(method, arguments, e);
+        } finally {
+            if (syncResponse) {
+                if (acceptableRequest) {
+                    postHandleRequest(arguments, requestHandler);
+                }
+                arguments.release();
+            }
+        }
+    }
 
-	protected AsyncListener newAsyncListener(
-		RequestArguments arguments,
-		RequestHandler requestHandler
-	) {
-	    return (AsyncCallback) event -> {
-			try {
-				try {
-					postHandleRequest(arguments, requestHandler);
-				}
-				finally {
-					watchResponse(
-						arguments.getMethod(),
-						arguments.getRequest(),
-						arguments.getResponse()
-					);
-				}
-			}
-			catch (Exception e) {
-				logger.warn(
-					"AsyncCallback.onComplete on uri: {} error",
-					arguments.getRequest().getRequestURI(), e
-				);
-			}
-			finally {
-				arguments.release();
-			}
-		};
-	}
+    protected AsyncListener newAsyncListener(
+        RequestArguments arguments,
+        RequestHandler requestHandler
+    ) {
+        return (AsyncCallback) event -> {
+            try {
+                try {
+                    postHandleRequest(arguments, requestHandler);
+                } finally {
+                    watchResponse(
+                        arguments.getMethod(),
+                        arguments.getRequest(),
+                        arguments.getResponse()
+                    );
+                }
+            } catch (Exception e) {
+                logger.warn(
+                    "AsyncCallback.onComplete on uri: {} error",
+                    arguments.getRequest().getRequestURI(), e
+                );
+            } finally {
+                arguments.release();
+            }
+        };
+    }
 
-	protected boolean handleError(
+    protected boolean handleError(
         HttpMethod method,
         HttpServletRequest request,
         HttpServletResponse response,
         int errorStatusCode
     ) {
-	    return handleError(method, request, response, errorStatusCode, null);
-	}
+        return handleError(method, request, response, errorStatusCode, null);
+    }
 
-	protected boolean handleError(
+    protected boolean handleError(
         HttpMethod method,
         HttpServletRequest request,
         HttpServletResponse response,
         int errorStatusCode,
         Exception exception
     ) {
-		if (exception != null) {
-			logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
-		}
-		if (unhandledErrorHandler != null) {
+        if (exception != null) {
+            logger.warn("handle request uri: {} error", request.getRequestURI(), exception);
+        }
+        if (unhandledErrorHandler != null) {
             Object data = unhandledErrorHandler.handleError(
                 method,
                 request,
@@ -294,225 +285,222 @@ public class BlockingServlet extends HttpServlet {
                 errorStatusCode,
                 exception
             );
-	        if (data == null) {
-	            response.setStatus(errorStatusCode);
-	            return false;
-	        }
-	        try {
+            if (data == null) {
+                response.setStatus(errorStatusCode);
+                return false;
+            }
+            try {
                 handleResponseData(request, response, data);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 logger.warn("handle error: {} with uri: {} failed", errorStatusCode, request.getRequestURI(), e);
             }
             return true;
-	    } else {
-	        response.setStatus(errorStatusCode);
-	        return false;
-	    }
-	}
+        } else {
+            response.setStatus(errorStatusCode);
+            return false;
+        }
+    }
 
-	protected void handleException(
-		HttpMethod method,
-		RequestArguments arguments,
-		Exception e
-	) {
-		UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
-		HttpServletRequest request = arguments.getRequest();
-		HttpServletResponse response = arguments.getResponse();
-		Exception exception = e;
-		if (handler != null) {
-			try {
-				Object result = handler.handleException(arguments, e);
-				if (result != null) {
-					String responseContentType = handler.getResponseContentType();
-					if (responseContentType != null) {
-						response.setContentType(responseContentType);
-					}
-					handleResponseData(request, response, result);
-				}
-				else {
-				    handleError(method, request, response, HttpServletResponse.SC_BAD_REQUEST);
-				}
-				exception = null;
-			}
-			catch (Exception ex) {
-				exception = ex;
-			}
-		}
-		if (exception != null) {
-		    handleError(method, request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception);
-		}
-	}
+    protected void handleException(
+        HttpMethod method,
+        RequestArguments arguments,
+        Exception e
+    ) {
+        UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
+        HttpServletRequest request = arguments.getRequest();
+        HttpServletResponse response = arguments.getResponse();
+        Exception exception = e;
+        if (handler != null) {
+            try {
+                Object result = handler.handleException(arguments, e);
+                if (result != null) {
+                    String responseContentType = handler.getResponseContentType();
+                    if (responseContentType != null) {
+                        response.setContentType(responseContentType);
+                    }
+                    handleResponseData(request, response, result);
+                } else {
+                    handleError(method, request, response, HttpServletResponse.SC_BAD_REQUEST);
+                }
+                exception = null;
+            } catch (Exception ex) {
+                exception = ex;
+            }
+        }
+        if (exception != null) {
+            handleError(method, request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception);
+        }
+    }
 
-	protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
-		for(Class<?> exc : handledExceptionClasses) {
-			if (exc.isAssignableFrom(exceptionClass)) {
-				return uncaughtExceptionHandlers.get(exc);
-			}
-		}
-		return null;
-	}
+    protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
+        for (Class<?> exc : handledExceptionClasses) {
+            if (exc.isAssignableFrom(exceptionClass)) {
+                return uncaughtExceptionHandlers.get(exc);
+            }
+        }
+        return null;
+    }
 
-	protected boolean preHandleRequest(
-		RequestArguments arguments,
-		RequestHandler requestHandler
-	) throws Exception {
-		Method handler = requestHandler.getHandlerMethod();
-		for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
-			boolean passed = interceptor.preHandle(arguments, handler);
-			if (!passed)
-				return false;
-		}
-		return true;
-	}
+    protected boolean preHandleRequest(
+        RequestArguments arguments,
+        RequestHandler requestHandler
+    ) throws Exception {
+        Method handler = requestHandler.getHandlerMethod();
+        for (RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
+            boolean passed = interceptor.preHandle(arguments, handler);
+            if (!passed)
+                return false;
+        }
+        return true;
+    }
 
-	protected void postHandleRequest(
-		RequestArguments arguments,
-		RequestHandler requestHandler
-	) {
-		Method handler = requestHandler.getHandlerMethod();
-		for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors())
-			interceptor.postHandle(arguments, handler);
-	}
+    protected void postHandleRequest(
+        RequestArguments arguments,
+        RequestHandler requestHandler
+    ) {
+        Method handler = requestHandler.getHandlerMethod();
+        for (RequestInterceptor interceptor : interceptorManager.getRequestInterceptors())
+            interceptor.postHandle(arguments, handler);
+    }
 
-	protected void handleResponseData(
-		HttpServletRequest request,
-		HttpServletResponse response,
-		Object data
-	) throws Exception {
-		Object body = data;
-		if (data instanceof ResponseEntity) {
-			ResponseEntity entity = (ResponseEntity)body;
-			body = entity.getBody();
-			response.setStatus(entity.getStatus());
-			MultiValueMap headers = entity.getHeaders();
-			if (headers != null) {
-				Map<String, String> encodedHeaders = headers.toMap();
-				for(Entry<String, String> entry : encodedHeaders.entrySet())
-					response.addHeader(entry.getKey(), entry.getValue());
-			}
-		}
-		else if (data instanceof Redirect) {
-			Redirect redirect = (Redirect)data;
-			for(Cookie cookie : redirect.getCookies())
-				response.addCookie(cookie);
-			for(Entry<String, String> e : redirect.getHeaders().entrySet())
-				response.addHeader(e.getKey(), e.getValue());
-			Map<String, Object> attributes = redirect.getAttributes();
-			if (attributes != null) {
-			    String attributesValue = objectMapper.writeValueAsString(attributes);
-			    Cookie attributesCookie = new Cookie(
-			            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
-			            EzyBase64.encodeUtf(attributesValue));
-			    attributesCookie.setMaxAge(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE);
-			    response.addCookie(attributesCookie);
-			}
-			response.sendRedirect(redirect.getUri() + redirect.getQueryString());
-			return;
-		}
-		else if (data instanceof View) {
-			if (viewContext == null) {
-				throw new IllegalStateException(
-					"viewContext is null, " +
-					"you must add ezyhttp-server-thymeleaf to your dependencies" +
-					" or create viewContext by yourself"
-				);
-			}
-			View view = (View)data;
-			for(Cookie cookie : view.getCookies())
-				response.addCookie(cookie);
-			for(Entry<String, String> e : view.getHeaders().entrySet())
-				response.addHeader(e.getKey(), e.getValue());
-			response.setContentType(view.getContentType());
-			viewContext.render(getServletContext(), request, response, view);
-			return;
-		}
-		else {
-			response.setStatus(HttpServletResponse.SC_OK);
-		}
-		if (body != null)
-			responseBody(response, body);
-	}
+    protected void handleResponseData(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object data
+    ) throws Exception {
+        Object body = data;
+        if (data instanceof ResponseEntity) {
+            ResponseEntity entity = (ResponseEntity)body;
+            body = entity.getBody();
+            response.setStatus(entity.getStatus());
+            MultiValueMap headers = entity.getHeaders();
+            if (headers != null) {
+                Map<String, String> encodedHeaders = headers.toMap();
+                for (Entry<String, String> entry : encodedHeaders.entrySet())
+                    response.addHeader(entry.getKey(), entry.getValue());
+            }
+        } else if (data instanceof Redirect) {
+            Redirect redirect = (Redirect)data;
+            for (Cookie cookie : redirect.getCookies()) {
+                    response.addCookie(cookie);
+            }
+            for (Entry<String, String> e : redirect.getHeaders().entrySet()) {
+                    response.addHeader(e.getKey(), e.getValue());
+            }
+            Map<String, Object> attributes = redirect.getAttributes();
+            if (attributes != null) {
+                String attributesValue = objectMapper.writeValueAsString(attributes);
+                Cookie attributesCookie = new Cookie(
+                        CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+                        EzyBase64.encodeUtf(attributesValue));
+                attributesCookie.setMaxAge(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE);
+                response.addCookie(attributesCookie);
+            }
+            response.sendRedirect(redirect.getUri() + redirect.getQueryString());
+            return;
+        } else if (data instanceof View) {
+            if (viewContext == null) {
+                throw new IllegalStateException(
+                    "viewContext is null, " +
+                    "you must add ezyhttp-server-thymeleaf to your dependencies" +
+                    " or create viewContext by yourself"
+                );
+            }
+            View view = (View)data;
+            for (Cookie cookie : view.getCookies())
+                response.addCookie(cookie);
+            for (Entry<String, String> e : view.getHeaders().entrySet())
+                response.addHeader(e.getKey(), e.getValue());
+            response.setContentType(view.getContentType());
+            viewContext.render(getServletContext(), request, response, view);
+            return;
+        } else {
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+        if (body != null)
+            responseBody(response, body);
+    }
 
-	protected void responseBody(
-		HttpServletResponse response,
-		Object data
-	) throws IOException {
-		String contentType = response.getContentType();
-		BodySerializer bodySerializer = dataConverters.getBodySerializer(contentType);
-		byte[] bytes = bodySerializer.serialize(data);
-		responseBytes(response, bytes);
-	}
+    protected void responseBody(
+        HttpServletResponse response,
+        Object data
+    ) throws IOException {
+        String contentType = response.getContentType();
+        BodySerializer bodySerializer = dataConverters.getBodySerializer(contentType);
+        byte[] bytes = bodySerializer.serialize(data);
+        responseBytes(response, bytes);
+    }
 
-	protected void responseString(
-		HttpServletResponse response,
-		String str
-	) throws IOException {
-		byte[] bytes = EzyStrings.getUtfBytes(str);
-		responseBytes(response, bytes);
-	}
+    protected void responseString(
+        HttpServletResponse response,
+        String str
+    ) throws IOException {
+        byte[] bytes = EzyStrings.getUtfBytes(str);
+        responseBytes(response, bytes);
+    }
 
-	protected void responseBytes(
-		HttpServletResponse response,
-		byte[] bytes
-	) throws IOException {
-		response.setContentLength(bytes.length);
-		ServletOutputStream outputStream = response.getOutputStream();
-		outputStream.write(bytes);
-	}
+    protected void responseBytes(
+        HttpServletResponse response,
+        byte[] bytes
+    ) throws IOException {
+        response.setContentLength(bytes.length);
+        ServletOutputStream outputStream = response.getOutputStream();
+        outputStream.write(bytes);
+    }
 
-	protected RequestArguments newRequestArguments(
-		HttpMethod method,
-		String uriTemplate,
-		HttpServletRequest request,
-		HttpServletResponse response
-	) {
-		SimpleRequestArguments arguments = new SimpleRequestArguments();
-		arguments.setDebug(debug);
-		arguments.setMethod(method);
-		arguments.setRequest(request);
-		arguments.setResponse(response);
-		arguments.setUriTemplate(uriTemplate);
-		arguments.setCookies(request.getCookies());
-		arguments.setObjectMapper(objectMapper);
-		arguments.setRedirectionAttributesFromCookie();
+    protected RequestArguments newRequestArguments(
+        HttpMethod method,
+        String uriTemplate,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) {
+        SimpleRequestArguments arguments = new SimpleRequestArguments();
+        arguments.setDebug(debug);
+        arguments.setMethod(method);
+        arguments.setRequest(request);
+        arguments.setResponse(response);
+        arguments.setUriTemplate(uriTemplate);
+        arguments.setCookies(request.getCookies());
+        arguments.setObjectMapper(objectMapper);
+        arguments.setRedirectionAttributesFromCookie();
 
-		Enumeration<String> paramNames = request.getParameterNames();
-		while(paramNames.hasMoreElements()) {
-			String paramName = paramNames.nextElement();
-			String[] paramValues = request.getParameterValues(paramName);
-			arguments.setParameter(paramName, paramValues);
-		}
+        Enumeration<String> paramNames = request.getParameterNames();
+        while(paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            String[] paramValues = request.getParameterValues(paramName);
+            arguments.setParameter(paramName, paramValues);
+        }
 
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while(headerNames.hasMoreElements()) {
-			String headerName = headerNames.nextElement();
-			String headerValue = request.getHeader(headerName);
-			arguments.setHeader(headerName, headerValue);
-		}
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while(headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            arguments.setHeader(headerName, headerValue);
+        }
 
-		return arguments;
-	}
+        return arguments;
+    }
 
-	protected void addDefaultExceptionHandlers() {
-		exceptionHandlerManager.addUncaughtExceptionHandler(
-			DeserializeValueException.class,
-			(args, e) -> {
-				DeserializeValueException deException = (DeserializeValueException)e;
-				Map<String, String> errorData = new HashMap<>();
-				errorData.put(deException.getValueName(), "invalid");
-				errorData.put("exception", e.getClass().getName());
-				return ResponseEntity.create(StatusCodes.BAD_REQUEST, errorData);
-			});
-		exceptionHandlerManager.addUncaughtExceptionHandler(
-			HttpRequestException.class,
-			(args, e) -> {
-				HttpRequestException requestException = (HttpRequestException)e;
-				int errorStatus = requestException.getCode();
-				Object errorData = requestException.getData();
-				if (errorData == null)
-					errorData = Collections.emptyMap();
-				return ResponseEntity.create(errorStatus, errorData);
-			});
-	}
+    protected void addDefaultExceptionHandlers() {
+        exceptionHandlerManager.addUncaughtExceptionHandler(
+            DeserializeValueException.class,
+            (args, e) -> {
+                DeserializeValueException deException = (DeserializeValueException)e;
+                Map<String, String> errorData = new HashMap<>();
+                errorData.put(deException.getValueName(), "invalid");
+                errorData.put("exception", e.getClass().getName());
+                return ResponseEntity.create(StatusCodes.BAD_REQUEST, errorData);
+            });
+        exceptionHandlerManager.addUncaughtExceptionHandler(
+            HttpRequestException.class,
+            (args, e) -> {
+                HttpRequestException requestException = (HttpRequestException)e;
+                int errorStatus = requestException.getCode();
+                Object errorData = requestException.getData();
+                if (errorData == null)
+                    errorData = Collections.emptyMap();
+                return ResponseEntity.create(errorStatus, errorData);
+            });
+    }
 }

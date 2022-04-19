@@ -4,9 +4,9 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
 public class DeleteRequest extends AbstractRequest<DeleteRequest> {
 
-	@Override
-	public HttpMethod getMethod() {
-		return HttpMethod.DELETE;
-	}
-	
+    @Override
+    public HttpMethod getMethod() {
+        return HttpMethod.DELETE;
+    }
+
 }

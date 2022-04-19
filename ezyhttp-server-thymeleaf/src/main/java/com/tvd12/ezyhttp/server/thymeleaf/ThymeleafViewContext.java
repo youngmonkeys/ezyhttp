@@ -26,45 +26,45 @@ import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 public class ThymeleafViewContext implements ViewContext {
 
     private final TemplateResolver metadata;
-	private final TemplateEngine templateEngine;
-	private final List<ViewDialect> viewDialects;
-	private final List<ViewDecorator> viewDecorators;
-	private final List<MessageProvider> messageProviders;
-	private final AbsentMessageResolver absentMessageResolver;
-	
-	public ThymeleafViewContext(
+    private final TemplateEngine templateEngine;
+    private final List<ViewDialect> viewDialects;
+    private final List<ViewDecorator> viewDecorators;
+    private final List<MessageProvider> messageProviders;
+    private final AbsentMessageResolver absentMessageResolver;
+    
+    public ThymeleafViewContext(
         TemplateResolver metadata,
         List<ViewDialect> viewDialects,
         List<ViewDecorator> viewDecorators,
         List<MessageProvider> messageProviders,
         AbsentMessageResolver absentMessageResolver
     ) {
-	    this.metadata = metadata;
-	    this.viewDialects = viewDialects;
-	    this.viewDecorators = viewDecorators;
-	    this.messageProviders = messageProviders;
-	    this.absentMessageResolver = absentMessageResolver;
-		this.templateEngine = createTemplateEngine();
-	}
-	
-	@Override
-	public void render(
-			ServletContext servletContext,
-			HttpServletRequest request,
-			HttpServletResponse response, View view) throws IOException {
-	    for (ViewDecorator viewDecorator : viewDecorators) {
-	        viewDecorator.decorate(request, view);
-	    }
-		WebContext ctx = 
-	            new WebContext(request, response, servletContext, view.getLocale());
-		ctx.setVariables(view.getVariables());
-	    templateEngine.process(view.getTemplate(), ctx, response.getWriter());
-	}
-	
-	private TemplateEngine createTemplateEngine() {
-		ClassLoaderTemplateResolver templateResolver = 
+        this.metadata = metadata;
+        this.viewDialects = viewDialects;
+        this.viewDecorators = viewDecorators;
+        this.messageProviders = messageProviders;
+        this.absentMessageResolver = absentMessageResolver;
+        this.templateEngine = createTemplateEngine();
+    }
+    
+    @Override
+    public void render(
+            ServletContext servletContext,
+            HttpServletRequest request,
+            HttpServletResponse response, View view) throws IOException {
+        for (ViewDecorator viewDecorator : viewDecorators) {
+            viewDecorator.decorate(request, view);
+        }
+        WebContext ctx = 
+                new WebContext(request, response, servletContext, view.getLocale());
+        ctx.setVariables(view.getVariables());
+        templateEngine.process(view.getTemplate(), ctx, response.getWriter());
+    }
+    
+    private TemplateEngine createTemplateEngine() {
+        ClassLoaderTemplateResolver templateResolver = 
                 new ClassLoaderTemplateResolver();
-		TemplateMode templateMode = TemplateMode.valueOf(metadata.getTemplateMode());
+        TemplateMode templateMode = TemplateMode.valueOf(metadata.getTemplateMode());
         templateResolver.setTemplateMode(templateMode);
         templateResolver.setPrefix(metadata.getPrefix());
         templateResolver.setSuffix(metadata.getSuffix());
@@ -87,5 +87,5 @@ public class ThymeleafViewContext implements ViewContext {
             }
         }
         return templateEngine;
-	}
+    }
 }

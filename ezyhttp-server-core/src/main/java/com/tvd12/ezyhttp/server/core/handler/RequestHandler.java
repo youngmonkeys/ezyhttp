@@ -7,27 +7,27 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public interface RequestHandler {
-	
-	EmptyRequestHandler EMPTY = EmptyRequestHandler.getInstance();
 
-	default void setController(Object controller) {}
-	
-	default void setHandlerMethod(Method method) {}
-	
-	Object handle(RequestArguments arguments) throws Exception;
-	
-	default Method getHandlerMethod() {
-		return EzyMethods.getMethod(getClass(), "handle", RequestArguments.class);
-	}
+    EmptyRequestHandler EMPTY = EmptyRequestHandler.getInstance();
 
-	default boolean isAsync() {
-	    return false;
-	}
-	
-	HttpMethod getMethod();
-	
-	String getRequestURI();
-	
-	String getResponseContentType();
-	
+    default void setController(Object controller) {}
+
+    default void setHandlerMethod(Method method) {}
+
+    Object handle(RequestArguments arguments) throws Exception;
+
+    default Method getHandlerMethod() {
+        return EzyMethods.getMethod(getClass(), "handle", RequestArguments.class);
+    }
+
+    default boolean isAsync() {
+        return false;
+    }
+
+    HttpMethod getMethod();
+
+    String getRequestURI();
+
+    String getResponseContentType();
+
 }

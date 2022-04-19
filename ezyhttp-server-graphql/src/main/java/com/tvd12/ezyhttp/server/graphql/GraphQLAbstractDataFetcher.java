@@ -6,18 +6,18 @@ import com.tvd12.ezyfox.reflect.EzyGenerics;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
 public abstract class GraphQLAbstractDataFetcher<A,D> 
-		extends EzyLoggable
-		implements GraphQLDataFetcher<A, D> {
+        extends EzyLoggable
+        implements GraphQLDataFetcher<A, D> {
 
-	@Override
-	public Class<?> getArgumentType() {
-		try {
-			Type genericSuperclass = getClass().getGenericSuperclass();
-			Class<?>[] args = EzyGenerics.getTwoGenericClassArguments(genericSuperclass);
-			return args[0];
-		}
-		catch(Exception e) {
-			return null;
-		}
-	}
+    @Override
+    public Class<?> getArgumentType() {
+        try {
+            Type genericSuperclass = getClass().getGenericSuperclass();
+            Class<?>[] args = EzyGenerics.getTwoGenericClassArguments(genericSuperclass);
+            return args[0];
+        }
+        catch(Exception e) {
+            return null;
+        }
+    }
 }

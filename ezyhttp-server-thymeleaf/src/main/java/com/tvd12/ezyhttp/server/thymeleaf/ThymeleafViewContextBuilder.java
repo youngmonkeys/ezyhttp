@@ -7,15 +7,15 @@ import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 @EzySingleton
 public class ThymeleafViewContextBuilder extends ViewContextBuilder {
 
-	@Override
-	public ViewContext build() {
-		return new ThymeleafViewContext(
-	        templateResolver,
-	        viewDialects,
-	        viewDecorators,
-	        messageProviders,
-	        absentMessageResolver
+    @Override
+    public ViewContext build() {
+        return new ThymeleafViewContext(
+            templateResolver,
+            viewDialects,
+            viewDecorators,
+            messageProviders,
+            absentMessageResolver
         );
-	}
-	
+    }
+    
 }

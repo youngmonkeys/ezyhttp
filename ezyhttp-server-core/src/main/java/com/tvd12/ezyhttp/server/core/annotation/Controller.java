@@ -14,17 +14,17 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Controller {
     
-	/**
-	 * the request uri
-	 * 
-	 * @return the uri
-	 */
-	String value() default "";
-	
-	/**
-	 * the request uri
-	 * 
-	 * @return the uri
-	 */
-	String uri() default "";
+    /**
+     * the request uri
+     *
+     * @return the uri
+     */
+    String value() default "";
+
+    /**
+     * the request uri
+     *
+     * @return the uri
+     */
+    String uri() default "";
 }

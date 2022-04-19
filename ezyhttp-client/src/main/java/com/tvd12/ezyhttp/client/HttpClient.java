@@ -34,7 +34,17 @@ import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
-import com.tvd12.ezyhttp.core.exception.*;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpConflictException;
+import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
+import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
+import com.tvd12.ezyhttp.core.exception.HttpMethodNotAllowedException;
+import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
+import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
+import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
+import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
@@ -42,278 +52,253 @@ import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWA
 
 public class HttpClient extends EzyLoggable {
 
-	protected final int defaultReadTimeout;
-	protected final int defaultConnectTimeout;
-	protected final DataConverters dataConverters;
-	
-	public static final int NO_TIMEOUT = -1;
-	
-	protected HttpClient(Builder builder) {
-		this.defaultReadTimeout = builder.readTimeout;
-		this.defaultConnectTimeout = builder.connectTimeout;
-		this.dataConverters = builder.dataConverters;
-	}
-	
-	public <T> T call(Request request) throws Exception {
-		ResponseEntity response = request(
-			request.getMethod(),
-			request.getURL(),
-			request.getEntity(),
-			request.getResponseTypes(),
-			request.getConnectTimeout(),
-			request.getReadTimeout()
-		);
-		return getResponseBody(response);
-	}
-	
-	public ResponseEntity request(Request request) throws Exception {
-		return request(
-			request.getMethod(),
-			request.getURL(),
-			request.getEntity(),
-			request.getResponseTypes(),
-			request.getConnectTimeout(),
-			request.getReadTimeout()
-		);
-	}
-	
-	public ResponseEntity request(
-		HttpMethod method,
-		String url,
-		RequestEntity entity,
-		Map<Integer, Class<?>> responseTypes,
-		int connectTimeout, int readTimeout
-	) throws Exception {
-		if (url == null) {
-			throw new IllegalArgumentException("url can not be null");
-		}
-		logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
-		HttpURLConnection connection = connect(url);
-		try {
-			connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-			connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
-			connection.setRequestMethod(method.toString());
-			connection.setDoInput(true);
-			connection.setDoOutput(method.hasOutput());
-			connection.setInstanceFollowRedirects(method == HttpMethod.GET);
-			MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
-			if (requestHeaders != null) {
-				Map<String, String> encodedHeaders = requestHeaders.toMap();
-				for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
-					connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
-			}
-			Object requestBody = null;
-			if (method != HttpMethod.GET && entity != null) {
-				requestBody = entity.getBody();
-			}
-			byte[] requestBodyBytes = null;
-			if (requestBody != null) {
-				String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
-				if (requestContentType == null) {
-					requestContentType = ContentTypes.APPLICATION_JSON;
-					connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-				}
-				requestBodyBytes = serializeRequestBody(requestContentType, requestBody);
-				int requestContentLength = requestBodyBytes.length;
-				connection.setFixedLengthStreamingMode(requestContentLength);
-			}
-			
-			connection.connect();
-			
-			if (requestBodyBytes != null) {
-				if (method.hasOutput()) {
-					OutputStream outputStream = connection.getOutputStream();
-					outputStream.write(requestBodyBytes);
-					outputStream.flush();
-					outputStream.close();
-				} else {
-					throw new IllegalArgumentException(method + " method can not have a payload body");
-				}
-			}
-			
-			int responseCode = connection.getResponseCode();
-			Map<String, List<String>> headerFields = connection.getHeaderFields();
-			MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
-			String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
-			if (responseContentType == null)
-				responseContentType = ContentTypes.APPLICATION_JSON;
-			InputStream inputStream = responseCode >= 400 
-					? connection.getErrorStream()
-					: connection.getInputStream();
-			Object responseBody = null;
-			if (inputStream != null) {
-				try {
-					int responseContentLength = connection.getContentLength();
-					Class<?> responseType = responseTypes.get(responseCode);
-					responseBody = deserializeResponseBody(
-							responseContentType, responseContentLength, inputStream, responseType);
-				}
-				finally {
-					inputStream.close();
-				}
-			}
-			logger.debug("end: {} - {} - {} - {}", method, url, responseCode, responseHeaders);
-			return new ResponseEntity(responseCode, responseHeaders, responseBody);
-		}
-		finally {
-			connection.disconnect();
-		}
-	}
-	
-	public HttpURLConnection connect(String url) throws Exception {
-		URL requestURL = new URL(url);
-		return (HttpURLConnection)requestURL.openConnection();
-	}
-	
-	protected byte[] serializeRequestBody(
-		String contentType,
-		Object requestBody
-	) throws IOException {
-		BodySerializer serializer = dataConverters.getBodySerializer(contentType);
-		return serializer.serialize(requestBody);
-	}
-	
-	protected Object deserializeResponseBody(
-		String contentType,
-		int contentLength,
-		InputStream inputStream, Class<?> responseType
-	) throws IOException {
-		BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
-		Object body;
-		if (responseType != null) {
-			if (responseType == String.class)
-				body = deserializer.deserializeToString(inputStream, contentLength);
-			else
-				body = deserializer.deserialize(inputStream, responseType);
-		}
-		else {
-			body = deserializer.deserializeToString(inputStream, contentLength);
-			if (body != null) {
-				try {
-					body = deserializer.deserialize((String)body, Map.class);
-				}
-				catch (Exception e) {
-					// do nothing
-				}
-			}
-		}
-		return body;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T getResponseBody(ResponseEntity entity) throws Exception {
-		int statusCode = entity.getStatus();
-		Object body = entity.getBody();
-		if (statusCode < 400)
-			return (T)body;
-		throw translateErrorCode(statusCode, body);
-	}
-	
-	private Exception translateErrorCode(int statusCode, Object body) {
-	    if (statusCode == StatusCodes.BAD_REQUEST) {
-			return new HttpBadRequestException(body);
-		}
-        if (statusCode == StatusCodes.NOT_FOUND) {
-			return new HttpNotFoundException(body);
-		}
-        if (statusCode == StatusCodes.UNAUTHORIZED) {
-			return new HttpUnauthorizedException(body);
-		}
-		if (statusCode == StatusCodes.PAYMENT_REQUIRED) {
-			return new HttpPaymentRequiredException(body);
-		}
-        if (statusCode == StatusCodes.FORBIDDEN) {
-			return new HttpForbiddenException(body);
-		}
-        if (statusCode == StatusCodes.METHOD_NOT_ALLOWED) {
-			return new HttpMethodNotAllowedException(body);
-		}
-        if (statusCode == StatusCodes.NOT_ACCEPTABLE) {
-			return new HttpNotAcceptableException(body);
-		}
-        if (statusCode == StatusCodes.REQUEST_TIMEOUT) {
-			return new HttpRequestTimeoutException(body);
-		}
-        if (statusCode == StatusCodes.CONFLICT) {
-			return new HttpConflictException(body);
-		}
-        if (statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE) {
-			return new HttpUnsupportedMediaTypeException(body);
-		}
-		if (statusCode == StatusCodes.TOO_MANY_REQUESTS) {
-			return new HttpTooManyRequestsException(body);
-		}
-        if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
-			return new HttpInternalServerErrorException(body);
-		}
-        return new HttpRequestException(statusCode, body);
-	}
+    protected final int defaultReadTimeout;
+    protected final int defaultConnectTimeout;
+    protected final DataConverters dataConverters;
 
-	/**
-	 * Downloads a file from a URL and store to a file
-	 *
-	 * @param fileURL HTTP URL of the file to be downloaded
-	 * @param storeLocation path of the directory to save the file
-	 * @throws IOException when there is any I/O error
-	 * @return the downloaded file name
-	 */
-	public String download(
-		String fileURL,
-		File storeLocation
-	) throws Exception {
-		return download(fileURL, storeLocation, ALWAYS_RUN);
-	}
-	
-	/**
+    public static final int NO_TIMEOUT = -1;
+
+    protected HttpClient(Builder builder) {
+        this.defaultReadTimeout = builder.readTimeout;
+        this.defaultConnectTimeout = builder.connectTimeout;
+        this.dataConverters = builder.dataConverters;
+    }
+
+    public <T> T call(Request request) throws Exception {
+        ResponseEntity response = request(
+                request.getMethod(),
+                request.getURL(),
+                request.getEntity(),
+                request.getResponseTypes(),
+                request.getConnectTimeout(),
+                request.getReadTimeout()
+        );
+        return getResponseBody(response);
+    }
+
+    public ResponseEntity request(Request request) throws Exception {
+        return request(
+                request.getMethod(),
+                request.getURL(),
+                request.getEntity(),
+                request.getResponseTypes(),
+                request.getConnectTimeout(),
+                request.getReadTimeout()
+        );
+    }
+
+    public ResponseEntity request(
+            HttpMethod method,
+            String url,
+            RequestEntity entity,
+            Map<Integer, Class<?>> responseTypes,
+            int connectTimeout, int readTimeout) throws Exception {
+        if (url == null)
+            throw new IllegalArgumentException("url can not be null");
+        logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
+        HttpURLConnection connection = connect(url);
+        try {
+            connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
+            connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
+            connection.setRequestMethod(method.toString());
+            connection.setDoInput(true);
+            connection.setDoOutput(method.hasOutput());
+            connection.setInstanceFollowRedirects(method == HttpMethod.GET);
+            MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
+            if (requestHeaders != null) {
+                Map<String, String> encodedHeaders = requestHeaders.toMap();
+                for (Entry<String, String> requestHeader : encodedHeaders.entrySet())
+                    connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+            }
+            Object requestBody = null;
+            if (method != HttpMethod.GET && entity != null) {
+                requestBody = entity.getBody();
+            }
+            byte[] requestBodyBytes = null;
+            if (requestBody != null) {
+                String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
+                if (requestContentType == null) {
+                    requestContentType = ContentTypes.APPLICATION_JSON;
+                    connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+                }
+                requestBodyBytes = serializeRequestBody(requestContentType, requestBody);
+                int requestContentLength = requestBodyBytes.length;
+                connection.setFixedLengthStreamingMode(requestContentLength);
+            }
+
+            connection.connect();
+
+            if (requestBodyBytes != null) {
+                if (method.hasOutput()) {
+                    OutputStream outputStream = connection.getOutputStream();
+                    outputStream.write(requestBodyBytes);
+                    outputStream.flush();
+                    outputStream.close();
+                } else {
+                    throw new IllegalArgumentException(method + " method can not have a payload body");
+                }
+            }
+
+            int responseCode = connection.getResponseCode();
+            Map<String, List<String>> headerFields = connection.getHeaderFields();
+            MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
+            String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
+            if (responseContentType == null)
+                responseContentType = ContentTypes.APPLICATION_JSON;
+            InputStream inputStream = responseCode >= 400
+                    ? connection.getErrorStream()
+                    : connection.getInputStream();
+            Object responseBody = null;
+            if (inputStream != null) {
+                try {
+                    int responseContentLength = connection.getContentLength();
+                    Class<?> responseType = responseTypes.get(responseCode);
+                    responseBody = deserializeResponseBody(
+                            responseContentType, responseContentLength, inputStream, responseType);
+                } finally {
+                    inputStream.close();
+                }
+            }
+            logger.debug("end: {} - {} - {} - {}", method, url, responseCode, responseHeaders);
+            return new ResponseEntity(responseCode, responseHeaders, responseBody);
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    public HttpURLConnection connect(String url) throws Exception {
+        URL requestURL = new URL(url);
+        return (HttpURLConnection)requestURL.openConnection();
+    }
+
+    protected byte[] serializeRequestBody(
+            String contentType, Object requestBody) throws IOException {
+        BodySerializer serializer = dataConverters.getBodySerializer(contentType);
+        return serializer.serialize(requestBody);
+    }
+
+    protected Object deserializeResponseBody(
+            String contentType,
+            int contentLength,
+            InputStream inputStream, Class<?> responseType) throws IOException {
+        BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
+        Object body;
+        if (responseType != null) {
+            if (responseType == String.class) {
+                    body = deserializer.deserializeToString(inputStream, contentLength);
+            } else
+                body = deserializer.deserialize(inputStream, responseType);
+        } else {
+            body = deserializer.deserializeToString(inputStream, contentLength);
+            if (body != null) {
+                try {
+                    body = deserializer.deserialize((String)body, Map.class);
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
+        }
+        return body;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getResponseBody(ResponseEntity entity) throws Exception {
+        int statusCode = entity.getStatus();
+        Object body = entity.getBody();
+        if (statusCode < 400)
+            return (T)body;
+        throw translateErrorCode(statusCode, body);
+    }
+
+    private Exception translateErrorCode(int statusCode, Object body) {
+        if (statusCode == StatusCodes.BAD_REQUEST)
+            return new HttpBadRequestException(body);
+        if (statusCode == StatusCodes.NOT_FOUND)
+            return new HttpNotFoundException(body);
+        if (statusCode == StatusCodes.UNAUTHORIZED)
+            return new HttpUnauthorizedException(body);
+        if (statusCode == StatusCodes.FORBIDDEN)
+            return new HttpForbiddenException(body);
+        if (statusCode == StatusCodes.METHOD_NOT_ALLOWED)
+            return new HttpMethodNotAllowedException(body);
+        if (statusCode == StatusCodes.NOT_ACCEPTABLE)
+            return new HttpNotAcceptableException(body);
+        if (statusCode == StatusCodes.REQUEST_TIMEOUT)
+            return new HttpRequestTimeoutException(body);
+        if (statusCode == StatusCodes.CONFLICT)
+            return new HttpConflictException(body);
+        if (statusCode == StatusCodes.UNSUPPORTED_MEDIA_TYPE)
+            return new HttpUnsupportedMediaTypeException(body);
+        if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR)
+            return new HttpInternalServerErrorException(body);
+        return new HttpRequestException(statusCode, body);
+    }
+
+    /**
      * Downloads a file from a URL and store to a file
-     * 
+     *
      * @param fileURL HTTP URL of the file to be downloaded
      * @param storeLocation path of the directory to save the file
-	 * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
     public String download(
-    	String fileURL,
-		File storeLocation,
-		DownloadCancellationToken cancellationToken
-	) throws Exception {
-        return download(
-        	new DownloadRequest(fileURL),
-			storeLocation,
-			cancellationToken
-		);
+        String fileURL,
+        File storeLocation
+    ) throws Exception {
+        return download(fileURL, storeLocation, ALWAYS_RUN);
     }
 
-	/**
-	 * Downloads a file from a URL and store to a file
-	 *
-	 * @param request the request of the file to be downloaded
-	 * @param storeLocation path of the directory to save the file
-	 * @throws IOException when there is any I/O error
-	 * @return the downloaded file name
-	 */
-	public String download(
-		DownloadRequest request,
-		File storeLocation
-	) throws Exception {
-		return download(request, storeLocation, ALWAYS_RUN);
-	}
+    /**
+     * Downloads a file from a URL and store to a file
+     * 
+     * @param fileURL HTTP URL of the file to be downloaded
+     * @param storeLocation path of the directory to save the file
+     * @param cancellationToken the token to cancel
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(
+        String fileURL,
+        File storeLocation,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        return download(
+            new DownloadRequest(fileURL),
+            storeLocation,
+            cancellationToken
+        );
+    }
+
+    /**
+     * Downloads a file from a URL and store to a file
+     *
+     * @param request the request of the file to be downloaded
+     * @param storeLocation path of the directory to save the file
+     * @throws IOException when there is any I/O error
+     * @return the downloaded file name
+     */
+    public String download(
+        DownloadRequest request,
+        File storeLocation
+    ) throws Exception {
+        return download(request, storeLocation, ALWAYS_RUN);
+    }
     
     /**
      * Downloads a file from a URL and store to a file
      * 
      * @param request the request of the file to be downloaded
      * @param storeLocation path of the directory to save the file
-	 * @param cancellationToken the token to cancel
+     * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      * @return the downloaded file name
      */
     public String download(
-    	DownloadRequest request,
-		File storeLocation,
-		DownloadCancellationToken cancellationToken
-	) throws Exception {
+        DownloadRequest request,
+        File storeLocation,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
@@ -329,7 +314,7 @@ public class HttpClient extends EzyLoggable {
         HttpURLConnection connection,
         String fileURL,
         File storeLocation,
-		DownloadCancellationToken cancellationToken
+        DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
         
@@ -350,82 +335,82 @@ public class HttpClient extends EzyLoggable {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
-                	if (cancellationToken.isCancelled()) {
-						Files.deleteIfExists(downloadingFilePath);
-						break;
-					}
+                    if (cancellationToken.isCancelled()) {
+                        Files.deleteIfExists(downloadingFilePath);
+                        break;
+                    }
                     outputStream.write(buffer, 0, bytesRead);
                 }
             }
         }
-		if (cancellationToken.isCancelled()) {
-			throw new DownloadCancelledException(fileURL);
-		}
+        if (cancellationToken.isCancelled()) {
+            throw new DownloadCancelledException(fileURL);
+        }
         Files.move(
-        	downloadingFile.toPath(),
-			storeFile.toPath(),
-			StandardCopyOption.REPLACE_EXISTING
-		);
+            downloadingFile.toPath(),
+            storeFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        );
         return fileName;
     }
 
-	/**
-	 * Downloads a file from a URL and store to an output stream
-	 *
-	 * @param fileURL HTTP URL of the file to be downloaded
-	 * @param outputStream the output stream to save the file
-	 * @throws IOException when there is any I/O error
-	 */
-	public void download(
-		String fileURL,
-		OutputStream outputStream
-	) throws Exception {
-		download(fileURL, outputStream, ALWAYS_RUN);
-	}
+    /**
+     * Downloads a file from a URL and store to an output stream
+     *
+     * @param fileURL HTTP URL of the file to be downloaded
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(
+        String fileURL,
+        OutputStream outputStream
+    ) throws Exception {
+        download(fileURL, outputStream, ALWAYS_RUN);
+    }
     
     /**
      * Downloads a file from a URL and store to an output stream
      * 
      * @param fileURL HTTP URL of the file to be downloaded
      * @param outputStream the output stream to save the file
-	 * @param cancellationToken the token to cancel
+     * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
     public void download(
-    	String fileURL,
-		OutputStream outputStream,
-		DownloadCancellationToken cancellationToken
-	) throws Exception {
+        String fileURL,
+        OutputStream outputStream,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
         download(new DownloadRequest(fileURL), outputStream, cancellationToken);
     }
 
-	/**
-	 * Downloads a file from a URL and store to an output stream
-	 *
-	 * @param request the request of the file to be downloaded
-	 * @param outputStream the output stream to save the file
-	 * @throws IOException when there is any I/O error
-	 */
-	public void download(
-		DownloadRequest request,
-		OutputStream outputStream
-	) throws Exception {
-		download(request, outputStream, ALWAYS_RUN);
-	}
+    /**
+     * Downloads a file from a URL and store to an output stream
+     *
+     * @param request the request of the file to be downloaded
+     * @param outputStream the output stream to save the file
+     * @throws IOException when there is any I/O error
+     */
+    public void download(
+        DownloadRequest request,
+        OutputStream outputStream
+    ) throws Exception {
+        download(request, outputStream, ALWAYS_RUN);
+    }
     
     /**
      * Downloads a file from a URL and store to an output stream
      * 
      * @param request the request of the file to be downloaded
      * @param outputStream the output stream to save the file
-	 * @param cancellationToken the token to cancel
+     * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
     public void download(
-    	DownloadRequest request,
-		OutputStream outputStream,
-		DownloadCancellationToken cancellationToken
-	) throws Exception {
+        DownloadRequest request,
+        OutputStream outputStream,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
@@ -441,7 +426,7 @@ public class HttpClient extends EzyLoggable {
         HttpURLConnection connection,
         String fileURL,
         OutputStream outputStream,
-		DownloadCancellationToken cancellationToken
+        DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
         
@@ -453,15 +438,15 @@ public class HttpClient extends EzyLoggable {
             int bytesRead;
             byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
-            	if (cancellationToken.isCancelled()) {
-            		break;
-				}
+                if (cancellationToken.isCancelled()) {
+                    break;
+                }
                 outputStream.write(buffer, 0, bytesRead);
             }
         }
         if (cancellationToken.isCancelled()) {
-        	throw new DownloadCancelledException(fileURL);
-		}
+            throw new DownloadCancelledException(fileURL);
+        }
     }
     
     private void decorateConnection(
@@ -475,7 +460,7 @@ public class HttpClient extends EzyLoggable {
         MultiValueMap requestHeaders = request.getHeaders();
         if (requestHeaders != null) {
             Map<String, String> encodedHeaders = requestHeaders.toMap();
-            for(Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+            for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
                 connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
             }
         }
@@ -492,8 +477,7 @@ public class HttpClient extends EzyLoggable {
             try {
                 int contentLength = connection.getContentLength();
                 responseBody = deserializeResponseBody(null, contentLength, inputStream, null);
-            }
-            finally {
+            } finally {
                 inputStream.close();
             }
         }
@@ -519,8 +503,7 @@ public class HttpClient extends EzyLoggable {
                         if ((++ quoteCount) >= 2) {
                             break;
                         }
-                    }
-                    else if (ch == '\"') {
+                    } else if (ch == '\"') {
                         if ((++ quotesCount) >= 2) {
                             break;
                         }
@@ -536,79 +519,79 @@ public class HttpClient extends EzyLoggable {
         }
         return answer;
     }
-	
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static class Builder implements EzyBuilder<HttpClient> {
-		
-		protected int readTimeout;
-		protected int connectTimeout;
-		protected ObjectMapper objectMapper;
-		protected Object stringConverter;
-		protected DataConverters dataConverters;
-		protected final List<Object> bodyConverterList;
-		protected final Map<String, Object> bodyConverterMap;
-		
-		public Builder() {
-			this.readTimeout = 15 * 1000;
-			this.connectTimeout = 15 * 1000;
-			this.bodyConverterList = new ArrayList<>();
-			this.bodyConverterMap = new HashMap<>();
-		}
-		
-		public Builder readTimeout(int readTimeout) {
-			this.readTimeout = readTimeout;
-			return this;
-		}
-		
-		public Builder connectTimeout(int connectTimeout) {
-			this.connectTimeout = connectTimeout;
-			return this;
-		}
-		
-		public Builder objectMapper(Object objectMapper) {
-			if (objectMapper instanceof ObjectMapper)
-				this.objectMapper = (ObjectMapper)objectMapper;
-			return this;
-		}
-		
-		public Builder setStringConverter(Object converter) {
-			this.stringConverter = converter;
-			return this;
-		}
-		
-		public Builder addBodyConverter(Object converter) {
-			this.bodyConverterList.add(converter);
-			return this;
-		}
-		
-		public Builder addBodyConverters(List<?> converters) {
-			this.bodyConverterList.addAll(converters);
-			return this;
-		}
-		
-		public Builder addBodyConverter(String contentType, Object converter) {
-			this.bodyConverterMap.put(contentType, converter);
-			return this;
-		}
-		
-		public Builder addBodyConverters(Map<String, Object> converterByContentType) {
-			this.bodyConverterMap.putAll(converterByContentType);
-			return this;
-		}
-		
-		@Override
-		public HttpClient build() {
-			if (objectMapper == null)
-				this.objectMapper = new ObjectMapperBuilder().build();
-			this.dataConverters = new DataConverters(objectMapper);
-			if (stringConverter != null)
-				this.dataConverters.setStringConverter(stringConverter);
-			this.dataConverters.addBodyConverters(bodyConverterList);
-			this.dataConverters.addBodyConverters(bodyConverterMap);
-			return new HttpClient(this);
-		}
-	}
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<HttpClient> {
+
+        protected int readTimeout;
+        protected int connectTimeout;
+        protected ObjectMapper objectMapper;
+        protected Object stringConverter;
+        protected DataConverters dataConverters;
+        protected final List<Object> bodyConverterList;
+        protected final Map<String, Object> bodyConverterMap;
+
+        public Builder() {
+            this.readTimeout = 15 * 1000;
+            this.connectTimeout = 15 * 1000;
+            this.bodyConverterList = new ArrayList<>();
+            this.bodyConverterMap = new HashMap<>();
+        }
+
+        public Builder readTimeout(int readTimeout) {
+            this.readTimeout = readTimeout;
+            return this;
+        }
+
+        public Builder connectTimeout(int connectTimeout) {
+            this.connectTimeout = connectTimeout;
+            return this;
+        }
+
+        public Builder objectMapper(Object objectMapper) {
+            if (objectMapper instanceof ObjectMapper)
+                this.objectMapper = (ObjectMapper)objectMapper;
+            return this;
+        }
+
+        public Builder setStringConverter(Object converter) {
+            this.stringConverter = converter;
+            return this;
+        }
+
+        public Builder addBodyConverter(Object converter) {
+            this.bodyConverterList.add(converter);
+            return this;
+        }
+
+        public Builder addBodyConverters(List<?> converters) {
+            this.bodyConverterList.addAll(converters);
+            return this;
+        }
+
+        public Builder addBodyConverter(String contentType, Object converter) {
+            this.bodyConverterMap.put(contentType, converter);
+            return this;
+        }
+
+        public Builder addBodyConverters(Map<String, Object> converterByContentType) {
+            this.bodyConverterMap.putAll(converterByContentType);
+            return this;
+        }
+
+        @Override
+        public HttpClient build() {
+            if (objectMapper == null)
+                this.objectMapper = new ObjectMapperBuilder().build();
+            this.dataConverters = new DataConverters(objectMapper);
+            if (stringConverter != null)
+                this.dataConverters.setStringConverter(stringConverter);
+            this.dataConverters.addBodyConverters(bodyConverterList);
+            this.dataConverters.addBodyConverters(bodyConverterMap);
+            return new HttpClient(this);
+        }
+    }
 }

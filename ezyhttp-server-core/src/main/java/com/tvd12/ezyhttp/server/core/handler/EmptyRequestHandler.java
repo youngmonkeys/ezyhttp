@@ -6,44 +6,44 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public class EmptyRequestHandler implements RequestHandler {
-	
-	private static final EmptyRequestHandler INSTANCE = new EmptyRequestHandler();
-	
-	private EmptyRequestHandler() {}
-	
-	public static EmptyRequestHandler getInstance() {
-		return INSTANCE;
-	}
 
-	@Override
-	public void setController(Object controller) {}
+    private static final EmptyRequestHandler INSTANCE = new EmptyRequestHandler();
 
-	@Override
-	public void setHandlerMethod(Method method) {}
+    private EmptyRequestHandler() {}
 
-	@Override
-	public Object handle(RequestArguments arguments) {
-		return null;
-	}
+    public static EmptyRequestHandler getInstance() {
+        return INSTANCE;
+    }
 
-	@Override
-	public Method getHandlerMethod() {
-		return null;
-	}
+    @Override
+    public void setController(Object controller) {}
 
-	@Override
-	public HttpMethod getMethod() {
-		return null;
-	}
+    @Override
+    public void setHandlerMethod(Method method) {}
 
-	@Override
-	public String getRequestURI() {
-		return null;
-	}
+    @Override
+    public Object handle(RequestArguments arguments) {
+        return null;
+    }
 
-	@Override
-	public String getResponseContentType() {
-		return null;
-	}
-	
+    @Override
+    public Method getHandlerMethod() {
+        return null;
+    }
+
+    @Override
+    public HttpMethod getMethod() {
+        return null;
+    }
+
+    @Override
+    public String getRequestURI() {
+        return null;
+    }
+
+    @Override
+    public String getResponseContentType() {
+        return null;
+    }
+
 }

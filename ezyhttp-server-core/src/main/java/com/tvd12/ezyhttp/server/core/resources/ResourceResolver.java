@@ -11,45 +11,45 @@ import lombok.Getter;
 
 public class ResourceResolver {
 
-	@Getter
-	protected final Map<String, Resource> resources = new HashMap<>();
-	protected final ResourceLoader resourceLoader = new ResourceLoader();
+    @Getter
+    protected final Map<String, Resource> resources = new HashMap<>();
+    protected final ResourceLoader resourceLoader = new ResourceLoader();
 
-	public final static String DEFAULT_RESOURCE_LOCATION = "static";
-	public final static String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
-	
-	public void register(String location) {
-		register(location, DEFAULT_FILE_PATH_PATTERN);
-	}
+    public static final String DEFAULT_RESOURCE_LOCATION = "static";
+    public static final String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
 
-	public void register(String[] locations) {
-		register(locations, DEFAULT_FILE_PATH_PATTERN);
-	}
-	
-	public void register(String[] locations, String... filePathRegexes) {
-		for(String location : locations)
-			register(location, filePathRegexes);
-	}
-	
-	public void register(String location, String... filePathRegexes) {
-		String trimLocation = location.trim();
-		List<ResourceFile> resourceFiles = resourceLoader.listResourceFiles(
-	        trimLocation, 
-	        Sets.newHashSet(filePathRegexes)
+    public void register(String location) {
+        register(location, DEFAULT_FILE_PATH_PATTERN);
+    }
+
+    public void register(String[] locations) {
+        register(locations, DEFAULT_FILE_PATH_PATTERN);
+    }
+
+    public void register(String[] locations, String... filePathRegexes) {
+        for (String location : locations)
+            register(location, filePathRegexes);
+    }
+
+    public void register(String location, String... filePathRegexes) {
+        String trimLocation = location.trim();
+        List<ResourceFile> resourceFiles = resourceLoader.listResourceFiles(
+            trimLocation,
+            Sets.newHashSet(filePathRegexes)
         );
-		for(ResourceFile res : resourceFiles) {
-		    String relativePath = res.getRelativePath();
-			String resourceURI = relativePath.substring(trimLocation.length() + 1)
-				.replace('\\', '/');
-			String extension = EzyFileUtil.getFileExtension(resourceURI);
-			Resource resource = new Resource(
-		        relativePath, 
-		        resourceURI, 
-		        extension,
-		        res.getFullPath()
-	        );
-			resources.put(resourceURI, resource);
-		}
-	}
-	
+        for (ResourceFile res : resourceFiles) {
+            String relativePath = res.getRelativePath();
+            String resourceURI = relativePath.substring(trimLocation.length() + 1)
+                .replace('\\', '/');
+            String extension = EzyFileUtil.getFileExtension(resourceURI);
+            Resource resource = new Resource(
+                relativePath,
+                resourceURI,
+                extension,
+                res.getFullPath()
+            );
+            resources.put(resourceURI, resource);
+        }
+    }
+
 }

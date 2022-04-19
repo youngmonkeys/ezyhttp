@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface GraphQLQuery {
-	
-	/**
-	 * Query name
-	 *
-	 * @return name of query
-	 */
+
+    /**
+     * Query name
+     *
+     * @return name of query
+     */
     String name();
 }
