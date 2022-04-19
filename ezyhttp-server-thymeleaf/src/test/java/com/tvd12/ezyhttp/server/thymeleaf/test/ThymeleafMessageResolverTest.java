@@ -27,22 +27,22 @@ public class ThymeleafMessageResolverTest {
         when(
             messageProvider.provide()
         ).thenReturn(Collections.singletonMap("en", exmessages));
-        
+
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
-                .messageLocation("messages")
-                .messageProviders(Collections.singletonList(messageProvider))
-                .build();
+            .messageLocation("messages")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
         ITemplateContext context = mock(ITemplateContext.class);
         when(context.getLocale()).thenReturn(new Locale("en", "US"));
         Class<?> origin = getClass();
-        
+
         // when
         String welcomeMessage = sut.resolveMessage(context, origin, "home.welcome", new Object[0]);
-        String greetTitle = sut.resolveMessage(context, origin, "greet.title", new Object[] {"Monkey"});
-        String greetMessage = sut.resolveMessage(context, origin, "greet.message", new Object[] {"Monkey"});
+        String greetTitle = sut.resolveMessage(context, origin, "greet.title", new Object[]{"Monkey"});
+        String greetMessage = sut.resolveMessage(context, origin, "greet.message", new Object[]{"Monkey"});
         String unkown = sut.resolveMessage(context, origin, "unknown", new Object[0]);
         String foo = sut.resolveMessage(context, origin, "foo", new Object[0]);
-        
+
         // then
         Asserts.assertEquals("DEFAULT", sut.getName());
         Asserts.assertEquals(0, sut.getOrder());
@@ -52,7 +52,7 @@ public class ThymeleafMessageResolverTest {
         Asserts.assertNull(unkown);
         Asserts.assertEquals("Bar", foo);
     }
-    
+
     @Test
     public void resolveMessageDefault() {
         // given
@@ -62,22 +62,22 @@ public class ThymeleafMessageResolverTest {
         when(
             messageProvider.provide()
         ).thenReturn(Collections.singletonMap("en", exmessages));
-        
+
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
-                .messageLocation("messages")
-                .messageProviders(Collections.singletonList(messageProvider))
-                .build();
+            .messageLocation("messages")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
         ITemplateContext context = mock(ITemplateContext.class);
         when(context.getLocale()).thenReturn(new Locale("unkown"));
         Class<?> origin = getClass();
-        
+
         // when
         String welcomeMessage = sut.resolveMessage(context, origin, "home.welcome", new Object[0]);
-        String greetTitle = sut.resolveMessage(context, origin, "greet.title", new Object[] {"Monkey"});
+        String greetTitle = sut.resolveMessage(context, origin, "greet.title", new Object[]{"Monkey"});
         String greetMessage = sut.resolveMessage(context, origin, "greet.message", null);
         String unkown = sut.resolveMessage(context, origin, "unknown", new Object[0]);
         String foo = sut.resolveMessage(context, origin, "foo", new Object[0]);
-        
+
         // then
         Asserts.assertEquals("Welcome to EzyHTTP", welcomeMessage);
         Asserts.assertEquals("Greet Monkey", greetTitle);
@@ -85,7 +85,7 @@ public class ThymeleafMessageResolverTest {
         Asserts.assertNull(unkown);
         Asserts.assertEquals("Bar", foo);
     }
-    
+
     @Test
     public void createAbsentMessageRepresentation() {
         // given
@@ -95,22 +95,22 @@ public class ThymeleafMessageResolverTest {
         when(
             messageProvider.provide()
         ).thenReturn(Collections.singletonMap("en", exmessages));
-        
+
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
-                .messageLocation("messages")
-                .messageProviders(Collections.singletonList(messageProvider))
-                .build();
+            .messageLocation("messages")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
         ITemplateContext context = mock(ITemplateContext.class);
         when(context.getLocale()).thenReturn(new Locale("unkown"));
         Class<?> origin = getClass();
-        
+
         // when
         String welcomeMessage = sut.createAbsentMessageRepresentation(context, origin, "home.welcome", new Object[0]);
-        
+
         // then
         Asserts.assertEquals("home.welcome", welcomeMessage);
     }
-    
+
     @Test
     public void createAbsentMessageRepresentationOK() {
         // given
@@ -120,22 +120,22 @@ public class ThymeleafMessageResolverTest {
         when(
             messageProvider.provide()
         ).thenReturn(Collections.singletonMap("en", exmessages));
-        
+
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
-                .messageLocation("unknow")
-                .messageProviders(Collections.singletonList(messageProvider))
-                .build();
+            .messageLocation("unknow")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
         ITemplateContext context = mock(ITemplateContext.class);
         when(context.getLocale()).thenReturn(new Locale("unkown"));
         Class<?> origin = getClass();
-        
+
         // when
         String welcomeMessage = sut.createAbsentMessageRepresentation(context, origin, "home.welcome", new Object[0]);
-        
+
         // then
         Asserts.assertEquals("home.welcome", welcomeMessage);
     }
-    
+
     @Test
     public void createAbsentMessageRepresentationWithResolver() {
         // given
@@ -145,37 +145,37 @@ public class ThymeleafMessageResolverTest {
         when(
             messageProvider.provide()
         ).thenReturn(Collections.singletonMap("EN", exmessages));
-        
+
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
-                .messageLocation("unknow")
-                .messageProviders(Collections.singletonList(messageProvider))
-                .absentMessageResolver(new TestAbsentMessageResolver())
-                .build();
+            .messageLocation("unknow")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .absentMessageResolver(new TestAbsentMessageResolver())
+            .build();
         ITemplateContext context = mock(ITemplateContext.class);
         when(context.getLocale()).thenReturn(new Locale("unkown"));
         Class<?> origin = getClass();
-        
+
         // when
         String helloMessage = sut.createAbsentMessageRepresentation(context, origin, "hello", new Object[0]);
         String welcomeMessage = sut.createAbsentMessageRepresentation(context, origin, "home.welcome", new Object[0]);
-        
+
         // then
         Asserts.assertEquals("Hello", helloMessage);
         Asserts.assertEquals("home.welcome", welcomeMessage);
     }
-    
+
     @Test
     public void isFormatCandidateTest() {
         // given
         String message = "hello '0'";
-        
+
         // when
         boolean actual = MethodUtil.invokeStaticMethod("isFormatCandidate", ThymeleafMessageResolver.class, message);
-        
+
         // then
         Asserts.assertTrue(actual);
     }
-    
+
     private static class TestAbsentMessageResolver implements AbsentMessageResolver {
 
         @Override

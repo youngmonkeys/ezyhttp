@@ -14,9 +14,9 @@ public class ThymeleafViewContextBuilderTest {
     public void test() {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
-                .build();
+            .build();
         ViewContextBuilder sut = new ThymeleafViewContextBuilder()
-                .templateResolver(resolver);
+            .templateResolver(resolver);
 
         // when
         ViewContext viewContext = sut.build();

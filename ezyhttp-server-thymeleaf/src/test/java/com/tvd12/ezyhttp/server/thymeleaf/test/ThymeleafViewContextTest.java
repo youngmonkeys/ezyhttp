@@ -39,125 +39,126 @@ public class ThymeleafViewContextTest {
     public void test() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
-                .build();
+            .build();
         ViewContext viewContext = new ThymeleafViewContextBuilder()
-                .templateResolver(resolver)
-                .build();
-        
+            .templateResolver(resolver)
+            .build();
+
         ServletContext servletContext = mock(ServletContext.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         PrintWriter writer = mock(PrintWriter.class);
         when(response.getWriter()).thenReturn(writer);
-        
+
         View view = View.builder()
-                .template("index.html")
-                .build();
-        
+            .template("index.html")
+            .build();
+
         // when
         viewContext.render(servletContext, request, response, view);
-        
+
         // then
         Asserts.assertNotNull(viewContext);
     }
-    
+
     @Test
     public void renderWithViewDecorator() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
-                .build();
-        
+            .build();
+
         ViewDecorator viewDecorator = mock(ViewDecorator.class);
-        
+
         ViewContext viewContext = new ThymeleafViewContextBuilder()
-                .templateResolver(resolver)
-                .viewDecorators(Collections.singletonList(viewDecorator))
-                .build();
-        
+            .templateResolver(resolver)
+            .viewDecorators(Collections.singletonList(viewDecorator))
+            .build();
+
         ServletContext servletContext = mock(ServletContext.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         PrintWriter writer = mock(PrintWriter.class);
         when(response.getWriter()).thenReturn(writer);
-        
+
         View view = View.builder()
-                .template("index.html")
-                .build();
-        
+            .template("index.html")
+            .build();
+
         // when
         viewContext.render(servletContext, request, response, view);
-        
+
         // then
         Asserts.assertNotNull(viewContext);
         verify(viewDecorator, times(1)).decorate(request, view);
     }
-    
+
     @Test
     public void renderWithViewDialect() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
-                .build();
-        
+            .build();
+
         ViewContext viewContext = new ThymeleafViewContextBuilder()
-                .templateResolver(resolver)
-                .viewDialects(Collections.singletonList(new VewHelloDialect()))
-                .build();
-        
+            .templateResolver(resolver)
+            .viewDialects(Collections.singletonList(new VewHelloDialect()))
+            .build();
+
         ServletContext servletContext = mock(ServletContext.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         PrintWriter writer = mock(PrintWriter.class);
         when(response.getWriter()).thenReturn(writer);
-        
+
         View view = View.builder()
-                .template("index.html")
-                .build();
-        
+            .template("index.html")
+            .build();
+
         // when
         viewContext.render(servletContext, request, response, view);
-        
+
         // then
         Asserts.assertNotNull(viewContext);
     }
-    
+
     @Test
     public void renderWithDialectButNotViewDialect() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
-                .build();
-        
+            .build();
+
         ViewDialect viewDialect = mock(ViewDialect.class);
         ViewContext viewContext = new ThymeleafViewContextBuilder()
-                .templateResolver(resolver)
-                .viewDialects(Collections.singletonList(viewDialect))
-                .build();
-        
+            .templateResolver(resolver)
+            .viewDialects(Collections.singletonList(viewDialect))
+            .build();
+
         ServletContext servletContext = mock(ServletContext.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         PrintWriter writer = mock(PrintWriter.class);
         when(response.getWriter()).thenReturn(writer);
-        
+
         View view = View.builder()
-                .template("index.html")
-                .build();
-        
+            .template("index.html")
+            .build();
+
         // when
         viewContext.render(servletContext, request, response, view);
-        
+
         // then
         Asserts.assertNotNull(viewContext);
     }
-    
-    private static class VewHelloDialect 
-            extends HelloDialect 
-            implements ViewDialect {}
-    
-    
+
+    private static class VewHelloDialect
+        extends HelloDialect
+        implements ViewDialect {
+    }
+
+
     private static class HelloDialect extends AbstractProcessorDialect {
 
         public HelloDialect() {
@@ -168,14 +169,14 @@ public class ThymeleafViewContextTest {
             );
         }
 
-        
+
         public Set<IProcessor> getProcessors(final String dialectPrefix) {
             final Set<IProcessor> processors = new HashSet<>();
             processors.add(new SayToAttributeTagProcessor(dialectPrefix));
             return processors;
         }
     }
-    
+
     private static class SayToAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
         private static final String ATTR_NAME = "sayto";
@@ -197,12 +198,12 @@ public class ThymeleafViewContextTest {
 
 
         protected void doProcess(
-                final ITemplateContext context, final IProcessableElementTag tag,
-                final AttributeName attributeName, final String attributeValue,
-                final IElementTagStructureHandler structureHandler) {
+            final ITemplateContext context, final IProcessableElementTag tag,
+            final AttributeName attributeName, final String attributeValue,
+            final IElementTagStructureHandler structureHandler) {
 
             structureHandler.setBody(
-                    "Hello, " + HtmlEscape.escapeHtml5(attributeValue) + "!", false);
+                "Hello, " + HtmlEscape.escapeHtml5(attributeValue) + "!", false);
         }
     }
 }

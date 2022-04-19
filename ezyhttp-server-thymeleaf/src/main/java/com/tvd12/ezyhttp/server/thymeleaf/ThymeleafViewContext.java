@@ -49,34 +49,34 @@ public class ThymeleafViewContext implements ViewContext {
 
     @Override
     public void render(
-            ServletContext servletContext,
-            HttpServletRequest request,
-            HttpServletResponse response, View view) throws IOException {
+        ServletContext servletContext,
+        HttpServletRequest request,
+        HttpServletResponse response, View view) throws IOException {
         for (ViewDecorator viewDecorator : viewDecorators) {
             viewDecorator.decorate(request, view);
         }
         WebContext ctx =
-                new WebContext(request, response, servletContext, view.getLocale());
+            new WebContext(request, response, servletContext, view.getLocale());
         ctx.setVariables(view.getVariables());
         templateEngine.process(view.getTemplate(), ctx, response.getWriter());
     }
 
     private TemplateEngine createTemplateEngine() {
         ClassLoaderTemplateResolver templateResolver =
-                new ClassLoaderTemplateResolver();
+            new ClassLoaderTemplateResolver();
         TemplateMode templateMode = TemplateMode.valueOf(metadata.getTemplateMode());
         templateResolver.setTemplateMode(templateMode);
         templateResolver.setPrefix(metadata.getPrefix());
         templateResolver.setSuffix(metadata.getSuffix());
         templateResolver.setCacheTTLMs((long) metadata.getCacheTTLMs());
         templateResolver.setCacheable(metadata.isCacheable());
-        
+
         ThymeleafMessageResolver messageResolver = ThymeleafMessageResolver.builder()
-                .messageLocation(metadata.getMessagesLocation())
-                .messageProviders(messageProviders)
-                .absentMessageResolver(absentMessageResolver)
-                .build();
-        
+            .messageLocation(metadata.getMessagesLocation())
+            .messageProviders(messageProviders)
+            .absentMessageResolver(absentMessageResolver)
+            .build();
+
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         templateEngine.setMessageResolver(messageResolver);
