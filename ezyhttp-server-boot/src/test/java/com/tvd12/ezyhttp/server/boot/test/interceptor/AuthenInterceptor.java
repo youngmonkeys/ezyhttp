@@ -11,20 +11,20 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 @Interceptor(priority = -1)
 public class AuthenInterceptor
-        extends EzyLoggable
-        implements RequestInterceptor {
+    extends EzyLoggable
+    implements RequestInterceptor {
 
     @Override
     public boolean preHandle(
-            RequestArguments arguments,
-            Method handler) {
+        RequestArguments arguments,
+        Method handler) {
         boolean mustAuthen = AuthenticatedMethods.AUTHENTICATED_METHODS.contains(handler);
         if (mustAuthen) {
             String token = arguments.getHeader("token");
-            if (token == null)
+            if (token == null) {
                 throw new HttpUnauthorizedException("invalid token");
+            }
         }
         return true;
     }
-
 }

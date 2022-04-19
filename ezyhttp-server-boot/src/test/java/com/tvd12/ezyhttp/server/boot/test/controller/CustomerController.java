@@ -74,8 +74,7 @@ public class CustomerController {
         Map<String, String> errors = new HashMap<>();
         if (customer == null) {
             errors.put("customer", "required");
-        }
-        else {
+        } else {
             if (customer.getName() == null)
                 errors.put("name", "required");
             if (customer.getAge() < 1)
@@ -84,5 +83,4 @@ public class CustomerController {
         if (errors.size() > 0)
             throw new HttpBadRequestException(errors);
     }
-
 }

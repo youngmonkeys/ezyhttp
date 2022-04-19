@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 public class FileController {
 
     private final FileUploadService fileUploadService;
-    
+
     @Async
     @DoGet("/files/{file}")
     public void downloadGet(

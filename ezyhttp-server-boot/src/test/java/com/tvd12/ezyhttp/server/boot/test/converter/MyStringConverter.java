@@ -16,5 +16,4 @@ public class MyStringConverter extends DefaultStringDeserializer {
             return Lists.newArrayList(strs);
         });
     }
-    
 }

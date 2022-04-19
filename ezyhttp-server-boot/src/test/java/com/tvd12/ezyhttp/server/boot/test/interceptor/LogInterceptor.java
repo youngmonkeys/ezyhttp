@@ -9,27 +9,25 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 @Interceptor(priority = -1)
 public class LogInterceptor
-        extends EzyLoggable
-        implements RequestInterceptor {
+    extends EzyLoggable
+    implements RequestInterceptor {
 
     @Override
     public boolean preHandle(
-            RequestArguments arguments, 
-            Method handler) {
-        logger.info("pre handle request uri: {}, method: {}, handler: {}", 
-                arguments.getRequest().getRequestURI(),
-                arguments.getMethod(),
-                handler);
+        RequestArguments arguments,
+        Method handler) {
+        logger.info("pre handle request uri: {}, method: {}, handler: {}",
+            arguments.getRequest().getRequestURI(),
+            arguments.getMethod(),
+            handler);
         return true;
     }
-    
+
     @Override
     public void postHandle(RequestArguments arguments, Method handler) {
-        logger.info("post handle request uri: {}, method: {}, code: {}", 
-                arguments.getRequest().getRequestURI(),
-                arguments.getMethod(),
-                arguments.getResponse().getStatus());
+        logger.info("post handle request uri: {}, method: {}, code: {}",
+            arguments.getRequest().getRequestURI(),
+            arguments.getMethod(),
+            arguments.getResponse().getStatus());
     }
-    
-    
 }

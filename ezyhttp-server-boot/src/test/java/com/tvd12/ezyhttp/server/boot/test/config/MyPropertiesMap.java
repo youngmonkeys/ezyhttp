@@ -13,5 +13,4 @@ public class MyPropertiesMap implements EzyPropertiesMap {
         map.put("webserver.port", "server.port");
         return map;
     }
-
 }

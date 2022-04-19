@@ -6,7 +6,7 @@ import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
 
 @EzySingleton
 public class GraphQLHeroDataFetcher
-        extends GraphQLAbstractDataFetcher<Object, int[]> {
+    extends GraphQLAbstractDataFetcher<Object, int[]> {
 
     public int[] getData(Object argument) {
         return new int[]{1, 2, 3};

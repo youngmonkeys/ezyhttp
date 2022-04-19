@@ -24,37 +24,36 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return ResponseEntity.badRequest("global: " + e.getMessage());
     }
-    
+
     @TryCatch({IllegalStateException.class, NullPointerException.class})
     public String handleException2(Exception e) {
         e.printStackTrace();
         return e.getMessage();
     }
-    
+
     @TryCatch(java.lang.UnsupportedOperationException.class)
     public void handleException3(Exception e) {
         e.printStackTrace();
     }
-    
+
     @TryCatch(InvalidFormatException.class)
     public void handleException(
-            RequestArguments args,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            InvalidFormatException e) {
+        RequestArguments args,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        InvalidFormatException e) {
         e.printStackTrace();
         Map<String, String> data = new HashMap<>();
         for (Reference reference : e.getPath())
             data.put(reference.getFieldName(), "invalid");
         throw new HttpBadRequestException(data);
     }
-    
+
     @TryCatch(NoPermissionException.class)
     public ResponseEntity handleException(NoPermissionException e) {
         return ResponseEntity.builder()
-                .status(StatusCodes.UNAUTHORIZED)
-                .body("has no permission")
-                .build();
+            .status(StatusCodes.UNAUTHORIZED)
+            .body("has no permission")
+            .build();
     }
-    
 }

@@ -29,14 +29,14 @@ public class HomeController {
 
     @DoGet
     public String welcome(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("firstName") String firstName,
-            @RequestParam String who,
-            @RequestHeader("key") String key,
-            @RequestHeader String token,
-            @RequestArgument("name") String name,
-            @NickName String nickName) {
+        HttpServletRequest request,
+        HttpServletResponse response,
+        @RequestParam("firstName") String firstName,
+        @RequestParam String who,
+        @RequestHeader("key") String key,
+        @RequestHeader String token,
+        @RequestArgument("name") String name,
+        @NickName String nickName) {
         System.out.println("request uri: " + request.getRequestURI());
         if (who == null)
             throw new IllegalArgumentException("who cannot be null");
@@ -45,26 +45,27 @@ public class HomeController {
 
     @DoPost
     public String hello(
-            @RequestBody HelloRequest body) {
+        @RequestBody HelloRequest body) {
         return "hello " + body.getWho();
     }
 
     @DoPut
-    public void doNothing() {}
+    public void doNothing() {
+    }
 
     @SuppressWarnings("unchecked")
     @DoGet("bye")
     public ResponseEntity bye(
-            @RequestParam("messages") List<String> messages,
-            @RequestParam("numbers") int[] numbers) {
+        @RequestParam("messages") List<String> messages,
+        @RequestParam("numbers") int[] numbers) {
         String body = "bye: " + messages + " : " + Arrays.toString(numbers);
         return ResponseEntity.builder()
-                .body(body)
-                .header("a;;;", "1")
-                .header("a;;;", "2")
-                .headers(EzyMapBuilder.mapBuilder().put("b", "3").build())
-                .status(StatusCodes.OK)
-                .build();
+            .body(body)
+            .header("a;;;", "1")
+            .header("a;;;", "2")
+            .headers(EzyMapBuilder.mapBuilder().put("b", "3").build())
+            .status(StatusCodes.OK)
+            .build();
     }
 
     @DoPost("love")
@@ -80,8 +81,8 @@ public class HomeController {
     @DoGet("text")
     public ResponseEntity text() {
         return ResponseEntity.builder()
-                .textPlain("Hello I'm a text")
-                .build();
+            .textPlain("Hello I'm a text")
+            .build();
     }
 
     @DoGet("list")
@@ -95,18 +96,17 @@ public class HomeController {
     }
 
     @TryCatch({IllegalStateException.class, NullPointerException.class})
-    public String handleException2( Exception e) {
+    public String handleException2(Exception e) {
         e.printStackTrace();
         return e.getClass().getName() + "(" + e.getMessage() + ")";
     }
 
     @TryCatch(java.lang.UnsupportedOperationException.class)
     public ResponseEntity handleException3(
-            RequestArguments args,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Exception e) {
+        RequestArguments args,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Exception e) {
         return ResponseEntity.badRequest();
     }
-
 }

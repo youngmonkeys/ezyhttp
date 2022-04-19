@@ -18,5 +18,4 @@ public class MyFormBodyDeserializer implements BodyDeserializer {
         Map<String, String> params = data.getParameters();
         return objectMapper.convertValue(params, bodyType);
     }
-
 }

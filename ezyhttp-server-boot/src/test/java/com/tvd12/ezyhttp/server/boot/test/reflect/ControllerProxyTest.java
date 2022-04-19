@@ -14,5 +14,4 @@ public class ControllerProxyTest extends BaseTest {
         ControllerProxy home = new ControllerProxy(new HomeController());
         System.out.println(home);
     }
-
 }

@@ -32,15 +32,15 @@ public class CustomerService {
 
     public List<Customer> getCustomersById(List<Long> ids) {
         return ids.stream()
-                .filter(it -> customerById.containsKey(it))
-                .map(it -> customerById.get(it))
-                .collect(Collectors.toList());
+            .filter(customerById::containsKey)
+            .map(customerById::get)
+            .collect(Collectors.toList());
     }
 
     public List<Customer> getCustomersByName(List<String> ids) {
         return ids.stream()
-                .filter(it -> customerByName.containsKey(it))
-                .map(it -> customerByName.get(it))
-                .collect(Collectors.toList());
+            .filter(customerByName::containsKey)
+            .map(customerByName::get)
+            .collect(Collectors.toList());
     }
 }

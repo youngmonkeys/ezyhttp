@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoveRequest {
-
     protected String who;
     protected int age;
-
 }

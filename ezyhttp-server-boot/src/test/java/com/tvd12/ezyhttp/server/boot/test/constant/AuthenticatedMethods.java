@@ -18,5 +18,4 @@ public final class AuthenticatedMethods {
         Set<Method> methods = new HashSet<>(EzyMethods.getDeclaredMethods(CustomerController.class));
         return Collections.unmodifiableSet(methods);
     }
-
 }

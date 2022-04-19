@@ -19,5 +19,4 @@ public class ExceptionHandlerImplementerTest extends BaseTest {
             implementer.implement();
         }
     }
-
 }

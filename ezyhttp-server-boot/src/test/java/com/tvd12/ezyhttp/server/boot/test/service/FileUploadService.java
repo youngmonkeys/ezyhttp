@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FileUploadService {
 
-    private final FileUploader fileUploadManager;
+    private final FileUploader fileUploader;
     private final ResourceDownloadManager resourceDownloadManager;
 
     @EzyPostInit
@@ -47,7 +47,7 @@ public class FileUploadService {
         String fileName = part.getSubmittedFileName();
         File file = new File("files/" + fileName);
         AsyncContext asyncContext = request.getAsyncContext();
-        fileUploadManager.accept(asyncContext, part, file, callback);
+        fileUploader.accept(asyncContext, part, file, callback);
     }
 
     public void download(

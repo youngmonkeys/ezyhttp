@@ -36,11 +36,11 @@ public class ViewController {
     @DoGet("/greet")
     public View home(@RequestParam String who) {
         return View.builder()
-                .template("greet/greet")
-                .addVariable("who", who)
-                .addVariable("welcome", new Welcome("Welcome " + who))
-                .addVariable("hi", Collections.singletonMap("message", "Hi " + who))
-                .build();
+            .template("greet/greet")
+            .addVariable("who", who)
+            .addVariable("welcome", new Welcome("Welcome " + who))
+            .addVariable("hi", Collections.singletonMap("message", "Hi " + who))
+            .build();
     }
 
     @DoGet("/upload")
@@ -51,11 +51,11 @@ public class ViewController {
     @Async
     @DoPost("/upload")
     public void uploadPost(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestBody FileUpload data,
-            @RequestParam("name") String fileName,
-            RequestArguments requestArguments
+        HttpServletRequest request,
+        HttpServletResponse response,
+        @RequestBody FileUpload data,
+        @RequestParam("name") String fileName,
+        RequestArguments requestArguments
     ) throws Exception {
         Part filePart = request.getPart("file");
         if (filePart.getSize() > 0) {

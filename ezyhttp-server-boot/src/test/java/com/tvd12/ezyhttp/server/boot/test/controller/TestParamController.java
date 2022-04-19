@@ -38,5 +38,4 @@ public class TestParamController {
     public boolean testPathVariable2(@PathVariable("variable") int variable) {
         return true;
     }
-
 }
