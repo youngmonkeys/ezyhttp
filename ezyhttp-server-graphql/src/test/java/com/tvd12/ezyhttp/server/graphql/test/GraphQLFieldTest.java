@@ -12,13 +12,13 @@ public class GraphQLFieldTest {
         // given
         String fieldName = RandomUtil.randomShortAlphabetString();
         GraphQLField fieldA = GraphQLField.builder()
-                .name(fieldName)
-                .build();
+            .name(fieldName)
+            .build();
 
         GraphQLField fieldB = GraphQLField.builder()
-                .name(fieldName)
-                .addField(fieldA)
-                .build();
+            .name(fieldName)
+            .addField(fieldA)
+            .build();
 
         // when
         boolean isEqual = fieldA.equals(fieldB);
@@ -29,5 +29,4 @@ public class GraphQLFieldTest {
         Asserts.assertEquals(fieldB.toString(), fieldName + ", [" + fieldA + "]");
         Asserts.assertEquals(fieldA.hashCode(), fieldName.hashCode());
     }
-
 }

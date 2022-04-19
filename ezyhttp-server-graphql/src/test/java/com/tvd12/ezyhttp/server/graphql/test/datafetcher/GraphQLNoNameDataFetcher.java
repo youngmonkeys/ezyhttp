@@ -6,7 +6,7 @@ import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
 @EzySingleton
 @SuppressWarnings("rawtypes")
 public class GraphQLNoNameDataFetcher
-        extends GraphQLAbstractDataFetcher {
+    extends GraphQLAbstractDataFetcher {
 
     @Override
     public Object getData(Object argument) {

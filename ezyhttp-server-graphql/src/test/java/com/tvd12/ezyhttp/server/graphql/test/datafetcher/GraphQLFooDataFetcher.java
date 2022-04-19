@@ -14,5 +14,4 @@ public class GraphQLFooDataFetcher implements GraphQLDataFetcher {
     public Object getData(Object argument) {
         return "Foo " + argument;
     }
-
 }

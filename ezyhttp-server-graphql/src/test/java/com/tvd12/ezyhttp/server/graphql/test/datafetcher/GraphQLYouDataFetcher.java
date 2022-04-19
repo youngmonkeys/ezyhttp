@@ -9,14 +9,14 @@ import lombok.Getter;
 @EzySingleton
 @GraphQLQuery(name = "you")
 public class GraphQLYouDataFetcher
-        extends GraphQLAbstractDataFetcher<Object, GraphQLYouDataFetcher.YouResponse> {
-    
+    extends GraphQLAbstractDataFetcher<Object, GraphQLYouDataFetcher.YouResponse> {
+
     public YouResponse getData(Object argument) {
         return YouResponse.builder()
-                .friends("A, B")
-                .build();
+            .friends("A, B")
+            .build();
     }
-    
+
     @Getter
     @Builder
     public static class YouResponse {

@@ -55,5 +55,4 @@ public class GraphQLConfigurationTest {
         Asserts.assertNotNull(controller);
         Asserts.assertTrue(dataFetchers.containsKey("A"));
     }
-
 }

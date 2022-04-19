@@ -11,22 +11,22 @@ import java.util.List;
 
 @EzySingleton
 public class GraphQLMeDataFetcher
-        extends GraphQLAbstractDataFetcher<GraphQLMeDataFetcher.MeRequest, GraphQLMeDataFetcher.MeResponse> {
+    extends GraphQLAbstractDataFetcher<GraphQLMeDataFetcher.MeRequest, GraphQLMeDataFetcher.MeResponse> {
 
     public MeResponse getData(MeRequest argument) {
         return MeResponse.builder()
-                .id(1)
-                .name("Dzung")
-                .nickName("Hello")
-                .friends(
-                        Arrays.asList(
-                                Friend.builder().id(1).name("Foo").build(),
-                                Friend.builder().id(1).name("Bar").build()
-                        )
+            .id(1)
+            .name("Dzung")
+            .nickName("Hello")
+            .friends(
+                Arrays.asList(
+                    Friend.builder().id(1).name("Foo").build(),
+                    Friend.builder().id(1).name("Bar").build()
                 )
-                .bank(Bank.builder().id(100).build())
-                .address(null)
-                .build();
+            )
+            .bank(Bank.builder().id(100).build())
+            .address(null)
+            .build();
     }
 
     @Override

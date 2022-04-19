@@ -23,12 +23,12 @@ public class GraphQLControllerTest {
         GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-                .addDataFetcher(meDataFetcher)
-                .addDataFetcher(heroDataFetcher).build();
+            .addDataFetcher(meDataFetcher)
+            .addDataFetcher(heroDataFetcher).build();
         ObjectMapper objectMapper = new ObjectMapper();
 
         GraphQLController controller = GraphQLController.builder()
-                .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
         GraphQLRequest meRequest = new GraphQLRequest();
         meRequest.setQuery("query{    me   {     name bank{id} friends{name} address}}");
@@ -52,7 +52,7 @@ public class GraphQLControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
 
         GraphQLController controller = GraphQLController.builder()
-                .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
         String heroQuery = "{hero}";
 
@@ -69,11 +69,11 @@ public class GraphQLControllerTest {
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcher welcomeDataFetcher = new GraphQLWelcomeDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-                .addDataFetcher(welcomeDataFetcher).build();
+            .addDataFetcher(welcomeDataFetcher).build();
         ObjectMapper objectMapper = new ObjectMapper();
 
         GraphQLController controller = GraphQLController.builder()
-                .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
         String welcomeQuery = "{welcome}";
         String variables = "{\"name\": \"Foo\"}";
@@ -96,11 +96,11 @@ public class GraphQLControllerTest {
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcher fooDataFetcher = new GraphQLFooDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-                .addDataFetcher(fooDataFetcher).build();
+            .addDataFetcher(fooDataFetcher).build();
         ObjectMapper objectMapper = new ObjectMapper();
 
         GraphQLController controller = GraphQLController.builder()
-                .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
         String fooQuery = "{foo}";
 
@@ -119,12 +119,12 @@ public class GraphQLControllerTest {
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcher meDataFetcher = new GraphQLYouDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-                .addDataFetcher(meDataFetcher)
-                .build();
+            .addDataFetcher(meDataFetcher)
+            .build();
         ObjectMapper objectMapper = new ObjectMapper();
 
         GraphQLController controller = GraphQLController.builder()
-                .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
+            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
         GraphQLRequest youRequest = new GraphQLRequest();
         youRequest.setQuery("query{you{friends{name}}}}");
@@ -147,5 +147,4 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertEquals(EzyNotImplementedException.class.toString(), e.getClass().toString());
     }
-
 }

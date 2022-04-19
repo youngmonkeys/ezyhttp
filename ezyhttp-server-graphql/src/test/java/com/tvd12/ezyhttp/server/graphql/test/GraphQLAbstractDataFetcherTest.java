@@ -18,5 +18,4 @@ public class GraphQLAbstractDataFetcherTest {
         // then
         Asserts.assertNull(c);
     }
-
 }
