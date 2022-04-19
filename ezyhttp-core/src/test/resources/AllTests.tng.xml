@@ -1,18 +1,18 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="AllTests">
-	<test name="All">
-		<packages>
-			<package name="com.tvd12.ezyhttp.core.test.concurrent"></package>
-			<package name="com.tvd12.ezyhttp.core.test.codec"></package>
-			<package name="com.tvd12.ezyhttp.core.test.constant"></package>
-			<package name="com.tvd12.ezyhttp.core.test.data"></package>
-			<package name="com.tvd12.ezyhttp.core.test.exception"></package>
-			<package name="com.tvd12.ezyhttp.core.test.json"></package>
-			<package name="com.tvd12.ezyhttp.core.test.net"></package>
-			<package name="com.tvd12.ezyhttp.core.test.resources"></package>
-			<package name="com.tvd12.ezyhttp.core.test.response"></package>
-			<package name="com.tvd12.ezyhttp.core.test.util"></package>
-		</packages>
-	</test>
+    <test name="All">
+        <packages>
+            <package name="com.tvd12.ezyhttp.core.test.concurrent"></package>
+            <package name="com.tvd12.ezyhttp.core.test.codec"></package>
+            <package name="com.tvd12.ezyhttp.core.test.constant"></package>
+            <package name="com.tvd12.ezyhttp.core.test.data"></package>
+            <package name="com.tvd12.ezyhttp.core.test.exception"></package>
+            <package name="com.tvd12.ezyhttp.core.test.json"></package>
+            <package name="com.tvd12.ezyhttp.core.test.net"></package>
+            <package name="com.tvd12.ezyhttp.core.test.resources"></package>
+            <package name="com.tvd12.ezyhttp.core.test.response"></package>
+            <package name="com.tvd12.ezyhttp.core.test.util"></package>
+        </packages>
+    </test>
 </suite>

@@ -8,17 +8,17 @@ import com.tvd12.test.assertion.Asserts;
 
 public class HttpForbiddenExceptionTest {
 
-	@Test
-	public void test() {
-		// given
-		int code = StatusCodes.FORBIDDEN;
-		String data = "error";
-		
-		// when
-		HttpForbiddenException sut = new HttpForbiddenException(data);
-		
-		// then
-		Asserts.assertEquals(code, sut.getCode());
-		Asserts.assertEquals(data, sut.getData());
-	}
+    @Test
+    public void test() {
+        // given
+        int code = StatusCodes.FORBIDDEN;
+        String data = "error";
+        
+        // when
+        HttpForbiddenException sut = new HttpForbiddenException(data);
+        
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+    }
 }

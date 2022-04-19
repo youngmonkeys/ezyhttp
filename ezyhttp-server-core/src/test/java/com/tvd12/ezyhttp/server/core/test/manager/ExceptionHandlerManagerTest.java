@@ -9,31 +9,31 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ExceptionHandlerManagerTest {
 
-	@Test
-	public void test() {
-		// given
-		ExceptionHandlerManager sut = new ExceptionHandlerManager();
-		
-		ExExceptionHandler exceptionHandler = new ExExceptionHandler();
-		sut.addExceptionHandler(exceptionHandler);
-		
-		ExUncaughtExceptionHandler uncaughtExceptionHandler = new ExUncaughtExceptionHandler();
-		sut.addUncaughtExceptionHandler(Exception.class, uncaughtExceptionHandler);
-		
-		// when
-		// then
-		Asserts.assertEquals(1, sut.getExceptionHandlerList().size());
-		Asserts.assertEquals(uncaughtExceptionHandler, sut.getUncaughtExceptionHandler(Exception.class));
-	}
-	
-	public static class ExExceptionHandler {}
-	
-	public static class ExUncaughtExceptionHandler implements UncaughtExceptionHandler {
+    @Test
+    public void test() {
+        // given
+        ExceptionHandlerManager sut = new ExceptionHandlerManager();
 
-		@Override
-		public Object handleException(RequestArguments arguments, Exception exception) {
-			return null;
-		}
-		
-	}
+        ExExceptionHandler exceptionHandler = new ExExceptionHandler();
+        sut.addExceptionHandler(exceptionHandler);
+
+        ExUncaughtExceptionHandler uncaughtExceptionHandler = new ExUncaughtExceptionHandler();
+        sut.addUncaughtExceptionHandler(Exception.class, uncaughtExceptionHandler);
+
+        // when
+        // then
+        Asserts.assertEquals(1, sut.getExceptionHandlerList().size());
+        Asserts.assertEquals(uncaughtExceptionHandler, sut.getUncaughtExceptionHandler(Exception.class));
+    }
+
+    public static class ExExceptionHandler {}
+
+    public static class ExUncaughtExceptionHandler implements UncaughtExceptionHandler {
+
+        @Override
+        public Object handleException(RequestArguments arguments, Exception exception) {
+            return null;
+        }
+
+    }
 }

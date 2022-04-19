@@ -12,44 +12,44 @@ import org.testng.annotations.Test;
 
 public class BodyDeserializerTest {
 
-	@Test
-	public void commonTest() throws Exception {
-		// given
-		BodyDeserializer sut = new BodyDeserializer() {};
-		
-		// when
-		Asserts.assertNull(sut.deserialize("", Object.class));
-		Asserts.assertNull(sut.deserialize(mock(BodyData.class), Object.class));
-		Asserts.assertNull(sut.deserialize(mock(InputStream.class), Object.class));
-	}
-	
-	@Test
-	public void deserializeToStringWithContentLengthTest() throws Exception {
-		// given
-		byte[] bytes = "abc".getBytes();
-		InputStream inputStream = new ByteArrayInputStream(bytes);
-		int contentLength = 2;
-		BodyDeserializer sut = new BodyDeserializer() {};
-		
-		// when
-		String actual = sut.deserializeToString(inputStream, contentLength);
-		
-		// then
-		Asserts.assertEquals("ab", actual);
-	}
-	
-	@Test
-	public void deserializeToStringWithoutContentLengthTest() throws Exception {
-		// given
-		byte[] bytes = "abc".getBytes();
-		InputStream inputStream = new ByteArrayInputStream(bytes);
-		int contentLength = 0;
-		BodyDeserializer sut = new BodyDeserializer() {};
-		
-		// when
-		String actual = sut.deserializeToString(inputStream, contentLength);
-		
-		// then
-		Asserts.assertEquals("abc", actual);
-	}
+    @Test
+    public void commonTest() throws Exception {
+        // given
+        BodyDeserializer sut = new BodyDeserializer() {};
+
+        // when
+        Asserts.assertNull(sut.deserialize("", Object.class));
+        Asserts.assertNull(sut.deserialize(mock(BodyData.class), Object.class));
+        Asserts.assertNull(sut.deserialize(mock(InputStream.class), Object.class));
+    }
+
+    @Test
+    public void deserializeToStringWithContentLengthTest() throws Exception {
+        // given
+        byte[] bytes = "abc".getBytes();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        int contentLength = 2;
+        BodyDeserializer sut = new BodyDeserializer() {};
+
+        // when
+        String actual = sut.deserializeToString(inputStream, contentLength);
+
+        // then
+        Asserts.assertEquals("ab", actual);
+    }
+
+    @Test
+    public void deserializeToStringWithoutContentLengthTest() throws Exception {
+        // given
+        byte[] bytes = "abc".getBytes();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        int contentLength = 0;
+        BodyDeserializer sut = new BodyDeserializer() {};
+
+        // when
+        String actual = sut.deserializeToString(inputStream, contentLength);
+
+        // then
+        Asserts.assertEquals("abc", actual);
+    }
 }

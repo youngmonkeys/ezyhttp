@@ -8,8 +8,8 @@ import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 @EzySingleton
 @GraphQLQuery(name = "A")
 public class GraphQLADataFetcher implements GraphQLDataFetcher {
-	@Override
-	public Object getData(Object argument) {
-		return "A";
-	}
+    @Override
+    public Object getData(Object argument) {
+        return "A";
+    }
 }

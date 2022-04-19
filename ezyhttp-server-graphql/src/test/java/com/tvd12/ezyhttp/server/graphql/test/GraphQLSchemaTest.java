@@ -7,16 +7,16 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 
 public class GraphQLSchemaTest {
-	
-	@Test
-	public void test() {
-		// given
-		GraphQLSchema.Builder builder = GraphQLSchema.builder();
-		
-		// when
-		GraphQLSchema schema = builder.build();
-		
-		// then
-		Asserts.assertEquals(schema.getQueryDefinitions(), Collections.emptyList());
-	}
+
+    @Test
+    public void test() {
+        // given
+        GraphQLSchema.Builder builder = GraphQLSchema.builder();
+
+        // when
+        GraphQLSchema schema = builder.build();
+
+        // then
+        Asserts.assertEquals(schema.getQueryDefinitions(), Collections.emptyList());
+    }
 }

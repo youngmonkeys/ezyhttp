@@ -26,28 +26,28 @@ public class ResourceLoader extends EzyLoggable {
     private static final String PROTOCOL_FILE = "file";
     private static final String PROTOCOL_JAR = "jar";
     private static final String PROTOCOL_FILE_PREFIX = "file:";
-	
-	public List<String> listResources(String rootPath) {
-	    return EzyLists.newArrayList(
+    
+    public List<String> listResources(String rootPath) {
+        return EzyLists.newArrayList(
             listResourceFiles(rootPath),
-			ResourceFile::getRelativePath
+            ResourceFile::getRelativePath
         );
-	}
-	
-	public List<ResourceFile> listResourceFiles(String rootPath) {
-	    return listResourceFiles(rootPath, Collections.emptySet());
     }
-	
-	public List<String> listResources(String rootPath, Set<String> regexes) {
-	    return EzyLists.newArrayList(
+    
+    public List<ResourceFile> listResourceFiles(String rootPath) {
+        return listResourceFiles(rootPath, Collections.emptySet());
+    }
+    
+    public List<String> listResources(String rootPath, Set<String> regexes) {
+        return EzyLists.newArrayList(
             listResourceFiles(rootPath, regexes),
-			ResourceFile::getRelativePath
+            ResourceFile::getRelativePath
         );
-	}
-	
-	public List<ResourceFile> listResourceFiles(String rootPath, Set<String> regexes) {
-		List<ResourceFile> answer = new ArrayList<>();
-		Set<URL> resourceURLs = getResourceURLs(rootPath);
+    }
+    
+    public List<ResourceFile> listResourceFiles(String rootPath, Set<String> regexes) {
+        List<ResourceFile> answer = new ArrayList<>();
+        Set<URL> resourceURLs = getResourceURLs(rootPath);
         if (resourceURLs.isEmpty()) {
             listResourcesByFolder(new File(rootPath), regexes, rootPath, answer);
         }
@@ -56,38 +56,38 @@ public class ResourceLoader extends EzyLoggable {
                 listResourcesByURL(url, regexes, rootPath, answer);
             }
         }
-		return answer;
-	}
-	
-	protected void listResourcesByURL(
-	        URL url,
+        return answer;
+    }
+    
+    protected void listResourcesByURL(
+            URL url,
             Set<String> regexes,
             String rootPath,
             List<ResourceFile> answer
     ) {
-	    if (url.getProtocol().equals(PROTOCOL_FILE)) {
-	        listResourcesByFileURL(url, regexes, rootPath, answer);
-	    }
-	    else if (url.getProtocol().equals(PROTOCOL_JAR)) {
-	        listResourcesByJarURL(url, regexes, rootPath, answer);
-	    }
-	}
-	
-	protected void listResourcesByFileURL(
-	        URL url,
-	        Set<String> regexes,
-	        String rootPath,
-	        List<ResourceFile> answer
+        if (url.getProtocol().equals(PROTOCOL_FILE)) {
+            listResourcesByFileURL(url, regexes, rootPath, answer);
+        }
+        else if (url.getProtocol().equals(PROTOCOL_JAR)) {
+            listResourcesByJarURL(url, regexes, rootPath, answer);
+        }
+    }
+    
+    protected void listResourcesByFileURL(
+            URL url,
+            Set<String> regexes,
+            String rootPath,
+            List<ResourceFile> answer
     ) {
-	    listResourcesByFolder(
+        listResourcesByFolder(
             new File(url.getPath()), 
             regexes,
             rootPath,
             answer
         );
     }
-	
-	protected void listResourcesByFolder(
+    
+    protected void listResourcesByFolder(
             File rootFolder,
             Set<String> regexes,
             String rootPath,
@@ -121,14 +121,14 @@ public class ResourceLoader extends EzyLoggable {
             }
         }
     }
-	
-	protected void listResourcesByJarURL(
+    
+    protected void listResourcesByJarURL(
             URL url,
             Set<String> regexes,
             String rootPath,
             List<ResourceFile> answer
     ) {
-	    String jarPath = url.getPath().substring(
+        String jarPath = url.getPath().substring(
             PROTOCOL_FILE_PREFIX.length(), 
             url.getPath().indexOf("!")
         );
@@ -150,66 +150,66 @@ public class ResourceLoader extends EzyLoggable {
                 }
             }
         }
-	}
-	
-	protected File[] listFile(File folder) {
-	    File[] files = folder.listFiles();
-	    return files != null ? files : new File[0];
-	}
-	
-	protected boolean isFileElement(String elementName) {
-	    return !elementName.endsWith("/") && !elementName.endsWith("\\");
-	}
-	
-	protected JarFile getJarFile(String filePath) {
-	    try {
+    }
+    
+    protected File[] listFile(File folder) {
+        File[] files = folder.listFiles();
+        return files != null ? files : new File[0];
+    }
+    
+    protected boolean isFileElement(String elementName) {
+        return !elementName.endsWith("/") && !elementName.endsWith("\\");
+    }
+    
+    protected JarFile getJarFile(String filePath) {
+        try {
             return new JarFile(URLDecoder.decode(filePath, EzyStrings.UTF_8));
         } catch (Exception e) {
             return null;
         }
-	}
-	
-	protected Set<URL> getResourceURLs(String resource) {
-	    Set<URL> answer = new HashSet<>();
-		String[] resources = {resource, "/" + resource};
-		for(String res : resources) {
-	        addURLsToSet(answer, () -> getContextClassLoader().getResources(res));
-	        addURLsToSet(answer, () -> getClass().getClassLoader().getResources(res));
-	        addURLsToSet(answer, () -> ClassLoader.getSystemResources(res));
-	        addURLToSet(answer, getContextClassLoader().getResource(res));
-	        addURLToSet(answer, getClass().getResource(res));
-	        addURLToSet(answer, getClass().getClassLoader().getResource(res));
-	        addURLToSet(answer, ClassLoader.getSystemResource(res));
-		}
-		return answer;
-	}
-	
-	private void addURLsToSet(
-	        Set<URL> answer, 
-	        EzySupplier<Enumeration<URL>> supplier) {
-	    try {
-	        Enumeration<URL> urls = supplier.get();
-	        addURLsToSet(answer, urls);
-	    }
-	    catch (Exception e) {
-	        // do nothing
+    }
+    
+    protected Set<URL> getResourceURLs(String resource) {
+        Set<URL> answer = new HashSet<>();
+        String[] resources = {resource, "/" + resource};
+        for(String res : resources) {
+            addURLsToSet(answer, () -> getContextClassLoader().getResources(res));
+            addURLsToSet(answer, () -> getClass().getClassLoader().getResources(res));
+            addURLsToSet(answer, () -> ClassLoader.getSystemResources(res));
+            addURLToSet(answer, getContextClassLoader().getResource(res));
+            addURLToSet(answer, getClass().getResource(res));
+            addURLToSet(answer, getClass().getClassLoader().getResource(res));
+            addURLToSet(answer, ClassLoader.getSystemResource(res));
         }
-	}
-	
-	private void addURLsToSet(Set<URL> answer, Enumeration<URL> urls) {
-	    if (urls != null) {
-	        while(urls.hasMoreElements()) {
-	            answer.add(urls.nextElement());
-	        }
-	    }
-	}
-	
-	private void addURLToSet(Set<URL> answer, URL url) {
-	    if (url != null)
-	        answer.add(url);
-	}
+        return answer;
+    }
+    
+    private void addURLsToSet(
+            Set<URL> answer, 
+            EzySupplier<Enumeration<URL>> supplier) {
+        try {
+            Enumeration<URL> urls = supplier.get();
+            addURLsToSet(answer, urls);
+        }
+        catch (Exception e) {
+            // do nothing
+        }
+    }
+    
+    private void addURLsToSet(Set<URL> answer, Enumeration<URL> urls) {
+        if (urls != null) {
+            while(urls.hasMoreElements()) {
+                answer.add(urls.nextElement());
+            }
+        }
+    }
+    
+    private void addURLToSet(Set<URL> answer, URL url) {
+        if (url != null)
+            answer.add(url);
+    }
 
-	private ClassLoader getContextClassLoader() {
-		return Thread.currentThread().getContextClassLoader();
-	}
+    private ClassLoader getContextClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 }

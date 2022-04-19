@@ -1,40 +1,40 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tvd12</groupId>
-		<artifactId>ezyhttp</artifactId>
-		<version>1.0.2</version>
-	</parent>
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tvd12</groupId>
+        <artifactId>ezyhttp</artifactId>
+        <version>1.0.2</version>
+    </parent>
 
-	<artifactId>ezyhttp-server-boot</artifactId>
-	<name>ezyhttp-server-boot</name>
-	<url>https://youngmonkeys.org/project/ezy-http/</url>
+    <artifactId>ezyhttp-server-boot</artifactId>
+    <name>ezyhttp-server-boot</name>
+    <url>https://youngmonkeys.org/project/ezy-http/</url>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-server-jetty</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-server-thymeleaf</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-server-graphql</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-server-management</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-jetty</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-thymeleaf</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-graphql</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-management</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

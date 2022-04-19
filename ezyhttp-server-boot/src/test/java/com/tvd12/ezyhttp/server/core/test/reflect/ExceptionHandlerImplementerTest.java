@@ -9,15 +9,15 @@ import com.tvd12.ezyhttp.server.core.test.controller.GlobalExceptionHandler;
 import com.tvd12.test.base.BaseTest;
 
 public class ExceptionHandlerImplementerTest extends BaseTest {
-	
-	@Test
-	public void test() {
-		ExceptionHandlerImplementer.setDebug(true);
-		ExceptionHandlerProxy exceptionHandler = new ExceptionHandlerProxy(new GlobalExceptionHandler());
-		for(ExceptionHandlerMethod method : exceptionHandler.getExceptionHandlerMethods()) {
-			ExceptionHandlerImplementer implementer = new ExceptionHandlerImplementer(exceptionHandler, method);
-			implementer.implement();
-		}
-	}
+
+    @Test
+    public void test() {
+        ExceptionHandlerImplementer.setDebug(true);
+        ExceptionHandlerProxy exceptionHandler = new ExceptionHandlerProxy(new GlobalExceptionHandler());
+        for(ExceptionHandlerMethod method : exceptionHandler.getExceptionHandlerMethods()) {
+            ExceptionHandlerImplementer implementer = new ExceptionHandlerImplementer(exceptionHandler, method);
+            implementer.implement();
+        }
+    }
 
 }

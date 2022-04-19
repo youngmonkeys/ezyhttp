@@ -35,34 +35,34 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ThymeleafViewContextTest {
 
-	@Test
-	public void test() throws Exception {
-		// given
-		TemplateResolver resolver = TemplateResolver.builder()
-				.build();
-		ViewContext viewContext = new ThymeleafViewContextBuilder()
-				.templateResolver(resolver)
-				.build();
-		
-		ServletContext servletContext = mock(ServletContext.class);
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-		
-		PrintWriter writer = mock(PrintWriter.class);
-		when(response.getWriter()).thenReturn(writer);
-		
-		View view = View.builder()
-				.template("index.html")
-				.build();
-		
-		// when
-		viewContext.render(servletContext, request, response, view);
-		
-		// then
-		Asserts.assertNotNull(viewContext);
-	}
-	
-	@Test
+    @Test
+    public void test() throws Exception {
+        // given
+        TemplateResolver resolver = TemplateResolver.builder()
+                .build();
+        ViewContext viewContext = new ThymeleafViewContextBuilder()
+                .templateResolver(resolver)
+                .build();
+        
+        ServletContext servletContext = mock(ServletContext.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        PrintWriter writer = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(writer);
+        
+        View view = View.builder()
+                .template("index.html")
+                .build();
+        
+        // when
+        viewContext.render(servletContext, request, response, view);
+        
+        // then
+        Asserts.assertNotNull(viewContext);
+    }
+    
+    @Test
     public void renderWithViewDecorator() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
@@ -93,8 +93,8 @@ public class ThymeleafViewContextTest {
         Asserts.assertNotNull(viewContext);
         verify(viewDecorator, times(1)).decorate(request, view);
     }
-	
-	@Test
+    
+    @Test
     public void renderWithViewDialect() throws Exception {
         // given
         TemplateResolver resolver = TemplateResolver.builder()
@@ -122,7 +122,7 @@ public class ThymeleafViewContextTest {
         // then
         Asserts.assertNotNull(viewContext);
     }
-	
+    
     @Test
     public void renderWithDialectButNotViewDialect() throws Exception {
         // given
@@ -152,57 +152,57 @@ public class ThymeleafViewContextTest {
         // then
         Asserts.assertNotNull(viewContext);
     }
-	
-	private static class VewHelloDialect 
-	        extends HelloDialect 
-	        implements ViewDialect {}
-	
-	
-	private static class HelloDialect extends AbstractProcessorDialect {
+    
+    private static class VewHelloDialect 
+            extends HelloDialect 
+            implements ViewDialect {}
+    
+    
+    private static class HelloDialect extends AbstractProcessorDialect {
 
-	    public HelloDialect() {
-	        super(
+        public HelloDialect() {
+            super(
                 "Hello Dialect",    // Dialect name
                 "hello",            // Dialect prefix (hello:*)
                 1000                // Dialect precedence
             );
-	    }
+        }
 
-	    
-	    public Set<IProcessor> getProcessors(final String dialectPrefix) {
-	        final Set<IProcessor> processors = new HashSet<>();
-	        processors.add(new SayToAttributeTagProcessor(dialectPrefix));
-	        return processors;
-	    }
-	}
-	
-	private static class SayToAttributeTagProcessor extends AbstractAttributeTagProcessor {
+        
+        public Set<IProcessor> getProcessors(final String dialectPrefix) {
+            final Set<IProcessor> processors = new HashSet<>();
+            processors.add(new SayToAttributeTagProcessor(dialectPrefix));
+            return processors;
+        }
+    }
+    
+    private static class SayToAttributeTagProcessor extends AbstractAttributeTagProcessor {
 
-	    private static final String ATTR_NAME = "sayto";
-	    private static final int PRECEDENCE = 10000;
+        private static final String ATTR_NAME = "sayto";
+        private static final int PRECEDENCE = 10000;
 
 
-	    public SayToAttributeTagProcessor(final String dialectPrefix) {
-	        super(
-	            TemplateMode.HTML, // This processor will apply only to HTML mode
-	            dialectPrefix,     // Prefix to be applied to name for matching
-	            null,              // No tag name: match any tag name
-	            false,             // No prefix to be applied to tag name
-	            ATTR_NAME,         // Name of the attribute that will be matched
-	            true,              // Apply dialect prefix to attribute name
-	            PRECEDENCE,        // Precedence (inside dialect's precedence)
-	            true
+        public SayToAttributeTagProcessor(final String dialectPrefix) {
+            super(
+                TemplateMode.HTML, // This processor will apply only to HTML mode
+                dialectPrefix,     // Prefix to be applied to name for matching
+                null,              // No tag name: match any tag name
+                false,             // No prefix to be applied to tag name
+                ATTR_NAME,         // Name of the attribute that will be matched
+                true,              // Apply dialect prefix to attribute name
+                PRECEDENCE,        // Precedence (inside dialect's precedence)
+                true
             );             // Remove the matched attribute afterwards
-	    }
+        }
 
 
-	    protected void doProcess(
-	            final ITemplateContext context, final IProcessableElementTag tag,
-	            final AttributeName attributeName, final String attributeValue,
-	            final IElementTagStructureHandler structureHandler) {
+        protected void doProcess(
+                final ITemplateContext context, final IProcessableElementTag tag,
+                final AttributeName attributeName, final String attributeValue,
+                final IElementTagStructureHandler structureHandler) {
 
-	        structureHandler.setBody(
-	                "Hello, " + HtmlEscape.escapeHtml5(attributeValue) + "!", false);
-	    }
-	}
+            structureHandler.setBody(
+                    "Hello, " + HtmlEscape.escapeHtml5(attributeValue) + "!", false);
+        }
+    }
 }

@@ -17,24 +17,24 @@ import com.tvd12.test.reflect.MethodInvoker;
 
 public class BannerPrinterTest {
 
-	@Test
-	public void getBannerBytesSuccessButEmpty() throws Exception {
-		// given
-		BannerPrinter sut = new BannerPrinter();
-		
-		InputStream inputStream = mock(InputStream.class);
-		when(inputStream.read(any())).thenThrow(new IOException("just test"));
-		
-		// when
-		byte[] bytes = MethodInvoker.create()
-				.object(sut)
-				.method("getBannerBytes")
-				.param(InputStream.class, inputStream)
-				.invoke(byte[].class);
-		
-		// then
-		Asserts.assertEquals(0, bytes.length);
-		
-		verify(inputStream, times(1)).read(any());
-	}
+    @Test
+    public void getBannerBytesSuccessButEmpty() throws Exception {
+        // given
+        BannerPrinter sut = new BannerPrinter();
+        
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any())).thenThrow(new IOException("just test"));
+        
+        // when
+        byte[] bytes = MethodInvoker.create()
+                .object(sut)
+                .method("getBannerBytes")
+                .param(InputStream.class, inputStream)
+                .invoke(byte[].class);
+        
+        // then
+        Asserts.assertEquals(0, bytes.length);
+        
+        verify(inputStream, times(1)).read(any());
+    }
 }

@@ -1,13 +1,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="AllTests">
-	<test name="All">
-		<packages>
-			<package name="com.tvd12.ezyhttp.testing"></package>
-			<package name="com.tvd12.ezyhttp.testing.codec"></package>
-			<package name="com.tvd12.ezyhttp.testing.net"></package>
-			<package name="com.tvd12.ezyhttp.testing.json"></package>
-			<package name="com.tvd12.ezyhttp.server.graphql.test"></package>
-		</packages>
-	</test>
+    <test name="All">
+        <packages>
+            <package name="com.tvd12.ezyhttp.testing"></package>
+            <package name="com.tvd12.ezyhttp.testing.codec"></package>
+            <package name="com.tvd12.ezyhttp.testing.net"></package>
+            <package name="com.tvd12.ezyhttp.testing.json"></package>
+            <package name="com.tvd12.ezyhttp.server.graphql.test"></package>
+        </packages>
+    </test>
 </suite>

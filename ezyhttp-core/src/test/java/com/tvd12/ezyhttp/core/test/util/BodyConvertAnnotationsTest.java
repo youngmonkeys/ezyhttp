@@ -7,15 +7,15 @@ import com.tvd12.test.assertion.Asserts;
 
 public class BodyConvertAnnotationsTest {
 
-	@Test
-	public void getContentTypeFailed() {
-		// given
-		Object conveter = getClass();
-		
-		// when
-		Throwable e = Asserts.assertThrows(() -> BodyConvertAnnotations.getContentType(conveter));
-		
-		// then
-		Asserts.assertThat(e).isEqualsType(IllegalArgumentException.class);
-	}
+    @Test
+    public void getContentTypeFailed() {
+        // given
+        Object conveter = getClass();
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> BodyConvertAnnotations.getContentType(conveter));
+
+        // then
+        Asserts.assertThat(e).isEqualsType(IllegalArgumentException.class);
+    }
 }

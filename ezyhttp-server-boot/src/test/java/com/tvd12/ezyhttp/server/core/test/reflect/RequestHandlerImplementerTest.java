@@ -9,15 +9,15 @@ import com.tvd12.ezyhttp.server.core.test.controller.HomeController;
 import com.tvd12.test.base.BaseTest;
 
 public class RequestHandlerImplementerTest extends BaseTest {
-	
-	@Test
-	public void test() {
-		RequestHandlerImplementer.setDebug(true);
-		ControllerProxy homeController = new ControllerProxy(new HomeController());
-		for(RequestHandlerMethod method : homeController.getRequestHandlerMethods()) {
-			RequestHandlerImplementer implementer = new RequestHandlerImplementer(homeController, method);
-			implementer.implement();
-		}
-	}
+
+    @Test
+    public void test() {
+        RequestHandlerImplementer.setDebug(true);
+        ControllerProxy homeController = new ControllerProxy(new HomeController());
+        for(RequestHandlerMethod method : homeController.getRequestHandlerMethods()) {
+            RequestHandlerImplementer implementer = new RequestHandlerImplementer(homeController, method);
+            implementer.implement();
+        }
+    }
 
 }

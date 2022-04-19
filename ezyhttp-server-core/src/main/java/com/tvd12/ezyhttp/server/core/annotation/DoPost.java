@@ -14,31 +14,31 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface DoPost {
     
-	/**
-	 * request uri
-	 * 
-	 * @return the uri
-	 */
+    /**
+     * request uri
+     *
+     * @return the uri
+     */
     String value() default "";
-	
-	/**
-	 * request uri
-	 * 
-	 * @return the uri
-	 */
+
+    /**
+     * request uri
+     *
+     * @return the uri
+     */
     String uri() default "";
-	
-	/**
-	 * accepted request body types
-	 * 
-	 * @return the accepted request body types
-	 */
+
+    /**
+     * accepted request body types
+     *
+     * @return the accepted request body types
+     */
     String[] accept() default {};
-	
-	/**
-	 * request uri
-	 * 
-	 * @return the response body type
-	 */
+
+    /**
+     * request uri
+     *
+     * @return the response body type
+     */
     String responseType() default "";
 }

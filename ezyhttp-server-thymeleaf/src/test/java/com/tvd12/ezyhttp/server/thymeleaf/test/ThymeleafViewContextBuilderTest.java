@@ -10,18 +10,18 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ThymeleafViewContextBuilderTest {
 
-	@Test
-	public void test() {
-		// given
-		TemplateResolver resolver = TemplateResolver.builder()
-				.build();
-		ViewContextBuilder sut = new ThymeleafViewContextBuilder()
-				.templateResolver(resolver);
-		
-		// when
-		ViewContext viewContext = sut.build();
-		
-		// then
-		Asserts.assertNotNull(viewContext);
-	}
+    @Test
+    public void test() {
+        // given
+        TemplateResolver resolver = TemplateResolver.builder()
+                .build();
+        ViewContextBuilder sut = new ThymeleafViewContextBuilder()
+                .templateResolver(resolver);
+
+        // when
+        ViewContext viewContext = sut.build();
+
+        // then
+        Asserts.assertNotNull(viewContext);
+    }
 }

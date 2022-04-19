@@ -9,22 +9,22 @@ import lombok.Setter;
 @Setter
 public class RequestURI {
 
-	protected final String uri;
-	protected final HttpMethod method;
-	protected final boolean api;
-	protected final boolean authenticated;
-	protected final boolean management;
-	protected final boolean resource;
-	protected final boolean payment;
-	protected final String feature;
-	protected final String resourceFullPath;
-	
-	public RequestURI(
+    protected final String uri;
+    protected final HttpMethod method;
+    protected final boolean api;
+    protected final boolean authenticated;
+    protected final boolean management;
+    protected final boolean resource;
+    protected final boolean payment;
+    protected final String feature;
+    protected final String resourceFullPath;
+
+    public RequestURI(
         HttpMethod method, 
         String uri, 
         boolean management
     ) {
-	    this.method = method;
+        this.method = method;
         this.uri = standardizeURI(uri);
         this.management = management;
         this.api = false;
@@ -34,8 +34,8 @@ public class RequestURI {
         this.feature = null;
         this.resourceFullPath = null;
     }
-	
-	public RequestURI(
+
+    public RequestURI(
         HttpMethod method, 
         String uri, 
         boolean management,
@@ -43,25 +43,25 @@ public class RequestURI {
         boolean api,
         String resourceFullPath
     ) {
-		this(
-			method,
-			uri,
-			RequestURIMeta.builder()
-				.api(api)
-				.authenticated(false)
-				.management(management)
-				.resource(resource)
-				.resourceFullPath(resourceFullPath)
-				.build()
-		);
-	}
+        this(
+            method,
+            uri,
+            RequestURIMeta.builder()
+                .api(api)
+                .authenticated(false)
+                .management(management)
+                .resource(resource)
+                .resourceFullPath(resourceFullPath)
+                .build()
+        );
+    }
 
-	public RequestURI(
+    public RequestURI(
         HttpMethod method, 
         String uri, 
         RequestURIMeta meta
     ) {
-	    this.method = method;
+        this.method = method;
         this.uri = standardizeURI(uri);
         this.api = meta.isApi();
         this.authenticated = meta.isAuthenticated();
@@ -71,18 +71,18 @@ public class RequestURI {
         this.feature = meta.getFeature();
         this.resourceFullPath = meta.getResourceFullPath();
 }
-	
-	protected String standardizeURI(String uri) {
-		if (uri.isEmpty() || uri.startsWith("/"))
-			return uri;
-		return "/" + uri;
-	}
-	
-	public String getSameURI() {
-	    return getSameURI(uri);
-	}
-	
-	public static String getSameURI(String originalURI) {
+
+    protected String standardizeURI(String uri) {
+        if (uri.isEmpty() || uri.startsWith("/"))
+            return uri;
+        return "/" + uri;
+    }
+
+    public String getSameURI() {
+        return getSameURI(uri);
+    }
+
+    public static String getSameURI(String originalURI) {
         if (originalURI.length() <= 1) {
             return originalURI;
         }
@@ -91,34 +91,34 @@ public class RequestURI {
         }
         return originalURI + "/";
     }
-	
-	@Override
-	public boolean equals(Object other) {
-		if (other == null)
-			return false;
-		if (other == this)
-			return true;
-		if (!other.getClass().equals(this.getClass()))
-			return false;
-		RequestURI t = (RequestURI)other;
-		return uri.equals(t.uri)
-			&& method.equals(t.method)
-			&& management == t.management;
-	}
-	
-	@Override
-	public int hashCode() {
-		int prime = 31;
-		int result = 1;
-		result = result * prime + uri.hashCode();
-		result = result * prime + method.hashCode();
-		result = result * prime + Boolean.hashCode(management);
-		return result;
-	}
-	
-	@Override
-	public String toString() {
-		return uri + " - " + method;
-	}
-	
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        if (other == this)
+            return true;
+        if (!other.getClass().equals(this.getClass()))
+            return false;
+        RequestURI t = (RequestURI)other;
+        return uri.equals(t.uri)
+            && method.equals(t.method)
+            && management == t.management;
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+        result = result * prime + uri.hashCode();
+        result = result * prime + method.hashCode();
+        result = result * prime + Boolean.hashCode(management);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return uri + " - " + method;
+    }
+
 }

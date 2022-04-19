@@ -8,17 +8,17 @@ import com.tvd12.test.assertion.Asserts;
 
 public class HttpNotAcceptableExceptionTest {
 
-	@Test
-	public void test() {
-		// given
-		int code = StatusCodes.NOT_ACCEPTABLE;
-		String data = "error";
-		
-		// when
-		HttpNotAcceptableException sut = new HttpNotAcceptableException(data);
-		
-		// then
-		Asserts.assertEquals(code, sut.getCode());
-		Asserts.assertEquals(data, sut.getData());
-	}
+    @Test
+    public void test() {
+        // given
+        int code = StatusCodes.NOT_ACCEPTABLE;
+        String data = "error";
+
+        // when
+        HttpNotAcceptableException sut = new HttpNotAcceptableException(data);
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+    }
 }

@@ -12,19 +12,19 @@ import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 @EzySingleton
 public class ViewContextBuilderTest extends ViewContextBuilder {
 
-	@Override
-	public ViewContext build() {
-		return new ViewContextTest();
-	}
+    @Override
+    public ViewContext build() {
+        return new ViewContextTest();
+    }
 
-	public static class ViewContextTest implements ViewContext {
+    public static class ViewContextTest implements ViewContext {
 
-		@Override
-		public void render(
-			ServletContext servletContext,
-			HttpServletRequest request,
-			HttpServletResponse response,
-			View view
-		) {}
-	}
+        @Override
+        public void render(
+            ServletContext servletContext,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            View view
+        ) {}
+    }
 }

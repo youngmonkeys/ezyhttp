@@ -15,20 +15,20 @@ import lombok.Setter;
 @Setter
 @EzyConfigurationBefore
 public class ResourceUploadManagerConfiguration 
-		implements EzyBeanContextAware, EzyBeanConfig {
-	
-	@EzyProperty(PropertyNames.RESOURCE_UPLOAD_ENABLE)
-	private boolean resourceUploadEnable = false;
-	
-	private EzyBeanContext context;
-	
-	@Override
-	public void config() {
-		if (resourceUploadEnable) {
-		    ResourceUploadManager resourceUploadManager = createUploadManager(context);
-		    FileUploader fileUploader = new FileUploader(resourceUploadManager);
-			context.getSingletonFactory().addSingleton(resourceUploadManager);
-			context.getSingletonFactory().addSingleton(fileUploader);
-		}
-	}
+        implements EzyBeanContextAware, EzyBeanConfig {
+    
+    @EzyProperty(PropertyNames.RESOURCE_UPLOAD_ENABLE)
+    private boolean resourceUploadEnable = false;
+    
+    private EzyBeanContext context;
+    
+    @Override
+    public void config() {
+        if (resourceUploadEnable) {
+            ResourceUploadManager resourceUploadManager = createUploadManager(context);
+            FileUploader fileUploader = new FileUploader(resourceUploadManager);
+            context.getSingletonFactory().addSingleton(resourceUploadManager);
+            context.getSingletonFactory().addSingleton(fileUploader);
+        }
+    }
 }

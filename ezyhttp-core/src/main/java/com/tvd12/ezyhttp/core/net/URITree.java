@@ -5,12 +5,12 @@ import java.util.Map;
 
 public class URITree {
 
-	protected String uri;
-	protected Map<String, URITree> children;
-	
-	public void addURI(String uri) {
-		URITree lastChild = this;
-		String[] paths = uri.split("/");
+    protected String uri;
+    protected Map<String, URITree> children;
+
+    public void addURI(String uri) {
+        URITree lastChild = this;
+        String[] paths = uri.split("/");
         for (String s : paths) {
             if (lastChild.children == null)
                 lastChild.children = new HashMap<>();
@@ -24,12 +24,12 @@ public class URITree {
             }
             lastChild = child;
         }
-		lastChild.uri = uri;
-	}
-	
-	public String getMatchedURI(String uri) {
-		URITree lastChild = this;
-		String[] paths = uri.split("/");
+        lastChild.uri = uri;
+    }
+
+    public String getMatchedURI(String uri) {
+        URITree lastChild = this;
+        String[] paths = uri.split("/");
         for (String path : paths) {
             if (lastChild.children == null)
                 return null;
@@ -40,16 +40,16 @@ public class URITree {
                 return null;
             lastChild = child;
         }
-		return lastChild.uri;
-		
-	}
-	
-	@Override
-	public String toString() {
-		if (children == null)
-			return uri;
-		return children.toString();
-		
-	}
-	
+        return lastChild.uri;
+
+    }
+
+    @Override
+    public String toString() {
+        if (children == null)
+            return uri;
+        return children.toString();
+
+    }
+
 }

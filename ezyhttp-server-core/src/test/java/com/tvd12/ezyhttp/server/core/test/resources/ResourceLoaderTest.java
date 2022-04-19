@@ -16,83 +16,83 @@ import com.tvd12.test.reflect.MethodInvoker;
 
 public class ResourceLoaderTest {
 
-	@Test
-	public void urlNull() {
-		// given
-		ResourceLoader sut = new ResourceLoader();
-		
-		// when
-		List<String> listResources = sut.listResources("not found");
-		
-		// then
-		Asserts.assertTrue(listResources.isEmpty());
-	}
-	
-	@Test
-	public void urlPathEmpty() {
-		// given
-		ResourceLoader sut = new ResourceLoader() {
-			@Override
-			protected Set<URL> getResourceURLs(String resource) {
-				try {
-					return Sets.newHashSet(new URL("http://locahost"));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-					throw new IllegalArgumentException(e);
-				}
-			}
-		};
-		
-		// when
-		List<String> listResources = sut.listResources("application.yaml");
-		
-		// then
-		Asserts.assertTrue(listResources.isEmpty());
-	}
-	
-	@Test
-	public void regexTest() {
-		// given
-		ResourceLoader sut = new ResourceLoader();
-		
-		// when
-		List<String> listResources = sut.listResources(
-			"static",
-			Sets.newHashSet("^static/css/.+")
-		);
-		
-		// then
-		Asserts.assertEquals(2, listResources.size());
-	}
-	
-	@Test
-	public void addURLsToSetTest() {
-	    // given
-	    ResourceLoader sut = new ResourceLoader();
-	    
-	    Set<URL> answer = new HashSet<>();
-	    Exception exception = new Exception("just test");
-	    EzySupplier<Enumeration<URL>> supplier = new EzySupplier<Enumeration<URL>>() {
+    @Test
+    public void urlNull() {
+        // given
+        ResourceLoader sut = new ResourceLoader();
+
+        // when
+        List<String> listResources = sut.listResources("not found");
+
+        // then
+        Asserts.assertTrue(listResources.isEmpty());
+    }
+
+    @Test
+    public void urlPathEmpty() {
+        // given
+        ResourceLoader sut = new ResourceLoader() {
+            @Override
+            protected Set<URL> getResourceURLs(String resource) {
+                try {
+                    return Sets.newHashSet(new URL("http://locahost"));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        };
+
+        // when
+        List<String> listResources = sut.listResources("application.yaml");
+
+        // then
+        Asserts.assertTrue(listResources.isEmpty());
+    }
+
+    @Test
+    public void regexTest() {
+        // given
+        ResourceLoader sut = new ResourceLoader();
+
+        // when
+        List<String> listResources = sut.listResources(
+            "static",
+            Sets.newHashSet("^static/css/.+")
+        );
+
+        // then
+        Asserts.assertEquals(2, listResources.size());
+    }
+
+    @Test
+    public void addURLsToSetTest() {
+        // given
+        ResourceLoader sut = new ResourceLoader();
+
+        Set<URL> answer = new HashSet<>();
+        Exception exception = new Exception("just test");
+        EzySupplier<Enumeration<URL>> supplier = new EzySupplier<Enumeration<URL>>() {
             @Override
             public Enumeration<URL> get() throws Exception {
                 throw exception;
             }
-	        
+
         };
-	    
-	    // when
-	    MethodInvoker.create()
-	        .object(sut)
-	        .method("addURLsToSet")
-	        .param(Set.class, answer)
-	        .param(EzySupplier.class, supplier)
-	        .invoke();
-	    
-	    // then
-	    Asserts.assertTrue(answer.isEmpty());
-	}
-	
-	@Test
+
+        // when
+        MethodInvoker.create()
+            .object(sut)
+            .method("addURLsToSet")
+            .param(Set.class, answer)
+            .param(EzySupplier.class, supplier)
+            .invoke();
+
+        // then
+        Asserts.assertTrue(answer.isEmpty());
+    }
+
+    @Test
     public void addURLsToSetURLsIsNull() {
         // given
         ResourceLoader sut = new ResourceLoader();
@@ -110,8 +110,8 @@ public class ResourceLoaderTest {
         // then
         Asserts.assertTrue(answer.isEmpty());
     }
-	
-	@Test
+
+    @Test
     public void loadFromJarTest() {
         // given
         ResourceLoader sut = new ResourceLoader();
@@ -122,8 +122,8 @@ public class ResourceLoaderTest {
         // then
         Asserts.assertEquals(0, listResources.size());
     }
-	
-	@Test
+
+    @Test
     public void loadFromJarMatchTest() {
         // given
         ResourceLoader sut = new ResourceLoader();
@@ -134,25 +134,25 @@ public class ResourceLoaderTest {
         // then
         Asserts.assertFalse(listResources.isEmpty());
     }
-	
-	@Test
-	public void listFileEmptyTest() {
-	    // given
-	    File file = new File("unknow file");
-	    ResourceLoader sut = new ResourceLoader();
-	    
-	    // when
-	    File[] actual = MethodInvoker.create()
-	            .object(sut)
-	            .method("listFile")
-	            .param(File.class, file)
-	            .invoke(File[].class);
-	    
-	    // then
-	    Asserts.assertZero(actual.length);
-	}
-	
-	@Test
+
+    @Test
+    public void listFileEmptyTest() {
+        // given
+        File file = new File("unknow file");
+        ResourceLoader sut = new ResourceLoader();
+
+        // when
+        File[] actual = MethodInvoker.create()
+                .object(sut)
+                .method("listFile")
+                .param(File.class, file)
+                .invoke(File[].class);
+
+        // then
+        Asserts.assertZero(actual.length);
+    }
+
+    @Test
     public void isNotFileElement() {
         // given
         String filePath = "file\\";
@@ -168,8 +168,8 @@ public class ResourceLoaderTest {
         // then
         Asserts.assertFalse(actual);
     }
-	
-	@Test
+
+    @Test
     public void getJarFileNullDueToException() {
         // given
         String filePath = "#$%^&*";
@@ -185,8 +185,8 @@ public class ResourceLoaderTest {
         // then
         Asserts.assertNull(actual);
     }
-	
-	@Test
+
+    @Test
     public void loadFromFolder() {
         // given
         ResourceLoader sut = new ResourceLoader();

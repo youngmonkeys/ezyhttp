@@ -9,14 +9,14 @@ import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 @Controller
 public class DefaultController {
 
-	@DoDelete
-	public void delete1() {}
-	
-	@DoDelete("/delete2")
-	public void delete2() {}
-	
-	@Api
-	@Authenticated
-	@DoDelete(uri = "delete3", responseType = ContentTypes.APPLICATION_JSON)
-	public void delete3() {}
+    @DoDelete
+    public void delete1() {}
+    
+    @DoDelete("/delete2")
+    public void delete2() {}
+    
+    @Api
+    @Authenticated
+    @DoDelete(uri = "delete3", responseType = ContentTypes.APPLICATION_JSON)
+    public void delete3() {}
 }

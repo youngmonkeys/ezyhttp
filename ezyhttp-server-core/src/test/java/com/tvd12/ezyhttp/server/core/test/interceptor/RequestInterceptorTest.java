@@ -6,15 +6,15 @@ import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 
 public class RequestInterceptorTest {
 
-	@Test
-	public void test() throws Exception {
-		// given
-		RequestInterceptor sut = new RequestInterceptor() {};
-		
-		
-		// when
-		// then
-		sut.preHandle(null, null);
-		sut.postHandle(null, null);
-	}
+    @Test
+    public void test() throws Exception {
+        // given
+        RequestInterceptor sut = new RequestInterceptor() {};
+
+
+        // when
+        // then
+        sut.preHandle(null, null);
+        sut.postHandle(null, null);
+    }
 }

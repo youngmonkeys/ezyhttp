@@ -14,13 +14,13 @@ public class BannerPrinter {
     }
     
     protected byte[] getBannerBytes() {
-    	InputStream inputStream = getBannerInputStream();
-    	try {
-    		return getBannerBytes(inputStream);
-    	}
-    	finally {
-			EzyProcessor.processSilently(inputStream::close);
-		}
+        InputStream inputStream = getBannerInputStream();
+        try {
+            return getBannerBytes(inputStream);
+        }
+        finally {
+            EzyProcessor.processSilently(inputStream::close);
+        }
     }
     
     protected byte[] getBannerBytes(InputStream stream) {

@@ -7,17 +7,17 @@ import org.testng.annotations.Test;
 
 public class HttpPaymentRequiredExceptionTest {
 
-	@Test
-	public void test() {
-		// given
-		int code = StatusCodes.PAYMENT_REQUIRED;
-		String data = "error";
-		
-		// when
-		HttpPaymentRequiredException sut = new HttpPaymentRequiredException(data);
-		
-		// then
-		Asserts.assertEquals(code, sut.getCode());
-		Asserts.assertEquals(data, sut.getData());
-	}
+    @Test
+    public void test() {
+        // given
+        int code = StatusCodes.PAYMENT_REQUIRED;
+        String data = "error";
+
+        // when
+        HttpPaymentRequiredException sut = new HttpPaymentRequiredException(data);
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+    }
 }

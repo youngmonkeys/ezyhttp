@@ -29,75 +29,75 @@ import com.tvd12.ezyhttp.server.core.test.request.HelloRequest;
 @Controller("/api")
 public class HomeController {
 
-	@DoGet
-	public String welcome(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@RequestParam("firstName") String firstName,
-			@RequestParam String who,
-			@RequestHeader("key") String key,
-			@RequestHeader String token,
-			@RequestCookie String cookieIndex,
-			@RequestCookie("cookie") String cookieValue,
-			@RequestArgument("name") String name,
-			@RequestBody HelloRequest body,
-			@NickName String nickName) {
-		System.out.println("request uri: " + request.getRequestURI());
-		if (who == null)
-			throw new IllegalArgumentException("who cannot be null");
-		return "welcome " + who + " " + body.getWho();
-	}
-	
-	@DoPost
-	public String hello(
-			RequestArguments args,
-			@RequestBody HelloRequest body) {
-		return "hello " + body.getWho();
-	}
-	
-	@DoPut
-	public void doNothing() {}
-	
-	@DoGet("bye")
-	public String bye(@RequestParam List<String> messages) {
-		return "bye: " + messages;
-	}
-	
-	@DoGet(value = "see", responseType = ContentTypes.APPLICATION_JSON)
-	public String see(
-			@RequestParam List<String> messages, 
-			@PathVariable("name") String name) {
-		return "bye: " + messages;
-	}
-	
-	@DoPut(value = "see", responseType = ContentTypes.APPLICATION_JSON)
-	public String put(
-			@RequestParam List<String> messages, 
-			@PathVariable("name") String name) {
-		return "bye: " + messages;
-	}
-	
-	@DoDelete("see")
-	public String delete(
-			@RequestHeader int count,
-			@RequestParam int skip,
-			@RequestParam int limit,
-			@RequestParam List<String> messages, 
-			@PathVariable("name") String name) {
-		return "bye: " + messages;
-	}
-	
-	@DoPost("/post1")
-	public void post1() {}
-	
-	@DoPost(uri = "post2", responseType = ContentTypes.APPLICATION_JSON)
-	public void post2() {}
-	
-	@TryCatch({IllegalStateException.class, NullPointerException.class})
-	public String handleException2(Exception e) {
-		return e.getMessage();
-	}
-	
-	@TryCatch(java.lang.UnsupportedOperationException.class)
-	public void handleException3(Exception e) {}
+    @DoGet
+    public String welcome(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam("firstName") String firstName,
+            @RequestParam String who,
+            @RequestHeader("key") String key,
+            @RequestHeader String token,
+            @RequestCookie String cookieIndex,
+            @RequestCookie("cookie") String cookieValue,
+            @RequestArgument("name") String name,
+            @RequestBody HelloRequest body,
+            @NickName String nickName) {
+        System.out.println("request uri: " + request.getRequestURI());
+        if (who == null)
+            throw new IllegalArgumentException("who cannot be null");
+        return "welcome " + who + " " + body.getWho();
+    }
+
+    @DoPost
+    public String hello(
+            RequestArguments args,
+            @RequestBody HelloRequest body) {
+        return "hello " + body.getWho();
+    }
+
+    @DoPut
+    public void doNothing() {}
+
+    @DoGet("bye")
+    public String bye(@RequestParam List<String> messages) {
+        return "bye: " + messages;
+    }
+
+    @DoGet(value = "see", responseType = ContentTypes.APPLICATION_JSON)
+    public String see(
+            @RequestParam List<String> messages,
+            @PathVariable("name") String name) {
+        return "bye: " + messages;
+    }
+
+    @DoPut(value = "see", responseType = ContentTypes.APPLICATION_JSON)
+    public String put(
+            @RequestParam List<String> messages,
+            @PathVariable("name") String name) {
+        return "bye: " + messages;
+    }
+
+    @DoDelete("see")
+    public String delete(
+            @RequestHeader int count,
+            @RequestParam int skip,
+            @RequestParam int limit,
+            @RequestParam List<String> messages,
+            @PathVariable("name") String name) {
+        return "bye: " + messages;
+    }
+
+    @DoPost("/post1")
+    public void post1() {}
+
+    @DoPost(uri = "post2", responseType = ContentTypes.APPLICATION_JSON)
+    public void post2() {}
+
+    @TryCatch({IllegalStateException.class, NullPointerException.class})
+    public String handleException2(Exception e) {
+        return e.getMessage();
+    }
+
+    @TryCatch(java.lang.UnsupportedOperationException.class)
+    public void handleException3(Exception e) {}
 }

@@ -14,14 +14,14 @@ import java.lang.annotation.Target;
 @Target({ ElementType.PARAMETER })
 public @interface RequestParam {
     
-	/**
-	 * name or parameter
-	 * 
-	 * @return the parameter's name
-	 */
+    /**
+     * name or parameter
+     *
+     * @return the parameter's name
+     */
     String value() default "";
-	
-	/**
+
+    /**
      * name or parameter
      * 
      * @return the parameter's name

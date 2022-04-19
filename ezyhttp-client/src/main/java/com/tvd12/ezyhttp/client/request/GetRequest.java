@@ -4,9 +4,9 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
 public class GetRequest extends AbstractRequest<GetRequest> {
 
-	@Override
-	public HttpMethod getMethod() {
-		return HttpMethod.GET;
-	}
-	
+    @Override
+    public HttpMethod getMethod() {
+        return HttpMethod.GET;
+    }
+
 }

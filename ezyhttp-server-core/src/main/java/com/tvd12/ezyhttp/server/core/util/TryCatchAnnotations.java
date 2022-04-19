@@ -5,13 +5,13 @@ import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 
 public final class TryCatchAnnotations {
 
-	private TryCatchAnnotations() {}
-	
-	public static Class<?>[] getExceptionClasses(TryCatch tryCatch) {
+    private TryCatchAnnotations() {}
+    
+    public static Class<?>[] getExceptionClasses(TryCatch tryCatch) {
         return tryCatch.value();
-	}
-	
-	public static String getResponseType(TryCatch annotation) {
+    }
+    
+    public static String getResponseType(TryCatch annotation) {
         return ContentTypes.APPLICATION_JSON;
-	}
+    }
 }

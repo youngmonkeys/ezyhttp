@@ -8,17 +8,17 @@ import com.tvd12.test.assertion.Asserts;
 
 public class HttpBadRequestExceptionTest {
 
-	@Test
-	public void test() {
-		// given
-		int code = StatusCodes.BAD_REQUEST;
-		String data = "error";
-		
-		// when
-		HttpBadRequestException sut = new HttpBadRequestException(data);
-		
-		// then
-		Asserts.assertEquals(code, sut.getCode());
-		Asserts.assertEquals(data, sut.getData());
-	}
+    @Test
+    public void test() {
+        // given
+        int code = StatusCodes.BAD_REQUEST;
+        String data = "error";
+
+        // when
+        HttpBadRequestException sut = new HttpBadRequestException(data);
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+    }
 }

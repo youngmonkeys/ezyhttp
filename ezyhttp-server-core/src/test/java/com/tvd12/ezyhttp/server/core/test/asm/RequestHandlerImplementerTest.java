@@ -11,28 +11,28 @@ import com.tvd12.test.assertion.Asserts;
 
 public class RequestHandlerImplementerTest {
 
-	@Test
-	public void implementOneFailed() throws Exception {
-		// given
-		ControllerProxy controller = new ControllerProxy(new Controller());
-		RequestHandlerMethod handlerMethod = new RequestHandlerMethod(
-				"/",
-				new EzyMethod(Controller.class.getDeclaredMethod("doGet")));
-		RequestHandlerImplementer sut = new RequestHandlerImplementer(
-				controller,
-				handlerMethod);
-		
-		// when
-		Throwable e = Asserts.assertThrows(() -> sut.implement());
-		
-		// then
-		Asserts.assertEquals(0, handlerMethod.getParameterTypes().length);
-		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
-	}
-	
-	private static class Controller {
-		
-		@DoGet("/get")
-		private void doGet() {}
-	}
+    @Test
+    public void implementOneFailed() throws Exception {
+        // given
+        ControllerProxy controller = new ControllerProxy(new Controller());
+        RequestHandlerMethod handlerMethod = new RequestHandlerMethod(
+                "/",
+                new EzyMethod(Controller.class.getDeclaredMethod("doGet")));
+        RequestHandlerImplementer sut = new RequestHandlerImplementer(
+                controller,
+                handlerMethod);
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.implement());
+
+        // then
+        Asserts.assertEquals(0, handlerMethod.getParameterTypes().length);
+        Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
+    }
+
+    private static class Controller {
+
+        @DoGet("/get")
+        private void doGet() {}
+    }
 }

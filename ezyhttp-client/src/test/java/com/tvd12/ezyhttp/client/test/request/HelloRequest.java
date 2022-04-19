@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class HelloRequest {
-	public String who;
+    public String who;
 }

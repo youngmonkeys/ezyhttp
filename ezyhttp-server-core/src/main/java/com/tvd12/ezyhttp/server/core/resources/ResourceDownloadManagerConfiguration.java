@@ -14,17 +14,17 @@ import lombok.Setter;
 @Setter
 @EzyConfigurationBefore
 public class ResourceDownloadManagerConfiguration 
-		implements EzyBeanContextAware, EzyBeanConfig {
-	
-	@EzyProperty(PropertyNames.RESOURCE_ENABLE)
-	private boolean resourcesEnable = false;
-	
-	private EzyBeanContext context;
-	
-	@Override
-	public void config() {
-		if (resourcesEnable) {
-			context.getSingletonFactory().addSingleton(createDownloadManager(context));
-		}
-	}
+        implements EzyBeanContextAware, EzyBeanConfig {
+
+    @EzyProperty(PropertyNames.RESOURCE_ENABLE)
+    private boolean resourcesEnable = false;
+
+    private EzyBeanContext context;
+
+    @Override
+    public void config() {
+        if (resourcesEnable) {
+            context.getSingletonFactory().addSingleton(createDownloadManager(context));
+        }
+    }
 }

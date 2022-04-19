@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Customer {
 
-	protected long id;
-	protected String name;
-	protected int age;
-	
+    protected long id;
+    protected String name;
+    protected int age;
+
 }

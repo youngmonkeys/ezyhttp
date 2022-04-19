@@ -8,38 +8,38 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public class RequestHandlerTest {
 
-	@Test
-	public void test() {
-		// given
-		ExRequestHandler handler = new ExRequestHandler();
-		
-		// when
-		// then
-		handler.setController(null);
-		handler.setHandlerMethod(null);
-	}
-	
-	private static class ExRequestHandler implements RequestHandler {
+    @Test
+    public void test() {
+        // given
+        ExRequestHandler handler = new ExRequestHandler();
 
-		@Override
-		public Object handle(RequestArguments arguments) {
-			return null;
-		}
+        // when
+        // then
+        handler.setController(null);
+        handler.setHandlerMethod(null);
+    }
 
-		@Override
-		public HttpMethod getMethod() {
-			return null;
-		}
+    private static class ExRequestHandler implements RequestHandler {
 
-		@Override
-		public String getRequestURI() {
-			return null;
-		}
+        @Override
+        public Object handle(RequestArguments arguments) {
+            return null;
+        }
 
-		@Override
-		public String getResponseContentType() {
-			return null;
-		}
-		
-	}
+        @Override
+        public HttpMethod getMethod() {
+            return null;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return null;
+        }
+
+        @Override
+        public String getResponseContentType() {
+            return null;
+        }
+
+    }
 }

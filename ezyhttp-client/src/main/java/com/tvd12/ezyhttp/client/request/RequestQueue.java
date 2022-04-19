@@ -9,26 +9,26 @@ import lombok.Getter;
 
 public class RequestQueue implements EzyClearable {
 
-	@Getter
-	protected final int capacity;
-	protected final BlockingQueue<Request> queue;
-	
-	public RequestQueue(int capacity) {
-		this.capacity = capacity;
-		this.queue = new LinkedBlockingQueue<>(capacity);
-	}
-	
-	public boolean add(Request request) {
+    @Getter
+    protected final int capacity;
+    protected final BlockingQueue<Request> queue;
+    
+    public RequestQueue(int capacity) {
+        this.capacity = capacity;
+        this.queue = new LinkedBlockingQueue<>(capacity);
+    }
+    
+    public boolean add(Request request) {
         return this.queue.offer(request);
-	}
-	
-	public Request take() throws InterruptedException {
+    }
+    
+    public Request take() throws InterruptedException {
         return queue.take();
-	}
-	
-	@Override
-	public void clear() {
-		this.queue.clear();
-	}
-	
+    }
+    
+    @Override
+    public void clear() {
+        this.queue.clear();
+    }
+    
 }

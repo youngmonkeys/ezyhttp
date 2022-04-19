@@ -7,15 +7,15 @@ import com.tvd12.test.assertion.Asserts;
 
 public class HttpMethodTest {
 
-	@Test
-	public void test() {
-		Asserts.assertEquals(1, HttpMethod.GET.getId());
-		Asserts.assertEquals("get", HttpMethod.GET.getName());
-		
-		Asserts.assertFalse(HttpMethod.GET.hasOutput());
-		Asserts.assertFalse(HttpMethod.DELETE.hasOutput());
-		Asserts.assertTrue(HttpMethod.POST.hasOutput());
-		Asserts.assertTrue(HttpMethod.PUT.hasOutput());
-		Asserts.assertTrue(HttpMethod.PATCH.hasOutput());
-	}
+    @Test
+    public void test() {
+        Asserts.assertEquals(1, HttpMethod.GET.getId());
+        Asserts.assertEquals("get", HttpMethod.GET.getName());
+        
+        Asserts.assertFalse(HttpMethod.GET.hasOutput());
+        Asserts.assertFalse(HttpMethod.DELETE.hasOutput());
+        Asserts.assertTrue(HttpMethod.POST.hasOutput());
+        Asserts.assertTrue(HttpMethod.PUT.hasOutput());
+        Asserts.assertTrue(HttpMethod.PATCH.hasOutput());
+    }
 }

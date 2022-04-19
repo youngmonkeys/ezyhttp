@@ -1,114 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tvd12</groupId>
-		<artifactId>ezyfox</artifactId>
-		<version>1.0.3</version>
-	</parent>
-	<artifactId>ezyhttp</artifactId>
-	<version>1.0.2</version>
-	<packaging>pom</packaging>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tvd12</groupId>
+        <artifactId>ezyfox</artifactId>
+        <version>1.0.3</version>
+    </parent>
+    <artifactId>ezyhttp</artifactId>
+    <version>1.0.2</version>
+    <packaging>pom</packaging>
 
-	<name>ezyhttp</name>
-	<url>https://youngmonkeys.org/project/ezy-http/</url>
-	<description>
-		Support for HTTP interaction
-	</description>
+    <name>ezyhttp</name>
+    <url>https://youngmonkeys.org/project/ezy-http/</url>
+    <description>
+        Support for HTTP interaction
+    </description>
 
-	<organization>
-		<name>Young Monkeys</name>
-		<url>https://youngmonkeys.org</url>
-	</organization>
+    <organization>
+        <name>Young Monkeys</name>
+        <url>https://youngmonkeys.org</url>
+    </organization>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<scm>
-		<connection>scm:git:git@github.com:youngmonkeys/ezyhttp.git</connection>
-		<developerConnection>scm:git:git@github.com:youngmonkeys/ezyhttp.git</developerConnection>
-		<url>https://github.com/youngmonkeys/ezyhttp</url>
-	</scm>
+    <scm>
+        <connection>scm:git:git@github.com:youngmonkeys/ezyhttp.git</connection>
+        <developerConnection>scm:git:git@github.com:youngmonkeys/ezyhttp.git</developerConnection>
+        <url>https://github.com/youngmonkeys/ezyhttp</url>
+    </scm>
 
-	<issueManagement>
-		<system>Github</system>
-		<url>https://github.com/youngmonkeys/ezyhttp/issues</url>
-	</issueManagement>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/youngmonkeys/ezyhttp/issues</url>
+    </issueManagement>
 
-	<ciManagement>
-		<system>travis</system>
-		<url>https://travis-ci.org/youngmonkeys/ezyhttp</url>
-	</ciManagement>
+    <ciManagement>
+        <system>travis</system>
+        <url>https://travis-ci.org/youngmonkeys/ezyhttp</url>
+    </ciManagement>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>oss.sonatype.org</id>
-			<url>https://oss.sonatype.org/content/groups/public</url>
-		</pluginRepository>
-	</pluginRepositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+        </pluginRepository>
+    </pluginRepositories>
 
-	<developers>
-		<developer>
-			<name>Ta Van Dung</name>
-			<email>itprono3@gmail.com</email>
-			<organization>Young Monkeys</organization>
-			<organizationUrl>http://www.youngmonkeys.org</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Ta Van Dung</name>
+            <email>itprono3@gmail.com</email>
+            <organization>Young Monkeys</organization>
+            <organizationUrl>http://www.youngmonkeys.org</organizationUrl>
+        </developer>
+    </developers>
 
-	<properties>
-		<ezy.version>1.2.2</ezy.version>
-		<javax.servlet.version>4.0.1</javax.servlet.version>
-		<jetty.version>9.4.43.v20210629</jetty.version>
-	</properties>
+    <properties>
+        <ezy.version>1.2.2</ezy.version>
+        <javax.servlet.version>4.0.1</javax.servlet.version>
+        <jetty.version>9.4.43.v20210629</jetty.version>
+    </properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.1.2</version>
-				<dependencies>
-					<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>8.42</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<consoleOutput>true</consoleOutput>
-					<violationSeverity>error</violationSeverity>
-					<configLocation>checkstyle.xml</configLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<id>verify</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.42</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <violationSeverity>error</violationSeverity>
+                    <configLocation>checkstyle.xml</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-	<modules>
-		<module>ezyhttp-server-core</module>
-		<module>ezyhttp-core</module>
-		<module>ezyhttp-server-jetty</module>
-		<module>ezyhttp-server-boot</module>
-		<module>ezyhttp-client</module>
-		<module>ezyhttp-server-thymeleaf</module>
-		<module>ezyhttp-server-graphql</module>
-		<module>ezyhttp-server-management</module>
-	</modules>
+    <modules>
+        <module>ezyhttp-server-core</module>
+        <module>ezyhttp-core</module>
+        <module>ezyhttp-server-jetty</module>
+        <module>ezyhttp-server-boot</module>
+        <module>ezyhttp-client</module>
+        <module>ezyhttp-server-thymeleaf</module>
+        <module>ezyhttp-server-graphql</module>
+        <module>ezyhttp-server-management</module>
+    </modules>
 </project>

@@ -1,33 +1,33 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tvd12</groupId>
-		<artifactId>ezyhttp</artifactId>
-		<version>1.0.2</version>
-	</parent>
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tvd12</groupId>
+        <artifactId>ezyhttp</artifactId>
+        <version>1.0.2</version>
+    </parent>
 
-	<artifactId>ezyhttp-server-core</artifactId>
-	<name>ezyhttp-server-core</name>
-	<url>https://youngmonkeys.org/project/ezy-http/</url>
+    <artifactId>ezyhttp-server-core</artifactId>
+    <name>ezyhttp-server-core</name>
+    <url>https://youngmonkeys.org/project/ezy-http/</url>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyfox-bean</artifactId>
-			<version>${ezy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${javax.servlet.version}</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyfox-bean</artifactId>
+            <version>${ezy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

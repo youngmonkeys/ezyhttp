@@ -7,14 +7,14 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ConstantsTest {
 
-	@Test
-	public void test() {
-		Asserts.assertEquals(
-				Constants.DEFAULT_PROPERTIES_FILES, 
-				new String[] {
-			            "application.properties",
-			            "application.yaml"
-			    }
-		);
-	}
+    @Test
+    public void test() {
+        Asserts.assertEquals(
+                Constants.DEFAULT_PROPERTIES_FILES, 
+                new String[] {
+                        "application.properties",
+                        "application.yaml"
+                }
+        );
+    }
 }

@@ -12,24 +12,24 @@ import com.tvd12.test.base.BaseTest;
 
 public class RequestHandlerMethodTest extends BaseTest {
 
-	@Test
-	public void test() throws Exception {
-		// given
-	    RequestHandlerMethod sut = new RequestHandlerMethod(
-	        "/get",
-	        new EzyMethod(InternalController.class.getDeclaredMethod("getSomething"))
+    @Test
+    public void test() throws Exception {
+        // given
+        RequestHandlerMethod sut = new RequestHandlerMethod(
+            "/get",
+            new EzyMethod(InternalController.class.getDeclaredMethod("getSomething"))
         );
-	    
-		// when
-		// then
-		Asserts.assertFalse(sut.isPayment());
-		Asserts.assertNull(sut.getFeature());
-		System.out.println(sut);
-	}
-	
-	@Test
-	public void isPaymentAndFeatureTest() throws Exception {
-	 // given
+
+        // when
+        // then
+        Asserts.assertFalse(sut.isPayment());
+        Asserts.assertNull(sut.getFeature());
+        System.out.println(sut);
+    }
+
+    @Test
+    public void isPaymentAndFeatureTest() throws Exception {
+     // given
         RequestHandlerMethod sut = new RequestHandlerMethod(
             "/get",
             new EzyMethod(InternalController.class.getDeclaredMethod("buySomething"))
@@ -39,16 +39,16 @@ public class RequestHandlerMethodTest extends BaseTest {
         // then
         Asserts.assertTrue(sut.isPayment());
         Asserts.assertEquals(sut.getFeature(), "hello.world");
-	}
+    }
 
-	public static class InternalController {
-	    
-	    @EzyPayment
-	    @EzyFeature("hello.world")
-	    @DoPost
-	    public void buySomething() {}
-	    
-	    @DoPost
-	    public void getSomething() {}
-	}
+    public static class InternalController {
+
+        @EzyPayment
+        @EzyFeature("hello.world")
+        @DoPost
+        public void buySomething() {}
+
+        @DoPost
+        public void getSomething() {}
+    }
 }

@@ -8,18 +8,18 @@ import lombok.Data;
 
 @EzySingleton
 public class GraphQLWelcomeDataFetcher implements GraphQLDataFetcher<WelcomeRequest, String> {
-	
-	public String getData(WelcomeRequest argument) {
-		return "Welcome " + argument.getName();
-	}
-	
-	@Override
-	public String getQueryName() {
-		return "welcome";
-	}
-	
-	@Data
-	public static class WelcomeRequest {
-		private String name;
-	}
+
+    public String getData(WelcomeRequest argument) {
+        return "Welcome " + argument.getName();
+    }
+
+    @Override
+    public String getQueryName() {
+        return "welcome";
+    }
+
+    @Data
+    public static class WelcomeRequest {
+        private String name;
+    }
 }

@@ -8,17 +8,17 @@ import com.tvd12.test.assertion.Asserts;
 
 public class HttpNotFoundExceptionTest {
 
-	@Test
-	public void test() {
-		// given
-		int code = StatusCodes.NOT_FOUND;
-		String data = "error";
-		
-		// when
-		HttpNotFoundException sut = new HttpNotFoundException(data);
-		
-		// then
-		Asserts.assertEquals(code, sut.getCode());
-		Asserts.assertEquals(data, sut.getData());
-	}
+    @Test
+    public void test() {
+        // given
+        int code = StatusCodes.NOT_FOUND;
+        String data = "error";
+        
+        // when
+        HttpNotFoundException sut = new HttpNotFoundException(data);
+        
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+    }
 }

@@ -18,42 +18,42 @@ import java.util.Map;
 import java.util.Set;
 
 public class GraphQLConfigurationTest {
-	
-	@Test
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public void test() throws NoSuchFieldException, IllegalAccessException {
-		// given
-		EzyBeanContextBuilder builder = new EzySimpleBeanContext.Builder();
-		
-		Set<String> packagesToScan = RandomUtil.randomSet(8, String.class);
-		packagesToScan.add("com.tvd12.ezyhttp.server.graphql.test.config");
-		
-		for (String p : packagesToScan) {
-			builder.scan(p);
-		}
-		
-		EzyBeanContext context = builder.build();
-		
-		GraphQLConfiguration sut = new GraphQLConfiguration();
-		EzySingletonFactory singletonFactory = context.getSingletonFactory();
-		sut.setSingletonFactory(singletonFactory);
-		sut.setObjectMapper(new ObjectMapper());
-		sut.setGraphQLEnable(true);
-		
-		// when
-		sut.config();
-		GraphQLController controller = (GraphQLController) singletonFactory.getSingleton(GraphQLController.class);
-		Field dataFetcherManagerField = GraphQLController.class.getDeclaredField("dataFetcherManager");
-		dataFetcherManagerField.setAccessible(true);
-		GraphQLDataFetcherManager dataFetcherManager = (GraphQLDataFetcherManager) dataFetcherManagerField.get(controller);
-		
-		Field dataFetchersField = GraphQLDataFetcherManager.class.getDeclaredField("dataFetchers");
-		dataFetchersField.setAccessible(true);
-		Map<String, GraphQLDataFetcher> dataFetchers = (Map<String, GraphQLDataFetcher>) dataFetchersField.get(dataFetcherManager);
-		
-		// then
-		Asserts.assertNotNull(controller);
-		Asserts.assertTrue(dataFetchers.containsKey("A"));
-	}
-	
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void test() throws NoSuchFieldException, IllegalAccessException {
+        // given
+        EzyBeanContextBuilder builder = new EzySimpleBeanContext.Builder();
+
+        Set<String> packagesToScan = RandomUtil.randomSet(8, String.class);
+        packagesToScan.add("com.tvd12.ezyhttp.server.graphql.test.config");
+
+        for (String p : packagesToScan) {
+            builder.scan(p);
+        }
+
+        EzyBeanContext context = builder.build();
+
+        GraphQLConfiguration sut = new GraphQLConfiguration();
+        EzySingletonFactory singletonFactory = context.getSingletonFactory();
+        sut.setSingletonFactory(singletonFactory);
+        sut.setObjectMapper(new ObjectMapper());
+        sut.setGraphQLEnable(true);
+
+        // when
+        sut.config();
+        GraphQLController controller = (GraphQLController) singletonFactory.getSingleton(GraphQLController.class);
+        Field dataFetcherManagerField = GraphQLController.class.getDeclaredField("dataFetcherManager");
+        dataFetcherManagerField.setAccessible(true);
+        GraphQLDataFetcherManager dataFetcherManager = (GraphQLDataFetcherManager) dataFetcherManagerField.get(controller);
+
+        Field dataFetchersField = GraphQLDataFetcherManager.class.getDeclaredField("dataFetchers");
+        dataFetchersField.setAccessible(true);
+        Map<String, GraphQLDataFetcher> dataFetchers = (Map<String, GraphQLDataFetcher>) dataFetchersField.get(dataFetcherManager);
+
+        // then
+        Asserts.assertNotNull(controller);
+        Asserts.assertTrue(dataFetchers.containsKey("A"));
+    }
+
 }

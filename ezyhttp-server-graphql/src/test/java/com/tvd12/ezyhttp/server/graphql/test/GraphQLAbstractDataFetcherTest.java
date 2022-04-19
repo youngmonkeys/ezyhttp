@@ -6,17 +6,17 @@ import org.testng.annotations.Test;
 
 @SuppressWarnings("rawtypes")
 public class GraphQLAbstractDataFetcherTest {
-	
-	@Test
-	public void testExceptionWhenGetArgumentType() {
-		// given
-		GraphQLNoNameDataFetcher noNameDataFetcher = new GraphQLNoNameDataFetcher();
-		
-		// when
-		Class c = noNameDataFetcher.getArgumentType();
-		
-		// then
-		Asserts.assertNull(c);
-	}
-	
+
+    @Test
+    public void testExceptionWhenGetArgumentType() {
+        // given
+        GraphQLNoNameDataFetcher noNameDataFetcher = new GraphQLNoNameDataFetcher();
+
+        // when
+        Class c = noNameDataFetcher.getArgumentType();
+
+        // then
+        Asserts.assertNull(c);
+    }
+
 }

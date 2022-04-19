@@ -10,13 +10,13 @@ import com.tvd12.ezyhttp.server.core.test.controller.CustomerController;
 
 public final class AuthenticatedMethods {
 
-	public static final Set<Method> AUTHENTICATED_METHODS = authenticatedMethods();
-	
-	private AuthenticatedMethods() {}
-	
-	private static Set<Method> authenticatedMethods() {
-		Set<Method> methods = new HashSet<>(EzyMethods.getDeclaredMethods(CustomerController.class));
-		return Collections.unmodifiableSet(methods);
-	}
-	
+    public static final Set<Method> AUTHENTICATED_METHODS = authenticatedMethods();
+
+    private AuthenticatedMethods() {}
+
+    private static Set<Method> authenticatedMethods() {
+        Set<Method> methods = new HashSet<>(EzyMethods.getDeclaredMethods(CustomerController.class));
+        return Collections.unmodifiableSet(methods);
+    }
+
 }

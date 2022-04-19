@@ -11,26 +11,26 @@ import com.tvd12.test.assertion.Asserts;
 
 public class ExceptionHandlerImplementerTest {
 
-	@Test
-	public void implementOneFailed() throws Exception {
-		// given
-		ExceptionHandlerProxy handler = new ExceptionHandlerProxy(new ExceptionHandler());
-		ExceptionHandlerMethod handlerMethod = new ExceptionHandlerMethod(
-				new EzyMethod(ExceptionHandler.class.getDeclaredMethod("handle", Exception.class)));
-		ExceptionHandlerImplementer sut = new ExceptionHandlerImplementer(
-				handler,
-				handlerMethod);
-		
-		// when
-		Throwable e = Asserts.assertThrows(sut::implement);
-		
-		// then
-		Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
-	}
-	
-	private static class ExceptionHandler {
-		
-		@TryCatch(Exception.class)
-		private void handle(Exception e) {}
-	}
+    @Test
+    public void implementOneFailed() throws Exception {
+        // given
+        ExceptionHandlerProxy handler = new ExceptionHandlerProxy(new ExceptionHandler());
+        ExceptionHandlerMethod handlerMethod = new ExceptionHandlerMethod(
+                new EzyMethod(ExceptionHandler.class.getDeclaredMethod("handle", Exception.class)));
+        ExceptionHandlerImplementer sut = new ExceptionHandlerImplementer(
+                handler,
+                handlerMethod);
+
+        // when
+        Throwable e = Asserts.assertThrows(sut::implement);
+
+        // then
+        Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
+    }
+
+    private static class ExceptionHandler {
+
+        @TryCatch(Exception.class)
+        private void handle(Exception e) {}
+    }
 }

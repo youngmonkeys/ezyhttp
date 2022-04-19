@@ -7,16 +7,16 @@ import org.testng.annotations.Test;
 
 public class HttpThreadFactoryTest {
 
-	@Test
-	public void test() {
-		// given
-		HttpThreadFactory sut = HttpThreadFactory.create("test");
-		
-		// when
-		Thread thread = sut.newThread(() ->  {});
-		
-		// then
-		Asserts.assertTrue(thread.getName().contains("ezyhttp"));
-	}
-	
+    @Test
+    public void test() {
+        // given
+        HttpThreadFactory sut = HttpThreadFactory.create("test");
+
+        // when
+        Thread thread = sut.newThread(() ->  {});
+
+        // then
+        Asserts.assertTrue(thread.getName().contains("ezyhttp"));
+    }
+
 }

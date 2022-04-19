@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class Customer {
 
-	protected String name;
-	protected int age;
-	
+    protected String name;
+    protected int age;
+
 }

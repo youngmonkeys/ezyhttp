@@ -1,32 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tvd12</groupId>
-		<artifactId>ezyhttp</artifactId>
-		<version>1.0.2</version>
-	</parent>
-	<artifactId>ezyhttp-server-management</artifactId>
-	<name>ezyhttp-server-management</name>
-	<description>Provider managment APIs for ezyhttp server</description>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tvd12</groupId>
+        <artifactId>ezyhttp</artifactId>
+        <version>1.0.2</version>
+    </parent>
+    <artifactId>ezyhttp-server-management</artifactId>
+    <name>ezyhttp-server-management</name>
+    <description>Provider managment APIs for ezyhttp server</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyfox-monitor</artifactId>
-			<version>${ezy.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tvd12</groupId>
-			<artifactId>ezyhttp-server-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${javax.servlet.version}</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyfox-monitor</artifactId>
+            <version>${ezy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

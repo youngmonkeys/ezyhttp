@@ -12,24 +12,24 @@ import lombok.Getter;
 
 public class InterceptorManager implements EzyDestroyable {
 
-	@Getter
-	public final List<RequestInterceptor> requestInterceptors;
-	
-	public InterceptorManager() {
-		this.requestInterceptors = new ArrayList<>();
-	}
-	
-	public void addRequestInterceptors(List<RequestInterceptor> interceptors) {
-		this.requestInterceptors.addAll(interceptors);
-		this.requestInterceptors.sort(requestInterceptorComparator());
-	}
-	
-	protected Comparator<RequestInterceptor> requestInterceptorComparator() {
-		return (a, b) -> getPriority(a) - getPriority(b);
-	}
-	
-	@Override
-	public void destroy() {
-		this.requestInterceptors.clear();
-	}
+    @Getter
+    public final List<RequestInterceptor> requestInterceptors;
+
+    public InterceptorManager() {
+        this.requestInterceptors = new ArrayList<>();
+    }
+
+    public void addRequestInterceptors(List<RequestInterceptor> interceptors) {
+        this.requestInterceptors.addAll(interceptors);
+        this.requestInterceptors.sort(requestInterceptorComparator());
+    }
+
+    protected Comparator<RequestInterceptor> requestInterceptorComparator() {
+        return (a, b) -> getPriority(a) - getPriority(b);
+    }
+
+    @Override
+    public void destroy() {
+        this.requestInterceptors.clear();
+    }
 }

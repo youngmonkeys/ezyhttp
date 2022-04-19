@@ -1,11 +1,11 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="AllTests">
-	<test name="All">
-		<packages>
-			<package name="com.tvd12.ezyhttp.client.test"></package>
-			<package name="com.tvd12.ezyhttp.client.test.concurrent"></package>
-			<package name="com.tvd12.ezyhttp.client.test.request"></package>
-		</packages>
-	</test>
+    <test name="All">
+        <packages>
+            <package name="com.tvd12.ezyhttp.client.test"></package>
+            <package name="com.tvd12.ezyhttp.client.test.concurrent"></package>
+            <package name="com.tvd12.ezyhttp.client.test.request"></package>
+        </packages>
+    </test>
 </suite>

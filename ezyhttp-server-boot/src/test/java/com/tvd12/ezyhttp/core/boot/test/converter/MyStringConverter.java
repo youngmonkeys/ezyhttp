@@ -9,12 +9,12 @@ import com.tvd12.ezyhttp.core.codec.DefaultStringDeserializer;
 @StringConvert
 public class MyStringConverter extends DefaultStringDeserializer {
 
-	public MyStringConverter() {
-		super();
-		this.mappers.put(List.class, v -> {
-			String[] strs = v.split(",");
-			return Lists.newArrayList(strs);
-		});
-	}
-	
+    public MyStringConverter() {
+        super();
+        this.mappers.put(List.class, v -> {
+            String[] strs = v.split(",");
+            return Lists.newArrayList(strs);
+        });
+    }
+    
 }

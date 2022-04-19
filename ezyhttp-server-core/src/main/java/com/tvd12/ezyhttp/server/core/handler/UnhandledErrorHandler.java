@@ -11,35 +11,35 @@ import com.tvd12.ezyhttp.server.core.view.View;
 
 public interface UnhandledErrorHandler {
 
-	default Object processError(
-		HttpMethod method,
-		HttpServletRequest request,
-		HttpServletResponse response,
-		int errorStatusCode,
-		Exception exception
-	) {
-		return null;
-	}
+    default Object processError(
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
+    ) {
+        return null;
+    }
 
-	default Object handleError(
-		HttpMethod method,
-		HttpServletRequest request,
-		HttpServletResponse response,
-		int errorStatusCode,
-		Exception exception
-	) {
-		Object result = processError(method, request, response, errorStatusCode, exception);
-		if (result != null) {
-			if (result instanceof ResponseEntity) {
-				response.setContentType(((ResponseEntity)result).getContentType());
-			}
-			else if (result instanceof View) {
-				response.setContentType(ContentTypes.TEXT_HTML_UTF8);
-			}
-			if (EzyStrings.isNoContent(response.getContentType())) {
-				response.setContentType(ContentTypes.APPLICATION_JSON);
-			}
-		}
-		return result;
-	}
+    default Object handleError(
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
+    ) {
+        Object result = processError(method, request, response, errorStatusCode, exception);
+        if (result != null) {
+            if (result instanceof ResponseEntity) {
+                response.setContentType(((ResponseEntity)result).getContentType());
+            }
+            else if (result instanceof View) {
+                response.setContentType(ContentTypes.TEXT_HTML_UTF8);
+            }
+            if (EzyStrings.isNoContent(response.getContentType())) {
+                response.setContentType(ContentTypes.APPLICATION_JSON);
+            }
+        }
+        return result;
+    }
 }

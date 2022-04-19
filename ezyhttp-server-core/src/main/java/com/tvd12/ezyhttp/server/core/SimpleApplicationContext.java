@@ -12,42 +12,42 @@ import lombok.Setter;
 
 @SuppressWarnings("unchecked")
 public class SimpleApplicationContext implements ApplicationContext {
-	
-	@Setter
-	@Getter
-	protected EzyBeanContext beanContext;
-	
-	@Override
-	public <T> T getProperty(Object key, Class<T> outType) {
-		return beanContext.getProperty(key, outType);
-	}
-	
-	@Override
-	public <T> T getProperty(Object key, Class<T> outType, T defaultValue) {
-		return beanContext.getProperty(key, outType, defaultValue);
-	}
-	
-	@Override
-	public <T> T getSingleton(Class<T> type) {
-		return beanContext.getSingleton(type);
-	}
 
-	@Override
-	public <T> T getAnnotatedSingleton(Class<? extends Annotation> annotationClass) {
-		return beanContext.getAnnotatedSingleton(annotationClass);
-	}
-	
-	@Override
-	public List<Object> getSingletons(Class<? extends Annotation> annotationClass) {
-		return beanContext.getSingletons(annotationClass);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void destroy() {
-		List destroyableComponents = beanContext.getSingletonsOf(EzyDestroyable.class);
-		for(Object component : destroyableComponents)
-			((EzyDestroyable)component).destroy();
-		ComponentManager.getInstance().destroy();
-	}
+    @Setter
+    @Getter
+    protected EzyBeanContext beanContext;
+
+    @Override
+    public <T> T getProperty(Object key, Class<T> outType) {
+        return beanContext.getProperty(key, outType);
+    }
+
+    @Override
+    public <T> T getProperty(Object key, Class<T> outType, T defaultValue) {
+        return beanContext.getProperty(key, outType, defaultValue);
+    }
+
+    @Override
+    public <T> T getSingleton(Class<T> type) {
+        return beanContext.getSingleton(type);
+    }
+
+    @Override
+    public <T> T getAnnotatedSingleton(Class<? extends Annotation> annotationClass) {
+        return beanContext.getAnnotatedSingleton(annotationClass);
+    }
+
+    @Override
+    public List<Object> getSingletons(Class<? extends Annotation> annotationClass) {
+        return beanContext.getSingletons(annotationClass);
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void destroy() {
+        List destroyableComponents = beanContext.getSingletonsOf(EzyDestroyable.class);
+        for(Object component : destroyableComponents)
+            ((EzyDestroyable)component).destroy();
+        ComponentManager.getInstance().destroy();
+    }
 }

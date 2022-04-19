@@ -9,10 +9,10 @@ import com.tvd12.test.base.BaseTest;
 
 public class ControllerProxyTest extends BaseTest {
 
-	@Test
-	public void test() {
-		ControllerProxy home = new ControllerProxy(new HomeController());
-		System.out.println(home);
-	}
-	
+    @Test
+    public void test() {
+        ControllerProxy home = new ControllerProxy(new HomeController());
+        System.out.println(home);
+    }
+
 }

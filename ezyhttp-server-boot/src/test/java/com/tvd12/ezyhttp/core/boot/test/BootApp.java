@@ -10,14 +10,14 @@ import com.tvd12.ezyhttp.server.core.asm.RequestHandlerImplementer;
 @ComponentsScan("com.tvd12.ezyhttp.server.core.test")
 public class BootApp {
 
-	public static void main(String[] args) throws Exception {
-		RequestHandlerImplementer.setDebug(true);
-		ExceptionHandlerImplementer.setDebug(true);
-		EzyHttpApplicationBootstrap.start(BootApp.class);
-	}
-	
-	@Test
-	public void test() throws Exception {
-		EzyHttpApplicationBootstrap.start(BootApp.class);
-	}
+    public static void main(String[] args) throws Exception {
+        RequestHandlerImplementer.setDebug(true);
+        ExceptionHandlerImplementer.setDebug(true);
+        EzyHttpApplicationBootstrap.start(BootApp.class);
+    }
+    
+    @Test
+    public void test() throws Exception {
+        EzyHttpApplicationBootstrap.start(BootApp.class);
+    }
 }

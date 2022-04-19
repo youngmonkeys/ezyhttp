@@ -7,6 +7,6 @@ import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 @Controller(uri = "empty")
 public class EmptyController {
 
-	@DoGet("/empty/{foo}/{bar}")
-	public void doGet(@PathVariable String value) {}
+    @DoGet("/empty/{foo}/{bar}")
+    public void doGet(@PathVariable String value) {}
 }
