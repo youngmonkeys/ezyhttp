@@ -19,11 +19,11 @@ public class ContentTypeTest {
 		Asserts.assertEquals(ContentType.ofExtension("bmp"), ContentType.IMAGE_BMP);
 		Asserts.assertEquals(ContentType.ofExtension("jpeg"), ContentType.IMAGE_JPEG);
 		Asserts.assertEquals(ContentType.ofExtension("jpg"), ContentType.IMAGE_JPG);
-		Asserts.assertEquals(ContentType.ofExtension("gif"), ContentType.IMAGE_GIF);
+		Asserts.assertEquals(ContentType.ofExtension("gif"), ContentType.IMAGE_Gif);
 		Asserts.assertEquals(ContentType.ofExtension("png"), ContentType.IMAGE_PNG);
 		Asserts.assertEquals(ContentType.ofExtension("svg"), ContentType.IMAGE_SVG);
 		Asserts.assertEquals(ContentType.ofExtension("tiff"), ContentType.IMAGE_TIFF);
-		Asserts.assertEquals(ContentType.ofExtension("tif"), ContentType.IMAGE_TIF);
+		Asserts.assertEquals(ContentType.ofExtension("tif"), ContentType.IMAGE_Tif);
 		Asserts.assertEquals(ContentType.ofExtension("webp"), ContentType.IMAGE_WEBP);
 		Asserts.assertEquals(ContentType.ofExtension("css"), ContentType.TEXT_CSS);
 		Asserts.assertEquals(ContentType.ofExtension("js"), ContentType.TEXT_JAVASCRIPT);

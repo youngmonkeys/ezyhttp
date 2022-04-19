@@ -6,14 +6,14 @@ import java.util.Map;
 
 public interface BodyData {
 
-	Map<String, String> getParameters();
-	
-	String getContentType();
-	
-	String getRequestContentType();
-	
-	int getContentLength();
-	
-	InputStream getInputStream() throws IOException;
-	
+    Map<String, String> getParameters();
+    
+    String getContentType();
+    
+    String getRequestContentType();
+    
+    int getContentLength();
+    
+    InputStream getInputStream() throws IOException;
+    
 }

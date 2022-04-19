@@ -29,7 +29,8 @@ public enum ContentType {
     JAR(ContentTypes.JAR, "jar"),
     JSONLD(ContentTypes.JSONLD, "jsonld"),
     MUSICAL_INSTRUMENT_DIGITAL_INTERFACE(ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE, "mid"),
-    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X(ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X, "midi"),
+    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X(
+            ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X, "midi"),
     TEXT_JAVASCRIPT_MODULE(ContentTypes.TEXT_JAVASCRIPT, "mjs"),
     MP3(ContentTypes.MP3, "mp3"),
     MP4(ContentTypes.MP4, "mp4"),
@@ -66,45 +67,45 @@ public enum ContentType {
     THREE_GP_VIDEO_2(ContentTypes.THREE_GP_VIDEO_2, "3g2"),
     THREE_GP_AUDIO_2(ContentTypes.THREE_GP_AUDIO_2, "3g2"),
     SEVEN_ZIP(ContentTypes.SEVEN_ZIP, "7z"),
-	APPLICATION_PDF(ContentTypes.APPLICATION_PDF, "pdf"),
-	APPLICATION_JSON(ContentTypes.APPLICATION_JSON, "json"),
-	APPLICATION_X_WWW_FORM_URLENCODED(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, ""),
-	APPLICATION_OCTET_STREAM(ContentTypes.APPLICATION_OCTET_STREAM, ""),
-	FONT_OTF(ContentTypes.FONT_OTF, "otf"),
-	FONT_TTF(ContentTypes.FONT_TTF, "ttf"),
-	FONT_WOFF(ContentTypes.FONT_WOFF, "woff"),
-	FONT_WOFF2(ContentTypes.FONT_WOFF2, "woff2"),
-	IMAGE_BMP(ContentTypes.IMAGE_BMP, "bmp"),
-	IMAGE_JPEG(ContentTypes.IMAGE_JPEG, "jpeg"),
-	IMAGE_JPG(ContentTypes.IMAGE_JPEG, "jpg"),
-	IMAGE_GIF(ContentTypes.IMAGE_GIF, "gif"),
-	IMAGE_PNG(ContentTypes.IMAGE_PNG, "png"),
-	IMAGE_SVG(ContentTypes.IMAGE_SVG, "svg"),
-	IMAGE_TIFF(ContentTypes.IMAGE_TIFF, "tiff"),
-	IMAGE_TIF(ContentTypes.IMAGE_TIFF, "tif"),
-	IMAGE_WEBP(ContentTypes.IMAGE_WEBP, "webp"),
-	TEXT_CSS(ContentTypes.TEXT_CSS, "css"),
-	TEXT_JAVASCRIPT(ContentTypes.TEXT_JAVASCRIPT, "js"),
-	TEXT_HTML(ContentTypes.TEXT_HTML, ""),
-	TEXT_HTML_UTF8(ContentTypes.TEXT_HTML_UTF8, "html"),
-	TEXT_PLAIN(ContentTypes.TEXT_PLAIN, "txt");
-	
-	private final String extension;
-	private final String value;
-	
-	private final static Map<String, ContentType> VALUE_BY_EXTENSION =
-			EzyEnums.enumMap(ContentType.class, it -> it.extension);
-	
-	ContentType(String value, String extension) {
-		this.value = value;
-		this.extension = extension;
-	}
-	
-	public static ContentType ofExtension(String extension) {
-		ContentType value = VALUE_BY_EXTENSION.get(extension);
-		if (value == null) {
+    APPLICATION_PDF(ContentTypes.APPLICATION_PDF, "pdf"),
+    APPLICATION_JSON(ContentTypes.APPLICATION_JSON, "json"),
+    APPLICATION_X_WWW_FORM_URLENCODED(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, ""),
+    APPLICATION_OCTET_STREAM(ContentTypes.APPLICATION_OCTET_STREAM, ""),
+    FONT_OTF(ContentTypes.FONT_OTF, "otf"),
+    FONT_TTF(ContentTypes.FONT_TTF, "ttf"),
+    FONT_WOFF(ContentTypes.FONT_WOFF, "woff"),
+    FONT_WOFF2(ContentTypes.FONT_WOFF2, "woff2"),
+    IMAGE_BMP(ContentTypes.IMAGE_BMP, "bmp"),
+    IMAGE_JPEG(ContentTypes.IMAGE_JPEG, "jpeg"),
+    IMAGE_JPG(ContentTypes.IMAGE_JPEG, "jpg"),
+    IMAGE_Gif(ContentTypes.IMAGE_GIF, "gif"),
+    IMAGE_PNG(ContentTypes.IMAGE_PNG, "png"),
+    IMAGE_SVG(ContentTypes.IMAGE_SVG, "svg"),
+    IMAGE_TIFF(ContentTypes.IMAGE_TIFF, "tiff"),
+    IMAGE_Tif(ContentTypes.IMAGE_TIFF, "tif"),
+    IMAGE_WEBP(ContentTypes.IMAGE_WEBP, "webp"),
+    TEXT_CSS(ContentTypes.TEXT_CSS, "css"),
+    TEXT_JAVASCRIPT(ContentTypes.TEXT_JAVASCRIPT, "js"),
+    TEXT_HTML(ContentTypes.TEXT_HTML, ""),
+    TEXT_HTML_UTF8(ContentTypes.TEXT_HTML_UTF8, "html"),
+    TEXT_PLAIN(ContentTypes.TEXT_PLAIN, "txt");
+    
+    private final String extension;
+    private final String value;
+    
+    private static final Map<String, ContentType> VALUE_BY_EXTENSION =
+            EzyEnums.enumMap(ContentType.class, it -> it.extension);
+    
+    ContentType(String value, String extension) {
+        this.value = value;
+        this.extension = extension;
+    }
+    
+    public static ContentType ofExtension(String extension) {
+        ContentType value = VALUE_BY_EXTENSION.get(extension);
+        if (value == null) {
             value = APPLICATION_OCTET_STREAM;
         }
-		return value;
-	}
+        return value;
+    }
 }
