@@ -8,13 +8,14 @@ import com.tvd12.ezyfox.util.EzyEntry;
 
 public final class PathVariables {
 
-    private PathVariables() {}
+    private PathVariables() {
+    }
 
     public static List<Entry<String, String>> getVariables(String template, String uri) {
         String[] tPaths = template.split("/");
         String[] uPaths = uri.split("/");
         List<Entry<String, String>> answer = new ArrayList<>();
-        for(int i = 0 ; i < tPaths.length ; ++i) {
+        for (int i = 0; i < tPaths.length; ++i) {
             String tPath = tPaths[i];
             if (isPathVariable(tPath)) {
                 String varName = getVariableName(tPath);
@@ -32,5 +33,4 @@ public final class PathVariables {
     public static boolean isPathVariable(String path) {
         return path.startsWith("{") && path.endsWith("}");
     }
-
 }

@@ -10,29 +10,36 @@ import com.tvd12.ezyhttp.core.data.BodyData;
 public interface BodyDeserializer {
 
     default <T> T deserialize(
-            String data, Class<T> bodyType) throws IOException {
+        String data,
+        Class<T> bodyType
+    ) throws IOException {
         return null;
     }
 
     default <T> T deserialize(
-            BodyData data, Class<T> bodyType) throws IOException {
+        BodyData data,
+        Class<T> bodyType
+    ) throws IOException {
         return null;
     }
 
     default <T> T deserialize(
-            InputStream inputStream, Class<T> bodyType) throws IOException {
+        InputStream inputStream,
+        Class<T> bodyType
+    ) throws IOException {
         return null;
     }
 
     default String deserializeToString(
-            InputStream inputStream, int contentLength) throws IOException {
+        InputStream inputStream,
+        int contentLength
+    ) throws IOException {
         byte[] bytes;
         int readBytes;
         if (contentLength > 0) {
             bytes = new byte[contentLength];
             readBytes = inputStream.read(bytes);
-        }
-        else {
+        } else {
             bytes = EzyInputStreams.toByteArray(inputStream);
             readBytes = bytes.length;
         }

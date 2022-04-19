@@ -9,9 +9,9 @@ public class HttpThreadFactory extends EzyThreadFactory {
     }
 
     public static HttpThreadFactory create(String poolName) {
-        return (HttpThreadFactory)builder()
-                .poolName(poolName)
-                .build();
+        return (HttpThreadFactory) builder()
+            .poolName(poolName)
+            .build();
     }
 
     public static Builder builder() {
@@ -29,7 +29,5 @@ public class HttpThreadFactory extends EzyThreadFactory {
         public HttpThreadFactory build() {
             return new HttpThreadFactory(this);
         }
-
     }
-
 }

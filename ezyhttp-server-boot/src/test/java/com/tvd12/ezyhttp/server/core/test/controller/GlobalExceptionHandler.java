@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
             InvalidFormatException e) {
         e.printStackTrace();
         Map<String, String> data = new HashMap<>();
-        for(Reference reference : e.getPath())
+        for (Reference reference : e.getPath())
             data.put(reference.getFieldName(), "invalid");
         throw new HttpBadRequestException(data);
     }

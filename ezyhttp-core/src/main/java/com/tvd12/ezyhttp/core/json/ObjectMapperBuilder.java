@@ -29,8 +29,9 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             .build()
             .registerModule(newModule())
             .findAndRegisterModules();
-        if (decorator != null)
+        if (decorator != null) {
             decorator.accept(objectMapper);
+        }
         return objectMapper;
     }
 
@@ -58,15 +59,15 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
         @Override
         public Date deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+            throws IOException {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return new Date(p.getValueAsLong());
-            }
-            else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+            } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parse(p.getValueAsString());
-            }
-            else {
-                throw new IOException("can deserialize value: " + p.getValueAsString() + " to Date");
+            } else {
+                throw new IOException(
+                    "can deserialize value: " + p.getValueAsString() + " to Date"
+                );
             }
         }
     }
@@ -80,15 +81,15 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
         @Override
         public Instant deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+            throws IOException {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return Instant.ofEpochMilli(p.getValueAsLong());
-            }
-            else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+            } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parse(p.getValueAsString()).toInstant();
-            }
-            else {
-                throw new IOException("can deserialize value: " + p.getValueAsString() + " to Instant");
+            } else {
+                throw new IOException(
+                    "can deserialize value: " + p.getValueAsString() + " to Instant"
+                );
             }
         }
     }
@@ -102,15 +103,13 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
         @Override
         public LocalDate deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+            throws IOException {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return EzyDates.millisToDateTime(p.getValueAsLong())
-                        .toLocalDate();
-            }
-            else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+                    .toLocalDate();
+            } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parseDate(p.getValueAsString());
-            }
-            else {
+            } else {
                 throw new IOException("can deserialize value: " + p.getValueAsString() + " to LocalDate");
             }
         }
@@ -125,16 +124,16 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
         @Override
         public LocalTime deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+            throws IOException {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return EzyDates.millisToDateTime(p.getValueAsLong())
-                        .toLocalTime();
-            }
-            else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+                    .toLocalTime();
+            } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parseTime(p.getValueAsString());
-            }
-            else {
-                throw new IOException("can deserialize value: " + p.getValueAsString() + " to LocalTime");
+            } else {
+                throw new IOException(
+                    "can deserialize value: " + p.getValueAsString() + " to LocalTime"
+                );
             }
         }
     }
@@ -148,14 +147,12 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
         @Override
         public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+            throws IOException {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return EzyDates.millisToDateTime(p.getValueAsLong());
-            }
-            else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
+            } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 return EzyDates.parseDateTime(p.getValueAsString());
-            }
-            else {
+            } else {
                 throw new IOException("can deserialize value: " + p.getValueAsString() + " to LocalDateTime");
             }
         }

@@ -27,7 +27,7 @@ public class ResourceResolver {
     }
 
     public void register(String[] locations, String... filePathRegexes) {
-        for(String location : locations)
+        for (String location : locations)
             register(location, filePathRegexes);
     }
 
@@ -37,7 +37,7 @@ public class ResourceResolver {
             trimLocation,
             Sets.newHashSet(filePathRegexes)
         );
-        for(ResourceFile res : resourceFiles) {
+        for (ResourceFile res : resourceFiles) {
             String relativePath = res.getRelativePath();
             String resourceURI = relativePath.substring(trimLocation.length() + 1)
                 .replace('\\', '/');

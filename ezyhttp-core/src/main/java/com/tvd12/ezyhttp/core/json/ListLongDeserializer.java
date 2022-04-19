@@ -12,7 +12,7 @@ import com.tvd12.reflections.util.Lists;
 
 public class ListLongDeserializer extends StdDeserializer<List<Long>> {
     private static final long serialVersionUID = -4497810070359275209L;
-    
+
     public ListLongDeserializer() {
         super(List.class);
     }
@@ -20,17 +20,16 @@ public class ListLongDeserializer extends StdDeserializer<List<Long>> {
     @SuppressWarnings("unchecked")
     @Override
     public List<Long> deserialize(
-            JsonParser p, 
-            DeserializationContext ctxt
+        JsonParser p,
+        DeserializationContext ctxt
     ) throws IOException {
         if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return SingletonStringDeserializer.getInstance().deserialize(
-                    p.getValueAsString(),
-                    List.class,
-                    Long.class
+                p.getValueAsString(),
+                List.class,
+                Long.class
             );
         }
         return Lists.newArrayList(ctxt.readValue(p, Long[].class));
     }
-
 }

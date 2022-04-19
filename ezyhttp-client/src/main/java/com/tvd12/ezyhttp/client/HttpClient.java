@@ -99,7 +99,7 @@ public class HttpClient extends EzyLoggable {
             MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
             if (requestHeaders != null) {
                 Map<String, String> encodedHeaders = requestHeaders.toMap();
-                for(Entry<String, String> requestHeader : encodedHeaders.entrySet())
+                for (Entry<String, String> requestHeader : encodedHeaders.entrySet())
                     connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
             }
             Object requestBody = null;
@@ -475,7 +475,7 @@ public class HttpClient extends EzyLoggable {
         MultiValueMap requestHeaders = request.getHeaders();
         if (requestHeaders != null) {
             Map<String, String> encodedHeaders = requestHeaders.toMap();
-            for(Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+            for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
                 connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
             }
         }

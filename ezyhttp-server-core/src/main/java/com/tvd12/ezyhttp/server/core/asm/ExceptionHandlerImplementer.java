@@ -104,7 +104,7 @@ public class ExceptionHandlerImplementer
         EzyBody body = function.body();
         Class<?>[] exceptionClasses = handlerMethod.getExceptionClasses();
         EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
-        for(Class<?> exceptionClass : exceptionTree.toList()) {
+        for (Class<?> exceptionClass : exceptionTree.toList()) {
             EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
                     .append("if (arg1 instanceof ")
                         .append(exceptionClass.getName())

@@ -48,7 +48,7 @@ public class ControllerProxy {
     protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {
         List<RequestHandlerMethod> list = new ArrayList<>();
         List<EzyMethod> methods = clazz.getPublicMethods(m -> isRequestHandlerMethod(m));
-        for(EzyMethod method : methods) {
+        for (EzyMethod method : methods) {
             RequestHandlerMethod m = new RequestHandlerMethod(requestURI, method);
             list.add(m);
         }
@@ -80,7 +80,7 @@ public class ControllerProxy {
     public List<ExceptionHandlerMethod> fetchExceptionHandlerMethods() {
         List<ExceptionHandlerMethod> list = new ArrayList<>();
         List<EzyMethod> methods = clazz.getMethods(m -> m.isAnnotated(TryCatch.class));
-        for(EzyMethod method : methods) {
+        for (EzyMethod method : methods) {
             ExceptionHandlerMethod m = new ExceptionHandlerMethod(method);
             list.add(m);
         }
@@ -89,15 +89,15 @@ public class ControllerProxy {
 
     protected final Map<Class<?>, ExceptionHandlerMethod> fetchExceptionHandlerMethodMap() {
         Map<Class<?>, ExceptionHandlerMethod> answer = new HashMap<>();
-        for(ExceptionHandlerMethod m : exceptionHandlerMethods) {
-            for(Class<?> exceptionClass : m.getExceptionClasses())
+        for (ExceptionHandlerMethod m : exceptionHandlerMethods) {
+            for (Class<?> exceptionClass : m.getExceptionClasses())
                 answer.put(exceptionClass, m);
         }
         return answer;
     }
 
     protected boolean isRequestHandlerMethod(EzyMethod method) {
-        for(Class annClass : REQUEST_HANDLER_ANNOTATIONS) {
+        for (Class annClass : REQUEST_HANDLER_ANNOTATIONS) {
             Annotation annotation = method.getAnnotation(annClass);
             if (annotation != null)
                 return true;

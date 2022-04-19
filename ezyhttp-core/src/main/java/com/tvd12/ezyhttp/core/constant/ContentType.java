@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public enum ContentType {
-    
+
     AAC_AUDIO(ContentTypes.AAC_AUDIO, "aac"),
     ABI_WORD_DOCUMENT(ContentTypes.ABI_WORD_DOCUMENT, "abw"),
     ARCHIVE_DOCUMENT(ContentTypes.ARCHIVE_DOCUMENT, "arc"),
@@ -28,8 +28,14 @@ public enum ContentType {
     ICALENDAR(ContentTypes.ICALENDAR, "ics"),
     JAR(ContentTypes.JAR, "jar"),
     JSONLD(ContentTypes.JSONLD, "jsonld"),
-    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE(ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE, "mid"),
-    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X(ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X, "midi"),
+    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE(
+        ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE,
+        "mid"
+    ),
+    MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X(
+        ContentTypes.MUSICAL_INSTRUMENT_DIGITAL_INTERFACE_X,
+        "midi"
+    ),
     TEXT_JAVASCRIPT_MODULE(ContentTypes.TEXT_JAVASCRIPT, "mjs"),
     MP3(ContentTypes.MP3, "mp3"),
     MP4(ContentTypes.MP4, "mp4"),
@@ -92,8 +98,8 @@ public enum ContentType {
     private final String extension;
     private final String value;
 
-    private final static Map<String, ContentType> VALUE_BY_EXTENSION =
-            EzyEnums.enumMap(ContentType.class, it -> it.extension);
+    private static final Map<String, ContentType> VALUE_BY_EXTENSION =
+        EzyEnums.enumMap(ContentType.class, it -> it.extension);
 
     ContentType(String value, String extension) {
         this.value = value;

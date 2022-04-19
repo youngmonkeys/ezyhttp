@@ -5,8 +5,8 @@ import java.io.IOException;
 public interface StringDeserializer {
 
     <T> T deserialize(
-            String value,
-            Class<T> outType,
-            Class<?> genericType) throws IOException;
-
+        String value,
+        Class<T> outType,
+        Class<?> genericType
+    ) throws IOException;
 }

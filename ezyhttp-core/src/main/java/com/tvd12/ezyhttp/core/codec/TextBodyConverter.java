@@ -26,8 +26,7 @@ public class TextBodyConverter implements BodyConverter {
         byte[] bytes;
         try {
             bytes = body.toString().getBytes(StandardCharsets.UTF_8);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new IOException("serialize body: " + body + " error", e);
         }
         return bytes;
@@ -35,19 +34,29 @@ public class TextBodyConverter implements BodyConverter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T deserialize(String data, Class<T> bodyType) throws IOException {
-        if (bodyType == String.class)
-            return (T)data;
+    public <T> T deserialize(
+        String data,
+        Class<T> bodyType
+    ) throws IOException {
+        if (bodyType == String.class) {
+            return (T) data;
+        }
         return objectMapper.readValue(data, bodyType);
     }
 
     @Override
-    public <T> T deserialize(BodyData data, Class<T> bodyType) throws IOException {
+    public <T> T deserialize(
+        BodyData data,
+        Class<T> bodyType
+    ) throws IOException {
         return deserialize(data.getInputStream(), bodyType);
     }
 
     @Override
-    public <T> T deserialize(InputStream inputStream, Class<T> bodyType) throws IOException {
+    public <T> T deserialize(
+        InputStream inputStream,
+        Class<T> bodyType
+    ) throws IOException {
         String data = EzyInputStreams.toStringUtf8(inputStream);
         return deserialize(data, bodyType);
     }

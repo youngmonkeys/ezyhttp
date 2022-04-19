@@ -92,7 +92,7 @@ public class HttpClientProxy
         this.active = false;
         this.requestQueue.clear();
         Map<Request, EzyFuture> undoneTasks = futures.clear();
-        for(Request undoneRequest : undoneTasks.keySet()) {
+        for (Request undoneRequest : undoneTasks.keySet()) {
             EzyFuture undoneTask = undoneTasks.get(undoneRequest);
             undoneTask.cancel("HttpClientProxy close, request to: " + undoneRequest.getURL() + " has cancelled");
         }

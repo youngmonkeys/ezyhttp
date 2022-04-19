@@ -104,7 +104,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     }
     
     public void addHandlers(Map<RequestURI, List<RequestHandler>> handlers) {
-        for(RequestURI uri : handlers.keySet()) {
+        for (RequestURI uri : handlers.keySet()) {
             for (RequestHandler handler : handlers.get(uri)) {
                 addHandler(uri, handler);
             }

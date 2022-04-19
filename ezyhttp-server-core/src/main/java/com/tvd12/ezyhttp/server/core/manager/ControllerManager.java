@@ -22,7 +22,7 @@ public class ControllerManager implements EzyDestroyable {
     }
     
     public void addControllers(Collection<?> controllers) {
-        for(Object controller : controllers)
+        for (Object controller : controllers)
             addController(controller);
     }
     

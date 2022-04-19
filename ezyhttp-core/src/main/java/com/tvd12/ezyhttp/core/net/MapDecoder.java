@@ -22,7 +22,7 @@ public final class MapDecoder {
         if (EzyStrings.isNoContent(string))
             return map;
         String[] keyValues = string.split("&");
-        for(String keyValue : keyValues) {
+        for (String keyValue : keyValues) {
             String[] kv = keyValue.split("=");
             String key = URLDecoder.decode(kv[0], EzyStrings.UTF_8);
             String value = URLDecoder.decode(kv[1], EzyStrings.UTF_8);
@@ -30,5 +30,4 @@ public final class MapDecoder {
         }
         return map;
     }
-
 }

@@ -18,7 +18,7 @@ public class JsonBodyConverter implements BodyConverter {
     @Override
     public byte[] serialize(Object body) throws IOException {
         return body instanceof String
-            ? ((String)body).getBytes(StandardCharsets.UTF_8)
+            ? ((String) body).getBytes(StandardCharsets.UTF_8)
             : objectMapper.writeValueAsBytes(body);
     }
 
@@ -37,5 +37,4 @@ public class JsonBodyConverter implements BodyConverter {
     public <T> T deserialize(InputStream inputStream, Class<T> bodyType) throws IOException {
         return objectMapper.readValue(inputStream, bodyType);
     }
-
 }

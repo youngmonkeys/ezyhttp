@@ -26,7 +26,7 @@ public class AbstractHandlerImplementer<H extends HandlerMethod>
             Class<?> exceptionClass) {
         int paramCount = 0;
         Parameter[] parameters = method.getParameters();
-        for(Parameter parameter : parameters) {
+        for (Parameter parameter : parameters) {
             Class<?> parameterType = parameter.getType();
             if (parameterType == RequestArguments.class) {
                 instruction.append("arg0");

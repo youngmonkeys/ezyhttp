@@ -24,7 +24,7 @@ public class MessageReader {
         List<MessagesFile> files = getMessagesFiles(folderPath);
         Map<String, Properties> answer = new HashMap<>();
         FileReader fileReader = new BaseFileReader();
-        for(MessagesFile file : files) {
+        for (MessagesFile file : files) {
             Properties properties = file.resourceFile.isInJar()
                     ? fileReader.read(file.resourceFile.getRelativePath())
                     : fileReader.read(new File(file.resourceFile.getFullPath()));

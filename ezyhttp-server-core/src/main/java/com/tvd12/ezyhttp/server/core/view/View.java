@@ -177,7 +177,7 @@ public class View {
         }
         
         public Builder addHeaders(Map<String, Object> headers) {
-            for(Entry<String, Object> e : headers.entrySet())
+            for (Entry<String, Object> e : headers.entrySet())
                 addHeader(e.getKey(), e.getValue());
             return this;
         }

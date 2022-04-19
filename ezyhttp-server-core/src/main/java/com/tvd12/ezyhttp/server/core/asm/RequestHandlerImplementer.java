@@ -146,7 +146,7 @@ public class RequestHandlerImplementer
         int pathVariableCount = 0;
         int cookieCount = 0;
         Parameter[] parameters = handlerMethod.getParameters();
-        for(Parameter parameter : parameters) {
+        for (Parameter parameter : parameters) {
             Class<?> parameterType = parameter.getType();
             Class<?> genericType = getGenericType(parameter);
             String genericTypeClass = genericType != null
@@ -253,7 +253,7 @@ public class RequestHandlerImplementer
         StringBuilder answerExpression = new StringBuilder();
         answerExpression.append("this.controller.").append(handlerMethod.getName())
                 .append("(");
-        for(int i = 0 ; i < paramCount ; ++i) {
+        for (int i = 0 ; i < paramCount ; ++i) {
             answerExpression.append(PARAMETER_PREFIX).append(i);
             if (i < paramCount - 1)
                 answerExpression.append(", ");
@@ -278,7 +278,7 @@ public class RequestHandlerImplementer
                 = controller.getExceptionHandlerMethodMap();
         Set<Class<?>> exceptionClasses = exceptionHandlerMethodMap.keySet();
         EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
-        for(Class<?> exceptionClass : exceptionTree.toList()) {
+        for (Class<?> exceptionClass : exceptionTree.toList()) {
             ExceptionHandlerMethod m = exceptionHandlerMethodMap.get(exceptionClass);
             EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
                     .append("if (arg1 instanceof ")

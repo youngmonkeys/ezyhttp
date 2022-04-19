@@ -26,9 +26,9 @@ public class RequestHandlersImplementer extends EzyLoggable {
             Collection<Object> controllers
     ) {
         Map<RequestURI, List<RequestHandler>> handlers = new HashMap<>();
-        for(Object controller : controllers) {
+        for (Object controller : controllers) {
             Map<RequestURI, List<RequestHandler>> map = implement(controller);
-            for(RequestURI uri : map.keySet()) {
+            for (RequestURI uri : map.keySet()) {
                 handlers.computeIfAbsent(uri, k -> new ArrayList<>())
                         .addAll(map.get(uri));
             }
@@ -40,7 +40,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
         Map<RequestURI, List<RequestHandler>> handlers = new HashMap<>();
         ControllerProxy proxy = new ControllerProxy(controller);
         String feature = proxy.getFeature();
-        for(RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
+        for (RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
             RequestHandlerImplementer implementer = newImplementer(proxy, method);
             RequestHandler handler = implementer.implement();
             HttpMethod httpMethod = handler.getMethod();

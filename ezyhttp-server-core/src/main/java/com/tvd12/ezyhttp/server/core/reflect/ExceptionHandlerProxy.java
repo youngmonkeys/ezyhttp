@@ -25,7 +25,7 @@ public class ExceptionHandlerProxy {
     public List<ExceptionHandlerMethod> fetchExceptionHandlerMethods() {
         List<ExceptionHandlerMethod> list = new ArrayList<>();
         List<EzyMethod> methods = clazz.getPublicMethods(m -> m.isAnnotated(TryCatch.class));
-        for(EzyMethod method : methods) {
+        for (EzyMethod method : methods) {
             ExceptionHandlerMethod m = new ExceptionHandlerMethod(method);
             list.add(m);
         }

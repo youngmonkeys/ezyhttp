@@ -22,8 +22,8 @@ import com.tvd12.ezyhttp.core.exception.MaxResourceDownloadCapacity;
 import lombok.AllArgsConstructor;
 
 public class ResourceDownloadManager
-        extends EzyLoggable
-        implements EzyStoppable, EzyDestroyable {
+    extends EzyLoggable
+    implements EzyStoppable, EzyDestroyable {
 
     protected volatile boolean active;
     protected final int capacity;
@@ -38,7 +38,7 @@ public class ResourceDownloadManager
     public static final int DEFAULT_BUFFER_SIZE = 1024;
     public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
     public static final int DEFAULT_THREAD_POOL_SIZE =
-            Runtime.getRuntime().availableProcessors() * 2;
+        Runtime.getRuntime().availableProcessors() * 2;
 
     public ResourceDownloadManager() {
         this(
@@ -49,8 +49,8 @@ public class ResourceDownloadManager
     }
 
     public ResourceDownloadManager(
-            int capacity,
-            int threadPoolSize, int bufferSize) {
+        int capacity,
+        int threadPoolSize, int bufferSize) {
         this.capacity = capacity;
         this.threadPoolSize = threadPoolSize;
         this.bufferSize = bufferSize;
@@ -69,14 +69,14 @@ public class ResourceDownloadManager
 
     private void start(int threadPoolSize) {
         this.active = true;
-        for (int i = 0 ; i < threadPoolSize ; ++i) {
+        for (int i = 0; i < threadPoolSize; ++i) {
             executorService.execute(this::loop);
         }
     }
 
     private void loop() {
         byte[] buffer = new byte[bufferSize];
-        while(active) {
+        while (active) {
             Entry entry = null;
             boolean done = true;
             Exception exception = null;
@@ -92,12 +92,10 @@ public class ResourceDownloadManager
                     outputStream.write(buffer, 0, read);
                     done = false;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
                 logger.info("download error", e);
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 exception = new IllegalStateException(e);
                 logger.info("download fatal error", e);
             }
@@ -112,12 +110,10 @@ public class ResourceDownloadManager
                     }
                     if (exception != null) {
                         future.setException(exception);
-                    }
-                    else {
+                    } else {
                         future.setResult(Boolean.TRUE);
                     }
-                }
-                else {
+                } else {
                     if (!queue.offer(entry)) {
                         EzyFuture future = futureMap.removeFuture(entry);
                         if (future != null) {
@@ -125,8 +121,7 @@ public class ResourceDownloadManager
                         }
                     }
                 }
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 logger.info("handle download result error", e);
             }
         }
@@ -140,9 +135,9 @@ public class ResourceDownloadManager
     }
 
     public void drainAsync(
-            InputStream from,
-            OutputStream to,
-            EzyResultCallback<Boolean> callback
+        InputStream from,
+        OutputStream to,
+        EzyResultCallback<Boolean> callback
     ) {
         Entry entry = new Entry(from, to);
         EzyCallableFutureTask future = new EzyCallableFutureTask(callback);
@@ -164,7 +159,7 @@ public class ResourceDownloadManager
     @Override
     public void stop() {
         this.active = false;
-        for(int i = 0 ; i < threadPoolSize ; ++i) {
+        for (int i = 0; i < threadPoolSize; ++i) {
             queue.offer(POISON);
         }
         this.executorService.shutdown();

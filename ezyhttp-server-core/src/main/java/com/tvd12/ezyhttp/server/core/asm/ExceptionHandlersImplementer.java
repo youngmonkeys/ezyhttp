@@ -14,7 +14,7 @@ public class ExceptionHandlersImplementer extends EzyLoggable {
     public Map<Class<?>, UncaughtExceptionHandler>
             implement(Collection<Object> exceptionHandlers) {
         Map<Class<?>, UncaughtExceptionHandler> handlers = new HashMap<>();
-        for(Object controller : exceptionHandlers)
+        for (Object controller : exceptionHandlers)
             handlers.putAll(implement(controller));
         return handlers;
     }
@@ -22,10 +22,10 @@ public class ExceptionHandlersImplementer extends EzyLoggable {
     public Map<Class<?>, UncaughtExceptionHandler> implement(Object exceptionHandler) {
         Map<Class<?>, UncaughtExceptionHandler> handlers = new HashMap<>();
         ExceptionHandlerProxy proxy = new ExceptionHandlerProxy(exceptionHandler);
-        for(ExceptionHandlerMethod method : proxy.getExceptionHandlerMethods()) {
+        for (ExceptionHandlerMethod method : proxy.getExceptionHandlerMethods()) {
             ExceptionHandlerImplementer implementer = newImplementer(proxy, method);
             UncaughtExceptionHandler handler = implementer.implement();
-            for(Class<?> exceptionClass : method.getExceptionClasses())
+            for (Class<?> exceptionClass : method.getExceptionClasses())
                 handlers.put(exceptionClass, handler);
         }
         return handlers;

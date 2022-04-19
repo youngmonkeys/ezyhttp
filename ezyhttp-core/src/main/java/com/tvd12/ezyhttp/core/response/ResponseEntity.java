@@ -141,13 +141,13 @@ public class ResponseEntity {
         }
 
         public Builder headers(Map<String, String> headers) {
-            for(Entry<String, String> header : headers.entrySet())
+            for (Entry<String, String> header : headers.entrySet())
                 header(header.getKey(), header.getValue());
             return this;
         }
 
         public Builder header(String name, List<String> values) {
-            for(String value : values)
+            for (String value : values)
                 header(name, value);
             return this;
         }

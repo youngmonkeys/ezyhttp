@@ -1,14 +1,14 @@
 package com.tvd12.ezyhttp.core.codec;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.data.BodyData;
 import com.tvd12.ezyhttp.core.net.MapDecoder;
 import com.tvd12.ezyhttp.core.net.MapEncoder;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 public class FormBodyConverter implements BodyConverter {
 
@@ -22,8 +22,8 @@ public class FormBodyConverter implements BodyConverter {
     @Override
     public byte[] serialize(Object body) throws IOException {
         Map<String, Object> map = body instanceof String
-                ? objectMapper.readValue(((String)body), Map.class)
-                : objectMapper.convertValue(body, Map.class);
+            ? objectMapper.readValue(((String) body), Map.class)
+            : objectMapper.convertValue(body, Map.class);
         return MapEncoder.encodeToBytes(map);
     }
 
@@ -45,5 +45,4 @@ public class FormBodyConverter implements BodyConverter {
         String data = EzyInputStreams.toStringUtf8(inputStream);
         return deserialize(data, bodyType);
     }
-
 }

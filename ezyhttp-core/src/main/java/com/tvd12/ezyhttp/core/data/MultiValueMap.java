@@ -29,8 +29,9 @@ public class MultiValueMap {
 
     public String getValue(String key) {
         List<String> values = map.get(key);
-        if (values == null || values.isEmpty())
+        if (values == null || values.isEmpty()) {
             return null;
+        }
         return values.get(0);
     }
 
@@ -41,24 +42,26 @@ public class MultiValueMap {
 
     public List<String> getValues(String key) {
         List<String> values = map.get(key);
-        if (values == null)
+        if (values == null) {
             return Collections.emptyList();
+        }
         return values;
     }
 
     public Map<String, String> getValueMap(String name) {
         List<String> values = getValues(name);
         Map<String, String> map = new HashMap<>();
-        for(String item : values) {
-            if (EzyStrings.isNoContent(item))
+        for (String item : values) {
+            if (EzyStrings.isNoContent(item)) {
                 continue;
+            }
             String[] kvs = item.split(";");
-            for(String kv : kvs) {
+            for (String kv : kvs) {
                 String[] strs = kv.split("=");
                 String key = strs[0].trim();
                 String value = strs.length <= 1
-                        ? kv.contains("=") ? "" : null
-                        : strs[1];
+                    ? kv.contains("=") ? "" : null
+                    : strs[1];
                 map.put(key, value);
             }
         }
@@ -72,13 +75,14 @@ public class MultiValueMap {
 
     public Map<String, String> toMap() {
         Map<String, String> answer = new HashMap<>();
-        for(Entry<String, List<String>> entry : map.entrySet()) {
+        for (Entry<String, List<String>> entry : map.entrySet()) {
             String key = entry.getKey();
             List<String> values = entry.getValue();
             StringBuilder valueString = new StringBuilder();
-            for(int i = 0 ; i < values.size() ; ++i) {
-                if (i > 0)
+            for (int i = 0; i < values.size(); ++i) {
+                if (i > 0) {
                     valueString.append(";");
+                }
                 valueString.append(values.get(i));
             }
             answer.put(key, valueString.toString());
@@ -88,13 +92,12 @@ public class MultiValueMap {
 
     public static List<String> mapToKeyValueList(Map<String, Object> map) {
         List<String> answer = new ArrayList<>();
-        for(Entry<String, Object> e : map.entrySet()) {
+        for (Entry<String, Object> e : map.entrySet()) {
             String key = e.getKey();
             Object value = e.getValue();
             if (value == null) {
                 answer.add(key);
-            }
-            else {
+            } else {
                 answer.add(key + "=" + value);
             }
         }
@@ -114,18 +117,15 @@ public class MultiValueMap {
         }
 
         public Builder setValue(String key, String value) {
-            List<String> v = map.get(key);
-            if (v == null) {
-                v = new ArrayList<>();
-                map.put(key, v);
-            }
-            v.add(value);
+            map.computeIfAbsent(key, k -> new ArrayList<>())
+                .add(value);
             return this;
         }
 
         public Builder setValues(String key, Iterable<String> values) {
-            for(String value : values)
+            for (String value : values) {
                 setValue(key, value);
+            }
             return this;
         }
 
@@ -137,7 +137,5 @@ public class MultiValueMap {
         public MultiValueMap build() {
             return new MultiValueMap(map);
         }
-
     }
-
 }

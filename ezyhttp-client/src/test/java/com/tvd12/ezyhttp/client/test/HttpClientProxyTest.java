@@ -50,7 +50,7 @@ public class HttpClientProxyTest extends BaseTest {
         client.start();
         postTest(client);
         new Thread(() -> {
-            for(int i = 0 ; i < 100 ; ++i) {
+            for (int i = 0 ; i < 100 ; ++i) {
                 try {
                     postTest(client);
                 }
@@ -505,7 +505,7 @@ public class HttpClientProxyTest extends BaseTest {
                 .setURL("http://127.0.0.1:18081/greet");
 
         RequestQueue queue = FieldUtil.getFieldValue(sut, "requestQueue");
-        for(int i = 0 ; i < 1000; ++i)
+        for (int i = 0 ; i < 1000; ++i)
             queue.add(request);
 
         // when

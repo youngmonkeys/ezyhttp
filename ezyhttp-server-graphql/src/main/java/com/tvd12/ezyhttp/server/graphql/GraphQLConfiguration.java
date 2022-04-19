@@ -35,7 +35,7 @@ public class GraphQLConfiguration implements
         GraphQLDataFetcherManager.Builder dataFetcherManagerBuilder =
                 GraphQLDataFetcherManager.builder();
         List singletons = singletonFactory.getSingletons();
-        for(Object singleton : singletons) {
+        for (Object singleton : singletons) {
             dataFetcherManagerBuilder.addDataFetcher(singleton);
         }
         GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder

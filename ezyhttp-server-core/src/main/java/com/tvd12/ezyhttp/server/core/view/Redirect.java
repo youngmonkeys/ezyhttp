@@ -48,7 +48,7 @@ public class Redirect {
             return "";
         char concatChar = '?';
         StringBuilder builder = new StringBuilder();
-        for(EzyPair<String, Object> pair : parameters) {
+        for (EzyPair<String, Object> pair : parameters) {
             builder
                 .append(concatChar)
                 .append(pair.getKey())
@@ -84,7 +84,7 @@ public class Redirect {
         }
         
         public Builder addHeaders(Map<String, Object> headers) {
-            for(Entry<String, Object> e : headers.entrySet())
+            for (Entry<String, Object> e : headers.entrySet())
                 addHeader(e.getKey(), e.getValue());
             return this;
         }
@@ -108,7 +108,7 @@ public class Redirect {
         }
         
         public Builder addParameters(Map<String, Object> parameters) {
-            for(Entry<String, Object> e : parameters.entrySet())
+            for (Entry<String, Object> e : parameters.entrySet())
                 addParameter(e.getKey(), e.getValue());
             return this;
         }

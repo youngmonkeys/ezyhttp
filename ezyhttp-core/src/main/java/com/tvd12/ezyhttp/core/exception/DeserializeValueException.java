@@ -11,23 +11,27 @@ public class DeserializeValueException extends IOException {
     public final String valueName;
     public final Object value;
     public final Class<?> outType;
-    
+
     public DeserializeValueException(
-            String valueName, Object value, Class<?> outType, Exception e) {
+        String valueName,
+        Object value,
+        Class<?> outType,
+        Exception e
+    ) {
         super(
-            "can't deserialize: " + valueName + 
-            " from: " + valueToString(value) + 
-            " to: " + outType.getSimpleName(),
+            "can't deserialize: " + valueName +
+                " from: " + valueToString(value) +
+                " to: " + outType.getSimpleName(),
             e
         );
         this.valueName = valueName;
         this.value = value;
         this.outType = outType;
     }
-    
+
     private static String valueToString(Object value) {
-        return value != null 
-                ? value + "(" + value.getClass().getSimpleName() + ")" 
-                : "null";
+        return value != null
+            ? value + "(" + value.getClass().getSimpleName() + ")"
+            : "null";
     }
 }

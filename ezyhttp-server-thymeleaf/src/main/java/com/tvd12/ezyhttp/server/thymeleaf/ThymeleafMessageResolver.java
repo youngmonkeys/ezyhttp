@@ -74,7 +74,7 @@ public class ThymeleafMessageResolver implements IMessageResolver {
     
     private Map<Locale, Properties> mapMessagesToLocal() {
         Map<Locale, Properties> messagesByLocale = new HashMap<>();
-        for(String lang : messagesByLanguage.keySet()) {
+        for (String lang : messagesByLanguage.keySet()) {
             if (lang.length() > 0) {
                 Locale locale;
                 if (lang.contains("_")) {

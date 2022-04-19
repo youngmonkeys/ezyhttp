@@ -52,7 +52,7 @@ public class ResourceLoader extends EzyLoggable {
             listResourcesByFolder(new File(rootPath), regexes, rootPath, answer);
         }
         else {
-            for(URL url : resourceURLs) {
+            for (URL url : resourceURLs) {
                 listResourcesByURL(url, regexes, rootPath, answer);
             }
         }
@@ -100,13 +100,13 @@ public class ResourceLoader extends EzyLoggable {
             File folder = folders.poll();
             File[] fileList = listFile(folder);
 
-            for(File resource : fileList) {
+            for (File resource : fileList) {
                 String resourcePath = resource
                         .toString()
                         .substring(rootFolder.toString().length() + 1);
                 String relativePath = rootPath + "/" + resourcePath;
                 boolean addable = regexes.isEmpty();
-                for(String regex : regexes) {
+                for (String regex : regexes) {
                     if (isResourcePathMatch(relativePath, regex)) {
                         addable = true;
                         break;
@@ -139,7 +139,7 @@ public class ResourceLoader extends EzyLoggable {
             String name = entries.nextElement().getName();
             if (name.startsWith(rootPath)) {
                 boolean addable = regexes.isEmpty();
-                for(String regex : regexes) {
+                for (String regex : regexes) {
                     if (isResourcePathMatch(name, regex)) {
                         addable = true;
                         break;
@@ -172,7 +172,7 @@ public class ResourceLoader extends EzyLoggable {
     protected Set<URL> getResourceURLs(String resource) {
         Set<URL> answer = new HashSet<>();
         String[] resources = {resource, "/" + resource};
-        for(String res : resources) {
+        for (String res : resources) {
             addURLsToSet(answer, () -> getContextClassLoader().getResources(res));
             addURLsToSet(answer, () -> getClass().getClassLoader().getResources(res));
             addURLsToSet(answer, () -> ClassLoader.getSystemResources(res));

@@ -17,5 +17,4 @@ import java.lang.annotation.Target;
 public @interface Interceptor {
     
     int priority() default 0;
-    
 }

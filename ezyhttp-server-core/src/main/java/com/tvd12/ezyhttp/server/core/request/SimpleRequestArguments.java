@@ -153,7 +153,7 @@ public class SimpleRequestArguments implements RequestArguments {
                 request.getRequestURI()
             );
             pathVariableMap = new HashMap<>();
-            for(Entry<String, String> entry : pathVariableList)
+            for (Entry<String, String> entry : pathVariableList)
                 pathVariableMap.put(entry.getKey(), entry.getValue());
         }
     }
@@ -193,7 +193,7 @@ public class SimpleRequestArguments implements RequestArguments {
             return;
         this.cookies = cookies;
         this.cookieMap = new HashMap<>();
-        for(Cookie cookie : cookies) {
+        for (Cookie cookie : cookies) {
             Cookie old = cookieMap.get(cookie.getName());
             if (old == null || EzyStrings.isBlank(old.getValue())) {
                 cookieMap.put(cookie.getName(), cookie);

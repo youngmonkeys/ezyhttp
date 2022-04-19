@@ -113,13 +113,13 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     public ApplicationContextBuilder scan(String... packageNames) {
-        for(String packageName : packageNames)
+        for (String packageName : packageNames)
             scan(packageName);
         return this;
     }
 
     public ApplicationContextBuilder scan(Iterable<String> packageNames) {
-        for(String packageName : packageNames)
+        for (String packageName : packageNames)
             scan(packageName);
         return this;
     }
@@ -154,13 +154,13 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     public ApplicationContextBuilder addComponentClasses(Class<?>... componentClasses) {
-        for(Class<?> clazz : componentClasses)
+        for (Class<?> clazz : componentClasses)
             addComponentClass(clazz);
         return this;
     }
 
     public ApplicationContextBuilder addComponentClasses(Iterable<Class<?>> componentClasses) {
-        for(Class<?> clazz : componentClasses)
+        for (Class<?> clazz : componentClasses)
             addComponentClass(clazz);
         return this;
     }
@@ -171,13 +171,13 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     public ApplicationContextBuilder addPropertiesSources(String... sources) {
-        for(String source : sources)
+        for (String source : sources)
             addPropertiesSource(source);
         return this;
     }
 
     public ApplicationContextBuilder addPropertiesSources(Iterable<String> sources) {
-        for(String source : sources)
+        for (String source : sources)
             addPropertiesSource(source);
         return this;
     }
@@ -290,7 +290,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         classes.addAll(reflection.getAnnotatedClasses(ComponentClasses.class));
         classes.addAll(reflection.getAnnotatedClasses(PropertiesSources.class));
         classes.addAll(reflection.getAnnotatedClasses(EzyPackagesToScan.class));
-        for(Class clazz : classes)
+        for (Class clazz : classes)
             addComponentClass(clazz);
     }
 
@@ -302,7 +302,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         List<String> propertiesFiles = new ArrayList<>();
         propertiesFiles.addAll(Arrays.asList(DEFAULT_PROPERTIES_FILES));
         propertiesFiles.addAll(propertiesSources);
-        for(String propertiesFile : propertiesFiles) {
+        for (String propertiesFile : propertiesFiles) {
             beanContextBuilder.addProperties(propertiesFile);
         }
         return beanContextBuilder;
@@ -318,7 +318,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected Map<String, Class> getServiceClasses(EzyReflection reflection) {
         Set<Class<?>> classes = reflection.getAnnotatedClasses(Service.class);
         Map<String, Class> answer = new HashMap<>();
-        for(Class<?> clazz : classes) {
+        for (Class<?> clazz : classes) {
             String serviceName = ServiceAnnotations.getServiceName(clazz);
             if (answer.containsKey(serviceName)) {
                 serviceName = clazz.getName();
@@ -420,7 +420,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
             return;
         ResourceDownloadManager downloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
         Map<String, Resource> resources = resourceResolver.getResources();
-        for(String resourceURI : resources.keySet()) {
+        for (String resourceURI : resources.keySet()) {
             Resource resource = resources.get(resourceURI);
             RequestURI requestURI = new RequestURI(
                     HttpMethod.GET,

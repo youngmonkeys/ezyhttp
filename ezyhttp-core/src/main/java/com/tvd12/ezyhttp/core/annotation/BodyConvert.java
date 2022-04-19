@@ -7,7 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *
+ * Annotated for body converter class.
+ *
  * @author tavandung12
  *
  */
@@ -17,5 +19,4 @@ import java.lang.annotation.Target;
 public @interface BodyConvert {
 
     String value();
-
 }

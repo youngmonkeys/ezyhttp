@@ -26,27 +26,29 @@ import com.tvd12.ezyfox.io.EzyStrings;
 public class DefaultStringDeserializer implements StringDeserializer {
 
     protected final Map<Class<?>, StringMapper> mappers;
-    
+
     public DefaultStringDeserializer() {
         this.mappers = defaultMappers();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(
-            String value,
-            Class<T> outType,
-            Class<?> genericType) throws IOException {
+        String value,
+        Class<T> outType,
+        Class<?> genericType
+    ) throws IOException {
         if (genericType != null) {
-            if (Set.class.isAssignableFrom(outType))
-                return (T)stringToSet(value, genericType);
-            else if (Collection.class.isAssignableFrom(outType))
-                return (T)stringToList(value, genericType);
+            if (Set.class.isAssignableFrom(outType)) {
+                return (T) stringToSet(value, genericType);
+            } else if (Collection.class.isAssignableFrom(outType)) {
+                return (T) stringToList(value, genericType);
+            }
         }
         return deserialize(value, outType);
     }
-    
-    @SuppressWarnings({ "unchecked" })
+
+    @SuppressWarnings({"unchecked"})
     public <T> T deserialize(String value, Class<T> outType) throws IOException {
         StringMapper mapper = mappers.get(outType);
         if (mapper == null) {
@@ -60,22 +62,21 @@ public class DefaultStringDeserializer implements StringDeserializer {
         }
         try {
             return (T) mapper.apply(value);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new IOException("can't deserialize value: " + value + " to: " + outType.getName(), e);
         }
     }
-    
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> T stringToEnum(String value, Class<T> outType) {
         try {
-            return (T)Enum.valueOf((Class)outType, value);
-            
+            return (T) Enum.valueOf((Class) outType, value);
+
         } catch (IllegalArgumentException e) {
-            return (T)Enum.valueOf((Class)outType, value.toUpperCase());
+            return (T) Enum.valueOf((Class) outType, value.toUpperCase());
         }
     }
-    
+
     protected Map<Class<?>, StringMapper> defaultMappers() {
         Map<Class<?>, StringMapper> map = new HashMap<>();
         map.put(String.class, v -> v);
@@ -96,11 +97,11 @@ public class DefaultStringDeserializer implements StringDeserializer {
         map.put(Integer.class, v -> v != null ? Integer.valueOf(v) : null);
         map.put(Long.class, v -> v != null ? Long.valueOf(v) : null);
         map.put(Short.class, v -> v != null ? Short.valueOf(v) : null);
-        
+
         map.put(String[].class, this::stringToStringArray);
         map.put(List.class, this::stringToList);
         map.put(Set.class, this::stringToSet);
-        
+
         map.put(boolean[].class, this::stringToPrimitiveBoolean);
         map.put(byte[].class, this::stringToPrimitiveByte);
         map.put(char[].class, this::stringToPrimitiveChar);
@@ -109,7 +110,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
         map.put(int[].class, this::stringToPrimitiveInteger);
         map.put(long[].class, this::stringToPrimitiveLong);
         map.put(short[].class, this::stringToPrimitiveShort);
-        
+
         map.put(Boolean[].class, this::stringToWrapperBoolean);
         map.put(Byte[].class, this::stringToWrapperByte);
         map.put(Character[].class, this::stringToWrapperChar);
@@ -118,7 +119,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
         map.put(Integer[].class, this::stringToWrapperInteger);
         map.put(Long[].class, this::stringToWrapperLong);
         map.put(Short[].class, this::stringToWrapperShort);
-        
+
         map.put(Date.class, v -> v != null ? new Date(Long.parseLong(v)) : null);
         map.put(Instant.class, v -> v != null ? Instant.ofEpochMilli(Long.parseLong(v)) : null);
         map.put(LocalDate.class, v -> v != null ? EzyDates.parseDate(v) : null);
@@ -134,41 +135,41 @@ public class DefaultStringDeserializer implements StringDeserializer {
         if (EzyStrings.isEmpty(value))
             return new String[0];
         String[] array = value.split(",");
-        for (int i = 0 ; i < array.length ; ++i) {
+        for (int i = 0; i < array.length; ++i) {
             array[i] = array[i].trim();
         }
         return array;
     }
-    
+
     protected List<String> stringToList(String value) {
         return Lists.newArrayList(stringToStringArray(value));
     }
-    
+
     protected Set<String> stringToSet(String value) {
         return Sets.newHashSet(stringToStringArray(value));
     }
-    
+
     // =============== primitive array ===============
     protected boolean[] stringToPrimitiveBoolean(String value) {
         String[] array = stringToStringArray(value);
         boolean[] answer = new boolean[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Boolean.parseBoolean(array[i]);
         return answer;
     }
-    
+
     protected byte[] stringToPrimitiveByte(String value) {
         String[] array = stringToStringArray(value);
         byte[] answer = new byte[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Byte.parseByte(array[i]);
         return answer;
     }
-    
+
     protected char[] stringToPrimitiveChar(String value) {
         String[] array = stringToStringArray(value);
         char[] answer = new char[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = array[i].charAt(0);
         return answer;
     }
@@ -176,64 +177,64 @@ public class DefaultStringDeserializer implements StringDeserializer {
     protected double[] stringToPrimitiveDouble(String value) {
         String[] array = stringToStringArray(value);
         double[] answer = new double[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Double.parseDouble(array[i]);
         return answer;
     }
-    
+
     protected float[] stringToPrimitiveFloat(String value) {
         String[] array = stringToStringArray(value);
         float[] answer = new float[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Float.parseFloat(array[i]);
         return answer;
     }
-    
+
     protected int[] stringToPrimitiveInteger(String value) {
         String[] array = stringToStringArray(value);
         int[] answer = new int[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Integer.parseInt(array[i]);
         return answer;
     }
-    
+
     protected long[] stringToPrimitiveLong(String value) {
         String[] array = stringToStringArray(value);
         long[] answer = new long[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Long.parseLong(array[i]);
         return answer;
     }
-    
+
     protected short[] stringToPrimitiveShort(String value) {
         String[] array = stringToStringArray(value);
         short[] answer = new short[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Short.parseShort(array[i]);
         return answer;
     }
-    
+
     // =============== wrapper array ===============
     protected Boolean[] stringToWrapperBoolean(String value) {
         String[] array = stringToStringArray(value);
         Boolean[] answer = new Boolean[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Boolean.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Byte[] stringToWrapperByte(String value) {
         String[] array = stringToStringArray(value);
         Byte[] answer = new Byte[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Byte.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Character[] stringToWrapperChar(String value) {
         String[] array = stringToStringArray(value);
         Character[] answer = new Character[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = array[i].charAt(0);
         return answer;
     }
@@ -241,46 +242,46 @@ public class DefaultStringDeserializer implements StringDeserializer {
     protected Double[] stringToWrapperDouble(String value) {
         String[] array = stringToStringArray(value);
         Double[] answer = new Double[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Double.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Float[] stringToWrapperFloat(String value) {
         String[] array = stringToStringArray(value);
         Float[] answer = new Float[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Float.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Integer[] stringToWrapperInteger(String value) {
         String[] array = stringToStringArray(value);
         Integer[] answer = new Integer[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Integer.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Long[] stringToWrapperLong(String value) {
         String[] array = stringToStringArray(value);
         Long[] answer = new Long[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Long.valueOf(array[i]);
         return answer;
     }
-    
+
     protected Short[] stringToWrapperShort(String value) {
         String[] array = stringToStringArray(value);
         Short[] answer = new Short[array.length];
-        for(int i = 0 ; i < array.length ; ++i)
+        for (int i = 0; i < array.length; ++i)
             answer[i] = Short.valueOf(array[i]);
         return answer;
     }
-    
+
     // =============== collection ===============
     protected <T> Set<T> stringToSet(
-            String value, Class<T> itemType) throws IOException {
+        String value, Class<T> itemType) throws IOException {
         if (value == null) {
             return Collections.emptySet();
         }
@@ -291,9 +292,9 @@ public class DefaultStringDeserializer implements StringDeserializer {
         }
         return answer;
     }
-    
+
     protected <T> List<T> stringToList(
-            String value, Class<T> itemType) throws IOException {
+        String value, Class<T> itemType) throws IOException {
         if (value == null) {
             return Collections.emptyList();
         }

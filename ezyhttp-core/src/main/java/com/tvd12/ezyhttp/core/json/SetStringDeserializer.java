@@ -12,7 +12,7 @@ import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 
 public class SetStringDeserializer extends StdDeserializer<Set<String>> {
     private static final long serialVersionUID = -4497810070359275209L;
-    
+
     public SetStringDeserializer() {
         super(Set.class);
     }
@@ -20,17 +20,16 @@ public class SetStringDeserializer extends StdDeserializer<Set<String>> {
     @SuppressWarnings("unchecked")
     @Override
     public Set<String> deserialize(
-            JsonParser p, 
-            DeserializationContext ctxt
+        JsonParser p,
+        DeserializationContext ctxt
     ) throws IOException {
         if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
             return SingletonStringDeserializer.getInstance().deserialize(
-                    p.getValueAsString(),
-                    Set.class,
-                    String.class
+                p.getValueAsString(),
+                Set.class,
+                String.class
             );
         }
         return Sets.newHashSet(ctxt.readValue(p, String[].class));
     }
-
 }

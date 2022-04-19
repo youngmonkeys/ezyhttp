@@ -17,7 +17,7 @@ public class ForLoopTest {
         List<Object> list = new ArrayList<>();
         list.add(new Object());
         long time2 = Performance.create()
-            .test(() -> {for(Object o : list) o.hashCode();})
+            .test(() -> {for (Object o : list) o.hashCode();})
             .getTime();
         System.out.print("time2: " + time2);
     }

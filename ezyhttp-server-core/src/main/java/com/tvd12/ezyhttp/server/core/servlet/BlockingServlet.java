@@ -345,7 +345,7 @@ public class BlockingServlet extends HttpServlet {
     }
 
     protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
-        for(Class<?> exc : handledExceptionClasses) {
+        for (Class<?> exc : handledExceptionClasses) {
             if (exc.isAssignableFrom(exceptionClass)) {
                 return uncaughtExceptionHandlers.get(exc);
             }
@@ -358,7 +358,7 @@ public class BlockingServlet extends HttpServlet {
         RequestHandler requestHandler
     ) throws Exception {
         Method handler = requestHandler.getHandlerMethod();
-        for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
+        for (RequestInterceptor interceptor : interceptorManager.getRequestInterceptors()) {
             boolean passed = interceptor.preHandle(arguments, handler);
             if (!passed)
                 return false;
@@ -371,7 +371,7 @@ public class BlockingServlet extends HttpServlet {
         RequestHandler requestHandler
     ) {
         Method handler = requestHandler.getHandlerMethod();
-        for(RequestInterceptor interceptor : interceptorManager.getRequestInterceptors())
+        for (RequestInterceptor interceptor : interceptorManager.getRequestInterceptors())
             interceptor.postHandle(arguments, handler);
     }
 
@@ -388,15 +388,15 @@ public class BlockingServlet extends HttpServlet {
             MultiValueMap headers = entity.getHeaders();
             if (headers != null) {
                 Map<String, String> encodedHeaders = headers.toMap();
-                for(Entry<String, String> entry : encodedHeaders.entrySet())
+                for (Entry<String, String> entry : encodedHeaders.entrySet())
                     response.addHeader(entry.getKey(), entry.getValue());
             }
         }
         else if (data instanceof Redirect) {
             Redirect redirect = (Redirect)data;
-            for(Cookie cookie : redirect.getCookies())
+            for (Cookie cookie : redirect.getCookies())
                 response.addCookie(cookie);
-            for(Entry<String, String> e : redirect.getHeaders().entrySet())
+            for (Entry<String, String> e : redirect.getHeaders().entrySet())
                 response.addHeader(e.getKey(), e.getValue());
             Map<String, Object> attributes = redirect.getAttributes();
             if (attributes != null) {
@@ -419,9 +419,9 @@ public class BlockingServlet extends HttpServlet {
                 );
             }
             View view = (View)data;
-            for(Cookie cookie : view.getCookies())
+            for (Cookie cookie : view.getCookies())
                 response.addCookie(cookie);
-            for(Entry<String, String> e : view.getHeaders().entrySet())
+            for (Entry<String, String> e : view.getHeaders().entrySet())
                 response.addHeader(e.getKey(), e.getValue());
             response.setContentType(view.getContentType());
             viewContext.render(getServletContext(), request, response, view);

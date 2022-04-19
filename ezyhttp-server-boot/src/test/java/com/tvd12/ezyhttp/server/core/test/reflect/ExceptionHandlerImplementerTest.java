@@ -14,7 +14,7 @@ public class ExceptionHandlerImplementerTest extends BaseTest {
     public void test() {
         ExceptionHandlerImplementer.setDebug(true);
         ExceptionHandlerProxy exceptionHandler = new ExceptionHandlerProxy(new GlobalExceptionHandler());
-        for(ExceptionHandlerMethod method : exceptionHandler.getExceptionHandlerMethods()) {
+        for (ExceptionHandlerMethod method : exceptionHandler.getExceptionHandlerMethods()) {
             ExceptionHandlerImplementer implementer = new ExceptionHandlerImplementer(exceptionHandler, method);
             implementer.implement();
         }

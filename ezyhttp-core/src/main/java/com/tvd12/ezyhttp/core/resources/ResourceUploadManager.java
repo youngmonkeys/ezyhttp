@@ -16,8 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ResourceUploadManager
-        extends EzyLoggable
-        implements EzyStoppable, EzyDestroyable {
+    extends EzyLoggable
+    implements EzyStoppable, EzyDestroyable {
 
     protected volatile boolean active;
     protected final int capacity;
@@ -33,7 +33,7 @@ public class ResourceUploadManager
     public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
     public static final long UNLIMITED_UPLOAD_SIZE = -1;
     public static final int DEFAULT_THREAD_POOL_SIZE =
-            Runtime.getRuntime().availableProcessors() * 2;
+        Runtime.getRuntime().availableProcessors() * 2;
 
     public ResourceUploadManager() {
         this(
@@ -44,8 +44,8 @@ public class ResourceUploadManager
     }
 
     public ResourceUploadManager(
-            int capacity,
-            int threadPoolSize, int bufferSize) {
+        int capacity,
+        int threadPoolSize, int bufferSize) {
         this.capacity = capacity;
         this.threadPoolSize = threadPoolSize;
         this.bufferSize = bufferSize;
@@ -64,14 +64,14 @@ public class ResourceUploadManager
 
     private void start(int threadPoolSize) {
         this.active = true;
-        for (int i = 0 ; i < threadPoolSize ; ++i) {
+        for (int i = 0; i < threadPoolSize; ++i) {
             executorService.execute(this::loop);
         }
     }
 
     private void loop() {
         byte[] buffer = new byte[bufferSize];
-        while(active) {
+        while (active) {
             Entry entry = null;
             boolean done = true;
             boolean isMaxUploaded = false;
@@ -92,12 +92,10 @@ public class ResourceUploadManager
                 } else {
                     isMaxUploaded = true;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 exception = e;
                 logger.info("upload error", e);
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 exception = new IllegalStateException(e);
                 logger.info("upload fatal error", e);
             }
@@ -115,12 +113,10 @@ public class ResourceUploadManager
                     }
                     if (exception != null) {
                         future.setException(exception);
-                    }
-                    else {
+                    } else {
                         future.setResult(Boolean.TRUE);
                     }
-                }
-                else {
+                } else {
                     if (!queue.offer(entry)) {
                         EzyFuture future = futureMap.removeFuture(entry);
                         if (future != null) {
@@ -128,15 +124,14 @@ public class ResourceUploadManager
                         }
                     }
                 }
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 logger.info("handle upload result error", e);
             }
         }
     }
 
     public void drain(
-        InputStream from, 
+        InputStream from,
         OutputStream to,
         long maxUploadSize
     ) throws Exception {
@@ -148,25 +143,6 @@ public class ResourceUploadManager
 
     public void drain(InputStream from, OutputStream to) throws Exception {
         drain(from, to, UNLIMITED_UPLOAD_SIZE);
-    }
-
-    public void drainAsync(
-        InputStream from, 
-        OutputStream to,
-        long maxUploadSize,
-        EzyResultCallback<Boolean> callback
-    ) {
-        Entry entry = new Entry(from, to, maxUploadSize);
-        EzyFuture future = new EzyCallableFutureTask(callback);
-        drain(entry, future);
-    }
-
-    public void drainAsync(
-        InputStream from, 
-        OutputStream to,
-        EzyResultCallback<Boolean> callback
-    ) {
-        drainAsync(from, to, UNLIMITED_UPLOAD_SIZE, callback);
     }
 
     private void drain(
@@ -181,10 +157,29 @@ public class ResourceUploadManager
         }
     }
 
+    public void drainAsync(
+        InputStream from,
+        OutputStream to,
+        long maxUploadSize,
+        EzyResultCallback<Boolean> callback
+    ) {
+        Entry entry = new Entry(from, to, maxUploadSize);
+        EzyFuture future = new EzyCallableFutureTask(callback);
+        drain(entry, future);
+    }
+
+    public void drainAsync(
+        InputStream from,
+        OutputStream to,
+        EzyResultCallback<Boolean> callback
+    ) {
+        drainAsync(from, to, UNLIMITED_UPLOAD_SIZE, callback);
+    }
+
     @Override
     public void stop() {
         this.active = false;
-        for(int i = 0 ; i < threadPoolSize ; ++i) {
+        for (int i = 0; i < threadPoolSize; ++i) {
             queue.offer(POISON);
         }
         this.executorService.shutdown();
