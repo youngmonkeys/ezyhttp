@@ -13,10 +13,10 @@ public class HttpRequestTimeoutExceptionTest {
         // given
         int code = StatusCodes.REQUEST_TIMEOUT;
         String data = "error";
-        
+
         // when
         HttpRequestTimeoutException sut = new HttpRequestTimeoutException(data);
-        
+
         // then
         Asserts.assertEquals(code, sut.getCode());
         Asserts.assertEquals(data, sut.getData());

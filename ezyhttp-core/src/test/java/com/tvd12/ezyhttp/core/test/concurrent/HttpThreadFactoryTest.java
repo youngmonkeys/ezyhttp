@@ -13,10 +13,9 @@ public class HttpThreadFactoryTest {
         HttpThreadFactory sut = HttpThreadFactory.create("test");
 
         // when
-        Thread thread = sut.newThread(() ->  {});
+        Thread thread = sut.newThread(() -> {});
 
         // then
         Asserts.assertTrue(thread.getName().contains("ezyhttp"));
     }
-
 }

@@ -105,8 +105,8 @@ public class DataConvertersTest {
         // given
         DataConverters sut = new DataConverters(new ObjectMapper());
         List<?> bodyConverters = Lists.newArrayList(
-                new JsonConverter(),
-                new Object()
+            new JsonConverter(),
+            new Object()
         );
 
         // when
@@ -114,12 +114,12 @@ public class DataConvertersTest {
 
         // then
         Asserts.assertEquals(
-                sut.getBodyDeserializer(ContentTypes.APPLICATION_JSON),
-                bodyConverters.get(0)
+            sut.getBodyDeserializer(ContentTypes.APPLICATION_JSON),
+            bodyConverters.get(0)
         );
         Asserts.assertEquals(
-                sut.getBodySerializer(ContentTypes.APPLICATION_JSON),
-                bodyConverters.get(0)
+            sut.getBodySerializer(ContentTypes.APPLICATION_JSON),
+            bodyConverters.get(0)
         );
     }
 
@@ -136,21 +136,21 @@ public class DataConvertersTest {
 
         // then
         Asserts.assertEquals(
-                sut.getBodyDeserializer(ContentTypes.APPLICATION_JSON),
-                bodyConverters.get(ContentTypes.APPLICATION_JSON)
+            sut.getBodyDeserializer(ContentTypes.APPLICATION_JSON),
+            bodyConverters.get(ContentTypes.APPLICATION_JSON)
         );
         Asserts.assertEquals(
-                sut.getBodySerializer(ContentTypes.APPLICATION_JSON),
-                bodyConverters.get(ContentTypes.APPLICATION_JSON)
+            sut.getBodySerializer(ContentTypes.APPLICATION_JSON),
+            bodyConverters.get(ContentTypes.APPLICATION_JSON)
         );
 
         Asserts.assertNotEquals(
-                sut.getBodyDeserializer(ContentTypes.TEXT_HTML),
-                bodyConverters.get(ContentTypes.TEXT_HTML)
+            sut.getBodyDeserializer(ContentTypes.TEXT_HTML),
+            bodyConverters.get(ContentTypes.TEXT_HTML)
         );
         Asserts.assertNotEquals(
-                sut.getBodySerializer(ContentTypes.TEXT_HTML),
-                bodyConverters.get(ContentTypes.TEXT_HTML)
+            sut.getBodySerializer(ContentTypes.TEXT_HTML),
+            bodyConverters.get(ContentTypes.TEXT_HTML)
         );
     }
 
@@ -185,6 +185,5 @@ public class DataConvertersTest {
         public <T> T deserialize(String value, Class<T> outType, Class<?> genericType) {
             return null;
         }
-
     }
 }

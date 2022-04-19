@@ -58,7 +58,7 @@ public class ResourceDownloadManagerTest extends BaseTest {
 
         // when
         AtomicReference<Exception> exceptionRef = new AtomicReference<>();
-        for (int i = 0 ; i < 100 ; ++i) {
+        for (int i = 0; i < 100; ++i) {
             try {
                 sut.drainAsync(inputStream, outputStream, new EzyResultCallback<Boolean>() {
                     @Override
@@ -100,9 +100,10 @@ public class ResourceDownloadManagerTest extends BaseTest {
         EzyFutureMap<?> futureMap = FieldUtil.getFieldValue(sut, "futureMap");
 
         // when
-        for (int i = 0 ; i < 1000 ; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             try {
-                sut.drainAsync(inputStream, outputStream, response -> {});
+                sut.drainAsync(inputStream, outputStream, response -> {
+                });
             } catch (Exception ignored) {
             }
             futureMap.clear();
@@ -223,7 +224,8 @@ public class ResourceDownloadManagerTest extends BaseTest {
         Thread.sleep(200);
 
         // when
-        sut.drainAsync(inputStream, outputStream, it -> {});
+        sut.drainAsync(inputStream, outputStream, it -> {
+        });
         Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
 
         // then
@@ -238,20 +240,21 @@ public class ResourceDownloadManagerTest extends BaseTest {
         // given
         info("start drainButFutureNull");
         ResourceDownloadManager sut = new ResourceDownloadManager(100, 1, 1024);
-        
+
         EzyFutureMap futureMap = FieldUtil.getFieldValue(sut, "futureMap");
-        
+
         InputStream inputStream = mock(InputStream.class);
         when(inputStream.read(any(byte[].class))).thenAnswer(it -> {
             Thread.sleep(200);
             return 0;
         });
         OutputStream outputStream = mock(OutputStream.class);
-        
+
         // when
-        sut.drainAsync(inputStream, outputStream, it -> {});
+        sut.drainAsync(inputStream, outputStream, it -> {
+        });
         futureMap.clear();
-        
+
         // then
         Thread.sleep(300);
         sut.stop();

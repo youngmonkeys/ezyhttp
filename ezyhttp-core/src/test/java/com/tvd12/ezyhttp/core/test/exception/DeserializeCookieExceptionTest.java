@@ -16,10 +16,10 @@ public class DeserializeCookieExceptionTest {
 
         // when
         DeserializeCookieException sut = new DeserializeCookieException(
-                "hello",
-                "world",
-                Map.class,
-                e
+            "hello",
+            "world",
+            Map.class,
+            e
         );
 
         // then
@@ -28,5 +28,4 @@ public class DeserializeCookieExceptionTest {
         Asserts.assertEquals(Map.class, sut.getOutType());
         Asserts.assertEquals(e, sut.getCause());
     }
-
 }

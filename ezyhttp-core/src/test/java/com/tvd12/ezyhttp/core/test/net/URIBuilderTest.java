@@ -12,31 +12,31 @@ public class URIBuilderTest {
     @Test
     public void test() {
         URI uri = new URIBuilder("/abc")
-                .addPath("/def/")
-                .addPath("/xyz/")
-                .addQueryParam("hell", "world")
-                .addQueryParam("zig", "zag")
-                .build();
+            .addPath("/def/")
+            .addPath("/xyz/")
+            .addQueryParam("hell", "world")
+            .addQueryParam("zig", "zag")
+            .build();
         System.out.println(uri);
         uri = new URIBuilder()
-                .addPath("/")
-                .addPath("/xyz/")
-                .addQueryParam("hell", "world")
-                .addQueryParam("zig", "zag")
-                .build();
+            .addPath("/")
+            .addPath("/xyz/")
+            .addQueryParam("hell", "world")
+            .addQueryParam("zig", "zag")
+            .build();
         System.out.println(uri);
         uri = new URIBuilder()
-                .addPath("/")
-                .addPath("//")
-                .addQueryParam("hell", "world")
-                .addQueryParam("zig", "zag")
-                .build();
+            .addPath("/")
+            .addPath("//")
+            .addQueryParam("hell", "world")
+            .addQueryParam("zig", "zag")
+            .build();
         System.out.println(uri);
         uri = new URIBuilder()
-                .addPath("/xzy/")
-                .addQueryParam("hell", "world")
-                .addQueryParam("zig", "zag")
-                .build();
+            .addPath("/xzy/")
+            .addQueryParam("hell", "world")
+            .addQueryParam("zig", "zag")
+            .build();
         System.out.println(uri);
     }
 
@@ -45,8 +45,8 @@ public class URIBuilderTest {
         // given
         // when
         URI uri = new URIBuilder()
-                .addPath("")
-                .build();
+            .addPath("")
+            .build();
 
         // then
         Asserts.assertEquals(URI.create(""), uri);
@@ -57,7 +57,7 @@ public class URIBuilderTest {
         // given
         // when
         URI uri = new URIBuilder()
-                .build();
+            .build();
 
         // then
         Asserts.assertEquals(URI.create(""), uri);

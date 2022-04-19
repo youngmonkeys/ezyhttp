@@ -46,11 +46,11 @@ public class MultiValueMapTest {
         values.put("d", "good");
         values.put("e", true);
         MultiValueMap sut = MultiValueMap.builder()
-                .setValue("1", "hello")
-                .setValues("2", Arrays.asList("foo", "bar"))
-                .setValues("3", Collections.emptyList())
-                .setValues("m", values)
-                .build();
+            .setValue("1", "hello")
+            .setValues("2", Arrays.asList("foo", "bar"))
+            .setValues("3", Collections.emptyList())
+            .setValues("m", values)
+            .build();
 
         // when
         Map<String, String> actual1 = sut.toMap();
@@ -73,12 +73,12 @@ public class MultiValueMapTest {
         values.put("d", "good");
         values.put("e", true);
         MultiValueMap sut = MultiValueMap.builder()
-                .setValue("1", "hello")
-                .setValues("2", Arrays.asList("foo", "bar"))
-                .setValues("3", Collections.emptyList())
-                .setValues("m", values)
-                .setValue("z", "")
-                .build();
+            .setValue("1", "hello")
+            .setValues("2", Arrays.asList("foo", "bar"))
+            .setValues("3", Collections.emptyList())
+            .setValues("m", values)
+            .setValue("z", "")
+            .build();
 
         // when
         Map<String, String> actual1 = sut.getValueMap("m");

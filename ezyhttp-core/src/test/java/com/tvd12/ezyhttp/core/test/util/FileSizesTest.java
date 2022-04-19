@@ -15,14 +15,14 @@ public class FileSizesTest {
         String mb = "30MB";
         String gb = "40gb";
         String tb = "50TB";
-        
+
         // when
         long actualB = FileSizes.toByteSize(b);
         long actualKB = FileSizes.toByteSize(kb);
         long actualMB = FileSizes.toByteSize(mb);
         long actualGB = FileSizes.toByteSize(gb);
         long actualTB = FileSizes.toByteSize(tb);
-        
+
         // then
         Asserts.assertEquals(actualB, 10L);
         Asserts.assertEquals(actualKB, 20 * 1024L);
@@ -30,33 +30,33 @@ public class FileSizesTest {
         Asserts.assertEquals(actualGB, 40L * 1024L * 1024L * 1024L);
         Asserts.assertEquals(actualTB, 50L * 1024L * 1024L * 1024L * 1024L);
     }
-    
+
     @Test
     public void toByteSizeFailedDueToEmptyValue() {
         // given
         // when
         Throwable e = Asserts.assertThrows(() -> FileSizes.toByteSize(""));
-        
+
         // then
         Asserts.assertThat(e).isEqualsType(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void toByteSizeFailedDueToInvalidValue() {
         // given
         // when
         Throwable e = Asserts.assertThrows(() -> FileSizes.toByteSize("ab"));
-        
+
         // then
         Asserts.assertThat(e).isEqualsType(IllegalArgumentException.class);
     }
-    
+
     @Test
     public void toByteSizeFailedDueToInvalidValue2() {
         // given
         // when
         Throwable e = Asserts.assertThrows(() -> FileSizes.toByteSize("abc"));
-        
+
         // then
         Asserts.assertThat(e).isEqualsType(IllegalArgumentException.class);
     }

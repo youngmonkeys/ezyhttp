@@ -16,10 +16,10 @@ public class DeserializeHeaderExceptionTest {
 
         // when
         DeserializeHeaderException sut = new DeserializeHeaderException(
-                "hello",
-                "world",
-                Map.class,
-                e
+            "hello",
+            "world",
+            Map.class,
+            e
         );
 
         // then
@@ -28,5 +28,4 @@ public class DeserializeHeaderExceptionTest {
         Asserts.assertEquals(Map.class, sut.getOutType());
         Asserts.assertEquals(e, sut.getCause());
     }
-
 }

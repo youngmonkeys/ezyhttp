@@ -22,21 +22,21 @@ import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 
 public class SingletonStringDeserializerTest {
-    
+
     private final DefaultStringDeserializer sut = new DefaultStringDeserializer();
-    
+
     @Test
     public void deserializeBooleanArray() throws Exception {
         // given
         String source = "true, false";
-        
+
         // when
         boolean[] actual = SingletonStringDeserializer
-                .getInstance()
-                .deserialize(source, boolean[].class);
-        
+            .getInstance()
+            .deserialize(source, boolean[].class);
+
         // then
-        Asserts.assertEquals(new boolean[] {true, false}, actual);
+        Asserts.assertEquals(new boolean[]{true, false}, actual);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class SingletonStringDeserializerTest {
         int intValue = RandomUtil.randomInt();
         long longValue = RandomUtil.randomLong();
         short shortValue = RandomUtil.randomShort();
-        
+
         // when
         boolean booleanActual = sut.deserialize(booleanValue + "", boolean.class);
         byte byteActual = sut.deserialize(byteValue + "", byte.class);
@@ -60,7 +60,7 @@ public class SingletonStringDeserializerTest {
         int intActual = sut.deserialize(intValue + "", int.class);
         long longActual = sut.deserialize(longValue + "", long.class);
         short shortActual = sut.deserialize(shortValue + "", short.class);
-        
+
         // then
         Asserts.assertEquals(booleanActual, booleanValue);
         Asserts.assertEquals(byteActual, byteValue);
@@ -71,7 +71,7 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(longActual, longValue);
         Asserts.assertEquals(shortActual, shortValue);
     }
-    
+
     @Test
     public void deserializeWrapper() throws Exception {
         // given
@@ -84,7 +84,7 @@ public class SingletonStringDeserializerTest {
         Long longValue = RandomUtil.randomLong();
         Short shortValue = RandomUtil.randomShort();
         String stringValue = RandomUtil.randomShortAlphabetString();
-        
+
         // when
         Boolean booleanActual = sut.deserialize(booleanValue + "", Boolean.class);
         Byte byteActual = sut.deserialize(byteValue + "", Byte.class);
@@ -95,7 +95,7 @@ public class SingletonStringDeserializerTest {
         Long longActual = sut.deserialize(longValue + "", Long.class);
         Short shortActual = sut.deserialize(shortValue + "", Short.class);
         String stringActual = sut.deserialize(stringValue, String.class);
-        
+
         // then
         Asserts.assertEquals(booleanActual, booleanValue);
         Asserts.assertEquals(byteActual, byteValue);
@@ -107,19 +107,19 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(shortActual, shortValue);
         Asserts.assertEquals(stringActual, stringValue);
     }
-    
+
     @Test
     public void deserializePrimitiveArray() throws Exception {
         // given
-        boolean[] booleanValues = new boolean[] { RandomUtil.randomBoolean(), RandomUtil.randomBoolean() };
-        byte[] byteValues = new byte[] { RandomUtil.randomByte(), RandomUtil.randomByte() };
-        char[] charValues = new char[] { RandomUtil.randomChar(), RandomUtil.randomChar() };
-        double[] doubleValues = new double[] { RandomUtil.randomDouble(), RandomUtil.randomDouble() };
-        float[] floatValues = new float[] { RandomUtil.randomFloat(), RandomUtil.randomFloat() };
-        int[] intValues = new int[] { RandomUtil.randomInt(), RandomUtil.randomInt() };
-        long[] longValues = new long[] { RandomUtil.randomLong(), RandomUtil.randomLong() };
-        short[] shortValues = new short[] { RandomUtil.randomShort(), RandomUtil.randomShort() };
-        
+        boolean[] booleanValues = new boolean[]{RandomUtil.randomBoolean(), RandomUtil.randomBoolean()};
+        byte[] byteValues = new byte[]{RandomUtil.randomByte(), RandomUtil.randomByte()};
+        char[] charValues = new char[]{RandomUtil.randomChar(), RandomUtil.randomChar()};
+        double[] doubleValues = new double[]{RandomUtil.randomDouble(), RandomUtil.randomDouble()};
+        float[] floatValues = new float[]{RandomUtil.randomFloat(), RandomUtil.randomFloat()};
+        int[] intValues = new int[]{RandomUtil.randomInt(), RandomUtil.randomInt()};
+        long[] longValues = new long[]{RandomUtil.randomLong(), RandomUtil.randomLong()};
+        short[] shortValues = new short[]{RandomUtil.randomShort(), RandomUtil.randomShort()};
+
         // when
         boolean[] booleanActuals = sut.deserialize(booleanValues[0] + "," + booleanValues[1], boolean[].class);
         byte[] byteActuals = sut.deserialize(byteValues[0] + "," + byteValues[1], byte[].class);
@@ -129,7 +129,7 @@ public class SingletonStringDeserializerTest {
         int[] intActuals = sut.deserialize(intValues[0] + "," + intValues[1], int[].class);
         long[] longActuals = sut.deserialize(longValues[0] + "," + longValues[1], long[].class);
         short[] shortActuals = sut.deserialize(shortValues[0] + "," + shortValues[1], short[].class);
-        
+
         // then
         Asserts.assertEquals(booleanActuals, booleanValues);
         Asserts.assertEquals(byteActuals, byteValues);
@@ -140,20 +140,20 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(longActuals, longValues);
         Asserts.assertEquals(shortActuals, shortValues);
     }
-    
+
     @Test
     public void deserializeWrapperArray() throws Exception {
         // given
-        Boolean[] booleanValues = new Boolean[] { RandomUtil.randomBoolean(), RandomUtil.randomBoolean() };
-        Byte[] byteValues = new Byte[] { RandomUtil.randomByte(), RandomUtil.randomByte() };
-        Character[] charValues = new Character[] { RandomUtil.randomChar(), RandomUtil.randomChar() };
-        Double[] doubleValues = new Double[] { RandomUtil.randomDouble(), RandomUtil.randomDouble() };
-        Float[] floatValues = new Float[] { RandomUtil.randomFloat(), RandomUtil.randomFloat() };
-        Integer[] intValues = new Integer[] { RandomUtil.randomInt(), RandomUtil.randomInt() };
-        Long[] longValues = new Long[] { RandomUtil.randomLong(), RandomUtil.randomLong() };
-        Short[] shortValues = new Short[] { RandomUtil.randomShort(), RandomUtil.randomShort() };
-        String[] stringValues = new String[] { RandomUtil.randomShortAlphabetString(), RandomUtil.randomShortAlphabetString() };
-        
+        Boolean[] booleanValues = new Boolean[]{RandomUtil.randomBoolean(), RandomUtil.randomBoolean()};
+        Byte[] byteValues = new Byte[]{RandomUtil.randomByte(), RandomUtil.randomByte()};
+        Character[] charValues = new Character[]{RandomUtil.randomChar(), RandomUtil.randomChar()};
+        Double[] doubleValues = new Double[]{RandomUtil.randomDouble(), RandomUtil.randomDouble()};
+        Float[] floatValues = new Float[]{RandomUtil.randomFloat(), RandomUtil.randomFloat()};
+        Integer[] intValues = new Integer[]{RandomUtil.randomInt(), RandomUtil.randomInt()};
+        Long[] longValues = new Long[]{RandomUtil.randomLong(), RandomUtil.randomLong()};
+        Short[] shortValues = new Short[]{RandomUtil.randomShort(), RandomUtil.randomShort()};
+        String[] stringValues = new String[]{RandomUtil.randomShortAlphabetString(), RandomUtil.randomShortAlphabetString()};
+
         // when
         Boolean[] booleanActuals = sut.deserialize(booleanValues[0] + "," + booleanValues[1], Boolean[].class);
         Byte[] byteActuals = sut.deserialize(byteValues[0] + "," + byteValues[1], Byte[].class);
@@ -164,7 +164,7 @@ public class SingletonStringDeserializerTest {
         Long[] longActuals = sut.deserialize(longValues[0] + "," + longValues[1], Long[].class);
         Short[] shortActuals = sut.deserialize(shortValues[0] + "," + shortValues[1], Short[].class);
         String[] stringActuals = sut.deserialize(stringValues[0] + "," + stringValues[1], String[].class);
-        
+
         // then
         Asserts.assertEquals(booleanActuals, booleanValues);
         Asserts.assertEquals(byteActuals, byteValues);
@@ -176,7 +176,7 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(shortActuals, shortValues);
         Asserts.assertEquals(stringActuals, stringActuals);
     }
-    
+
     @Test
     public void deserializeSpecialValues() throws Exception {
         // given
@@ -187,7 +187,7 @@ public class SingletonStringDeserializerTest {
         LocalDateTime localDateTime = RandomUtil.randomLocalDateTime();
         BigInteger bigInteger = RandomUtil.random32BitBigInteger();
         BigDecimal bigDecimal = RandomUtil.random32BitBigDecimal();
-        
+
         // when
         Date actualDate = sut.deserialize(date.getTime() + "", Date.class);
         Instant actualInstant = sut.deserialize(instant.toEpochMilli() + "", Instant.class);
@@ -196,7 +196,7 @@ public class SingletonStringDeserializerTest {
         LocalDateTime actualLocalDateTime = sut.deserialize(localDateTime.toString(), LocalDateTime.class);
         BigInteger actualBigInteger = sut.deserialize(bigInteger.toString(), BigInteger.class);
         BigDecimal actualBigDecimal = sut.deserialize(bigDecimal.toString(), BigDecimal.class, String.class);
-        
+
         // then
         Asserts.assertEquals(date, actualDate);
         Asserts.assertEquals(instant, actualInstant);
@@ -206,17 +206,17 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(bigInteger, actualBigInteger);
         Asserts.assertEquals(bigDecimal, actualBigDecimal);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void rawCollectionDeserializer() throws Exception {
         // given
         String value = "1,2,3";
-        
+
         // when
         List<String> actualList = sut.deserialize(value, List.class, null);
         Set<String> actualSet = sut.deserialize(value, Set.class, null);
-        
+
         // then
         Asserts.assertEquals(Lists.newArrayList("1", "2", "3"), actualList);
         Asserts.assertEquals(Sets.newHashSet("1", "2", "3"), actualSet);
@@ -229,58 +229,58 @@ public class SingletonStringDeserializerTest {
                 .deserialize(null, Set.class, String.class)
         );
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void intCollectionDeserializer() throws Exception {
         // given
         String value = "1,2,3";
-        
+
         // when
         List<Integer> actualList = sut.deserialize(value, List.class, Integer.class);
         Set<Integer> actualSet = sut.deserialize(value, Set.class, Integer.class);
-        
+
         // then
         Asserts.assertEquals(Lists.newArrayList(1, 2, 3), actualList);
         Asserts.assertEquals(Sets.newHashSet(1, 2, 3), actualSet);
     }
-    
+
     @Test
     public void emptyValueDeserialize() throws Exception {
         // given
         String value = "";
-        
+
         // when
         int[] actual = sut.deserialize(value, int[].class);
-        
+
         // then
         Asserts.assertEquals(actual.length, 0);
     }
-    
+
     @Test
     public void noMapper() {
         // given
         String value = RandomUtil.randomShortAlphabetString();
-        
+
         // when
         Throwable exception = Asserts.assertThrows(() -> sut.deserialize(value, getClass()));
-        
+
         // then
         Asserts.assertEquals(exception.getClass(), IOException.class);
     }
-    
+
     @Test
     public void exceptionCase() {
         // given
         String value = RandomUtil.randomShortAlphabetString();
-        
+
         // when
         Throwable exception = Asserts.assertThrows(() -> sut.deserialize(value, Long.class));
-        
+
         // then
         Asserts.assertEquals(exception.getClass(), IOException.class);
     }
-    
+
     @Test
     public void deserializeNullStringToPrimitive() throws Exception {
         // given
@@ -301,7 +301,7 @@ public class SingletonStringDeserializerTest {
         int intValue = sut.deserialize(null, int.class);
         long longValue = sut.deserialize(null, long.class);
         short shortValue = sut.deserialize(null, short.class);
-        
+
         // then
         Asserts.assertEquals(false, booleanValue);
         Asserts.assertEquals(byteActual, byteValue);
@@ -312,7 +312,7 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(longActual, longValue);
         Asserts.assertEquals(shortActual, shortValue);
     }
-    
+
     @Test
     public void deserializeNullStringToWrapper() throws Exception {
         // given
@@ -324,7 +324,7 @@ public class SingletonStringDeserializerTest {
         Integer intActual = null;
         Long longActual = null;
         Short shortActual = null;
-        
+
         // when
         Boolean booleanValue = sut.deserialize(null, Boolean.class);
         Byte byteValue = sut.deserialize(null, Byte.class);
@@ -335,7 +335,7 @@ public class SingletonStringDeserializerTest {
         Long longValue = sut.deserialize(null, Long.class);
         Short shortValue = sut.deserialize(null, Short.class);
         String stringValue = sut.deserialize(null, String.class);
-        
+
         // then
         Asserts.assertEquals(booleanActual, booleanValue);
         Asserts.assertEquals(byteActual, byteValue);
@@ -347,7 +347,7 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(shortActual, shortValue);
         Asserts.assertEquals(null, stringValue);
     }
-    
+
     @Test
     public void deserializeNullStringToSpecialValues() throws Exception {
         // given
@@ -359,7 +359,7 @@ public class SingletonStringDeserializerTest {
         LocalDateTime actualLocalDateTime = sut.deserialize(null, LocalDateTime.class);
         BigInteger actualBigInteger = sut.deserialize(null, BigInteger.class);
         BigDecimal actualBigDecimal = sut.deserialize(null, BigDecimal.class);
-        
+
         // then
         Asserts.assertEquals(null, actualDate);
         Asserts.assertEquals(null, actualInstant);
@@ -369,7 +369,7 @@ public class SingletonStringDeserializerTest {
         Asserts.assertEquals(null, actualBigInteger);
         Asserts.assertEquals(null, actualBigDecimal);
     }
-    
+
     @Test
     public void deserializeEnumTest() throws Exception {
         MyEnum value = SingletonStringDeserializer.getInstance()
@@ -379,9 +379,8 @@ public class SingletonStringDeserializerTest {
             .deserialize(null, MyEnum.class));
         Asserts.assertEquals(SingletonStringDeserializer.getInstance()
             .deserialize("hello", MyEnum.class), MyEnum.HELLO);
-        
     }
-    
+
     public enum MyEnum {
         HELLO, WORLD
     }

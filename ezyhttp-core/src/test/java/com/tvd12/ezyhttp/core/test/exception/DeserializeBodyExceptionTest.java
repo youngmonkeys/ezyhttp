@@ -11,16 +11,15 @@ public class DeserializeBodyExceptionTest {
     public void test() {
         // given
         Exception e = new Exception("just test");
-        
+
         // when
         DeserializeBodyException sut = new DeserializeBodyException(
-                "hello",
-                e
+            "hello",
+            e
         );
-        
+
         // then
         Asserts.assertEquals("hello", sut.getMessage());
         Asserts.assertEquals(e, sut.getCause());
     }
-    
 }

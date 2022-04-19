@@ -62,7 +62,7 @@ public class ResourceUploadManagerTest extends BaseTest {
 
         // when
         AtomicReference<Exception> exceptionRef = new AtomicReference<>();
-        for (int i = 0 ; i < 100 ; ++i) {
+        for (int i = 0; i < 100; ++i) {
             try {
                 sut.drainAsync(inputStream, outputStream, new EzyResultCallback<Boolean>() {
                     @Override
@@ -104,9 +104,10 @@ public class ResourceUploadManagerTest extends BaseTest {
         EzyFutureMap<?> futureMap = FieldUtil.getFieldValue(sut, "futureMap");
 
         // when
-        for (int i = 0 ; i < 1000 ; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             try {
-                sut.drainAsync(inputStream, outputStream, response -> {});
+                sut.drainAsync(inputStream, outputStream, response -> {
+                });
             } catch (Exception ignored) {
             }
             futureMap.clear();
@@ -147,17 +148,17 @@ public class ResourceUploadManagerTest extends BaseTest {
     public void drainWithMaxUploadSizeTest() throws Exception {
         // given
         ResourceUploadManager sut = new ResourceUploadManager();
-        
+
         int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
-        
+
         byte[] inputBytes = RandomUtil.randomByteArray(size);
         InputStream inputStream = new ByteArrayInputStream(inputBytes);
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
-        
+
         // when
         sut.drain(inputStream, outputStream, Integer.MAX_VALUE);
-        
+
         // then
         byte[] outputBytes = outputStream.toByteArray();
         Asserts.assertEquals(inputBytes, outputBytes);
@@ -209,17 +210,17 @@ public class ResourceUploadManagerTest extends BaseTest {
     public void drainFailedDueToOverUploadSizeTest() {
         // given
         ResourceUploadManager sut = new ResourceUploadManager();
-        
+
         int size = ResourceUploadManager.DEFAULT_BUFFER_SIZE * 3;
-        
+
         byte[] inputBytes = RandomUtil.randomByteArray(size);
         InputStream inputStream = new ByteArrayInputStream(inputBytes);
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
-        
+
         // when
         Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream, 1));
-        
+
         // then
         Asserts.assertEqualsType(e, MaxUploadSizeException.class);
         sut.stop();
@@ -239,7 +240,8 @@ public class ResourceUploadManagerTest extends BaseTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size);
 
         // when
-        sut.drainAsync(inputStream, outputStream, it -> {});
+        sut.drainAsync(inputStream, outputStream, it -> {
+        });
         Thread.sleep(100);
 
         // then
@@ -252,18 +254,19 @@ public class ResourceUploadManagerTest extends BaseTest {
     public void drainFailedDueToMaxResourceUploadCapacity() throws Exception {
         // given
         ResourceUploadManager sut = new ResourceUploadManager(1, 1, 1024);
-        
+
         InputStream inputStream = mock(InputStream.class);
         when(inputStream.read(any(byte[].class))).thenReturn(10);
         OutputStream outputStream = mock(OutputStream.class);
-        
+
         sut.stop();
         Thread.sleep(200);
-        
+
         // when
-        sut.drainAsync(inputStream, outputStream, it -> {});
+        sut.drainAsync(inputStream, outputStream, it -> {
+        });
         Throwable e = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
-        
+
         // then
         Asserts.assertThat(e).isEqualsType(MaxResourceUploadCapacity.class);
         sut.stop();
@@ -274,20 +277,21 @@ public class ResourceUploadManagerTest extends BaseTest {
     public void drainButFutureNull() throws Exception {
         // given
         ResourceUploadManager sut = new ResourceUploadManager(100, 1, 1024);
-        
+
         EzyFutureMap futureMap = FieldUtil.getFieldValue(sut, "futureMap");
-        
+
         InputStream inputStream = mock(InputStream.class);
         when(inputStream.read(any(byte[].class))).thenAnswer(it -> {
             Thread.sleep(200);
             return 0;
         });
         OutputStream outputStream = mock(OutputStream.class);
-        
+
         // when
-        sut.drainAsync(inputStream, outputStream, it -> {});
+        sut.drainAsync(inputStream, outputStream, it -> {
+        });
         futureMap.clear();
-        
+
         // then
         Thread.sleep(300);
         sut.stop();

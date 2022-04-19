@@ -16,10 +16,10 @@ public class DeserializePathVariableExceptionTest {
 
         // when
         DeserializePathVariableException sut = new DeserializePathVariableException(
-                "hello",
-                "world",
-                Map.class,
-                e
+            "hello",
+            "world",
+            Map.class,
+            e
         );
 
         // then
@@ -28,5 +28,4 @@ public class DeserializePathVariableExceptionTest {
         Asserts.assertEquals(Map.class, sut.getOutType());
         Asserts.assertEquals(e, sut.getCause());
     }
-
 }

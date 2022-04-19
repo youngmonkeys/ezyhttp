@@ -13,10 +13,10 @@ public class HttpUnauthorizedExceptionTest {
         // given
         int code = StatusCodes.UNAUTHORIZED;
         String data = "error";
-        
+
         // when
         HttpUnauthorizedException sut = new HttpUnauthorizedException(data);
-        
+
         // then
         Asserts.assertEquals(code, sut.getCode());
         Asserts.assertEquals(data, sut.getData());

@@ -16,10 +16,10 @@ public class DeserializeParameterExceptionTest {
 
         // when
         DeserializeParameterException sut = new DeserializeParameterException(
-                "hello",
-                "world",
-                Map.class,
-                e
+            "hello",
+            "world",
+            Map.class,
+            e
         );
 
         // then
@@ -28,5 +28,4 @@ public class DeserializeParameterExceptionTest {
         Asserts.assertEquals(Map.class, sut.getOutType());
         Asserts.assertEquals(e, sut.getCause());
     }
-
 }
