@@ -26,7 +26,9 @@ import lombok.Setter;
 
 @Setter
 @ApplicationBootstrap
-public class JettyApplicationBootstrap extends EzyLoggable implements ApplicationEntry {
+public class JettyApplicationBootstrap
+    extends EzyLoggable
+    implements ApplicationEntry {
 
     @EzyProperty("server.port")
     protected int port = 8080;
@@ -96,8 +98,9 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
-        if (managementEnable)
+        if (managementEnable) {
             logger.info("management started on: {}:{}", managementHost, managementPort);
+        }
     }
 
     protected ServletContextHandler newServletHandler() {
@@ -107,8 +110,8 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
             .setMultipartConfig(new MultipartConfigElement(
                 multipartLocation,
                 FileSizes.toByteSize(multipartMaxFileSize),
-                (int)FileSizes.toByteSize(multipartMaxRequestSize),
-                (int)FileSizes.toByteSize(multipartFileSizeThreshold)
+                (int) FileSizes.toByteSize(multipartMaxRequestSize),
+                (int) FileSizes.toByteSize(multipartFileSizeThreshold)
             ));
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
@@ -117,20 +120,32 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         }
         return servletHandler;
     }
-    
+
     protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
         servletHandler.addFilter(filter, "/*", EnumSet.of(DispatcherType.REQUEST));
     }
-    
+
     protected FilterHolder newCrossOriginFilter() {
         FilterHolder filter = new FilterHolder();
         filter.setName("cross-origin");
         filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, allowedOrigins);
-        filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
+        filter.setInitParameter(
+            CrossOriginFilter.ALLOWED_METHODS_PARAM,
+            "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS"
+        );
         filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, allowedHeaders);
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowedOrigins);
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_METHODS_HEADER, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER, allowedHeaders);
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER,
+            allowedOrigins
+        );
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_METHODS_HEADER,
+            "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS"
+        );
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER,
+            allowedHeaders
+        );
         CrossOriginFilter corsFilter = new CrossOriginFilter();
         filter.setFilter(corsFilter);
         return filter;

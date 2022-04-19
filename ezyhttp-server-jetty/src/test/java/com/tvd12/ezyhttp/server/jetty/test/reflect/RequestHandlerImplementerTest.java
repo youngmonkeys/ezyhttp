@@ -9,7 +9,7 @@ import com.tvd12.ezyhttp.server.jetty.test.controller.HomeController;
 import com.tvd12.test.base.BaseTest;
 
 public class RequestHandlerImplementerTest extends BaseTest {
-    
+
     @Test
     public void test() {
         RequestHandlerImplementer.setDebug(true);
@@ -19,5 +19,4 @@ public class RequestHandlerImplementerTest extends BaseTest {
             implementer.implement();
         }
     }
-
 }

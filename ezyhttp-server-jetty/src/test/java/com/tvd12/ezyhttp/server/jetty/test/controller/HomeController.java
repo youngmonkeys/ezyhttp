@@ -20,15 +20,15 @@ public class HomeController {
 
     @DoGet
     public String welcome(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("firstName") String firstName,
-            @RequestParam String who,
-            @RequestHeader("key") String key,
-            @RequestHeader String token,
-            @RequestArgument("name") String name,
-            @RequestBody HelloRequest body,
-            @NickName String nickName) {
+        HttpServletRequest request,
+        HttpServletResponse response,
+        @RequestParam("firstName") String firstName,
+        @RequestParam String who,
+        @RequestHeader("key") String key,
+        @RequestHeader String token,
+        @RequestArgument("name") String name,
+        @RequestBody HelloRequest body,
+        @NickName String nickName) {
         System.out.println("request uri: " + request.getRequestURI());
         if (who == null)
             throw new IllegalArgumentException("who cannot be null");
@@ -37,7 +37,7 @@ public class HomeController {
 
     @DoPost
     public String hello(
-            @RequestBody HelloRequest body) {
+        @RequestBody HelloRequest body) {
         return "hello " + body.getWho();
     }
 
@@ -50,6 +50,5 @@ public class HomeController {
     }
 
     @TryCatch(java.lang.UnsupportedOperationException.class)
-    public void handleException3(Exception e) {
-    }
+    public void handleException3(Exception e) {}
 }
