@@ -24,20 +24,20 @@ import com.tvd12.ezyhttp.server.management.monitor.SystemMonitor;
 public class MetricsController implements ManagementController {
 
     private final long startTime = System.currentTimeMillis();
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/start-time")
     public long getStartTime() {
         return startTime;
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/live-time")
     public long getLiveTime() {
         long current = System.currentTimeMillis();
         return (current - startTime) / 1000;
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/active-threads")
     public EzyThreadsDetail activeThreadsGet() {
@@ -45,7 +45,7 @@ public class MetricsController implements ManagementController {
             .getThreadsMonitor()
             .getThreadsDetails();
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/thread-count")
     public ThreadCountPoint threadsGet() {
@@ -54,9 +54,9 @@ public class MetricsController implements ManagementController {
         int threadCount = threadsMonitor.getThreadCount();
         int daemonThreadCount = threadsMonitor.getDaemonThreadCount();
         return ThreadCountPoint.builder()
-                .threadCount(threadCount)
-                .daemonThreadCount(daemonThreadCount)
-                .build();
+            .threadCount(threadCount)
+            .daemonThreadCount(daemonThreadCount)
+            .build();
     }
 
     @EzyFeature(DEFAULT_FEATURE_NAME)
@@ -83,19 +83,19 @@ public class MetricsController implements ManagementController {
             .totalMemory(memoryMonitor.getTotalMemory())
             .build();
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/total-request")
     public long totalRequestGet() {
         return SystemMonitor.getInstance().getRequestCount();
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/request-per-second")
     public long requestPerSecondGet() {
         return SystemMonitor.getInstance().getRequestPerSecond();
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/response-per-second")
     public long responsePerSecondGet() {

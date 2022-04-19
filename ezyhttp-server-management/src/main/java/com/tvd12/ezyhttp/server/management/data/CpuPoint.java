@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CpuPoint {
-
     private double systemCpuLoad;
     private double processCpuLoad;
     private double processGcActivity;

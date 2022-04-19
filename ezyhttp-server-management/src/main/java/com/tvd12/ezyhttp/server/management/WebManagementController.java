@@ -39,13 +39,13 @@ public class WebManagementController implements ManagementController {
             )
             .collect(Collectors.toList());
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/features")
     public Map<String, Map<String, List<HttpMethod>>> featuresGet() {
         return futureURIManager.getURIsByFeatureMap();
     }
-    
+
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/feature-names")
     public List<String> featureNamesGet() {

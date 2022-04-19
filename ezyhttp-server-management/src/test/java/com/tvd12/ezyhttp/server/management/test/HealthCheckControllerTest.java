@@ -12,10 +12,10 @@ public class HealthCheckControllerTest {
     public void healthCheck() {
         // given
         HealthCheckController sut = new HealthCheckController();
-        
+
         // when
         ResponseEntity actual = sut.healthCheck();
-        
+
         // then
         Asserts.assertEquals(actual, ResponseEntity.ok());
     }

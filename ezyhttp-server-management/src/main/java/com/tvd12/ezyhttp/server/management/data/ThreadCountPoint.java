@@ -6,7 +6,6 @@ import lombok.Getter;
 @Builder
 @Getter
 public class ThreadCountPoint {
-
     private int threadCount;
     private int daemonThreadCount;
 }

@@ -17,22 +17,22 @@ public class ManagementRequestResponseWatcher implements RequestResponseWatcher 
 
     @EzyProperty("management.port")
     protected int managementPort;
-    
+
     @Override
     public void watchRequest(
-            HttpMethod method, 
-            ServletRequest request
+        HttpMethod method,
+        ServletRequest request
     ) {
         if (request.getServerPort() != managementPort) {
             SystemMonitor.getInstance().increaseRequestCount();
         }
     }
-    
+
     @Override
     public void watchResponse(
-            HttpMethod method, 
-            ServletRequest request, 
-            ServletResponse response
+        HttpMethod method,
+        ServletRequest request,
+        ServletResponse response
     ) {
         if (request.getServerPort() != managementPort) {
             SystemMonitor.getInstance().increaseResponseCount();
