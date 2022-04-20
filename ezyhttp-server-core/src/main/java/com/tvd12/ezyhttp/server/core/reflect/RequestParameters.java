@@ -9,8 +9,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestArgument;
 
 public final class RequestParameters {
 
-    private RequestParameters() {
-    }
+    private RequestParameters() {}
 
     public static String getArgumentKeyString(Parameter parameter) {
         RequestArgument requestArgumentAnno = parameter.getAnnotation(RequestArgument.class);
@@ -25,5 +24,4 @@ public final class RequestParameters {
         Class<?> parameterType = parameter.getType();
         return parameterType.getName() + Constants.EXTENSION_CLASS;
     }
-
 }

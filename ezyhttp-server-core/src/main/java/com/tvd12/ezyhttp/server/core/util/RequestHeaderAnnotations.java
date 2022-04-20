@@ -5,8 +5,7 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestHeader;
 
 public final class RequestHeaderAnnotations {
 
-    private RequestHeaderAnnotations() {
-    }
+    private RequestHeaderAnnotations() {}
 
     public static String getHeaderKeyString(RequestHeader annotation, int index) {
         String keyString = annotation.value();
@@ -20,5 +19,4 @@ public final class RequestHeaderAnnotations {
         }
         return keyString;
     }
-
 }

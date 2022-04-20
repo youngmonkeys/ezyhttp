@@ -7,8 +7,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 
 public final class DoPostAnnotations {
 
-    private DoPostAnnotations() {
-    }
+    private DoPostAnnotations() {}
 
     public static String getURI(DoPost annotation) {
         String uri = annotation.value();

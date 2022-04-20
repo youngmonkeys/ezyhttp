@@ -20,21 +20,21 @@ public class ViewTest {
     public void test() {
         // given
         View sut = View.builder()
-                .template("index.html")
-                .locale(Locale.ENGLISH)
-                .locale("vi")
-                .contentType(ContentTypes.TEXT_HTML_UTF8)
-                .addHeader("foo", "bar")
-                .addHeader("hello", "world")
-                .addHeaders(Collections.singletonMap("header", "headerValue"))
-                .addCookie(new Cookie("cookie1", "cookie1Value"))
-                .addCookie(new Cookie("cookie2", "cookie2Value"))
-                .addCookie("cookie2", "cookie3Value", "/path")
-                .addVariable("variable1", "variable1Value")
-                .addVariable("variable2", "variable2Value")
-                .appendToVariable("list", "a")
-                .appendToVariable("list", "b")
-                .build();
+            .template("index.html")
+            .locale(Locale.ENGLISH)
+            .locale("vi")
+            .contentType(ContentTypes.TEXT_HTML_UTF8)
+            .addHeader("foo", "bar")
+            .addHeader("hello", "world")
+            .addHeaders(Collections.singletonMap("header", "headerValue"))
+            .addCookie(new Cookie("cookie1", "cookie1Value"))
+            .addCookie(new Cookie("cookie2", "cookie2Value"))
+            .addCookie("cookie2", "cookie3Value", "/path")
+            .addVariable("variable1", "variable1Value")
+            .addVariable("variable2", "variable2Value")
+            .appendToVariable("list", "a")
+            .appendToVariable("list", "b")
+            .build();
 
         // when
         sut.setVariable("setValue", "value");
@@ -46,23 +46,23 @@ public class ViewTest {
         Asserts.assertEquals(new Locale("vi"), sut.getLocale());
         Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getContentType());
         Asserts.assertEquals(
-                EzyMapBuilder.mapBuilder()
-                    .put("foo", "bar")
-                    .put("hello", "world")
-                    .put("header", "headerValue")
-                    .build(),
-                sut.getHeaders());
+            EzyMapBuilder.mapBuilder()
+                .put("foo", "bar")
+                .put("hello", "world")
+                .put("header", "headerValue")
+                .build(),
+            sut.getHeaders());
         Asserts.assertEquals("variable1Value", sut.getVariable("variable1"));
         Asserts.assertEquals("variable2Value", sut.getVariable("variable2"));
         Asserts.assertEquals(
-                EzyMapBuilder.mapBuilder()
-                    .put("variable1", "variable1Value")
-                    .put("variable2", "variable2Value")
-                    .put("setValue", "value")
-                    .put("list", Arrays.asList("a", "b", "c"))
-                    .put("mapKey", "mapValue")
-                    .build(),
-                sut.getVariables());
+            EzyMapBuilder.mapBuilder()
+                .put("variable1", "variable1Value")
+                .put("variable2", "variable2Value")
+                .put("setValue", "value")
+                .put("list", Arrays.asList("a", "b", "c"))
+                .put("mapKey", "mapValue")
+                .build(),
+            sut.getVariables());
         Asserts.assertEquals(sut.getVariable("setValue"), "value");
         Asserts.assertEquals(sut.getVariable("list"), Arrays.asList("a", "b", "c"), false);
         Asserts.assertTrue(sut.containsVariable("variable1"));
@@ -121,9 +121,27 @@ public class ViewTest {
             .template("abc")
             .build();
         sut.putKeyValuesToVariable("hello", map);
-        
+
         // when
         // then
+        Asserts.assertEquals(sut.getVariable("hello"), map);
+    }
+
+    @Test
+    public void putKeyValuesToVariableByBuilderTest() {
+        // given
+        View sut = View.builder()
+            .template("abc")
+            .putKeyValueToVariable("hello", "a", "1")
+            .putKeyValueToVariable("hello", "b", 2)
+            .build();
+
+        // when
+        // then
+        Map<String, Object> map = EzyMapBuilder.mapBuilder()
+            .put("a", "1")
+            .put("b", 2)
+            .toMap();
         Asserts.assertEquals(sut.getVariable("hello"), map);
     }
 }

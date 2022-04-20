@@ -7,8 +7,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 
 public final class DoGetAnnotations {
 
-    private DoGetAnnotations() {
-    }
+    private DoGetAnnotations() {}
 
     public static String getURI(DoGet annotation) {
         String uri = annotation.value();

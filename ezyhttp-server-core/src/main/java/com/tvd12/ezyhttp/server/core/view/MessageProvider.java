@@ -11,5 +11,4 @@ public interface MessageProvider {
      * @return the messages that maps to language
      */
     Map<String, Properties> provide();
-
 }

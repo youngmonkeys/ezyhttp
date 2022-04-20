@@ -6,6 +6,5 @@ public final class CoreConstants {
     public static final String COOKIE_REDIRECT_ATTRIBUTES_NAME = "ezyRedirectAttributes";
     public static final int COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE = 60;
 
-    private CoreConstants() {
-    }
+    private CoreConstants() {}
 }

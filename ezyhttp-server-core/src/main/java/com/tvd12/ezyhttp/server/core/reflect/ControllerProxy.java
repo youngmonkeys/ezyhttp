@@ -47,7 +47,7 @@ public class ControllerProxy {
 
     protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {
         List<RequestHandlerMethod> list = new ArrayList<>();
-        List<EzyMethod> methods = clazz.getPublicMethods(m -> isRequestHandlerMethod(m));
+        List<EzyMethod> methods = clazz.getPublicMethods(this::isRequestHandlerMethod);
         for (EzyMethod method : methods) {
             RequestHandlerMethod m = new RequestHandlerMethod(requestURI, method);
             list.add(m);
@@ -57,7 +57,7 @@ public class ControllerProxy {
 
     public boolean isManagement() {
         return instance instanceof ManagementController
-                || clazz.isAnnotated(EzyManagement.class);
+            || clazz.isAnnotated(EzyManagement.class);
     }
 
     public boolean isApi() {
@@ -114,11 +114,10 @@ public class ControllerProxy {
     @Override
     public String toString() {
         return clazz.getName() +
-                "(\n" +
-                "\tinstance: " + instance + ",\n" +
-                "\trequestHandlerMethods: " + requestHandlerMethods + ",\n" +
-                "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
-                ")";
+            "(\n" +
+            "\tinstance: " + instance + ",\n" +
+            "\trequestHandlerMethods: " + requestHandlerMethods + ",\n" +
+            "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
+            ")";
     }
-
 }

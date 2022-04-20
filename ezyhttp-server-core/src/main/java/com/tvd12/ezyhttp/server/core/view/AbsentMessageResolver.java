@@ -5,10 +5,9 @@ import java.util.Locale;
 public interface AbsentMessageResolver {
 
     String resolve(
-            Locale locale,
-            Class<?> origin,
-            String key,
-            Object[] parameters
+        Locale locale,
+        Class<?> origin,
+        String key,
+        Object[] parameters
     );
-
 }

@@ -6,8 +6,8 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 public interface UncaughtExceptionHandler {
 
     Object handleException(
-            RequestArguments arguments,
-            Exception exception
+        RequestArguments arguments,
+        Exception exception
     ) throws Exception;
 
     default String getResponseContentType() {

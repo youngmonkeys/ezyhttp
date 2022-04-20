@@ -80,17 +80,17 @@ public class TemplateResolver {
 
         public Builder setFrom(EzyPropertyFetcher propertyFetcher) {
             this.templateMode = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_MODE, String.class, templateMode);
+                VIEW_TEMPLATE_MODE, String.class, templateMode);
             this.prefix = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_PREFIX, String.class, prefix);
+                VIEW_TEMPLATE_PREFIX, String.class, prefix);
             this.suffix = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_SUFFIX, String.class, suffix);
+                VIEW_TEMPLATE_SUFFIX, String.class, suffix);
             this.cacheTTLMs = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_CACHE_TTL_MS, int.class, cacheTTLMs);
+                VIEW_TEMPLATE_CACHE_TTL_MS, int.class, cacheTTLMs);
             this.cacheable = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_CACHEABLE, boolean.class, cacheable);
+                VIEW_TEMPLATE_CACHEABLE, boolean.class, cacheable);
             this.messagesLocation = propertyFetcher.getProperty(
-                    VIEW_TEMPLATE_MESSAGES_LOCATION, String.class, messagesLocation);
+                VIEW_TEMPLATE_MESSAGES_LOCATION, String.class, messagesLocation);
             return this;
         }
 
@@ -99,5 +99,4 @@ public class TemplateResolver {
             return new TemplateResolver(this);
         }
     }
-
 }

@@ -30,5 +30,4 @@ public abstract class HandlerMethod {
     public Class<?>[] getParameterTypes() {
         return method.getParameterTypes();
     }
-
 }

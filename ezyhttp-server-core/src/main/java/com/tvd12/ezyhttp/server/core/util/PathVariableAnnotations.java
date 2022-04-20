@@ -5,8 +5,7 @@ import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 
 public final class PathVariableAnnotations {
 
-    private PathVariableAnnotations() {
-    }
+    private PathVariableAnnotations() {}
 
     public static String getVariableNameKeyString(PathVariable annotation, int index) {
         String keyString = annotation.value();
@@ -17,5 +16,4 @@ public final class PathVariableAnnotations {
         }
         return keyString;
     }
-
 }

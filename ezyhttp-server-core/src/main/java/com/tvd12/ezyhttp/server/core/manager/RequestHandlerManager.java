@@ -63,7 +63,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     }
 
     public RequestHandler getHandler(
-            HttpMethod method, String matchedURI, boolean isManagement) {
+        HttpMethod method, String matchedURI, boolean isManagement) {
         RequestURI requestURI = new RequestURI(method, matchedURI, isManagement);
         RequestHandler handler = handlers.get(requestURI);
         return handler != null ? handler : RequestHandler.EMPTY;
@@ -77,8 +77,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         this.handledURIs.add(uri.getUri());
         this.logger.info("add mapping uri: {}", uri);
         this.handlerListByURI
-                .computeIfAbsent(uri, k -> new ArrayList<>())
-                .add(handler);
+            .computeIfAbsent(uri, k -> new ArrayList<>())
+            .add(handler);
         this.requestURIManager.addHandledURI(uri.getMethod(), uri.getUri());
         if (uri.isApi()) {
             this.requestURIManager.addApiURI(uri.getMethod(), uri.getUri());
@@ -99,7 +99,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         if (EzyStrings.isNotBlank(uri.getFeature())) {
             this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(), uri.getUri());
             this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(),
-                    uri.getSameURI());
+                uri.getSameURI());
         }
         URITree uriTree = uriTreeByMethod.get(uri.getMethod());
         uriTree.addURI(uri.getUri());

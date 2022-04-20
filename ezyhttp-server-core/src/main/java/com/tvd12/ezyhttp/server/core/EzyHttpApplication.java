@@ -13,8 +13,8 @@ import com.tvd12.ezyhttp.server.core.util.BannerPrinter;
 import lombok.Getter;
 
 public class EzyHttpApplication
-        extends EzyLoggable
-        implements EzyStartable, EzyStoppable {
+    extends EzyLoggable
+    implements EzyStartable, EzyStoppable {
 
     @Getter
     protected final ApplicationContext applicationContext;
@@ -29,7 +29,7 @@ public class EzyHttpApplication
     }
 
     public static EzyHttpApplication start(
-            Class<?> bootstrapClass, Class<?>... componentClasses) throws Exception {
+        Class<?> bootstrapClass, Class<?>... componentClasses) throws Exception {
         String basePackage = bootstrapClass.getPackage().getName();
         Set<Class<?>> classSet = new HashSet<>();
         classSet.add(bootstrapClass);
@@ -39,10 +39,10 @@ public class EzyHttpApplication
     }
 
     public static EzyHttpApplication start(
-            String basePackage,
-            Class<?>... componentClasses) throws Exception {
+        String basePackage,
+        Class<?>... componentClasses) throws Exception {
         ApplicationContext applicationContext
-                = createApplicationContext(basePackage, componentClasses);
+            = createApplicationContext(basePackage, componentClasses);
         EzyHttpApplication application = new EzyHttpApplication(applicationContext);
         application.start();
         return application;
@@ -51,32 +51,32 @@ public class EzyHttpApplication
     @Override
     public void start() throws Exception {
         ApplicationEntry entry = applicationContext
-                .getAnnotatedSingleton(ApplicationBootstrap.class);
+            .getAnnotatedSingleton(ApplicationBootstrap.class);
         if (entry == null) {
             throw new IllegalStateException("Failed to start application, " +
-                    "the ApplicationEntry not found, " +
-                    "let's use EzyHttpApplicationBootstrap.start(...)");
+                "the ApplicationEntry not found, " +
+                "let's use EzyHttpApplicationBootstrap.start(...)"
+            );
         }
         entry.init();
         entry.start();
         boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class,
-                true);
+            true);
         if (printBanner) {
             logger.info("\n{}\n", new BannerPrinter().getBannerText());
         }
     }
 
     protected static ApplicationContext
-        createApplicationContext(String basePackage, Class<?>... componentClasses) {
+    createApplicationContext(String basePackage, Class<?>... componentClasses) {
         return new ApplicationContextBuilder()
-                .scan(basePackage)
-                .addComponentClasses(componentClasses)
-                .build();
+            .scan(basePackage)
+            .addComponentClasses(componentClasses)
+            .build();
     }
 
     @Override
     public void stop() {
         applicationContext.destroy();
     }
-
 }

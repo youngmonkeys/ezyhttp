@@ -20,9 +20,9 @@ public class RequestURI {
     protected final String resourceFullPath;
 
     public RequestURI(
-            HttpMethod method,
-            String uri,
-            boolean management
+        HttpMethod method,
+        String uri,
+        boolean management
     ) {
         this.method = method;
         this.uri = standardizeURI(uri);
@@ -36,30 +36,30 @@ public class RequestURI {
     }
 
     public RequestURI(
-            HttpMethod method,
-            String uri,
-            boolean management,
-            boolean resource,
-            boolean api,
-            String resourceFullPath
+        HttpMethod method,
+        String uri,
+        boolean management,
+        boolean resource,
+        boolean api,
+        String resourceFullPath
     ) {
         this(
-                method,
-                uri,
-                RequestURIMeta.builder()
-                        .api(api)
-                        .authenticated(false)
-                        .management(management)
-                        .resource(resource)
-                        .resourceFullPath(resourceFullPath)
-                        .build()
+            method,
+            uri,
+            RequestURIMeta.builder()
+                .api(api)
+                .authenticated(false)
+                .management(management)
+                .resource(resource)
+                .resourceFullPath(resourceFullPath)
+                .build()
         );
     }
 
     public RequestURI(
-            HttpMethod method,
-            String uri,
-            RequestURIMeta meta
+        HttpMethod method,
+        String uri,
+        RequestURIMeta meta
     ) {
         this.method = method;
         this.uri = standardizeURI(uri);
@@ -106,8 +106,8 @@ public class RequestURI {
         }
         RequestURI t = (RequestURI) other;
         return uri.equals(t.uri)
-                && method.equals(t.method)
-                && management == t.management;
+            && method.equals(t.method)
+            && management == t.management;
     }
 
     @Override
@@ -124,5 +124,4 @@ public class RequestURI {
     public String toString() {
         return uri + " - " + method;
     }
-
 }

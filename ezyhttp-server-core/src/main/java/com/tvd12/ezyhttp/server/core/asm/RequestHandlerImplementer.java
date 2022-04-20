@@ -43,9 +43,8 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
 
-@SuppressWarnings({"LocalVariableName"})
 public class RequestHandlerImplementer
-        extends AbstractHandlerImplementer<RequestHandlerMethod> {
+    extends AbstractHandlerImplementer<RequestHandlerMethod> {
 
     @Setter
     private static boolean debug;
@@ -58,7 +57,9 @@ public class RequestHandlerImplementer
     protected static final AtomicInteger COUNT = new AtomicInteger(0);
 
     public RequestHandlerImplementer(
-            ControllerProxy controller, RequestHandlerMethod handlerMethod) {
+        ControllerProxy controller,
+        RequestHandlerMethod handlerMethod
+    ) {
         super(handlerMethod);
         this.controller = controller;
         this.isAsync = handlerMethod.isAsync();
@@ -66,14 +67,14 @@ public class RequestHandlerImplementer
 
     public RequestHandler implement() {
         try {
-            return doimplement();
+            return doImplement();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
     @SuppressWarnings("rawtypes")
-    protected RequestHandler doimplement() throws Exception {
+    protected RequestHandler doImplement() throws Exception {
         ClassPool pool = ClassPool.getDefault();
         String implClassName = getImplClassName();
         CtClass implClass = pool.makeClass(implClassName);
@@ -85,7 +86,7 @@ public class RequestHandlerImplementer
         String getHttpMethodMethodContent = makeGetHttpMethodMethodContent();
         String getRequestURIMethodContent = makeGetRequestURIMethodContent();
         String getResponseContentTypeMethodContent = makeGetResponseContentTypeMethodContent();
-        String isAsyncMethodContent = makeIsAsynceMethodContent();
+        String isAsyncMethodContent = makeIsAsyncMethodContent();
         printComponentContent(controllerFieldContent);
         printComponentContent(setControllerMethodContent);
         printComponentContent(handleRequestMethodContent);
@@ -117,29 +118,29 @@ public class RequestHandlerImplementer
 
     protected String makeControllerFieldContent() {
         return new EzyInstruction()
-                .append("private ")
-                .append(controller.getClazz().getName())
-                .append(" controller")
-                .toString();
+            .append("private ")
+            .append(controller.getClazz().getName())
+            .append(" controller")
+            .toString();
     }
 
     protected String makeSetControllerMethodContent() {
         return new EzyFunction(getSetControllerMethod())
-                .body()
-                .append(new EzyInstruction("\t", "\n")
-                        .append("this.controller")
-                        .equal()
-                        .brackets(controller.getClazz().getClazz())
-                        .append("arg0"))
-                .function()
-                .toString();
+            .body()
+            .append(new EzyInstruction("\t", "\n")
+                .append("this.controller")
+                .equal()
+                .brackets(controller.getClazz().getClazz())
+                .append("arg0"))
+            .function()
+            .toString();
     }
 
     @SuppressWarnings("MethodLength")
     protected String makeHandleRequestMethodContent() {
         EzyMethod method = getHandleRequestMethod();
         EzyFunction function = new EzyFunction(method)
-                .throwsException();
+            .throwsException();
         EzyBody body = function.body();
         int paramCount = 0;
         int headerCount = 0;
@@ -151,88 +152,88 @@ public class RequestHandlerImplementer
             Class<?> parameterType = parameter.getType();
             Class<?> genericType = getGenericType(parameter);
             String genericTypeClass = genericType != null
-                    ? genericType.getName() + ".class"
-                    : "null";
+                ? genericType.getName() + ".class"
+                : "null";
             EzyInstruction instruction = new EzyInstruction("\t", "\n")
-                    .clazz(parameterType)
-                    .append(" ").append(PARAMETER_PREFIX).append(paramCount)
-                    .equal();
+                .clazz(parameterType)
+                .append(" ").append(PARAMETER_PREFIX).append(paramCount)
+                .equal();
             boolean hasAnnotation = false;
             RequestParam requestParamAnno = parameter.getAnnotation(RequestParam.class);
             if (requestParamAnno != null) {
                 String paramKey = RequestParamAnnotations
-                        .getParamKeyString(requestParamAnno, parameterCount);
+                    .getParamKeyString(requestParamAnno, parameterCount);
                 String defaultValue = requestParamAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                        ? "arg0.getParameter(" + paramKey + ")"
-                        : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
+                    ? "arg0.getParameter(" + paramKey + ")"
+                    : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeParameter(" +
-                        paramKey +
-                        ", " + getValueExpression +
-                        ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")";
+                    paramKey +
+                    ", " + getValueExpression +
+                    ", " + parameterType.getTypeName() + ".class" +
+                    ", " + genericTypeClass + ")";
                 instruction
-                        .cast(parameterType, valueExpression);
+                    .cast(parameterType, valueExpression);
                 ++parameterCount;
                 hasAnnotation = true;
             }
             RequestHeader requestHeaderAnno = parameter.getAnnotation(RequestHeader.class);
             if (requestHeaderAnno != null) {
                 String headerKey = RequestHeaderAnnotations
-                        .getHeaderKeyString(requestHeaderAnno, headerCount);
+                    .getHeaderKeyString(requestHeaderAnno, headerCount);
                 String defaultValue = requestHeaderAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                        ? "arg0.getHeader(" + headerKey + ")"
-                        : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
+                    ? "arg0.getHeader(" + headerKey + ")"
+                    : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeHeader(" +
-                        headerKey +
-                        ", " + getValueExpression +
-                        ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")";
+                    headerKey +
+                    ", " + getValueExpression +
+                    ", " + parameterType.getTypeName() + ".class" +
+                    ", " + genericTypeClass + ")";
                 instruction
-                        .cast(parameterType, valueExpression);
+                    .cast(parameterType, valueExpression);
                 ++headerCount;
                 hasAnnotation = true;
             }
             PathVariable pathVariableAnno = parameter.getAnnotation(PathVariable.class);
             if (pathVariableAnno != null) {
                 String varNameKey = PathVariableAnnotations
-                        .getVariableNameKeyString(pathVariableAnno, pathVariableCount);
+                    .getVariableNameKeyString(pathVariableAnno, pathVariableCount);
                 String valueExpression = "this.deserializePathVariable(" +
-                        varNameKey +
-                        ", arg0.getPathVariable(" + varNameKey + ")" +
-                        ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")";
+                    varNameKey +
+                    ", arg0.getPathVariable(" + varNameKey + ")" +
+                    ", " + parameterType.getTypeName() + ".class" +
+                    ", " + genericTypeClass + ")";
                 instruction
-                        .cast(parameterType, valueExpression);
+                    .cast(parameterType, valueExpression);
                 ++pathVariableCount;
                 hasAnnotation = true;
             }
             RequestCookie requestCookieAnno = parameter.getAnnotation(RequestCookie.class);
             if (requestCookieAnno != null) {
                 String cookieKey = RequestCookieAnnotations
-                        .getCookieKeyString(requestCookieAnno, cookieCount);
+                    .getCookieKeyString(requestCookieAnno, cookieCount);
                 String defaultValue = requestCookieAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                        ? "arg0.getCookieValue(" + cookieKey + ")"
-                        : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
+                    ? "arg0.getCookieValue(" + cookieKey + ")"
+                    : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeCookie(" +
-                        cookieKey +
-                        ", " + getValueExpression +
-                        ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")";
+                    cookieKey +
+                    ", " + getValueExpression +
+                    ", " + parameterType.getTypeName() + ".class" +
+                    ", " + genericTypeClass + ")";
                 instruction
-                        .cast(parameterType, valueExpression);
+                    .cast(parameterType, valueExpression);
                 ++cookieCount;
                 hasAnnotation = true;
             }
             RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);
             if (requestBodyAnno != null) {
                 instruction
-                        .brackets(parameterType)
-                        .append("this.deserializeBody(")
-                        .append("arg0, ").clazz(parameterType, true)
-                        .append(")");
+                    .brackets(parameterType)
+                    .append("this.deserializeBody(")
+                    .append("arg0, ").clazz(parameterType, true)
+                    .append(")");
                 hasAnnotation = true;
             }
             if (!hasAnnotation) {
@@ -254,7 +255,7 @@ public class RequestHandlerImplementer
         }
         StringBuilder answerExpression = new StringBuilder();
         answerExpression.append("this.controller.").append(handlerMethod.getName())
-                .append("(");
+            .append("(");
         for (int i = 0; i < paramCount; ++i) {
             answerExpression.append(PARAMETER_PREFIX).append(i);
             if (i < paramCount - 1) {
@@ -277,18 +278,18 @@ public class RequestHandlerImplementer
     protected String makeHandleExceptionMethodContent() {
         EzyMethod method = getHandleExceptionMethod();
         EzyFunction function = new EzyFunction(method)
-                .throwsException();
+            .throwsException();
         EzyBody body = function.body();
         Map<Class<?>, ExceptionHandlerMethod> exceptionHandlerMethodMap
-                = controller.getExceptionHandlerMethodMap();
+            = controller.getExceptionHandlerMethodMap();
         Set<Class<?>> exceptionClasses = exceptionHandlerMethodMap.keySet();
         EzyClassTree exceptionTree = new EzyClassTree(exceptionClasses);
         for (Class<?> exceptionClass : exceptionTree.toList()) {
             ExceptionHandlerMethod m = exceptionHandlerMethodMap.get(exceptionClass);
             EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
-                    .append("if (arg1 instanceof ")
-                    .append(exceptionClass.getName())
-                    .append(") {");
+                .append("if (arg1 instanceof ")
+                .append(exceptionClass.getName())
+                .append(") {");
             body.append(instructionIf);
             EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
             Class<?> returnType = m.getReturnType();
@@ -296,11 +297,11 @@ public class RequestHandlerImplementer
                 instructionHandle.answer();
             }
             instructionHandle
-                    .append("this.controller.").append(m.getName())
-                    .bracketopen();
+                .append("this.controller.").append(m.getName())
+                .bracketopen();
             appendHandleExceptionMethodArguments(m, instructionHandle, exceptionClass);
             instructionHandle
-                    .bracketclose();
+                .bracketclose();
             body.append(instructionHandle);
             if (returnType == void.class) {
                 body.append(new EzyInstruction("\t\t", "\n").append("return null"));
@@ -314,14 +315,14 @@ public class RequestHandlerImplementer
     protected String makeGetHttpMethodMethodContent() {
         HttpMethod httpMethod = handlerMethod.getHttpMethod();
         return new EzyFunction(getGetHttpMethodMethod())
-                .body()
-                .append(new EzyInstruction("\t", "\n")
-                        .answer()
-                        .append(httpMethod.getDeclaringClass().getName())
-                        .dot()
-                        .append(httpMethod))
-                .function()
-                .toString();
+            .body()
+            .append(new EzyInstruction("\t", "\n")
+                .answer()
+                .append(httpMethod.getDeclaringClass().getName())
+                .dot()
+                .append(httpMethod))
+            .function()
+            .toString();
     }
 
     protected String makeGetRequestURIMethodContent() {
@@ -330,32 +331,32 @@ public class RequestHandlerImplementer
             requestURI = requestURIDecorator.decorate(controller.getClazz(), requestURI);
         }
         return new EzyFunction(getGetRequestURIMethod())
-                .body()
-                .append(new EzyInstruction("\t", "\n")
-                        .answer()
-                        .string(requestURI))
-                .function()
-                .toString();
+            .body()
+            .append(new EzyInstruction("\t", "\n")
+                .answer()
+                .string(requestURI))
+            .function()
+            .toString();
     }
 
     protected String makeGetResponseContentTypeMethodContent() {
         return new EzyFunction(getGetResponseContentTypeMethod())
-                .body()
-                .append(new EzyInstruction("\t", "\n")
-                        .answer()
-                        .string(handlerMethod.getResponseType()))
-                .function()
-                .toString();
+            .body()
+            .append(new EzyInstruction("\t", "\n")
+                .answer()
+                .string(handlerMethod.getResponseType()))
+            .function()
+            .toString();
     }
 
-    protected String makeIsAsynceMethodContent() {
+    protected String makeIsAsyncMethodContent() {
         return new EzyFunction(getIsAsyncMethod())
-                .body()
-                .append(new EzyInstruction("\t", "\n")
-                        .answer()
-                        .append(isAsync))
-                .function()
-                .toString();
+            .body()
+            .append(new EzyInstruction("\t", "\n")
+                .answer()
+                .append(isAsync))
+            .function()
+            .toString();
     }
 
     protected Class<?> getGenericType(Parameter parameter) {
@@ -370,45 +371,45 @@ public class RequestHandlerImplementer
 
     protected EzyMethod getSetControllerMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "setController", Object.class);
+            AbstractRequestHandler.class, "setController", Object.class);
         return new EzyMethod(method);
     }
 
     protected EzyMethod getHandleRequestMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "handleRequest", RequestArguments.class);
+            AbstractRequestHandler.class, "handleRequest", RequestArguments.class);
         return new EzyMethod(method);
     }
 
     protected EzyMethod getHandleExceptionMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class,
-                "handleException",
-                RequestArguments.class, Exception.class);
+            AbstractRequestHandler.class,
+            "handleException",
+            RequestArguments.class, Exception.class);
         return new EzyMethod(method);
     }
 
     protected EzyMethod getGetHttpMethodMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "getMethod");
+            AbstractRequestHandler.class, "getMethod");
         return new EzyMethod(method);
     }
 
     protected EzyMethod getGetRequestURIMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "getRequestURI");
+            AbstractRequestHandler.class, "getRequestURI");
         return new EzyMethod(method);
     }
 
     protected EzyMethod getGetResponseContentTypeMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "getResponseContentType");
+            AbstractRequestHandler.class, "getResponseContentType");
         return new EzyMethod(method);
     }
 
     protected EzyMethod getIsAsyncMethod() {
         Method method = EzyMethods.getMethod(
-                AbstractRequestHandler.class, "isAsync");
+            AbstractRequestHandler.class, "isAsync");
         return new EzyMethod(method);
     }
 
@@ -418,7 +419,7 @@ public class RequestHandlerImplementer
 
     protected String getImplClassName() {
         return controller.getControllerName()
-                + "$" + handlerMethod.getName() + "$Handler$AutoImpl$" + COUNT.incrementAndGet();
+            + "$" + handlerMethod.getName() + "$Handler$AutoImpl$" + COUNT.incrementAndGet();
     }
 
     protected void printComponentContent(String componentContent) {
@@ -426,5 +427,4 @@ public class RequestHandlerImplementer
             logger.debug("component content: \n{}", componentContent);
         }
     }
-
 }

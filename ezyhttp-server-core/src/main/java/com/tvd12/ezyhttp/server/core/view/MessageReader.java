@@ -26,32 +26,32 @@ public class MessageReader {
         FileReader fileReader = new BaseFileReader();
         for (MessagesFile file : files) {
             Properties properties = file.resourceFile.isInJar()
-                    ? fileReader.read(file.resourceFile.getRelativePath())
-                    : fileReader.read(new File(file.resourceFile.getFullPath()));
+                ? fileReader.read(file.resourceFile.getRelativePath())
+                : fileReader.read(new File(file.resourceFile.getFullPath()));
             answer
-                    .computeIfAbsent(file.language, k -> new Properties())
-                    .putAll(properties);
+                .computeIfAbsent(file.language, k -> new Properties())
+                .putAll(properties);
             answer
-                    .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
-                    .putAll(properties);
+                .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
+                .putAll(properties);
         }
         return answer;
     }
 
     private List<MessagesFile> getMessagesFiles(String folderPath) {
         return listResourceFiles(folderPath)
-                .stream()
-                .filter(it -> it.isFileNameMatches(MESSAGES_FILE_PATTERN))
-                .map(it -> {
-                    String fileName = getFileName(it.getRelativePath());
-                    int index = fileName.indexOf('_');
-                    String lang = "";
-                    if (index > 0) {
-                        lang = fileName.substring(index + 1, fileName.lastIndexOf('.'));
-                    }
-                    return new MessagesFile(lang, it);
-                })
-                .collect(Collectors.toList());
+            .stream()
+            .filter(it -> it.isFileNameMatches(MESSAGES_FILE_PATTERN))
+            .map(it -> {
+                String fileName = getFileName(it.getRelativePath());
+                int index = fileName.indexOf('_');
+                String lang = "";
+                if (index > 0) {
+                    lang = fileName.substring(index + 1, fileName.lastIndexOf('.'));
+                }
+                return new MessagesFile(lang, it);
+            })
+            .collect(Collectors.toList());
     }
 
     protected List<ResourceFile> listResourceFiles(String folderPath) {
@@ -63,5 +63,4 @@ public class MessageReader {
         private final String language;
         private final ResourceFile resourceFile;
     }
-
 }

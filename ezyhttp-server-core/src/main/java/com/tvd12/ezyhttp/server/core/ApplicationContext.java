@@ -19,5 +19,4 @@ public interface ApplicationContext extends EzyDestroyable {
     <T> T getAnnotatedSingleton(Class<? extends Annotation> annotationClass);
 
     List<Object> getSingletons(Class<? extends Annotation> annotationClass);
-
 }

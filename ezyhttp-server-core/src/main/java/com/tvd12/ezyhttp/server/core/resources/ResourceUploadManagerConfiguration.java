@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @EzyConfigurationBefore
 public class ResourceUploadManagerConfiguration
-        implements EzyBeanContextAware, EzyBeanConfig {
+    implements EzyBeanContextAware, EzyBeanConfig {
 
     @EzyProperty(PropertyNames.RESOURCE_UPLOAD_ENABLE)
     private boolean resourceUploadEnable = false;

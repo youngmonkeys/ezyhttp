@@ -12,7 +12,7 @@ import com.tvd12.ezyhttp.server.core.reflect.HandlerMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
 public class AbstractHandlerImplementer<H extends HandlerMethod>
-        extends EzyLoggable {
+    extends EzyLoggable {
 
     protected final H handlerMethod;
 
@@ -21,9 +21,10 @@ public class AbstractHandlerImplementer<H extends HandlerMethod>
     }
 
     protected void appendHandleExceptionMethodArguments(
-            ExceptionHandlerMethod method,
-            EzyInstruction instruction,
-            Class<?> exceptionClass) {
+        ExceptionHandlerMethod method,
+        EzyInstruction instruction,
+        Class<?> exceptionClass
+    ) {
         int paramCount = 0;
         Parameter[] parameters = method.getParameters();
         for (Parameter parameter : parameters) {
@@ -48,5 +49,4 @@ public class AbstractHandlerImplementer<H extends HandlerMethod>
             }
         }
     }
-
 }

@@ -16,18 +16,18 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 public class FeatureURIManager implements EzyDestroyable {
 
     private final Map<String, Map<HttpMethod, String>> featureByURI =
-            new ConcurrentHashMap<>();
+        new ConcurrentHashMap<>();
     private final Map<String, Map<String, Set<HttpMethod>>> urisByFeature =
-            new ConcurrentHashMap<>();
+        new ConcurrentHashMap<>();
 
     public void addFeatureURI(String feature, HttpMethod method, String uri) {
         this.featureByURI
-                .computeIfAbsent(uri, k -> new ConcurrentHashMap<>())
-                .put(method, feature);
+            .computeIfAbsent(uri, k -> new ConcurrentHashMap<>())
+            .put(method, feature);
         this.urisByFeature
-                .computeIfAbsent(feature, k -> new ConcurrentHashMap<>())
-                .computeIfAbsent(uri, k -> ConcurrentHashMap.newKeySet())
-                .add(method);
+            .computeIfAbsent(feature, k -> new ConcurrentHashMap<>())
+            .computeIfAbsent(uri, k -> ConcurrentHashMap.newKeySet())
+            .add(method);
     }
 
     public List<String> getFeatures() {
@@ -41,8 +41,8 @@ public class FeatureURIManager implements EzyDestroyable {
 
     public Map<String, List<HttpMethod>> getURIsByFeature(String feature) {
         return newHashMapNewValues(
-                urisByFeature.getOrDefault(feature, Collections.emptyMap()),
-                ArrayList::new
+            urisByFeature.getOrDefault(feature, Collections.emptyMap()),
+            ArrayList::new
         );
     }
 
@@ -52,7 +52,7 @@ public class FeatureURIManager implements EzyDestroyable {
 
     public Map<String, Map<String, List<HttpMethod>>> getURIsByFeatureMap() {
         return newHashMapNewValues(urisByFeature, v ->
-                newHashMapNewValues(v, ArrayList::new)
+            newHashMapNewValues(v, ArrayList::new)
         );
     }
 

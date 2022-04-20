@@ -39,8 +39,8 @@ public class Redirect {
 
     public static Redirect to(String uri) {
         return Redirect.builder()
-                .uri(uri)
-                .build();
+            .uri(uri)
+            .build();
     }
 
     public String getQueryString() throws IOException {
@@ -51,10 +51,10 @@ public class Redirect {
         StringBuilder builder = new StringBuilder();
         for (EzyPair<String, Object> pair : parameters) {
             builder
-                    .append(concatChar)
-                    .append(pair.getKey())
-                    .append("=")
-                    .append(URLEncoder.encode(pair.getValue().toString(), EzyStrings.UTF_8));
+                .append(concatChar)
+                .append(pair.getKey())
+                .append("=")
+                .append(URLEncoder.encode(pair.getValue().toString(), EzyStrings.UTF_8));
             concatChar = '&';
         }
         return builder.toString();

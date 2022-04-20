@@ -117,8 +117,8 @@ public class RequestHandlerMethod extends HandlerMethod {
     @Override
     public String toString() {
         return method.getName() +
-                "(" +
-                "uri: " + requestURI +
-                ")";
+            "(" +
+            "uri: " + requestURI +
+            ")";
     }
 }

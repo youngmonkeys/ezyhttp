@@ -38,7 +38,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 
     @Override
     public final Object handle(
-            RequestArguments arguments
+        RequestArguments arguments
     ) throws Exception {
         try {
             return handleRequest(arguments);
@@ -55,18 +55,19 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected abstract Object handleRequest(
-            RequestArguments arguments
+        RequestArguments arguments
     ) throws Exception;
 
     protected abstract Object handleException(
-            RequestArguments arguments,
-            Exception e
+        RequestArguments arguments,
+        Exception e
     ) throws Exception;
 
     protected <T> T deserializeHeader(
-            int index,
-            String value,
-            Class<T> type, Class<?> genericType
+        int index,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -77,9 +78,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeHeader(
-            String name,
-            String value,
-            Class<T> type, Class<?> genericType
+        String name,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -90,9 +92,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeParameter(
-            int index,
-            String value,
-            Class<T> type, Class<?> genericType
+        int index,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -103,9 +106,11 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeParameter(
-            String name,
-            String value,
-            Class<T> type, Class<?> genericType) throws IOException {
+        String name,
+        String value,
+        Class<T> type,
+        Class<?> genericType
+    ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
             return deserializer.deserialize(value, type, genericType);
@@ -115,9 +120,9 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializePathVariable(
-            String name,
-            String value,
-            Class<T> type, Class<?> genericType
+        String name,
+        String value,
+        Class<T> type, Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -128,9 +133,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializePathVariable(
-            int index,
-            String value,
-            Class<T> type, Class<?> genericType
+        int index,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -141,9 +147,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeCookie(
-            int index,
-            String value,
-            Class<T> type, Class<?> genericType
+        int index,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -154,9 +161,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeCookie(
-            String name,
-            String value,
-            Class<T> type, Class<?> genericType
+        String name,
+        String value,
+        Class<T> type,
+        Class<?> genericType
     ) throws IOException {
         try {
             StringDeserializer deserializer = dataConverters.getStringDeserializer();
@@ -167,8 +175,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     }
 
     protected <T> T deserializeBody(
-            BodyData bodyData,
-            Class<T> type
+        BodyData bodyData,
+        Class<T> type
     ) throws IOException {
         String contentType = bodyData.getContentType();
         if (contentType == null) {
@@ -178,8 +186,10 @@ public abstract class AbstractRequestHandler implements RequestHandler {
         try {
             return deserializer.deserialize(bodyData, type);
         } catch (Exception e) {
-            throw new DeserializeBodyException("can't deserialize body data to: " +
-                    type.getName(), e);
+            throw new DeserializeBodyException(
+                "can't deserialize body data to: " + type.getName(),
+                e
+            );
         }
     }
 }

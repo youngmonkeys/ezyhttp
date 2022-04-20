@@ -105,8 +105,8 @@ public class SimpleRequestArguments implements RequestArguments {
             parameterMap = new HashMap<>();
         }
         String value = values.length == 0
-                ? ""
-                : values.length == 1 ? values[0] : String.join(",", values);
+            ? ""
+            : values.length == 1 ? values[0] : String.join(",", values);
         parameterList.add(value);
         parameterMap.put(name, value);
     }
@@ -159,8 +159,8 @@ public class SimpleRequestArguments implements RequestArguments {
     protected void fetchPathVariables() {
         if (pathVariableList == null) {
             pathVariableList = PathVariables.getVariables(
-                    uriTemplate,
-                    request.getRequestURI()
+                uriTemplate,
+                request.getRequestURI()
             );
             pathVariableMap = new HashMap<>();
             for (Entry<String, String> entry : pathVariableList) {

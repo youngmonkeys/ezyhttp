@@ -7,8 +7,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 
 public final class DoDeleteAnnotations {
 
-    private DoDeleteAnnotations() {
-    }
+    private DoDeleteAnnotations() {}
 
     public static String getURI(DoDelete annotation) {
         String uri = annotation.value();

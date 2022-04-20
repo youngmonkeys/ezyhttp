@@ -130,18 +130,18 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         ComponentsScan componentsScan = componentClass.getAnnotation(ComponentsScan.class);
         if (componentsScan != null) {
             scan(
-                    componentsScan.value().length != 0
-                            ? componentsScan.value()
-                            : new String[]{componentClass.getPackage().getName()}
+                componentsScan.value().length != 0
+                    ? componentsScan.value()
+                    : new String[]{componentClass.getPackage().getName()}
 
             );
         }
         EzyPackagesToScan packagesToScan = componentClass.getAnnotation(EzyPackagesToScan.class);
         if (packagesToScan != null) {
             scan(
-                    packagesToScan.value().length != 0
-                            ? packagesToScan.value()
-                            : new String[]{componentClass.getPackage().getName()}
+                packagesToScan.value().length != 0
+                    ? packagesToScan.value()
+                    : new String[]{componentClass.getPackage().getName()}
 
             );
         }
@@ -207,8 +207,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     public ApplicationContextBuilder addSingleton(Object singleton) {
         return addSingleton(
-                EzyBeanNameParser.getSingletonName(singleton.getClass()),
-                singleton
+            EzyBeanNameParser.getSingletonName(singleton.getClass()),
+            singleton
         );
     }
 
@@ -256,23 +256,23 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         Map<String, Class> serviceClasses = getServiceClasses(reflection);
         EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
         EzyBeanContext beanContext = newBeanContextBuilder()
-                .scan(allPackageToScans)
-                .addSingletonClasses(componentClasses)
-                .addSingletonClasses(serviceClasses)
-                .addSingletonClasses(controllerClasses)
-                .addSingletonClasses(interceptorClases)
-                .addSingletonClasses(exceptionHandlerClasses)
-                .addSingletonClasses(bodyConverterClasses)
-                .addSingletonClasses(stringConverterClasses)
-                .addSingletonClasses(bootstrapClasses)
-                .propertiesMap(propertiesMap)
-                .addSingleton("systemObjectMapper", objectMapper)
-                .addSingleton("componentManager", componentManager)
-                .addSingleton("requestHandlerManager", requestHandlerManager)
-                .addSingleton("featureURIManager", requestHandlerManager.getFeatureURIManager())
-                .addSingleton("requestURIManager", requestHandlerManager.getRequestURIManager())
-                .addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
-                .build();
+            .scan(allPackageToScans)
+            .addSingletonClasses(componentClasses)
+            .addSingletonClasses(serviceClasses)
+            .addSingletonClasses(controllerClasses)
+            .addSingletonClasses(interceptorClases)
+            .addSingletonClasses(exceptionHandlerClasses)
+            .addSingletonClasses(bodyConverterClasses)
+            .addSingletonClasses(stringConverterClasses)
+            .addSingletonClasses(bootstrapClasses)
+            .propertiesMap(propertiesMap)
+            .addSingleton("systemObjectMapper", objectMapper)
+            .addSingleton("componentManager", componentManager)
+            .addSingleton("requestHandlerManager", requestHandlerManager)
+            .addSingleton("featureURIManager", requestHandlerManager.getFeatureURIManager())
+            .addSingleton("requestURIManager", requestHandlerManager.getRequestURIManager())
+            .addAllClasses(EzyPackages.scanPackage(DEFAULT_PACKAGE_TO_SCAN))
+            .build();
         setComponentProperties(beanContext);
         registerComponents(beanContext);
         addRequestHandlers(beanContext);
@@ -284,10 +284,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     private Set<String> getPackagesToScanFromProviders(EzyReflection reflection) {
         Set<String> answer = new HashSet<>();
         Set<Class<?>> providerClasses = reflection
-                .getExtendsClasses(EzyPackagesToScanProvider.class);
+            .getExtendsClasses(EzyPackagesToScanProvider.class);
         for (Class<?> clazz : providerClasses) {
             EzyPackagesToScanProvider provider =
-                    (EzyPackagesToScanProvider) EzyClasses.newInstance(clazz);
+                (EzyPackagesToScanProvider) EzyClasses.newInstance(clazz);
             answer.addAll(provider.provide());
         }
         return answer;
@@ -306,9 +306,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected EzyBeanContextBuilder newBeanContextBuilder() {
         EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder()
-                .addProperties(properties)
-                .addSingletons(singletonByName)
-                .addSingletonsByKey(singletonByKey);
+            .addProperties(properties)
+            .addSingletons(singletonByName)
+            .addSingletonsByKey(singletonByKey);
         List<String> propertiesFiles = new ArrayList<>();
         propertiesFiles.addAll(Arrays.asList(DEFAULT_PROPERTIES_FILES));
         propertiesFiles.addAll(propertiesSources);
@@ -341,10 +341,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected void setComponentProperties(EzyBeanContext beanContext) {
         componentManager.setDebug(
-                beanContext.getProperty(PropertyNames.DEBUG, boolean.class, false)
+            beanContext.getProperty(PropertyNames.DEBUG, boolean.class, false)
         );
         requestHandlerManager.setAllowOverrideURI(
-                beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
+            beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
         );
     }
 
@@ -383,10 +383,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     private int getManagementPort(EzyBeanContext beanContext) {
         boolean managementEnable = beanContext.getProperty(
-                MANAGEMENT_ENABLE, boolean.class, false);
+            MANAGEMENT_ENABLE, boolean.class, false);
         return managementEnable
-                ? beanContext.getProperty(MANAGEMENT_PORT, int.class, 18080)
-                : 0;
+            ? beanContext.getProperty(MANAGEMENT_PORT, int.class, 18080)
+            : 0;
     }
 
     private int getAsyncDefaultTimeout(EzyBeanContext beanContext) {
@@ -397,21 +397,21 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         ViewContext viewContext = beanContext.getSingleton(ViewContext.class);
         if (viewContext == null) {
             ViewContextBuilder viewContextBuilder = beanContext
-                    .getSingleton(ViewContextBuilder.class);
+                .getSingleton(ViewContextBuilder.class);
             if (viewContextBuilder != null) {
                 TemplateResolver templateResolver = beanContext
-                        .getSingleton(TemplateResolver.class);
+                    .getSingleton(TemplateResolver.class);
                 if (templateResolver == null) {
                     templateResolver = TemplateResolver.of(beanContext);
                 }
                 viewContext = viewContextBuilder
-                        .templateResolver(templateResolver)
-                        .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
-                        .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
-                        .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
-                        .absentMessageResolver(beanContext
-                                .getSingleton(AbsentMessageResolver.class))
-                        .build();
+                    .templateResolver(templateResolver)
+                    .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
+                    .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
+                    .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
+                    .absentMessageResolver(beanContext
+                        .getSingleton(AbsentMessageResolver.class))
+                    .build();
             }
         }
         if (viewContext != null) {
@@ -425,7 +425,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         RequestHandlersImplementer implementer = newRequestHandlersImplementer();
         implementer.setRequestURIDecorator(beanContext.getSingleton(RequestURIDecorator.class));
         Map<RequestURI, List<RequestHandler>> requestHandlers =
-                implementer.implement(controllerList);
+            implementer.implement(controllerList);
         requestHandlerManager.addHandlers(requestHandlers);
     }
 
@@ -435,29 +435,29 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
             return;
         }
         ResourceDownloadManager downloadManager = beanContext
-                .getSingleton(ResourceDownloadManager.class);
+            .getSingleton(ResourceDownloadManager.class);
         Map<String, Resource> resources = resourceResolver.getResources();
         for (String resourceURI : resources.keySet()) {
             Resource resource = resources.get(resourceURI);
             RequestURI requestURI = new RequestURI(
-                    HttpMethod.GET,
-                    resourceURI,
-                    false,
-                    true,
-                    true,
-                    resource.getFullPath());
+                HttpMethod.GET,
+                resourceURI,
+                false,
+                true,
+                true,
+                resource.getFullPath());
             RequestHandler requestHandler = new ResourceRequestHandler(
-                    resource.getPath(),
-                    resource.getUri(),
-                    resource.getExtension(),
-                    downloadManager);
+                resource.getPath(),
+                resource.getUri(),
+                resource.getExtension(),
+                downloadManager);
             requestHandlerManager.addHandler(requestURI, requestHandler);
         }
     }
 
     protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
         ResourceResolver resourceResolver =
-                beanContext.getSingleton(ResourceResolver.class);
+            beanContext.getSingleton(ResourceResolver.class);
         if (resourceResolver == null) {
             resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
             if (resourceResolver != null) {
@@ -471,7 +471,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         List<Object> exceptionHandlerList = exceptionHandlerManager.getExceptionHandlerList();
         ExceptionHandlersImplementer implementer = newExceptionHandlersImplementer();
         Map<Class<?>, UncaughtExceptionHandler> exceptionHandlers = implementer
-                .implement(exceptionHandlerList);
+            .implement(exceptionHandlerList);
         exceptionHandlerManager.addUncaughtExceptionHandlers(exceptionHandlers);
     }
 
@@ -482,5 +482,4 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected ExceptionHandlersImplementer newExceptionHandlersImplementer() {
         return new ExceptionHandlersImplementer();
     }
-
 }

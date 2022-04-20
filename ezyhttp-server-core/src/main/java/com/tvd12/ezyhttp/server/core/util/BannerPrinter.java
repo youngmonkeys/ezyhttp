@@ -32,9 +32,8 @@ public class BannerPrinter {
 
     protected InputStream getBannerInputStream() {
         return EzyClassPathInputStreamLoader.builder()
-                .context(getClass())
-                .build()
-                .load("ezyhttp-banner.txt");
+            .context(getClass())
+            .build()
+            .load("ezyhttp-banner.txt");
     }
-
 }

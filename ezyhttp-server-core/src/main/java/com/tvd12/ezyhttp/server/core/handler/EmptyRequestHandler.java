@@ -9,20 +9,17 @@ public class EmptyRequestHandler implements RequestHandler {
 
     private static final EmptyRequestHandler INSTANCE = new EmptyRequestHandler();
 
-    private EmptyRequestHandler() {
-    }
+    private EmptyRequestHandler() {}
 
     public static EmptyRequestHandler getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public void setController(Object controller) {
-    }
+    public void setController(Object controller) {}
 
     @Override
-    public void setHandlerMethod(Method method) {
-    }
+    public void setHandlerMethod(Method method) {}
 
     @Override
     public Object handle(RequestArguments arguments) {
@@ -48,5 +45,4 @@ public class EmptyRequestHandler implements RequestHandler {
     public String getResponseContentType() {
         return null;
     }
-
 }

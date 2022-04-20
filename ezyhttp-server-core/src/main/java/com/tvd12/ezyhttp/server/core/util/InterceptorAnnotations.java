@@ -7,8 +7,7 @@ import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 
 public final class InterceptorAnnotations {
 
-    private InterceptorAnnotations() {
-    }
+    private InterceptorAnnotations() {}
 
     public static int getPriority(Interceptor annotation) {
         return annotation.priority();
@@ -20,8 +19,8 @@ public final class InterceptorAnnotations {
     }
 
     public static Comparator<Object> comparator() {
-        return (a, b) ->
-                getPriority(a.getClass().getAnnotation(Interceptor.class))
-                        - getPriority(b.getClass().getAnnotation(Interceptor.class));
+        return Comparator.comparingInt(a ->
+            getPriority(a.getClass().getAnnotation(Interceptor.class))
+        );
     }
 }

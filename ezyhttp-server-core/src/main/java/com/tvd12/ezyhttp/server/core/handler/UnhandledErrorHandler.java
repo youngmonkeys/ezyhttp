@@ -12,21 +12,21 @@ import com.tvd12.ezyhttp.server.core.view.View;
 public interface UnhandledErrorHandler {
 
     default Object processError(
-            HttpMethod method,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            int errorStatusCode,
-            Exception exception
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
     ) {
         return null;
     }
 
     default Object handleError(
-            HttpMethod method,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            int errorStatusCode,
-            Exception exception
+        HttpMethod method,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        int errorStatusCode,
+        Exception exception
     ) {
         Object result = processError(method, request, response, errorStatusCode, exception);
         if (result != null) {

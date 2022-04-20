@@ -18,8 +18,8 @@ public class ResourceFile {
     }
 
     public static boolean isResourcePathMatch(
-            String resourcePath,
-            String regex
+        String resourcePath,
+        String regex
     ) {
         if (resourcePath.matches(regex)) {
             return true;

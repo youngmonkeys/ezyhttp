@@ -28,8 +28,8 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addHandledURI(HttpMethod method, String uri) {
         this.handledURIs
-                .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
-                .add(uri);
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
     }
 
     public boolean containsHandledURI(HttpMethod method, String uri) {
@@ -39,8 +39,8 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addApiURI(HttpMethod method, String uri) {
         this.apiURIs
-                .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
-                .add(uri);
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
     }
 
     public boolean isApiURI(HttpMethod method, String uri) {
@@ -50,8 +50,8 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addManagementURI(HttpMethod method, String uri) {
         this.managementURIs
-                .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
-                .add(uri);
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
     }
 
     public boolean isManagementURI(HttpMethod method, String uri) {
@@ -61,8 +61,8 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addAuthenticatedURI(HttpMethod method, String uri) {
         this.authenticatedURIs
-                .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
-                .add(uri);
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
     }
 
     public boolean isAuthenticatedURI(HttpMethod method, String uri) {
@@ -72,8 +72,8 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addPaymentURI(HttpMethod method, String uri) {
         this.paymentURIs
-                .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
-                .add(uri);
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
     }
 
     public boolean isPaymentURI(HttpMethod method, String uri) {

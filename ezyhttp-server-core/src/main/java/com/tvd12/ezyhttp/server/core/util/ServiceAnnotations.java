@@ -6,8 +6,7 @@ import com.tvd12.ezyhttp.server.core.annotation.Service;
 
 public final class ServiceAnnotations {
 
-    private ServiceAnnotations() {
-    }
+    private ServiceAnnotations() {}
 
     public static String getServiceName(Class<?> serviceClass) {
         Service annotation = serviceClass.getAnnotation(Service.class);
@@ -19,5 +18,4 @@ public final class ServiceAnnotations {
         }
         return EzyClasses.getVariableName(serviceClass, "Impl");
     }
-
 }

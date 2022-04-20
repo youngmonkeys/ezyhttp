@@ -6,8 +6,7 @@ import com.tvd12.ezyhttp.server.core.annotation.Controller;
 
 public final class ControllerAnnotations {
 
-    private ControllerAnnotations() {
-    }
+    private ControllerAnnotations() {}
 
     public static String getURI(Controller annotation) {
         if (annotation == null) {
@@ -31,5 +30,4 @@ public final class ControllerAnnotations {
         }
         return uri;
     }
-
 }

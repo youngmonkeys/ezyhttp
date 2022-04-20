@@ -17,7 +17,6 @@ public class ExceptionHandlerMethod extends HandlerMethod {
         super(method);
         this.responseType = fetchResponseType();
         this.exceptionClasses = fetchExceptionClasses();
-
     }
 
     protected Class<?>[] fetchExceptionClasses() {
@@ -33,9 +32,8 @@ public class ExceptionHandlerMethod extends HandlerMethod {
     @Override
     public String toString() {
         return method.getName() +
-                "(" +
-                "exceptionClasses: " + EzyStrings.join(exceptionClasses, ", ") +
-                ")";
+            "(" +
+            "exceptionClasses: " + EzyStrings.join(exceptionClasses, ", ") +
+            ")";
     }
-
 }

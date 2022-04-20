@@ -5,8 +5,7 @@ import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 
 public final class TryCatchAnnotations {
 
-    private TryCatchAnnotations() {
-    }
+    private TryCatchAnnotations() {}
 
     public static Class<?>[] getExceptionClasses(TryCatch tryCatch) {
         return tryCatch.value();

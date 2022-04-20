@@ -11,8 +11,9 @@ import com.tvd12.ezyhttp.server.core.reflect.ExceptionHandlerProxy;
 
 public class ExceptionHandlersImplementer extends EzyLoggable {
 
-    public Map<Class<?>, UncaughtExceptionHandler>
-        implement(Collection<Object> exceptionHandlers) {
+    public Map<Class<?>, UncaughtExceptionHandler> implement(
+        Collection<Object> exceptionHandlers
+    ) {
         Map<Class<?>, UncaughtExceptionHandler> handlers = new HashMap<>();
         for (Object controller : exceptionHandlers) {
             handlers.putAll(implement(controller));
@@ -34,8 +35,9 @@ public class ExceptionHandlersImplementer extends EzyLoggable {
     }
 
     protected ExceptionHandlerImplementer newImplementer(
-            ExceptionHandlerProxy exceptionHandler, ExceptionHandlerMethod method) {
+        ExceptionHandlerProxy exceptionHandler,
+        ExceptionHandlerMethod method
+    ) {
         return new ExceptionHandlerImplementer(exceptionHandler, method);
     }
-
 }

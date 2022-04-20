@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @EzyConfigurationBefore
 public class ResourceDownloadManagerConfiguration
-        implements EzyBeanContextAware, EzyBeanConfig {
+    implements EzyBeanContextAware, EzyBeanConfig {
 
     @EzyProperty(PropertyNames.RESOURCE_ENABLE)
     private boolean resourcesEnable = false;

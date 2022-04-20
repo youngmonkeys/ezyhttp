@@ -6,7 +6,5 @@ import com.tvd12.ezyfox.util.EzyStartable;
 public interface ApplicationEntry extends EzyInitable, EzyStartable {
 
     @Override
-    default void init() {
-    }
-
+    default void init() {}
 }

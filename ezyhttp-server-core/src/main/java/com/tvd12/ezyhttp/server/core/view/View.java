@@ -64,40 +64,40 @@ public class View {
 
     @SuppressWarnings("unchecked")
     public static void appendToVariable(
-            Map<String, Object> variables,
-            String variableName,
-            Object value
+        Map<String, Object> variables,
+        String variableName,
+        Object value
     ) {
         ((List<Object>) variables.computeIfAbsent(
-                variableName,
-                k -> new ArrayList<>())
+            variableName,
+            k -> new ArrayList<>())
         ).add(value);
     }
 
     public void putKeyValueToVariable(
-            String variableName,
-            String key,
-            Object value
+        String variableName,
+        String key,
+        Object value
     ) {
         View.putKeyValueToVariable(variables, variableName, key, value);
     }
 
     @SuppressWarnings("unchecked")
     public static void putKeyValueToVariable(
-            Map<String, Object> variables,
-            String variableName,
-            String key,
-            Object value
+        Map<String, Object> variables,
+        String variableName,
+        String key,
+        Object value
     ) {
         ((Map<String, Object>) variables.computeIfAbsent(
-                variableName,
-                k -> new HashMap<>())
+            variableName,
+            k -> new HashMap<>())
         ).put(key, value);
     }
 
     public void putKeyValuesToVariable(
-            String variableName,
-            Map<String, Object> keyValues
+        String variableName,
+        Map<String, Object> keyValues
     ) {
         for (Map.Entry<String, Object> e : keyValues.entrySet()) {
             putKeyValueToVariable(variableName, e.getKey(), e.getValue());
@@ -152,17 +152,17 @@ public class View {
         }
 
         public Builder putKeyValueToVariable(
-                String variableName,
-                String key,
-                Object value
+            String variableName,
+            String key,
+            Object value
         ) {
             View.putKeyValueToVariable(variables, variableName, key, value);
             return this;
         }
 
         public Builder putKeyValuesToVariable(
-                String variableName,
-                Map<String, Object> keyValues
+            String variableName,
+            Map<String, Object> keyValues
         ) {
             for (Map.Entry<String, Object> e : keyValues.entrySet()) {
                 putKeyValueToVariable(variableName, e.getKey(), e.getValue());
