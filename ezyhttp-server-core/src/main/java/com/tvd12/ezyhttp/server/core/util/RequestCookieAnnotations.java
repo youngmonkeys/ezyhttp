@@ -5,8 +5,9 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestCookie;
 
 public final class RequestCookieAnnotations {
 
-    private RequestCookieAnnotations() {}
-    
+    private RequestCookieAnnotations() {
+    }
+
     public static String getCookieKeyString(RequestCookie annotation, int index) {
         String keyString = annotation.value();
         if (EzyStrings.isNoContent(keyString)) {
@@ -19,5 +20,5 @@ public final class RequestCookieAnnotations {
         }
         return keyString;
     }
-    
+
 }

@@ -17,11 +17,12 @@ import com.tvd12.ezyhttp.server.core.request.RequestURIMeta;
 
 import lombok.Setter;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestHandlersImplementer extends EzyLoggable {
-    
+
     @Setter
     private RequestURIDecorator requestURIDecorator;
-    
+
     public Map<RequestURI, List<RequestHandler>> implement(
             Collection<Object> controllers
     ) {
@@ -47,12 +48,12 @@ public class RequestHandlersImplementer extends EzyLoggable {
             String requestURI = handler.getRequestURI();
             String methodFeature = method.getFeature();
             RequestURIMeta uriMeta = RequestURIMeta.builder()
-                .api(method.isApi() || proxy.isApi())
-                .authenticated(method.isAuthenticated() || proxy.isAuthenticated())
-                .management(method.isManagement() || proxy.isManagement())
-                .payment(method.isPayment() || proxy.isPayment())
-                .feature(methodFeature != null ? methodFeature : feature)
-                .build();
+                    .api(method.isApi() || proxy.isApi())
+                    .authenticated(method.isAuthenticated() || proxy.isAuthenticated())
+                    .management(method.isManagement() || proxy.isManagement())
+                    .payment(method.isPayment() || proxy.isPayment())
+                    .feature(methodFeature != null ? methodFeature : feature)
+                    .build();
             RequestURI uri = new RequestURI(httpMethod, requestURI, uriMeta);
             handlers.computeIfAbsent(uri, k -> new ArrayList<>())
                     .add(handler);

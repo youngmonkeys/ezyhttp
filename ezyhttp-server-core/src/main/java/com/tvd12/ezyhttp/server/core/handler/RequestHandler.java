@@ -6,13 +6,16 @@ import com.tvd12.ezyfox.reflect.EzyMethods;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
+@SuppressWarnings("AbbreviationAsWordInName")
 public interface RequestHandler {
 
     EmptyRequestHandler EMPTY = EmptyRequestHandler.getInstance();
 
-    default void setController(Object controller) {}
+    default void setController(Object controller) {
+    }
 
-    default void setHandlerMethod(Method method) {}
+    default void setHandlerMethod(Method method) {
+    }
 
     Object handle(RequestArguments arguments) throws Exception;
 

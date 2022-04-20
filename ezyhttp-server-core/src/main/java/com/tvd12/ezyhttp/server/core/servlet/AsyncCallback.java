@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 public interface AsyncCallback extends AsyncListener {
-    
+
     Logger LOGGER = LoggerFactory.getLogger(AsyncCallback.class);
 
     @Override
@@ -28,7 +28,7 @@ public interface AsyncCallback extends AsyncListener {
             LOGGER.info("AsyncCallback.onError failed, request = {}", event.getSuppliedRequest());
         }
     }
-    
+
     @Override
     default void onTimeout(AsyncEvent event) {
         try {
@@ -43,7 +43,7 @@ public interface AsyncCallback extends AsyncListener {
             LOGGER.info("AsyncCallback.onTimeout failed, request = {}", event.getSuppliedRequest());
         }
     }
-    
+
     @Override
     default void onStartAsync(AsyncEvent event) {
         LOGGER.info("AsyncCallback.onStartAsync, request = {}", event.getSuppliedRequest());

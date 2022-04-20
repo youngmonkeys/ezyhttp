@@ -6,16 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author tavandung12
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 public @interface PathVariable {
-    
+
     /**
-     * name or path variable
+     * name or path variable.
      *
      * @return the variable's name
      */

@@ -27,7 +27,7 @@ public class View {
     private final List<Cookie> cookies;
     private final Map<String, String> headers;
     private final Map<String, Object> variables;
-    
+
     protected View(Builder builder) {
         this.template = builder.template;
         this.locale = builder.locale;
@@ -36,78 +36,79 @@ public class View {
         this.cookies = builder.cookies;
         this.headers = builder.headers;
     }
-    
+
     public static View of(String template) {
         return View.builder().template(template).build();
     }
-    
+
     public boolean containsVariable(String name) {
         return variables.containsKey(name);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getVariable(String name) {
-        return (T)variables.get(name);
+        return (T) variables.get(name);
     }
-    
+
     public void setVariable(String name, Object value) {
         this.variables.put(name, value);
     }
-    
+
     public void setVariables(Map<String, Object> variables) {
         this.variables.putAll(variables);
     }
-    
+
     public void appendToVariable(String name, Object value) {
         appendToVariable(variables, name, value);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void appendToVariable(
-        Map<String, Object> variables,
-        String variableName,
-        Object value
+            Map<String, Object> variables,
+            String variableName,
+            Object value
     ) {
-        ((List<Object>)variables.computeIfAbsent(
-            variableName, 
-            k -> new ArrayList<>())
+        ((List<Object>) variables.computeIfAbsent(
+                variableName,
+                k -> new ArrayList<>())
         ).add(value);
     }
-    
+
     public void putKeyValueToVariable(
-        String variableName,
-        String key,
-        Object value
+            String variableName,
+            String key,
+            Object value
     ) {
         View.putKeyValueToVariable(variables, variableName, key, value);
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public static void putKeyValueToVariable(
+            Map<String, Object> variables,
+            String variableName,
+            String key,
+            Object value
+    ) {
+        ((Map<String, Object>) variables.computeIfAbsent(
+                variableName,
+                k -> new HashMap<>())
+        ).put(key, value);
+    }
+
     public void putKeyValuesToVariable(
-        String variableName,
-        Map<String, Object> keyValues
+            String variableName,
+            Map<String, Object> keyValues
     ) {
         for (Map.Entry<String, Object> e : keyValues.entrySet()) {
             putKeyValueToVariable(variableName, e.getKey(), e.getValue());
         }
     }
-    
-    @SuppressWarnings("unchecked")
-    public static void putKeyValueToVariable(
-        Map<String, Object> variables,
-        String variableName,
-        String key,
-        Object value
-    ) {
-        ((Map<String, Object>)variables.computeIfAbsent(
-            variableName, 
-            k -> new HashMap<>())
-        ).put(key, value);
-    }
-    
+
+
     public static Builder builder() {
         return new Builder();
     }
-    
+
     public static class Builder implements EzyBuilder<View> {
         private String template;
         private List<Cookie> cookies;
@@ -115,98 +116,104 @@ public class View {
         private Locale locale = Locale.ENGLISH;
         private String contentType = ContentTypes.TEXT_HTML_UTF8;
         private final Map<String, Object> variables = new HashMap<>();
-        
+
         public Builder template(String template) {
             this.template = template;
             return this;
         }
-        
+
         public Builder locale(Locale locale) {
             this.locale = locale;
             return this;
         }
-        
+
         public Builder locale(String locale) {
             return locale(new Locale(locale));
         }
-        
+
         public Builder contentType(String contentType) {
             this.contentType = contentType;
             return this;
         }
-        
+
         public Builder addVariable(String name, Object value) {
             this.variables.put(name, value);
             return this;
         }
-        
+
         public Builder addVariables(Map<String, Object> variables) {
             this.variables.putAll(variables);
             return this;
         }
-        
+
         public Builder appendToVariable(String variableName, Object value) {
             View.appendToVariable(variables, variableName, value);
             return this;
         }
-        
+
         public Builder putKeyValueToVariable(
-            String variableName,
-            String key,
-            Object value
+                String variableName,
+                String key,
+                Object value
         ) {
             View.putKeyValueToVariable(variables, variableName, key, value);
             return this;
         }
-        
+
         public Builder putKeyValuesToVariable(
-            String variableName,
-            Map<String, Object> keyValues
+                String variableName,
+                Map<String, Object> keyValues
         ) {
             for (Map.Entry<String, Object> e : keyValues.entrySet()) {
                 putKeyValueToVariable(variableName, e.getKey(), e.getValue());
             }
             return this;
         }
-        
+
         public Builder addHeader(String name, Object value) {
-            if (headers == null)
+            if (headers == null) {
                 this.headers = new HashMap<>();
+            }
             this.headers.put(name, value.toString());
             return this;
         }
-        
+
         public Builder addHeaders(Map<String, Object> headers) {
-            for (Entry<String, Object> e : headers.entrySet())
+            for (Entry<String, Object> e : headers.entrySet()) {
                 addHeader(e.getKey(), e.getValue());
+            }
             return this;
         }
-        
+
         public Builder addCookie(Cookie cookie) {
-            if (cookies == null)
+            if (cookies == null) {
                 this.cookies = new LinkedList<>();
+            }
             this.cookies.add(cookie);
             return this;
         }
-        
+
         public Builder addCookie(String name, Object value) {
             return addCookie(new Cookie(name, value.toString()));
         }
-        
+
         public Builder addCookie(String name, Object value, String path) {
             Cookie cookie = new Cookie(name, value.toString());
             cookie.setPath(path);
             return addCookie(cookie);
         }
-        
+
         @Override
         public View build() {
-            if (template == null)
+            if (template == null) {
                 throw new NullPointerException("template can not be null");
-            if (cookies == null)
+            }
+            if (cookies == null) {
                 cookies = Collections.emptyList();
-            if (headers == null)
+            }
+            if (headers == null) {
                 headers = Collections.emptyMap();
+            }
             return new View(this);
         }
     }

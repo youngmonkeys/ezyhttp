@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestURI {
 
     protected final String uri;
@@ -20,9 +21,9 @@ public class RequestURI {
     protected final String resourceFullPath;
 
     public RequestURI(
-        HttpMethod method, 
-        String uri, 
-        boolean management
+            HttpMethod method,
+            String uri,
+            boolean management
     ) {
         this.method = method;
         this.uri = standardizeURI(uri);
@@ -36,30 +37,30 @@ public class RequestURI {
     }
 
     public RequestURI(
-        HttpMethod method, 
-        String uri, 
-        boolean management,
-        boolean resource,
-        boolean api,
-        String resourceFullPath
+            HttpMethod method,
+            String uri,
+            boolean management,
+            boolean resource,
+            boolean api,
+            String resourceFullPath
     ) {
         this(
-            method,
-            uri,
-            RequestURIMeta.builder()
-                .api(api)
-                .authenticated(false)
-                .management(management)
-                .resource(resource)
-                .resourceFullPath(resourceFullPath)
-                .build()
+                method,
+                uri,
+                RequestURIMeta.builder()
+                        .api(api)
+                        .authenticated(false)
+                        .management(management)
+                        .resource(resource)
+                        .resourceFullPath(resourceFullPath)
+                        .build()
         );
     }
 
     public RequestURI(
-        HttpMethod method, 
-        String uri, 
-        RequestURIMeta meta
+            HttpMethod method,
+            String uri,
+            RequestURIMeta meta
     ) {
         this.method = method;
         this.uri = standardizeURI(uri);
@@ -70,11 +71,12 @@ public class RequestURI {
         this.payment = meta.isPayment();
         this.feature = meta.getFeature();
         this.resourceFullPath = meta.getResourceFullPath();
-}
+    }
 
     protected String standardizeURI(String uri) {
-        if (uri.isEmpty() || uri.startsWith("/"))
+        if (uri.isEmpty() || uri.startsWith("/")) {
             return uri;
+        }
         return "/" + uri;
     }
 
@@ -94,16 +96,19 @@ public class RequestURI {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null)
+        if (other == null) {
             return false;
-        if (other == this)
+        }
+        if (other == this) {
             return true;
-        if (!other.getClass().equals(this.getClass()))
+        }
+        if (!other.getClass().equals(this.getClass())) {
             return false;
-        RequestURI t = (RequestURI)other;
+        }
+        RequestURI t = (RequestURI) other;
         return uri.equals(t.uri)
-            && method.equals(t.method)
-            && management == t.management;
+                && method.equals(t.method)
+                && management == t.management;
     }
 
     @Override

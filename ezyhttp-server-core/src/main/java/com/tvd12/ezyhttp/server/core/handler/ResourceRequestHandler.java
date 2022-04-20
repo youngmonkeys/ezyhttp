@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 @AllArgsConstructor
+@SuppressWarnings("AbbreviationAsWordInName")
 public class ResourceRequestHandler implements RequestHandler {
 
     private final String resourcePath;
@@ -29,51 +30,51 @@ public class ResourceRequestHandler implements RequestHandler {
     private final int defaultTimeout;
 
     public ResourceRequestHandler(
-        String resourcePath,
-        String resourceURI,
-        String resourceExtension,
-        ResourceDownloadManager downloadManager
+            String resourcePath,
+            String resourceURI,
+            String resourceExtension,
+            ResourceDownloadManager downloadManager
     ) {
         this(
-            resourcePath,
-            resourceURI,
-            resourceExtension,
-            downloadManager,
-            0
+                resourcePath,
+                resourceURI,
+                resourceExtension,
+                downloadManager,
+                0
         );
     }
 
     public ResourceRequestHandler(
-        String resourcePath,
-        String resourceURI,
-        String resourceExtension,
-        EzyInputStreamLoader inputStreamLoader,
-        ResourceDownloadManager downloadManager
+            String resourcePath,
+            String resourceURI,
+            String resourceExtension,
+            EzyInputStreamLoader inputStreamLoader,
+            ResourceDownloadManager downloadManager
     ) {
         this(
-            resourcePath,
-            resourceURI,
-            resourceExtension,
-            inputStreamLoader,
-            downloadManager,
-            0
+                resourcePath,
+                resourceURI,
+                resourceExtension,
+                inputStreamLoader,
+                downloadManager,
+                0
         );
     }
 
     public ResourceRequestHandler(
-        String resourcePath,
-        String resourceURI,
-        String resourceExtension,
-        ResourceDownloadManager downloadManager,
-        int defaultTimeout
+            String resourcePath,
+            String resourceURI,
+            String resourceExtension,
+            ResourceDownloadManager downloadManager,
+            int defaultTimeout
     ) {
         this(
-            resourcePath,
-            resourceURI,
-            resourceExtension,
-            new EzyAnywayInputStreamLoader(),
-            downloadManager,
-            defaultTimeout
+                resourcePath,
+                resourceURI,
+                resourceExtension,
+                new EzyAnywayInputStreamLoader(),
+                downloadManager,
+                defaultTimeout
         );
     }
 
@@ -84,31 +85,31 @@ public class ResourceRequestHandler implements RequestHandler {
             asyncContext.setTimeout(defaultTimeout);
         }
         HttpServletResponse servletResponse =
-            (HttpServletResponse) asyncContext.getResponse();
+                (HttpServletResponse) asyncContext.getResponse();
         InputStream inputStream = inputStreamLoader.load(resourcePath);
         OutputStream outputStream = servletResponse.getOutputStream();
         try {
             downloadManager.drainAsync(
-                inputStream, 
-                outputStream, 
-                new EzyResultCallback<Boolean>() {
-                    @Override
-                    public void onResponse(Boolean response) {
-                        processWithLogException(inputStream::close);
-                        servletResponse.setContentType(getResponseContentType());
-                        servletResponse.setStatus(StatusCodes.OK);
-                        asyncContext.complete();
+                    inputStream,
+                    outputStream,
+                    new EzyResultCallback<Boolean>() {
+                        @Override
+                        public void onResponse(Boolean response) {
+                            processWithLogException(inputStream::close);
+                            servletResponse.setContentType(getResponseContentType());
+                            servletResponse.setStatus(StatusCodes.OK);
+                            asyncContext.complete();
+                        }
+
+                        @Override
+                        public void onException(Exception e) {
+                            processWithLogException(inputStream::close);
+                            servletResponse.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+                            asyncContext.complete();
+                        }
                     }
-                    @Override
-                    public void onException(Exception e) {
-                        processWithLogException(inputStream::close);
-                        servletResponse.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-                        asyncContext.complete();
-                    }
-                }
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             processWithLogException(inputStream::close);
             servletResponse.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
             asyncContext.complete();

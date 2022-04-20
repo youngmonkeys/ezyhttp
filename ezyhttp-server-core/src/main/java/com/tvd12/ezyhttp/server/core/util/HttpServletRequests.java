@@ -6,11 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
 public final class HttpServletRequests {
-    
-    private HttpServletRequests() {}
-    
+
+    private HttpServletRequests() {
+    }
+
     public static String getRequestValue(HttpServletRequest request, String name) {
-        String value = (String)request.getAttribute(name);
+        String value = (String) request.getAttribute(name);
         if (value == null) {
             value = request.getHeader(name);
         }

@@ -33,9 +33,9 @@ public class ExceptionHandlerMethod extends HandlerMethod {
     @Override
     public String toString() {
         return method.getName() +
-            "(" +
-            "exceptionClasses: " + EzyStrings.join(exceptionClasses, ", ") +
-            ")";
+                "(" +
+                "exceptionClasses: " + EzyStrings.join(exceptionClasses, ", ") +
+                ")";
     }
 
 }

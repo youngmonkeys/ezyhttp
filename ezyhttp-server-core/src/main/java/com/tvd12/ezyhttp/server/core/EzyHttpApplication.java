@@ -12,7 +12,7 @@ import com.tvd12.ezyhttp.server.core.util.BannerPrinter;
 
 import lombok.Getter;
 
-public class EzyHttpApplication 
+public class EzyHttpApplication
         extends EzyLoggable
         implements EzyStartable, EzyStoppable {
 
@@ -48,24 +48,30 @@ public class EzyHttpApplication
         return application;
     }
 
+    @Override
+    public void start() throws Exception {
+        ApplicationEntry entry = applicationContext
+                .getAnnotatedSingleton(ApplicationBootstrap.class);
+        if (entry == null) {
+            throw new IllegalStateException("Failed to start application, " +
+                    "the ApplicationEntry not found, " +
+                    "let's use EzyHttpApplicationBootstrap.start(...)");
+        }
+        entry.init();
+        entry.start();
+        boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class,
+                true);
+        if (printBanner) {
+            logger.info("\n{}\n", new BannerPrinter().getBannerText());
+        }
+    }
+
     protected static ApplicationContext
-            createApplicationContext(String basePackage, Class<?>... componentClasses) {
+        createApplicationContext(String basePackage, Class<?>... componentClasses) {
         return new ApplicationContextBuilder()
                 .scan(basePackage)
                 .addComponentClasses(componentClasses)
                 .build();
-    }
-
-    @Override
-    public void start() throws Exception {
-        ApplicationEntry entry = applicationContext.getAnnotatedSingleton(ApplicationBootstrap.class);
-        if (entry == null)
-            throw new IllegalStateException("Failed to start application, the ApplicationEntry not found, let's use EzyHttpApplicationBootstrap.start(...)");
-        entry.init();
-        entry.start();
-        boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class, true);
-        if (printBanner)
-            logger.info("\n{}\n", new BannerPrinter().getBannerText());
     }
 
     @Override

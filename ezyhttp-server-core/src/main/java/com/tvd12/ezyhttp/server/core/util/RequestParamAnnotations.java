@@ -5,7 +5,8 @@ import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 
 public final class RequestParamAnnotations {
 
-    private RequestParamAnnotations() {}
+    private RequestParamAnnotations() {
+    }
 
     public static String getParamKeyString(RequestParam annotation, int index) {
         String keyString = annotation.value();

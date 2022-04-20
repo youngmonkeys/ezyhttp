@@ -68,7 +68,7 @@ import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import com.tvd12.ezyhttp.server.core.view.ViewDialect;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked", "AbbreviationAsWordInName", "MethodCount"})
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
     protected final Properties properties;
@@ -113,14 +113,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     public ApplicationContextBuilder scan(String... packageNames) {
-        for (String packageName : packageNames)
+        for (String packageName : packageNames) {
             scan(packageName);
+        }
         return this;
     }
 
     public ApplicationContextBuilder scan(Iterable<String> packageNames) {
-        for (String packageName : packageNames)
+        for (String packageName : packageNames) {
             scan(packageName);
+        }
         return this;
     }
 
@@ -128,40 +130,44 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         ComponentsScan componentsScan = componentClass.getAnnotation(ComponentsScan.class);
         if (componentsScan != null) {
             scan(
-                componentsScan.value().length != 0
-                    ? componentsScan.value()
-                    : new String[] { componentClass.getPackage().getName() }
+                    componentsScan.value().length != 0
+                            ? componentsScan.value()
+                            : new String[]{componentClass.getPackage().getName()}
 
             );
         }
         EzyPackagesToScan packagesToScan = componentClass.getAnnotation(EzyPackagesToScan.class);
         if (packagesToScan != null) {
             scan(
-                 packagesToScan.value().length != 0
-                    ? packagesToScan.value()
-                    : new String[] { componentClass.getPackage().getName() }
-                    
+                    packagesToScan.value().length != 0
+                            ? packagesToScan.value()
+                            : new String[]{componentClass.getPackage().getName()}
+
             );
         }
         ComponentClasses componentClasses = componentClass.getAnnotation(ComponentClasses.class);
-        if (componentClasses != null)
+        if (componentClasses != null) {
             addComponentClasses(componentClasses.value());
+        }
         PropertiesSources propertiesSources = componentClass.getAnnotation(PropertiesSources.class);
-        if (propertiesSources != null)
+        if (propertiesSources != null) {
             addPropertiesSources(propertiesSources.value());
+        }
         this.componentClasses.add(componentClass);
         return this;
     }
 
     public ApplicationContextBuilder addComponentClasses(Class<?>... componentClasses) {
-        for (Class<?> clazz : componentClasses)
+        for (Class<?> clazz : componentClasses) {
             addComponentClass(clazz);
+        }
         return this;
     }
 
     public ApplicationContextBuilder addComponentClasses(Iterable<Class<?>> componentClasses) {
-        for (Class<?> clazz : componentClasses)
+        for (Class<?> clazz : componentClasses) {
             addComponentClass(clazz);
+        }
         return this;
     }
 
@@ -171,14 +177,16 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     public ApplicationContextBuilder addPropertiesSources(String... sources) {
-        for (String source : sources)
+        for (String source : sources) {
             addPropertiesSource(source);
+        }
         return this;
     }
 
     public ApplicationContextBuilder addPropertiesSources(Iterable<String> sources) {
-        for (String source : sources)
+        for (String source : sources) {
             addPropertiesSource(source);
+        }
         return this;
     }
 
@@ -199,8 +207,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     public ApplicationContextBuilder addSingleton(Object singleton) {
         return addSingleton(
-            EzyBeanNameParser.getSingletonName(singleton.getClass()),
-            singleton
+                EzyBeanNameParser.getSingletonName(singleton.getClass()),
+                singleton
         );
     }
 
@@ -228,8 +236,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     protected EzyBeanContext createBeanContext() {
-        if (packageToScans.isEmpty())
+        if (packageToScans.isEmpty()) {
             throw new IllegalStateException("must scan at least one package");
+        }
         Set<String> allPackageToScans = new HashSet<>();
         allPackageToScans.add(DEFAULT_PACKAGE_TO_SCAN);
         allPackageToScans.addAll(packageToScans);
@@ -277,8 +286,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         Set<Class<?>> providerClasses = reflection
                 .getExtendsClasses(EzyPackagesToScanProvider.class);
         for (Class<?> clazz : providerClasses) {
-            EzyPackagesToScanProvider provider = 
-                    (EzyPackagesToScanProvider)EzyClasses.newInstance(clazz);
+            EzyPackagesToScanProvider provider =
+                    (EzyPackagesToScanProvider) EzyClasses.newInstance(clazz);
             answer.addAll(provider.provide());
         }
         return answer;
@@ -290,8 +299,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         classes.addAll(reflection.getAnnotatedClasses(ComponentClasses.class));
         classes.addAll(reflection.getAnnotatedClasses(PropertiesSources.class));
         classes.addAll(reflection.getAnnotatedClasses(EzyPackagesToScan.class));
-        for (Class clazz : classes)
+        for (Class clazz : classes) {
             addComponentClass(clazz);
+        }
     }
 
     protected EzyBeanContextBuilder newBeanContextBuilder() {
@@ -310,9 +320,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected EzyPropertiesMap getPropertiesMap(EzyReflection reflection) {
         Class propertiesMapClass = reflection.getExtendsClass(EzyPropertiesMap.class);
-        if (propertiesMapClass == null)
+        if (propertiesMapClass == null) {
             return null;
-        return (EzyPropertiesMap)EzyClasses.newInstance(propertiesMapClass);
+        }
+        return (EzyPropertiesMap) EzyClasses.newInstance(propertiesMapClass);
     }
 
     protected Map<String, Class> getServiceClasses(EzyReflection reflection) {
@@ -330,10 +341,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected void setComponentProperties(EzyBeanContext beanContext) {
         componentManager.setDebug(
-            beanContext.getProperty(PropertyNames.DEBUG, boolean.class, false)
+                beanContext.getProperty(PropertyNames.DEBUG, boolean.class, false)
         );
         requestHandlerManager.setAllowOverrideURI(
-            beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
+                beanContext.getProperty(PropertyNames.ALLOW_OVERRIDE_URI, boolean.class, false)
         );
     }
 
@@ -385,23 +396,27 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected ViewContext buildViewContext(EzyBeanContext beanContext) {
         ViewContext viewContext = beanContext.getSingleton(ViewContext.class);
         if (viewContext == null) {
-            ViewContextBuilder viewContextBuilder = beanContext.getSingleton(ViewContextBuilder.class);
+            ViewContextBuilder viewContextBuilder = beanContext
+                    .getSingleton(ViewContextBuilder.class);
             if (viewContextBuilder != null) {
-                TemplateResolver templateResolver = beanContext.getSingleton(TemplateResolver.class);
+                TemplateResolver templateResolver = beanContext
+                        .getSingleton(TemplateResolver.class);
                 if (templateResolver == null) {
                     templateResolver = TemplateResolver.of(beanContext);
                 }
                 viewContext = viewContextBuilder
-                    .templateResolver(templateResolver)
-                    .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
-                    .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
-                    .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
-                    .absentMessageResolver(beanContext.getSingleton(AbsentMessageResolver.class))
-                    .build();
+                        .templateResolver(templateResolver)
+                        .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
+                        .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
+                        .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
+                        .absentMessageResolver(beanContext
+                                .getSingleton(AbsentMessageResolver.class))
+                        .build();
             }
         }
-        if (viewContext != null)
+        if (viewContext != null) {
             beanContext.getSingletonFactory().addSingleton(viewContext);
+        }
         return viewContext;
     }
 
@@ -416,9 +431,11 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected void addResourceRequestHandlers(EzyBeanContext beanContext) {
         ResourceResolver resourceResolver = getResourceResolver(beanContext);
-        if (resourceResolver == null)
+        if (resourceResolver == null) {
             return;
-        ResourceDownloadManager downloadManager = beanContext.getSingleton(ResourceDownloadManager.class);
+        }
+        ResourceDownloadManager downloadManager = beanContext
+                .getSingleton(ResourceDownloadManager.class);
         Map<String, Resource> resources = resourceResolver.getResources();
         for (String resourceURI : resources.keySet()) {
             Resource resource = resources.get(resourceURI);
@@ -440,11 +457,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     protected ResourceResolver getResourceResolver(EzyBeanContext beanContext) {
         ResourceResolver resourceResolver =
-            beanContext.getSingleton(ResourceResolver.class);
+                beanContext.getSingleton(ResourceResolver.class);
         if (resourceResolver == null) {
             resourceResolver = ResourceResolvers.createResourdeResolver(beanContext);
-            if (resourceResolver != null)
+            if (resourceResolver != null) {
                 beanContext.getSingletonFactory().addSingleton(resourceResolver);
+            }
         }
         return resourceResolver;
     }
@@ -452,7 +470,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected void addExceptionHandlers() {
         List<Object> exceptionHandlerList = exceptionHandlerManager.getExceptionHandlerList();
         ExceptionHandlersImplementer implementer = newExceptionHandlersImplementer();
-        Map<Class<?>, UncaughtExceptionHandler> exceptionHandlers = implementer.implement(exceptionHandlerList);
+        Map<Class<?>, UncaughtExceptionHandler> exceptionHandlers = implementer
+                .implement(exceptionHandlerList);
         exceptionHandlerManager.addUncaughtExceptionHandlers(exceptionHandlers);
     }
 

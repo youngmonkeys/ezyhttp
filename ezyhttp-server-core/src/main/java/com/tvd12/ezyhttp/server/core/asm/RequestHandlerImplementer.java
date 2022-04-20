@@ -43,7 +43,8 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
 
-public class RequestHandlerImplementer 
+@SuppressWarnings({"AbbreviationAsWordInName", "LocalVariableName"})
+public class RequestHandlerImplementer
         extends AbstractHandlerImplementer<RequestHandlerMethod> {
 
     @Setter
@@ -53,8 +54,8 @@ public class RequestHandlerImplementer
     @Setter
     protected RequestURIDecorator requestURIDecorator;
 
-    protected final static String PARAMETER_PREFIX = "param";
-    protected final static AtomicInteger COUNT = new AtomicInteger(0);
+    protected static final String PARAMETER_PREFIX = "param";
+    protected static final AtomicInteger COUNT = new AtomicInteger(0);
 
     public RequestHandlerImplementer(
             ControllerProxy controller, RequestHandlerMethod handlerMethod) {
@@ -66,8 +67,7 @@ public class RequestHandlerImplementer
     public RequestHandler implement() {
         try {
             return doimplement();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
@@ -118,23 +118,24 @@ public class RequestHandlerImplementer
     protected String makeControllerFieldContent() {
         return new EzyInstruction()
                 .append("private ")
-                    .append(controller.getClazz().getName())
-                        .append(" controller")
+                .append(controller.getClazz().getName())
+                .append(" controller")
                 .toString();
     }
 
     protected String makeSetControllerMethodContent() {
         return new EzyFunction(getSetControllerMethod())
                 .body()
-                    .append(new EzyInstruction("\t", "\n")
-                            .append("this.controller")
-                            .equal()
-                            .brackets(controller.getClazz().getClazz())
-                            .append("arg0"))
-                    .function()
+                .append(new EzyInstruction("\t", "\n")
+                        .append("this.controller")
+                        .equal()
+                        .brackets(controller.getClazz().getClazz())
+                        .append("arg0"))
+                .function()
                 .toString();
     }
 
+    @SuppressWarnings("MethodLength")
     protected String makeHandleRequestMethodContent() {
         EzyMethod method = getHandleRequestMethod();
         EzyFunction function = new EzyFunction(method)
@@ -163,16 +164,16 @@ public class RequestHandlerImplementer
                         .getParamKeyString(requestParamAnno, parameterCount);
                 String defaultValue = requestParamAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                   ? "arg0.getParameter(" + paramKey + ")"
-                   : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
+                        ? "arg0.getParameter(" + paramKey + ")"
+                        : "arg0.getParameter(" + paramKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeParameter(" +
                         paramKey +
                         ", " + getValueExpression +
                         ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")" ;
+                        ", " + genericTypeClass + ")";
                 instruction
-                    .cast(parameterType, valueExpression);
-                ++ parameterCount;
+                        .cast(parameterType, valueExpression);
+                ++parameterCount;
                 hasAnnotation = true;
             }
             RequestHeader requestHeaderAnno = parameter.getAnnotation(RequestHeader.class);
@@ -181,16 +182,16 @@ public class RequestHandlerImplementer
                         .getHeaderKeyString(requestHeaderAnno, headerCount);
                 String defaultValue = requestHeaderAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                   ? "arg0.getHeader(" + headerKey + ")"
-                   : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
+                        ? "arg0.getHeader(" + headerKey + ")"
+                        : "arg0.getHeader(" + headerKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeHeader(" +
                         headerKey +
                         ", " + getValueExpression +
                         ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")" ;
+                        ", " + genericTypeClass + ")";
                 instruction
-                    .cast(parameterType, valueExpression);
-                ++ headerCount;
+                        .cast(parameterType, valueExpression);
+                ++headerCount;
                 hasAnnotation = true;
             }
             PathVariable pathVariableAnno = parameter.getAnnotation(PathVariable.class);
@@ -201,10 +202,10 @@ public class RequestHandlerImplementer
                         varNameKey +
                         ", arg0.getPathVariable(" + varNameKey + ")" +
                         ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")" ;
+                        ", " + genericTypeClass + ")";
                 instruction
-                    .cast(parameterType, valueExpression);
-                ++ pathVariableCount;
+                        .cast(parameterType, valueExpression);
+                ++pathVariableCount;
                 hasAnnotation = true;
             }
             RequestCookie requestCookieAnno = parameter.getAnnotation(RequestCookie.class);
@@ -213,25 +214,25 @@ public class RequestHandlerImplementer
                         .getCookieKeyString(requestCookieAnno, cookieCount);
                 String defaultValue = requestCookieAnno.defaultValue();
                 String getValueExpression = defaultValue.equals(EzyStrings.NULL)
-                   ? "arg0.getCookieValue(" + cookieKey + ")"
-                   : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
+                        ? "arg0.getCookieValue(" + cookieKey + ")"
+                        : "arg0.getCookieValue(" + cookieKey + ", " + quote(defaultValue) + ")";
                 String valueExpression = "this.deserializeCookie(" +
                         cookieKey +
                         ", " + getValueExpression +
                         ", " + parameterType.getTypeName() + ".class" +
-                        ", " + genericTypeClass + ")" ;
+                        ", " + genericTypeClass + ")";
                 instruction
-                    .cast(parameterType, valueExpression);
-                ++ cookieCount;
+                        .cast(parameterType, valueExpression);
+                ++cookieCount;
                 hasAnnotation = true;
             }
             RequestBody requestBodyAnno = parameter.getAnnotation(RequestBody.class);
             if (requestBodyAnno != null) {
                 instruction
-                    .brackets(parameterType)
-                    .append("this.deserializeBody(")
+                        .brackets(parameterType)
+                        .append("this.deserializeBody(")
                         .append("arg0, ").clazz(parameterType, true)
-                    .append(")");
+                        .append(")");
                 hasAnnotation = true;
             }
             if (!hasAnnotation) {
@@ -243,29 +244,33 @@ public class RequestHandlerImplementer
                 instruction.cast(parameterType, valueExpression);
             }
             body.append(instruction);
-            ++ paramCount;
+            ++paramCount;
 
         }
         EzyInstruction instruction = new EzyInstruction("\t", "\n");
         Class<?> returnType = handlerMethod.getReturnType();
-        if (returnType != void.class)
+        if (returnType != void.class) {
             instruction.answer();
+        }
         StringBuilder answerExpression = new StringBuilder();
         answerExpression.append("this.controller.").append(handlerMethod.getName())
                 .append("(");
-        for (int i = 0 ; i < paramCount ; ++i) {
+        for (int i = 0; i < paramCount; ++i) {
             answerExpression.append(PARAMETER_PREFIX).append(i);
-            if (i < paramCount - 1)
+            if (i < paramCount - 1) {
                 answerExpression.append(", ");
+            }
         }
         answerExpression.append(")");
-        if (returnType != void.class)
+        if (returnType != void.class) {
             instruction.valueOf(returnType, answerExpression.toString());
-        else
+        } else {
             instruction.append(answerExpression);
+        }
         body.append(instruction);
-        if (returnType == void.class)
+        if (returnType == void.class) {
             body.append(new EzyInstruction("\t", "\n").append("return null"));
+        }
         return function.toString();
     }
 
@@ -282,13 +287,14 @@ public class RequestHandlerImplementer
             ExceptionHandlerMethod m = exceptionHandlerMethodMap.get(exceptionClass);
             EzyInstruction instructionIf = new EzyInstruction("\t", "\n", false)
                     .append("if (arg1 instanceof ")
-                        .append(exceptionClass.getName())
+                    .append(exceptionClass.getName())
                     .append(") {");
             body.append(instructionIf);
             EzyInstruction instructionHandle = new EzyInstruction("\t\t", "\n");
             Class<?> returnType = m.getReturnType();
-            if (returnType != void.class)
+            if (returnType != void.class) {
                 instructionHandle.answer();
+            }
             instructionHandle
                     .append("this.controller.").append(m.getName())
                     .bracketopen();
@@ -296,8 +302,9 @@ public class RequestHandlerImplementer
             instructionHandle
                     .bracketclose();
             body.append(instructionHandle);
-            if (returnType == void.class)
+            if (returnType == void.class) {
                 body.append(new EzyInstruction("\t\t", "\n").append("return null"));
+            }
             body.append(new EzyInstruction("\t", "\n", false).append("}"));
         }
         body.append(new EzyInstruction("\t", "\n").append("throw arg1"));
@@ -308,12 +315,12 @@ public class RequestHandlerImplementer
         HttpMethod httpMethod = handlerMethod.getHttpMethod();
         return new EzyFunction(getGetHttpMethodMethod())
                 .body()
-                    .append(new EzyInstruction("\t", "\n")
-                            .answer()
-                            .append(httpMethod.getDeclaringClass().getName())
-                            .dot()
-                            .append(httpMethod))
-                    .function()
+                .append(new EzyInstruction("\t", "\n")
+                        .answer()
+                        .append(httpMethod.getDeclaringClass().getName())
+                        .dot()
+                        .append(httpMethod))
+                .function()
                 .toString();
     }
 
@@ -324,30 +331,30 @@ public class RequestHandlerImplementer
         }
         return new EzyFunction(getGetRequestURIMethod())
                 .body()
-                    .append(new EzyInstruction("\t", "\n")
-                            .answer()
-                            .string(requestURI))
-                    .function()
+                .append(new EzyInstruction("\t", "\n")
+                        .answer()
+                        .string(requestURI))
+                .function()
                 .toString();
     }
 
     protected String makeGetResponseContentTypeMethodContent() {
         return new EzyFunction(getGetResponseContentTypeMethod())
                 .body()
-                    .append(new EzyInstruction("\t", "\n")
-                            .answer()
-                            .string(handlerMethod.getResponseType()))
-                    .function()
+                .append(new EzyInstruction("\t", "\n")
+                        .answer()
+                        .string(handlerMethod.getResponseType()))
+                .function()
                 .toString();
     }
 
     protected String makeIsAsynceMethodContent() {
         return new EzyFunction(getIsAsyncMethod())
                 .body()
-                    .append(new EzyInstruction("\t", "\n")
-                            .answer()
-                            .append(isAsync))
-                    .function()
+                .append(new EzyInstruction("\t", "\n")
+                        .answer()
+                        .append(isAsync))
+                .function()
                 .toString();
     }
 
@@ -356,7 +363,7 @@ public class RequestHandlerImplementer
         if (parameterizedType instanceof ParameterizedType) {
             ParameterizedType aType = (ParameterizedType) parameterizedType;
             Type[] parameterArgTypes = aType.getActualTypeArguments();
-            return (Class<?>)parameterArgTypes[0];
+            return (Class<?>) parameterArgTypes[0];
         }
         return null;
     }
@@ -415,8 +422,9 @@ public class RequestHandlerImplementer
     }
 
     protected void printComponentContent(String componentContent) {
-        if (debug)
+        if (debug) {
             logger.debug("component content: \n{}", componentContent);
+        }
     }
 
 }

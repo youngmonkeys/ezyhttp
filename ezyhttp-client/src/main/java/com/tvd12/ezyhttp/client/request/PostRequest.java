@@ -8,4 +8,5 @@ public class PostRequest extends AbstractRequest<PostRequest> {
     public HttpMethod getMethod() {
         return HttpMethod.POST;
     }
+    
 }

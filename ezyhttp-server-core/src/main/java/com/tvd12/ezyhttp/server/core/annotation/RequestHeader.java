@@ -6,31 +6,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author tavandung12
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 public @interface RequestHeader {
-    
+
     /**
-     * name of header
-     * 
+     * name of header.
+     *
      * @return the header's name
      */
     String value() default "";
-    
+
     /**
-     * name or header
-     * 
+     * name or header.
+     *
      * @return the header's name
      */
     String name() default "";
-    
+
     /**
-     * default or header
-     * 
+     * default or header.
+     *
      * @return the default value of the header
      */
     String defaultValue() default "null";

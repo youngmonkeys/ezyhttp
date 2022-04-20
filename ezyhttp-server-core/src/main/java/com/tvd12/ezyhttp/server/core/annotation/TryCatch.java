@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
- * @author tavandung12
+ * Indicates that a class configure which packages bean context need to load.
  *
+ * @author tavandung12.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 public @interface TryCatch {
-    
+
     Class<?>[] value();
 
 }

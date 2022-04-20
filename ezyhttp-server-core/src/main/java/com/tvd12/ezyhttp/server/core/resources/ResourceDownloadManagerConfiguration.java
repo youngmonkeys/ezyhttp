@@ -13,7 +13,7 @@ import lombok.Setter;
 
 @Setter
 @EzyConfigurationBefore
-public class ResourceDownloadManagerConfiguration 
+public class ResourceDownloadManagerConfiguration
         implements EzyBeanContextAware, EzyBeanConfig {
 
     @EzyProperty(PropertyNames.RESOURCE_ENABLE)

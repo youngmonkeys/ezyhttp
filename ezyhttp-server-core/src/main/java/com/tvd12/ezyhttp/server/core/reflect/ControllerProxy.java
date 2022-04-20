@@ -22,7 +22,7 @@ import com.tvd12.ezyhttp.server.core.util.ControllerAnnotations;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes", "AbbreviationAsWordInName"})
 public class ControllerProxy {
 
     protected final EzyClass clazz;
@@ -57,7 +57,7 @@ public class ControllerProxy {
 
     public boolean isManagement() {
         return instance instanceof ManagementController
-            || clazz.isAnnotated(EzyManagement.class);
+                || clazz.isAnnotated(EzyManagement.class);
     }
 
     public boolean isApi() {
@@ -90,8 +90,9 @@ public class ControllerProxy {
     protected final Map<Class<?>, ExceptionHandlerMethod> fetchExceptionHandlerMethodMap() {
         Map<Class<?>, ExceptionHandlerMethod> answer = new HashMap<>();
         for (ExceptionHandlerMethod m : exceptionHandlerMethods) {
-            for (Class<?> exceptionClass : m.getExceptionClasses())
+            for (Class<?> exceptionClass : m.getExceptionClasses()) {
                 answer.put(exceptionClass, m);
+            }
         }
         return answer;
     }
@@ -99,8 +100,9 @@ public class ControllerProxy {
     protected boolean isRequestHandlerMethod(EzyMethod method) {
         for (Class annClass : REQUEST_HANDLER_ANNOTATIONS) {
             Annotation annotation = method.getAnnotation(annClass);
-            if (annotation != null)
+            if (annotation != null) {
                 return true;
+            }
         }
         return false;
     }
@@ -112,11 +114,11 @@ public class ControllerProxy {
     @Override
     public String toString() {
         return clazz.getName() +
-            "(\n" +
-            "\tinstance: " + instance + ",\n" +
-            "\trequestHandlerMethods: " + requestHandlerMethods + ",\n" +
-            "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
-            ")";
+                "(\n" +
+                "\tinstance: " + instance + ",\n" +
+                "\trequestHandlerMethods: " + requestHandlerMethods + ",\n" +
+                "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
+                ")";
     }
 
 }

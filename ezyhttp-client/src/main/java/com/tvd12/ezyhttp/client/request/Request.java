@@ -17,4 +17,5 @@ public interface Request {
     RequestEntity getEntity();
 
     Map<Integer, Class<?>> getResponseTypes();
+
 }

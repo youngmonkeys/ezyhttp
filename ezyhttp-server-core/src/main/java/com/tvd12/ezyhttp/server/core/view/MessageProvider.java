@@ -6,11 +6,10 @@ import java.util.Properties;
 public interface MessageProvider {
 
     /**
-     * 
-     * Provide messages maps to language
-     * 
+     * Provide messages maps to language.
+     *
      * @return the messages that maps to language
      */
     Map<String, Properties> provide();
-    
+
 }

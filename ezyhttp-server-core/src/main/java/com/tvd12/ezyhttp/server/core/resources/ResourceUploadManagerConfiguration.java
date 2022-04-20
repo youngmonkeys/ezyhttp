@@ -14,14 +14,14 @@ import lombok.Setter;
 
 @Setter
 @EzyConfigurationBefore
-public class ResourceUploadManagerConfiguration 
+public class ResourceUploadManagerConfiguration
         implements EzyBeanContextAware, EzyBeanConfig {
-    
+
     @EzyProperty(PropertyNames.RESOURCE_UPLOAD_ENABLE)
     private boolean resourceUploadEnable = false;
-    
+
     private EzyBeanContext context;
-    
+
     @Override
     public void config() {
         if (resourceUploadEnable) {

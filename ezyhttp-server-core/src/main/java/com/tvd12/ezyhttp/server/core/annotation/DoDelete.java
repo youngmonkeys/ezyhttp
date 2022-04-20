@@ -6,37 +6,35 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author tavandung12
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 public @interface DoDelete {
-    
+
     /**
-     * request uri
+     * request uri.
      *
      * @return the uri
      */
     String value() default "";
 
     /**
-     * request uri
+     * request uri.
      *
      * @return the uri
      */
     String uri() default "";
 
     /**
-     * accepted request body types
+     * accepted request body types.
      *
      * @return the accepted request body types
      */
     String[] accept() default {};
 
     /**
-     * request uri
+     * request uri.
      *
      * @return the response body type
      */

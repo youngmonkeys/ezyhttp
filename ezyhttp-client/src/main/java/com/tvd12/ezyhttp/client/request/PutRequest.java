@@ -8,4 +8,5 @@ public class PutRequest extends AbstractRequest<PutRequest> {
     public HttpMethod getMethod() {
         return HttpMethod.PUT;
     }
+    
 }
