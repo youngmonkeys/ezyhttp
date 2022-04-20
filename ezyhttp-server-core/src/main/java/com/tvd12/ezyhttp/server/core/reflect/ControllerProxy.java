@@ -22,7 +22,7 @@ import com.tvd12.ezyhttp.server.core.util.ControllerAnnotations;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings({"unchecked", "rawtypes", "AbbreviationAsWordInName"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ControllerProxy {
 
     protected final EzyClass clazz;

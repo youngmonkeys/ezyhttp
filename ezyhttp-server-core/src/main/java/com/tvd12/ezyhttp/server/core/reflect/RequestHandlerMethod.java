@@ -21,7 +21,6 @@ import com.tvd12.ezyhttp.server.core.util.DoPutAnnotations;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestHandlerMethod extends HandlerMethod {
 
     protected final String requestURI;

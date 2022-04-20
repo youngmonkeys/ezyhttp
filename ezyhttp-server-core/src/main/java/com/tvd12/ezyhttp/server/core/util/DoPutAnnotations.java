@@ -5,7 +5,6 @@ import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.DoPut;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class DoPutAnnotations {
 
     private DoPutAnnotations() {

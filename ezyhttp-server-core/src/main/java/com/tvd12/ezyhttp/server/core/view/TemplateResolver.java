@@ -13,7 +13,6 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings("AbbreviationAsWordInName")
 public class TemplateResolver {
 
     private final String prefix;

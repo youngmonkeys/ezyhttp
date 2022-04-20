@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 @AllArgsConstructor
-@SuppressWarnings("AbbreviationAsWordInName")
 public class ResourceRequestHandler implements RequestHandler {
 
     private final String resourcePath;

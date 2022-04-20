@@ -5,7 +5,6 @@ import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class DoDeleteAnnotations {
 
     private DoDeleteAnnotations() {

@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestURI {
 
     protected final String uri;

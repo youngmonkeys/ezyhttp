@@ -43,7 +43,7 @@ import javassist.CtField;
 import javassist.CtNewMethod;
 import lombok.Setter;
 
-@SuppressWarnings({"AbbreviationAsWordInName", "LocalVariableName"})
+@SuppressWarnings({"LocalVariableName"})
 public class RequestHandlerImplementer
         extends AbstractHandlerImplementer<RequestHandlerMethod> {
 

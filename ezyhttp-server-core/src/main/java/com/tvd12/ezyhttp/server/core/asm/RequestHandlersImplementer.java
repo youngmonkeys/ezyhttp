@@ -17,7 +17,6 @@ import com.tvd12.ezyhttp.server.core.request.RequestURIMeta;
 
 import lombok.Setter;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestHandlersImplementer extends EzyLoggable {
 
     @Setter

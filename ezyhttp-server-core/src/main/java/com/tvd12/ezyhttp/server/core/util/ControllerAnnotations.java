@@ -4,7 +4,6 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class ControllerAnnotations {
 
     private ControllerAnnotations() {

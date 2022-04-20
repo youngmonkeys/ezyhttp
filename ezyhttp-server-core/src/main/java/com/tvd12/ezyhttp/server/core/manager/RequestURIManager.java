@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestURIManager implements EzyDestroyable {
 
     private final Map<HttpMethod, Set<String>> apiURIs;

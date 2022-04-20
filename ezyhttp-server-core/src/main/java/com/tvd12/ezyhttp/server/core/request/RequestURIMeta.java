@@ -5,7 +5,6 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestURIMeta {
 
     private final boolean api;

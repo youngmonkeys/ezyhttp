@@ -21,7 +21,6 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 
 import static com.tvd12.ezyhttp.server.core.resources.ResourceFile.isResourcePathMatch;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class ResourceLoader extends EzyLoggable {
 
     private static final String PROTOCOL_FILE = "file";

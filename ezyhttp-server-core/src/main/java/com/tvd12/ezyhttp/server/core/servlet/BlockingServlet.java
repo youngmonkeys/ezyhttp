@@ -50,7 +50,6 @@ import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class BlockingServlet extends HttpServlet {
     private static final long serialVersionUID = -3874017929628817672L;
 

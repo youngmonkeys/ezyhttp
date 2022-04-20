@@ -20,7 +20,6 @@ import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable {
 
     @Setter

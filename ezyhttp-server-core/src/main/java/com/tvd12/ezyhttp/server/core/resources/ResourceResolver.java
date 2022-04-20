@@ -9,7 +9,6 @@ import com.tvd12.reflections.util.Sets;
 
 import lombok.Getter;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class ResourceResolver {
 
     @Getter

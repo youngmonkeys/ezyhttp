@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@SuppressWarnings("AbbreviationAsWordInName")
 public final class ComponentManager implements EzyDestroyable {
 
     @Setter

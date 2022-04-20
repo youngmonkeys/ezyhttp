@@ -68,7 +68,7 @@ import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
 import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import com.tvd12.ezyhttp.server.core.view.ViewDialect;
 
-@SuppressWarnings({"rawtypes", "unchecked", "AbbreviationAsWordInName", "MethodCount"})
+@SuppressWarnings({"rawtypes", "unchecked", "MethodCount"})
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
     protected final Properties properties;
