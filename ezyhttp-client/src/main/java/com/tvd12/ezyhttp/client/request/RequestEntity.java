@@ -42,14 +42,16 @@ public class RequestEntity {
     }
 
     public String getHeader(String name) {
-        if (headers == null)
+        if (headers == null) {
             return null;
+        }
         return headers.getValue(name);
     }
 
     public String getContentType() {
-        if (headers == null)
+        if (headers == null) {
             return ContentTypes.APPLICATION_JSON;
+        }
         return headers.getValue(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
     }
 
@@ -72,10 +74,11 @@ public class RequestEntity {
 
         public Builder body(Object body) {
             if (body != null) {
-                if (body instanceof MultiValueMap)
+                if (body instanceof MultiValueMap) {
                     this.body = ((MultiValueMap) body).toMap();
-                else
+                } else {
                     this.body = body;
+                }
             }
             return this;
         }
@@ -84,26 +87,26 @@ public class RequestEntity {
             if (value == null) {
                 return this;
             }
-            if (this.headers == null)
+            if (this.headers == null) {
                 this.headers = new HashMap<>();
-            List<String> values = headers.get(name);
-            if (values == null) {
-                values = new ArrayList<>();
-                headers.put(name, values);
             }
-            values.add(value);
-            return this;
-        }
-
-        public Builder headers(Map<String, String> headers) {
-            for (Entry<String, String> header : headers.entrySet())
-                header(header.getKey(), header.getValue());
+            headers
+                .computeIfAbsent(name, k -> new ArrayList<>())
+                .add(value);
             return this;
         }
 
         public Builder header(String name, List<String> values) {
-            for (String value : values)
+            for (String value : values) {
                 header(name, value);
+            }
+            return this;
+        }
+
+        public Builder headers(Map<String, String> headers) {
+            for (Entry<String, String> header : headers.entrySet()) {
+                header(header.getKey(), header.getValue());
+            }
             return this;
         }
 
@@ -115,7 +118,5 @@ public class RequestEntity {
         public RequestEntity build() {
             return new RequestEntity(headers, body);
         }
-
     }
-
 }

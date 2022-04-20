@@ -26,57 +26,59 @@ import lombok.Setter;
 
 @Setter
 @ApplicationBootstrap
-public class JettyApplicationBootstrap extends EzyLoggable implements ApplicationEntry {
-    
+public class JettyApplicationBootstrap
+    extends EzyLoggable
+    implements ApplicationEntry {
+
     @EzyProperty("server.port")
     protected int port = 8080;
-    
+
     @EzyProperty("server.host")
     protected String host = "0.0.0.0";
-    
+
     @EzyProperty("server.max_threads")
     protected int maxThreads = 256;
-    
+
     @EzyProperty("server.min_threads")
     protected int minThreads = 16;
-    
+
     @EzyProperty("server.idle_timeout")
     protected int idleTimeout = 150 * 1000;
-    
+
     @EzyProperty("server.multipart.location")
     protected String multipartLocation = "tmp";
-    
+
     @EzyProperty("server.multipart.file_size_threshold")
     protected String multipartFileSizeThreshold = "5MB";
-    
+
     @EzyProperty("server.multipart.max_file_size")
     protected String multipartMaxFileSize = "5MB";
-    
+
     @EzyProperty("server.multipart.max_request_size")
     protected String multipartMaxRequestSize = "5MB";
-    
+
     @EzyProperty("cors.enable")
     protected boolean corsEnable;
-    
+
     @EzyProperty("cors.allowed_origins")
     protected String allowedOrigins = "*";
-    
+
     @EzyProperty("cors.allowed_headers")
     protected String allowedHeaders = "*";
-    
+
     @EzyProperty("management.enable")
     protected boolean managementEnable;
-    
+
     @EzyProperty("management.host")
     protected String managementHost = "0.0.0.0";
-    
+
     @EzyProperty("management.port")
     protected int managementPort = 18080;
 
     @Setter(AccessLevel.NONE)
     protected Server server;
-     
-    @Override   
+
+    @Override
     public void start() throws Exception {
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         server = new Server(threadPool);
@@ -96,10 +98,11 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
-        if (managementEnable)
+        if (managementEnable) {
             logger.info("management started on: {}:{}", managementHost, managementPort);
+        }
     }
-    
+
     protected ServletContextHandler newServletHandler() {
         ServletContextHandler servletHandler = new ServletContextHandler();
         servletHandler.addServlet(JettyBlockingServlet.class, "/*")
@@ -107,8 +110,8 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
             .setMultipartConfig(new MultipartConfigElement(
                 multipartLocation,
                 FileSizes.toByteSize(multipartMaxFileSize),
-                (int) fileSizes.toByteSize(multipartMaxRequestSize),
-                (int) fileSizes.toByteSize(multipartFileSizeThreshold)
+                (int) FileSizes.toByteSize(multipartMaxRequestSize),
+                (int) FileSizes.toByteSize(multipartFileSizeThreshold)
             ));
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
@@ -117,20 +120,32 @@ public class JettyApplicationBootstrap extends EzyLoggable implements Applicatio
         }
         return servletHandler;
     }
-    
+
     protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
         servletHandler.addFilter(filter, "/*", EnumSet.of(DispatcherType.REQUEST));
     }
-    
+
     protected FilterHolder newCrossOriginFilter() {
         FilterHolder filter = new FilterHolder();
         filter.setName("cross-origin");
         filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, allowedOrigins);
-        filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
+        filter.setInitParameter(
+            CrossOriginFilter.ALLOWED_METHODS_PARAM,
+            "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS"
+        );
         filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, allowedHeaders);
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, allowedOrigins);
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_METHODS_HEADER, "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS");
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER, allowedHeaders);
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER,
+            allowedOrigins
+        );
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_METHODS_HEADER,
+            "GET,HEAD,POST,PUT,DELETE,CONNECT,TRACE,PATCH,OPTIONS"
+        );
+        filter.setInitParameter(
+            CrossOriginFilter.ACCESS_CONTROL_ALLOW_HEADERS_HEADER,
+            allowedHeaders
+        );
         CrossOriginFilter corsFilter = new CrossOriginFilter();
         filter.setFilter(corsFilter);
         return filter;

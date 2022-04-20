@@ -45,15 +45,15 @@ public class HttpClient extends EzyLoggable {
     protected final int defaultReadTimeout;
     protected final int defaultConnectTimeout;
     protected final DataConverters dataConverters;
-    
+
     public static final int NO_TIMEOUT = -1;
-    
+
     protected HttpClient(Builder builder) {
         this.defaultReadTimeout = builder.readTimeout;
         this.defaultConnectTimeout = builder.connectTimeout;
         this.dataConverters = builder.dataConverters;
     }
-    
+
     public <T> T call(Request request) throws Exception {
         ResponseEntity response = request(
             request.getMethod(),
@@ -65,7 +65,7 @@ public class HttpClient extends EzyLoggable {
         );
         return getResponseBody(response);
     }
-    
+
     public ResponseEntity request(Request request) throws Exception {
         return request(
             request.getMethod(),
@@ -76,7 +76,8 @@ public class HttpClient extends EzyLoggable {
             request.getReadTimeout()
         );
     }
-    
+
+    @SuppressWarnings("MethodLength")
     public ResponseEntity request(
         HttpMethod method,
         String url,
@@ -87,11 +88,19 @@ public class HttpClient extends EzyLoggable {
         if (url == null) {
             throw new IllegalArgumentException("url can not be null");
         }
-        logger.debug("start: {} - {} - {}", method, url, entity != null ? entity.getHeaders() : null);
+        logger.debug(
+            "start: {} - {} - {}",
+            method, url,
+            entity != null ? entity.getHeaders() : null
+        );
         HttpURLConnection connection = connect(url);
         try {
-            connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-            connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
+            connection.setConnectTimeout(
+                connectTimeout > 0 ? connectTimeout : defaultConnectTimeout
+            );
+            connection.setReadTimeout(
+                readTimeout > 0 ? readTimeout : defaultReadTimeout
+            );
             connection.setRequestMethod(method.toString());
             connection.setDoInput(true);
             connection.setDoOutput(method.hasOutput());
@@ -99,8 +108,12 @@ public class HttpClient extends EzyLoggable {
             MultiValueMap requestHeaders = entity != null ? entity.getHeaders() : null;
             if (requestHeaders != null) {
                 Map<String, String> encodedHeaders = requestHeaders.toMap();
-                for (Entry<String, String> requestHeader : encodedHeaders.entrySet())
-                    connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+                for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+                    connection.setRequestProperty(
+                        requestHeader.getKey(),
+                        requestHeader.getValue()
+                    );
+                }
             }
             Object requestBody = null;
             if (method != HttpMethod.GET && entity != null) {
@@ -111,15 +124,18 @@ public class HttpClient extends EzyLoggable {
                 String requestContentType = connection.getRequestProperty(Headers.CONTENT_TYPE);
                 if (requestContentType == null) {
                     requestContentType = ContentTypes.APPLICATION_JSON;
-                    connection.setRequestProperty(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+                    connection.setRequestProperty(
+                        Headers.CONTENT_TYPE,
+                        ContentTypes.APPLICATION_JSON
+                    );
                 }
                 requestBodyBytes = serializeRequestBody(requestContentType, requestBody);
                 int requestContentLength = requestBodyBytes.length;
                 connection.setFixedLengthStreamingMode(requestContentLength);
             }
-            
+
             connection.connect();
-            
+
             if (requestBodyBytes != null) {
                 if (method.hasOutput()) {
                     OutputStream outputStream = connection.getOutputStream();
@@ -127,26 +143,29 @@ public class HttpClient extends EzyLoggable {
                     outputStream.flush();
                     outputStream.close();
                 } else {
-                    throw new IllegalArgumentException(method + " method can not have a payload body");
+                    throw new IllegalArgumentException(
+                        method + " method can not have a payload body"
+                    );
                 }
             }
-            
+
             int responseCode = connection.getResponseCode();
             Map<String, List<String>> headerFields = connection.getHeaderFields();
             MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
             String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
-            if (responseContentType == null)
+            if (responseContentType == null) {
                 responseContentType = ContentTypes.APPLICATION_JSON;
-            InputStream inputStream = responseCode >= 400 
-                    ? connection.getErrorStream()
-                    : connection.getInputStream();
+            }
+            InputStream inputStream = responseCode >= 400
+                ? connection.getErrorStream()
+                : connection.getInputStream();
             Object responseBody = null;
             if (inputStream != null) {
                 try {
                     int responseContentLength = connection.getContentLength();
                     Class<?> responseType = responseTypes.get(responseCode);
                     responseBody = deserializeResponseBody(
-                            responseContentType, responseContentLength, inputStream, responseType);
+                        responseContentType, responseContentLength, inputStream, responseType);
                 } finally {
                     inputStream.close();
                 }
@@ -157,12 +176,12 @@ public class HttpClient extends EzyLoggable {
             connection.disconnect();
         }
     }
-    
+
     public HttpURLConnection connect(String url) throws Exception {
         URL requestURL = new URL(url);
         return (HttpURLConnection) requestURL.openConnection();
     }
-    
+
     protected byte[] serializeRequestBody(
         String contentType,
         Object requestBody
@@ -170,7 +189,7 @@ public class HttpClient extends EzyLoggable {
         BodySerializer serializer = dataConverters.getBodySerializer(contentType);
         return serializer.serialize(requestBody);
     }
-    
+
     protected Object deserializeResponseBody(
         String contentType,
         int contentLength,
@@ -179,33 +198,34 @@ public class HttpClient extends EzyLoggable {
         BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
         Object body;
         if (responseType != null) {
-            if (responseType == String.class)
+            if (responseType == String.class) {
                 body = deserializer.deserializeToString(inputStream, contentLength);
-            else
+            } else {
                 body = deserializer.deserialize(inputStream, responseType);
+            }
         } else {
             body = deserializer.deserializeToString(inputStream, contentLength);
             if (body != null) {
                 try {
                     body = deserializer.deserialize((String) body, Map.class);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // do nothing
                 }
             }
         }
         return body;
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getResponseBody(ResponseEntity entity) throws Exception {
         int statusCode = entity.getStatus();
         Object body = entity.getBody();
-        if (statusCode < 400)
+        if (statusCode < 400) {
             return (T) body;
+        }
         throw translateErrorCode(statusCode, body);
     }
-    
+
     private Exception translateErrorCode(int statusCode, Object body) {
         if (statusCode == StatusCodes.BAD_REQUEST) {
             return new HttpBadRequestException(body);
@@ -247,12 +267,12 @@ public class HttpClient extends EzyLoggable {
     }
 
     /**
-     * Downloads a file from a URL and store to a file
+     * Downloads a file from a URL and store to a file.
      *
-     * @param fileURL HTTP URL of the file to be downloaded
+     * @param fileURL       HTTP URL of the file to be downloaded
      * @param storeLocation path of the directory to save the file
-     * @throws IOException when there is any I/O error
      * @return the downloaded file name
+     * @throws IOException when there is any I/O error
      */
     public String download(
         String fileURL,
@@ -260,15 +280,15 @@ public class HttpClient extends EzyLoggable {
     ) throws Exception {
         return download(fileURL, storeLocation, ALWAYS_RUN);
     }
-    
+
     /**
-     * Downloads a file from a URL and store to a file
-     * 
-     * @param fileURL HTTP URL of the file to be downloaded
-     * @param storeLocation path of the directory to save the file
+     * Downloads a file from a URL and store to a file.
+     *
+     * @param fileURL           HTTP URL of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
      * @param cancellationToken the token to cancel
-     * @throws IOException when there is any I/O error
      * @return the downloaded file name
+     * @throws IOException when there is any I/O error
      */
     public String download(
         String fileURL,
@@ -283,12 +303,12 @@ public class HttpClient extends EzyLoggable {
     }
 
     /**
-     * Downloads a file from a URL and store to a file
+     * Downloads a file from a URL and store to a file.
      *
-     * @param request the request of the file to be downloaded
+     * @param request       the request of the file to be downloaded
      * @param storeLocation path of the directory to save the file
-     * @throws IOException when there is any I/O error
      * @return the downloaded file name
+     * @throws IOException when there is any I/O error
      */
     public String download(
         DownloadRequest request,
@@ -296,15 +316,15 @@ public class HttpClient extends EzyLoggable {
     ) throws Exception {
         return download(request, storeLocation, ALWAYS_RUN);
     }
-    
+
     /**
-     * Downloads a file from a URL and store to a file
-     * 
-     * @param request the request of the file to be downloaded
-     * @param storeLocation path of the directory to save the file
+     * Downloads a file from a URL and store to a file.
+     *
+     * @param request           the request of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
      * @param cancellationToken the token to cancel
-     * @throws IOException when there is any I/O error
      * @return the downloaded file name
+     * @throws IOException when there is any I/O error
      */
     public String download(
         DownloadRequest request,
@@ -321,7 +341,7 @@ public class HttpClient extends EzyLoggable {
             connection.disconnect();
         }
     }
-    
+
     private String download(
         HttpURLConnection connection,
         String fileURL,
@@ -329,7 +349,7 @@ public class HttpClient extends EzyLoggable {
         DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
-        
+
         if (responseCode >= 400) {
             throw processDownloadError(connection, fileURL, responseCode);
         }
@@ -341,8 +361,8 @@ public class HttpClient extends EzyLoggable {
         Path downloadingFilePath = downloadingFile.toPath();
         Files.deleteIfExists(downloadingFilePath);
         Files.createFile(downloadingFilePath);
-         
-        try(InputStream inputStream = connection.getInputStream()) {
+
+        try (InputStream inputStream = connection.getInputStream()) {
             try (FileOutputStream outputStream = new FileOutputStream(downloadingFile)) {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
@@ -367,9 +387,9 @@ public class HttpClient extends EzyLoggable {
     }
 
     /**
-     * Downloads a file from a URL and store to an output stream
+     * Downloads a file from a URL and store to an output stream.
      *
-     * @param fileURL HTTP URL of the file to be downloaded
+     * @param fileURL      HTTP URL of the file to be downloaded
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
@@ -379,12 +399,12 @@ public class HttpClient extends EzyLoggable {
     ) throws Exception {
         download(fileURL, outputStream, ALWAYS_RUN);
     }
-    
+
     /**
-     * Downloads a file from a URL and store to an output stream
-     * 
-     * @param fileURL HTTP URL of the file to be downloaded
-     * @param outputStream the output stream to save the file
+     * Downloads a file from a URL and store to an output stream.
+     *
+     * @param fileURL           HTTP URL of the file to be downloaded
+     * @param outputStream      the output stream to save the file
      * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
@@ -397,9 +417,9 @@ public class HttpClient extends EzyLoggable {
     }
 
     /**
-     * Downloads a file from a URL and store to an output stream
+     * Downloads a file from a URL and store to an output stream.
      *
-     * @param request the request of the file to be downloaded
+     * @param request      the request of the file to be downloaded
      * @param outputStream the output stream to save the file
      * @throws IOException when there is any I/O error
      */
@@ -409,12 +429,12 @@ public class HttpClient extends EzyLoggable {
     ) throws Exception {
         download(request, outputStream, ALWAYS_RUN);
     }
-    
+
     /**
-     * Downloads a file from a URL and store to an output stream
-     * 
-     * @param request the request of the file to be downloaded
-     * @param outputStream the output stream to save the file
+     * Downloads a file from a URL and store to an output stream.
+     *
+     * @param request           the request of the file to be downloaded
+     * @param outputStream      the output stream to save the file
      * @param cancellationToken the token to cancel
      * @throws IOException when there is any I/O error
      */
@@ -433,7 +453,7 @@ public class HttpClient extends EzyLoggable {
             connection.disconnect();
         }
     }
-    
+
     private void download(
         HttpURLConnection connection,
         String fileURL,
@@ -441,12 +461,12 @@ public class HttpClient extends EzyLoggable {
         DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
-        
+
         if (responseCode >= 400) {
             throw processDownloadError(connection, fileURL, responseCode);
         }
-         
-        try(InputStream inputStream = connection.getInputStream()) {
+
+        try (InputStream inputStream = connection.getInputStream()) {
             int bytesRead;
             byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -460,9 +480,9 @@ public class HttpClient extends EzyLoggable {
             throw new DownloadCancelledException(fileURL);
         }
     }
-    
+
     private void decorateConnection(
-        HttpURLConnection connection, 
+        HttpURLConnection connection,
         DownloadRequest request
     ) {
         int connectTimeout = request.getReadTimeout();
@@ -477,7 +497,7 @@ public class HttpClient extends EzyLoggable {
             }
         }
     }
-    
+
     private Exception processDownloadError(
         HttpURLConnection connection,
         String fileURL,
@@ -496,8 +516,11 @@ public class HttpClient extends EzyLoggable {
         logger.debug("download error: {} - {} - {}", fileURL, responseCode, responseBody);
         return translateErrorCode(responseCode, responseBody);
     }
-    
-    public static String getDownloadFileName(String fileURL, String contentDisposition) {
+
+    public static String getDownloadFileName(
+        String fileURL,
+        String contentDisposition
+    ) {
         String answer = null;
         if (contentDisposition != null) {
             String prefix = "filename=";
@@ -512,11 +535,11 @@ public class HttpClient extends EzyLoggable {
                         break;
                     }
                     if (ch == '\'') {
-                        if ((++ quoteCount) >= 2) {
+                        if ((++quoteCount) >= 2) {
                             break;
                         }
                     } else if (ch == '\"') {
-                        if ((++ quotesCount) >= 2) {
+                        if ((++quotesCount) >= 2) {
                             break;
                         }
                     } else {
@@ -531,13 +554,13 @@ public class HttpClient extends EzyLoggable {
         }
         return answer;
     }
-    
+
     public static Builder builder() {
         return new Builder();
     }
-    
+
     public static class Builder implements EzyBuilder<HttpClient> {
-        
+
         protected int readTimeout;
         protected int connectTimeout;
         protected ObjectMapper objectMapper;
@@ -545,62 +568,65 @@ public class HttpClient extends EzyLoggable {
         protected DataConverters dataConverters;
         protected final List<Object> bodyConverterList;
         protected final Map<String, Object> bodyConverterMap;
-        
+
         public Builder() {
             this.readTimeout = 15 * 1000;
             this.connectTimeout = 15 * 1000;
             this.bodyConverterList = new ArrayList<>();
             this.bodyConverterMap = new HashMap<>();
         }
-        
+
         public Builder readTimeout(int readTimeout) {
             this.readTimeout = readTimeout;
             return this;
         }
-        
+
         public Builder connectTimeout(int connectTimeout) {
             this.connectTimeout = connectTimeout;
             return this;
         }
-        
+
         public Builder objectMapper(Object objectMapper) {
-            if (objectMapper instanceof ObjectMapper)
+            if (objectMapper instanceof ObjectMapper) {
                 this.objectMapper = (ObjectMapper) objectMapper;
+            }
             return this;
         }
-        
+
         public Builder setStringConverter(Object converter) {
             this.stringConverter = converter;
             return this;
         }
-        
+
         public Builder addBodyConverter(Object converter) {
             this.bodyConverterList.add(converter);
             return this;
         }
-        
-        public Builder addBodyConverters(List<?> converters) {
-            this.bodyConverterList.addAll(converters);
-            return this;
-        }
-        
+
         public Builder addBodyConverter(String contentType, Object converter) {
             this.bodyConverterMap.put(contentType, converter);
             return this;
         }
-        
+
+        public Builder addBodyConverters(List<?> converters) {
+            this.bodyConverterList.addAll(converters);
+            return this;
+        }
+
         public Builder addBodyConverters(Map<String, Object> converterByContentType) {
             this.bodyConverterMap.putAll(converterByContentType);
             return this;
         }
-        
+
         @Override
         public HttpClient build() {
-            if (objectMapper == null)
+            if (objectMapper == null) {
                 this.objectMapper = new ObjectMapperBuilder().build();
+            }
             this.dataConverters = new DataConverters(objectMapper);
-            if (stringConverter != null)
+            if (stringConverter != null) {
                 this.dataConverters.setStringConverter(stringConverter);
+            }
             this.dataConverters.addBodyConverters(bodyConverterList);
             this.dataConverters.addBodyConverters(bodyConverterMap);
             return new HttpClient(this);
