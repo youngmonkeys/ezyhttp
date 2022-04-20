@@ -12,14 +12,14 @@ public class ResourceFile {
     private final String relativePath;
     private final String fullPath;
     private final boolean inJar;
-    
+
     public boolean isFileNameMatches(String pattern) {
         return EzyFileUtil.getFileName(relativePath).matches(pattern);
     }
 
     public static boolean isResourcePathMatch(
-        String resourcePath,
-        String regex
+            String resourcePath,
+            String regex
     ) {
         if (resourcePath.matches(regex)) {
             return true;

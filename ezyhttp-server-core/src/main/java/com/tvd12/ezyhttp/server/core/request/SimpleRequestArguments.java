@@ -59,29 +59,33 @@ public class SimpleRequestArguments implements RequestArguments {
         if (argument == null && debug) {
             throw new NullPointerException("there is no value for argment: " + key);
         }
-        return (T)argument;
+        return (T) argument;
     }
 
     @Override
     public void setArgument(Object key, Object value) {
-        if (arguments == null)
+        if (arguments == null) {
             arguments = new HashMap<>();
+        }
         arguments.put(key, value);
     }
 
     @Override
     public String getParameter(int index) {
-        if (parameterList == null)
+        if (parameterList == null) {
             return null;
-        if (parameterList.size() <= index)
+        }
+        if (parameterList.size() <= index) {
             return null;
+        }
         return parameterList.get(index);
     }
 
     @Override
     public String getParameter(String name) {
-        if (parameterMap == null)
+        if (parameterMap == null) {
             return null;
+        }
         return parameterMap.get(name);
     }
 
@@ -101,33 +105,38 @@ public class SimpleRequestArguments implements RequestArguments {
             parameterMap = new HashMap<>();
         }
         String value = values.length == 0
-            ? ""
-            : values.length == 1 ? values[0] : String.join(",", values);
+                ? ""
+                : values.length == 1 ? values[0] : String.join(",", values);
         parameterList.add(value);
         parameterMap.put(name, value);
     }
 
     @Override
     public String getHeader(int index) {
-        if (headerList == null)
+        if (headerList == null) {
             return null;
-        if (headerList.size() <= index)
+        }
+        if (headerList.size() <= index) {
             return null;
+        }
         return headerList.get(index);
     }
 
     @Override
     public String getHeader(String name) {
-        if (headerMap == null)
+        if (headerMap == null) {
             return null;
+        }
         return headerMap.get(name);
     }
 
     public void setHeader(String name, String value) {
-        if (headerList == null)
+        if (headerList == null) {
             headerList = new ArrayList<>();
-        if (headerMap == null)
+        }
+        if (headerMap == null) {
             headerMap = new HashMap<>();
+        }
         headerList.add(value);
         headerMap.put(name, value);
     }
@@ -135,8 +144,9 @@ public class SimpleRequestArguments implements RequestArguments {
     @Override
     public String getPathVariable(int index) {
         fetchPathVariables();
-        if (pathVariableList.size() <= index)
+        if (pathVariableList.size() <= index) {
             return null;
+        }
         return pathVariableList.get(index).getValue();
     }
 
@@ -149,12 +159,13 @@ public class SimpleRequestArguments implements RequestArguments {
     protected void fetchPathVariables() {
         if (pathVariableList == null) {
             pathVariableList = PathVariables.getVariables(
-                uriTemplate,
-                request.getRequestURI()
+                    uriTemplate,
+                    request.getRequestURI()
             );
             pathVariableMap = new HashMap<>();
-            for (Entry<String, String> entry : pathVariableList)
+            for (Entry<String, String> entry : pathVariableList) {
                 pathVariableMap.put(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -189,8 +200,9 @@ public class SimpleRequestArguments implements RequestArguments {
     }
 
     public void setCookies(Cookie[] cookies) {
-        if (cookies == null || cookies.length == 0)
+        if (cookies == null || cookies.length == 0) {
             return;
+        }
         this.cookies = cookies;
         this.cookieMap = new HashMap<>();
         for (Cookie cookie : cookies) {
@@ -212,14 +224,14 @@ public class SimpleRequestArguments implements RequestArguments {
     }
 
     @Override
-    public Cookie getCookie(String name) {
-        return cookieMap != null ? cookieMap.get(name) : null;
-    }
-
-    @Override
     public String getCookieValue(String name) {
         Cookie cookie = getCookie(name);
         return cookie != null ? cookie.getValue() : null;
+    }
+
+    @Override
+    public Cookie getCookie(String name) {
+        return cookieMap != null ? cookieMap.get(name) : null;
     }
 
     public void setRedirectionAttributesFromCookie() {
@@ -243,7 +255,7 @@ public class SimpleRequestArguments implements RequestArguments {
         if (redirectionAttributes == null) {
             return null;
         }
-        return (T)redirectionAttributes.get(name);
+        return (T) redirectionAttributes.get(name);
     }
 
     @Override
@@ -264,24 +276,33 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public void release() {
-        if (arguments != null)
+        if (arguments != null) {
             arguments.clear();
-        if (headerList != null)
+        }
+        if (headerList != null) {
             headerList.clear();
-        if (headerMap != null)
+        }
+        if (headerMap != null) {
             headerMap.clear();
-        if (parameterList != null)
+        }
+        if (parameterList != null) {
             parameterList.clear();
-        if (parameterMap != null)
+        }
+        if (parameterMap != null) {
             parameterMap.clear();
-        if (cookieMap != null)
+        }
+        if (cookieMap != null) {
             cookieMap.clear();
-        if (pathVariableList != null)
+        }
+        if (pathVariableList != null) {
             pathVariableList.clear();
-        if (pathVariableMap != null)
+        }
+        if (pathVariableMap != null) {
             pathVariableMap.clear();
-        if (redirectionAttributes != null)
+        }
+        if (redirectionAttributes != null) {
             redirectionAttributes.clear();
+        }
         this.arguments = null;
         this.headerList = null;
         this.headerMap = null;

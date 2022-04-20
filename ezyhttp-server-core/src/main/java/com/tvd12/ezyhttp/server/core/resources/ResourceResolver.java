@@ -15,8 +15,8 @@ public class ResourceResolver {
     protected final Map<String, Resource> resources = new HashMap<>();
     protected final ResourceLoader resourceLoader = new ResourceLoader();
 
-    public final static String DEFAULT_RESOURCE_LOCATION = "static";
-    public final static String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
+    public static final String DEFAULT_RESOURCE_LOCATION = "static";
+    public static final String DEFAULT_FILE_PATH_PATTERN = "[.\\/\\w\\d_-]+[.][\\w\\d_-]+";
 
     public void register(String location) {
         register(location, DEFAULT_FILE_PATH_PATTERN);
@@ -27,26 +27,27 @@ public class ResourceResolver {
     }
 
     public void register(String[] locations, String... filePathRegexes) {
-        for (String location : locations)
+        for (String location : locations) {
             register(location, filePathRegexes);
+        }
     }
 
     public void register(String location, String... filePathRegexes) {
         String trimLocation = location.trim();
         List<ResourceFile> resourceFiles = resourceLoader.listResourceFiles(
-            trimLocation,
-            Sets.newHashSet(filePathRegexes)
+                trimLocation,
+                Sets.newHashSet(filePathRegexes)
         );
         for (ResourceFile res : resourceFiles) {
             String relativePath = res.getRelativePath();
             String resourceURI = relativePath.substring(trimLocation.length() + 1)
-                .replace('\\', '/');
+                    .replace('\\', '/');
             String extension = EzyFileUtil.getFileExtension(resourceURI);
             Resource resource = new Resource(
-                relativePath,
-                resourceURI,
-                extension,
-                res.getFullPath()
+                    relativePath,
+                    resourceURI,
+                    extension,
+                    res.getFullPath()
             );
             resources.put(resourceURI, resource);
         }

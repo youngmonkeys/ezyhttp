@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface ViewDecorator {
 
     void decorate(HttpServletRequest request, View view);
-    
+
     default int getPriority() {
         return 0;
     }

@@ -21,7 +21,7 @@ public class TemplateResolver {
     private final boolean cacheable;
     private final String templateMode;
     private final String messagesLocation;
-    
+
     protected TemplateResolver(Builder builder) {
         this.prefix = builder.prefix;
         this.suffix = builder.suffix;
@@ -30,16 +30,16 @@ public class TemplateResolver {
         this.templateMode = builder.templateMode;
         this.messagesLocation = builder.messagesLocation;
     }
-    
+
     public static TemplateResolver of(EzyPropertyFetcher propertyFetcher) {
         return builder().setFrom(propertyFetcher).build();
     }
-    
+
     public static Builder builder() {
         return new Builder();
     }
-    
-    
+
+
     public static class Builder implements EzyBuilder<TemplateResolver> {
         private String prefix = "templates/";
         private String suffix = ".html";
@@ -47,37 +47,37 @@ public class TemplateResolver {
         private boolean cacheable = true;
         private String templateMode = "HTML";
         private String messagesLocation = "messages";
-        
+
         public Builder prefix(String prefix) {
             this.prefix = prefix;
             return this;
         }
-        
+
         public Builder suffix(String suffix) {
             this.suffix = suffix;
             return this;
         }
-        
+
         public Builder cacheTTLMs(int cacheTTLMs) {
             this.cacheTTLMs = cacheTTLMs;
             return this;
         }
-        
+
         public Builder cacheable(boolean cacheable) {
             this.cacheable = cacheable;
             return this;
         }
-        
+
         public Builder templateMode(String templateMode) {
             this.templateMode = templateMode;
             return this;
         }
-        
+
         public Builder messagesLocation(String messagesLocation) {
             this.messagesLocation = messagesLocation;
             return this;
         }
-        
+
         public Builder setFrom(EzyPropertyFetcher propertyFetcher) {
             this.templateMode = propertyFetcher.getProperty(
                     VIEW_TEMPLATE_MODE, String.class, templateMode);
@@ -93,11 +93,11 @@ public class TemplateResolver {
                     VIEW_TEMPLATE_MESSAGES_LOCATION, String.class, messagesLocation);
             return this;
         }
-        
+
         @Override
         public TemplateResolver build() {
             return new TemplateResolver(this);
         }
     }
-    
+
 }

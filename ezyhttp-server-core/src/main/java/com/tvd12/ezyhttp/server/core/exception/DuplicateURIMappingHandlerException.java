@@ -9,7 +9,8 @@ public class DuplicateURIMappingHandlerException extends IllegalStateException {
     public DuplicateURIMappingHandlerException(
             RequestURI uri,
             RequestHandler old, RequestHandler now) {
-        super("duplicate mapping uri: " + uri + " <> " + old.getHandlerMethod() + " => " + now.getHandlerMethod());
+        super("duplicate mapping uri: " + uri + " <> " + old.getHandlerMethod() +
+                " => " + now.getHandlerMethod());
     }
 
 }

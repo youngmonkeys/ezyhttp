@@ -4,6 +4,7 @@ import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 
 public interface AsmUncaughtExceptionHandler extends UncaughtExceptionHandler {
 
-    default void setExceptionHandler(Object handler) {}
+    default void setExceptionHandler(Object handler) {
+    }
 
 }

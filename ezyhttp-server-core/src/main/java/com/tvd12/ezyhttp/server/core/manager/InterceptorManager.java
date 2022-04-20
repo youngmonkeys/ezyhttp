@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
+
 import static com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations.*;
 
 import lombok.Getter;

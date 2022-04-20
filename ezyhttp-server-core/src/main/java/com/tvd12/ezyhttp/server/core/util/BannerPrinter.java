@@ -12,17 +12,16 @@ public class BannerPrinter {
     public String getBannerText() {
         return new String(getBannerBytes());
     }
-    
+
     protected byte[] getBannerBytes() {
         InputStream inputStream = getBannerInputStream();
         try {
             return getBannerBytes(inputStream);
-        }
-        finally {
+        } finally {
             EzyProcessor.processSilently(inputStream::close);
         }
     }
-    
+
     protected byte[] getBannerBytes(InputStream stream) {
         try {
             return EzyInputStreams.toByteArray(stream);
@@ -30,12 +29,12 @@ public class BannerPrinter {
             return new byte[0];
         }
     }
-    
+
     protected InputStream getBannerInputStream() {
         return EzyClassPathInputStreamLoader.builder()
                 .context(getClass())
                 .build()
                 .load("ezyhttp-banner.txt");
     }
-    
+
 }

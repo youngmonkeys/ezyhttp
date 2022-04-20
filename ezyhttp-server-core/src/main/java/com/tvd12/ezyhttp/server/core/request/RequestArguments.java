@@ -33,9 +33,29 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 
     String getParameter(String name);
 
+    default String getParameter(int index, String defaultValue) {
+        String answer = getParameter(index);
+        return answer != null ? answer : defaultValue;
+    }
+
+    default String getParameter(String name, String defaultValue) {
+        String answer = getParameter(name);
+        return answer != null ? answer : defaultValue;
+    }
+
     String getHeader(int index);
 
     String getHeader(String name);
+
+    default String getHeader(String name, String defaultValue) {
+        String answer = getHeader(name);
+        return answer != null ? answer : defaultValue;
+    }
+
+    default String getHeader(int index, String defaultValue) {
+        String answer = getHeader(index);
+        return answer != null ? answer : defaultValue;
+    }
 
     String getPathVariable(int index);
 
@@ -47,11 +67,21 @@ public interface RequestArguments extends BodyData, EzyReleasable {
 
     String getCookieValue(String name);
 
+    default String getCookieValue(int index, String defaultValue) {
+        String answer = getCookieValue(index);
+        return answer != null ? answer : defaultValue;
+    }
+
+    default String getCookieValue(String name, String defaultValue) {
+        String answer = getCookieValue(name);
+        return answer != null ? answer : defaultValue;
+    }
+
+    Map<String, Object> getRedirectionAttributes();
+
     <T> T getRedirectionAttribute(String name);
 
     <T> T getRedirectionAttribute(String name, Class<T> outType);
-
-    Map<String, Object> getRedirectionAttributes();
 
     default <T> T getRedirectionAttribute(String name, T defaultValue) {
         T value = getRedirectionAttribute(name);
@@ -61,35 +91,5 @@ public interface RequestArguments extends BodyData, EzyReleasable {
     default <T> T getRedirectionAttribute(String name, Class<T> outType, T defaultValue) {
         T value = getRedirectionAttribute(name, outType);
         return value != null ? value : defaultValue;
-    }
-
-    default String getParameter(int index, String defaultValue) {
-        String answer = getParameter(index);
-        return answer != null ? answer : defaultValue;
-    }
-    
-    default String getParameter(String name, String defaultValue) {
-        String answer = getParameter(name);
-        return answer != null ? answer : defaultValue;
-    }
-
-    default String getHeader(String name, String defaultValue) {
-        String answer = getHeader(name);
-        return answer != null ? answer : defaultValue;
-    }
-    
-    default String getHeader(int index, String defaultValue) {
-        String answer = getHeader(index);
-        return answer != null ? answer : defaultValue;
-    }
-    
-    default String getCookieValue(int index, String defaultValue) {
-        String answer = getCookieValue(index);
-        return answer != null ? answer : defaultValue;
-    }
-    
-    default String getCookieValue(String name, String defaultValue) {
-        String answer = getCookieValue(name);
-        return answer != null ? answer : defaultValue;
     }
 }

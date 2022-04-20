@@ -32,7 +32,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     protected final Map<HttpMethod, URITree> uriTreeByMethod;
     protected final Map<RequestURI, RequestHandler> handlers;
     protected final Map<RequestURI, List<RequestHandler>> handlerListByURI;
-    
+
     public RequestHandlerManager() {
         this.handlers = new HashMap<>();
         this.handledURIs = new HashSet<>();
@@ -41,7 +41,7 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         this.requestURIManager = new RequestURIManager();
         this.uriTreeByMethod = this.newUriTreeByMethod();
     }
-    
+
     private Map<HttpMethod, URITree> newUriTreeByMethod() {
         Map<HttpMethod, URITree> answer = new HashMap<>();
         for (HttpMethod method : HttpMethod.values()) {
@@ -49,25 +49,26 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         }
         return answer;
     }
-    
+
     public String getMatchedURI(HttpMethod method, String requestURI) {
         String matchedURI = null;
-        if (handledURIs.contains(requestURI))
+        if (handledURIs.contains(requestURI)) {
             matchedURI = requestURI;
+        }
         if (matchedURI == null && requestURI != null) {
             URITree uriTree = uriTreeByMethod.get(method);
             matchedURI = uriTree.getMatchedURI(requestURI);
         }
         return matchedURI;
     }
-    
+
     public RequestHandler getHandler(
             HttpMethod method, String matchedURI, boolean isManagement) {
         RequestURI requestURI = new RequestURI(method, matchedURI, isManagement);
         RequestHandler handler = handlers.get(requestURI);
         return handler != null ? handler : RequestHandler.EMPTY;
     }
-    
+
     public void addHandler(RequestURI uri, RequestHandler handler) {
         RequestHandler old = this.handlers.put(uri, handler);
         if (old != null && !allowOverrideURI) {
@@ -76,8 +77,8 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         this.handledURIs.add(uri.getUri());
         this.logger.info("add mapping uri: {}", uri);
         this.handlerListByURI
-            .computeIfAbsent(uri, k -> new ArrayList<>())
-            .add(handler);
+                .computeIfAbsent(uri, k -> new ArrayList<>())
+                .add(handler);
         this.requestURIManager.addHandledURI(uri.getMethod(), uri.getUri());
         if (uri.isApi()) {
             this.requestURIManager.addApiURI(uri.getMethod(), uri.getUri());
@@ -97,12 +98,13 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
         }
         if (EzyStrings.isNotBlank(uri.getFeature())) {
             this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(), uri.getUri());
-            this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(), uri.getSameURI());
+            this.featureURIManager.addFeatureURI(uri.getFeature(), uri.getMethod(),
+                    uri.getSameURI());
         }
         URITree uriTree = uriTreeByMethod.get(uri.getMethod());
         uriTree.addURI(uri.getUri());
     }
-    
+
     public void addHandlers(Map<RequestURI, List<RequestHandler>> handlers) {
         for (RequestURI uri : handlers.keySet()) {
             for (RequestHandler handler : handlers.get(uri)) {
@@ -110,11 +112,11 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
             }
         }
     }
-    
+
     public Map<RequestURI, List<RequestHandler>> getHandlerListByURI() {
         return Collections.unmodifiableMap(handlerListByURI);
     }
-    
+
     @Override
     public void destroy() {
         this.handlers.clear();

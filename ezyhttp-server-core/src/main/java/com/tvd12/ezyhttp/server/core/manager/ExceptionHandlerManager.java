@@ -44,8 +44,9 @@ public class ExceptionHandlerManager extends EzyLoggable implements EzyDestroyab
 
     public void addUncaughtExceptionHandlers(
             Map<Class<?>, UncaughtExceptionHandler> handlers) {
-        for (Class<?> exceptionClass : handlers.keySet())
+        for (Class<?> exceptionClass : handlers.keySet()) {
             addUncaughtExceptionHandler(exceptionClass, handlers.get(exceptionClass));
+        }
     }
 
     public Map<Class<?>, UncaughtExceptionHandler> getUncaughtExceptionHandlers() {

@@ -9,7 +9,8 @@ public final class Annotations {
     public static final Set<Class<?>> REQUEST_HANDLER_ANNOTATIONS
             = requestHandlerAnnotations();
 
-    private Annotations() {}
+    private Annotations() {
+    }
 
     private static Set<Class<?>> requestHandlerAnnotations() {
         Set<Class<?>> set = new HashSet<>();

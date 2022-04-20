@@ -14,7 +14,7 @@ public class RequestURIMeta {
     private final boolean payment;
     private final String feature;
     private final String resourceFullPath;
-    
+
     protected RequestURIMeta(Builder builder) {
         this.api = builder.api;
         this.authenticated = builder.authenticated;
@@ -24,13 +24,13 @@ public class RequestURIMeta {
         this.feature = builder.feature;
         this.resourceFullPath = builder.resourceFullPath;
     }
-    
+
     public static Builder builder() {
         return new Builder();
     }
-    
+
     public static class Builder implements EzyBuilder<RequestURIMeta> {
-        
+
         private boolean api;
         private boolean authenticated;
         private boolean management;
@@ -38,42 +38,42 @@ public class RequestURIMeta {
         private boolean payment;
         private String feature;
         private String resourceFullPath;
-        
+
         public Builder api(boolean api) {
             this.api = api;
             return this;
         }
-        
+
         public Builder authenticated(boolean authenticated) {
             this.authenticated = authenticated;
             return this;
         }
-        
+
         public Builder management(boolean management) {
             this.management = management;
             return this;
         }
-        
+
         public Builder resource(boolean resource) {
             this.resource = resource;
             return this;
         }
-        
+
         public Builder payment(boolean payment) {
             this.payment = payment;
             return this;
         }
-        
+
         public Builder feature(String feature) {
             this.feature = feature;
             return this;
         }
-        
+
         public Builder resourceFullPath(String resourceFullPath) {
             this.resourceFullPath = resourceFullPath;
             return this;
         }
-        
+
         @Override
         public RequestURIMeta build() {
             return new RequestURIMeta(this);

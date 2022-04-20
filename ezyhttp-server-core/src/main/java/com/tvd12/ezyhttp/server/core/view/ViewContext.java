@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 public interface ViewContext {
 
     void render(
-        ServletContext servletContext,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        View view
+            ServletContext servletContext,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            View view
     ) throws IOException;
 
 }

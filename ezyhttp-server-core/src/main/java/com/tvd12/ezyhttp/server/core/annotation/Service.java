@@ -6,23 +6,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author tavandung12
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Service {
-    
+
     /**
-     * the service name
+     * the service name.
      *
      * @return the service name
      */
     String value() default "";
 
     /**
-     * the service name
+     * the service name.
      *
      * @return the service name
      */

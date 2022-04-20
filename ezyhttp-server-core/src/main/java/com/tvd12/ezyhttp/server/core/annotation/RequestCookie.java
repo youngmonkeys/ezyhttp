@@ -6,31 +6,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
  * @author tavandung12
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 public @interface RequestCookie {
-    
+
     /**
-     * name or parameter
+     * name or parameter.
      *
      * @return the parameter's name
      */
     String value() default "";
 
     /**
-     * name or cookie
-     * 
+     * name or cookie.
+     *
      * @return the cookie's name
      */
     String name() default "";
-    
+
     /**
-     * default or cookie
-     * 
+     * default or cookie.
+     *
      * @return the default value of the cookie
      */
     String defaultValue() default "null";

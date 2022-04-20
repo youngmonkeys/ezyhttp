@@ -46,8 +46,9 @@ public class SimpleApplicationContext implements ApplicationContext {
     @Override
     public void destroy() {
         List destroyableComponents = beanContext.getSingletonsOf(EzyDestroyable.class);
-        for (Object component : destroyableComponents)
-            ((EzyDestroyable)component).destroy();
+        for (Object component : destroyableComponents) {
+            ((EzyDestroyable) component).destroy();
+        }
         ComponentManager.getInstance().destroy();
     }
 }

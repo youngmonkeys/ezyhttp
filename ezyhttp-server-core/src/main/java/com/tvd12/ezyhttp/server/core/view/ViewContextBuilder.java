@@ -6,7 +6,7 @@ import java.util.List;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
 public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
-    
+
     protected TemplateResolver templateResolver;
     protected AbsentMessageResolver absentMessageResolver;
     protected final List<ViewDialect> viewDialects;

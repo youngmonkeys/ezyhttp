@@ -6,19 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a class configure which packages bean context need to load
- * 
- * @author tavandung12
+ * Indicates that a class configure which packages bean context need to load.
  *
+ * @author tavandung12
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface ComponentClasses {
-    
+
     /**
-     * component classes to load
-     * 
+     * component classes to load.
+     *
      * @return array of component classes
      */
     Class<?>[] value();

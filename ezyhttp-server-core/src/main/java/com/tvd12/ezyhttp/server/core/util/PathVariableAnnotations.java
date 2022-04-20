@@ -5,14 +5,16 @@ import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 
 public final class PathVariableAnnotations {
 
-    private PathVariableAnnotations() {}
+    private PathVariableAnnotations() {
+    }
 
     public static String getVariableNameKeyString(PathVariable annotation, int index) {
         String keyString = annotation.value();
-        if (EzyStrings.isNoContent(keyString))
+        if (EzyStrings.isNoContent(keyString)) {
             keyString = String.valueOf(index);
-        else
+        } else {
             keyString = EzyStrings.quote(keyString);
+        }
         return keyString;
     }
 

@@ -39,10 +39,10 @@ public class ExceptionHandlerProxy {
     @Override
     public String toString() {
         return clazz.getName() +
-            "(\n" +
-            "\tinstance: " + instance + ",\n" +
-            "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
-            ")";
+                "(\n" +
+                "\tinstance: " + instance + ",\n" +
+                "\texceptionHandlerMethods: " + exceptionHandlerMethods + "\n" +
+                ")";
     }
 
 }

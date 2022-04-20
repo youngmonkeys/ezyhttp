@@ -29,11 +29,11 @@ public class MessageReader {
                     ? fileReader.read(file.resourceFile.getRelativePath())
                     : fileReader.read(new File(file.resourceFile.getFullPath()));
             answer
-                .computeIfAbsent(file.language, k -> new Properties())
-                .putAll(properties);
+                    .computeIfAbsent(file.language, k -> new Properties())
+                    .putAll(properties);
             answer
-                .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
-                .putAll(properties);
+                    .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
+                    .putAll(properties);
         }
         return answer;
     }
@@ -46,8 +46,9 @@ public class MessageReader {
                     String fileName = getFileName(it.getRelativePath());
                     int index = fileName.indexOf('_');
                     String lang = "";
-                    if (index > 0)
+                    if (index > 0) {
                         lang = fileName.substring(index + 1, fileName.lastIndexOf('.'));
+                    }
                     return new MessagesFile(lang, it);
                 })
                 .collect(Collectors.toList());
