@@ -41,4 +41,14 @@ public class RequestHandlerManagerTest {
         Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get"), "hello.world");
         Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get/"), "hello.world");
     }
+
+    @Test
+    public void getMatchedUriWithRequestUriNull() {
+        // given
+        RequestHandlerManager sut = new RequestHandlerManager();
+
+        // when
+        // then
+        Asserts.assertNull(sut.getMatchedURI(HttpMethod.GET, null));
+    }
 }
