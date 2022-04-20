@@ -31,17 +31,17 @@ public class HomeController {
 
     @DoGet
     public String welcome(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("firstName") String firstName,
-            @RequestParam String who,
-            @RequestHeader("key") String key,
-            @RequestHeader String token,
-            @RequestCookie String cookieIndex,
-            @RequestCookie("cookie") String cookieValue,
-            @RequestArgument("name") String name,
-            @RequestBody HelloRequest body,
-            @NickName String nickName) {
+        HttpServletRequest request,
+        HttpServletResponse response,
+        @RequestParam("firstName") String firstName,
+        @RequestParam String who,
+        @RequestHeader("key") String key,
+        @RequestHeader String token,
+        @RequestCookie String cookieIndex,
+        @RequestCookie("cookie") String cookieValue,
+        @RequestArgument("name") String name,
+        @RequestBody HelloRequest body,
+        @NickName String nickName) {
         System.out.println("request uri: " + request.getRequestURI());
         if (who == null)
             throw new IllegalArgumentException("who cannot be null");
@@ -50,13 +50,14 @@ public class HomeController {
 
     @DoPost
     public String hello(
-            RequestArguments args,
-            @RequestBody HelloRequest body) {
+        RequestArguments args,
+        @RequestBody HelloRequest body) {
         return "hello " + body.getWho();
     }
 
     @DoPut
-    public void doNothing() {}
+    public void doNothing() {
+    }
 
     @DoGet("bye")
     public String bye(@RequestParam List<String> messages) {
@@ -65,25 +66,25 @@ public class HomeController {
 
     @DoGet(value = "see", responseType = ContentTypes.APPLICATION_JSON)
     public String see(
-            @RequestParam List<String> messages,
-            @PathVariable("name") String name) {
+        @RequestParam List<String> messages,
+        @PathVariable("name") String name) {
         return "bye: " + messages;
     }
 
     @DoPut(value = "see", responseType = ContentTypes.APPLICATION_JSON)
     public String put(
-            @RequestParam List<String> messages,
-            @PathVariable("name") String name) {
+        @RequestParam List<String> messages,
+        @PathVariable("name") String name) {
         return "bye: " + messages;
     }
 
     @DoDelete("see")
     public String delete(
-            @RequestHeader int count,
-            @RequestParam int skip,
-            @RequestParam int limit,
-            @RequestParam List<String> messages,
-            @PathVariable("name") String name) {
+        @RequestHeader int count,
+        @RequestParam int skip,
+        @RequestParam int limit,
+        @RequestParam List<String> messages,
+        @PathVariable("name") String name) {
         return "bye: " + messages;
     }
 

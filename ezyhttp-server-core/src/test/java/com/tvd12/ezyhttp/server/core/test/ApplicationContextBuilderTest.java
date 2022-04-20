@@ -44,13 +44,13 @@ public class ApplicationContextBuilderTest {
     public void postTest() {
         ComponentManager.getInstance().destroy();
     }
-    
+
     @Test
     public void test() {
         // given
         EzyBeanContext internalBeanContext = EzyBeanContext.builder()
-                .addSingleton(new InternalSingleton1())
-                .build();
+            .addSingleton(new InternalSingleton1())
+            .build();
         Properties properties = new Properties();
         properties.put("b", 2);
         ApplicationContext applicationContext = new ApplicationContextBuilder()
@@ -177,9 +177,9 @@ public class ApplicationContextBuilderTest {
                 "i_dont_know",
                 "com.tvd12.ezyhttp.server",
                 "com.tvd12.ezyhttp.server.core.test",
-                "com.tvd12.ezyhttp.server.core.test.config", 
+                "com.tvd12.ezyhttp.server.core.test.config",
                 "com.tvd12.ezyhttp.server.core.test.event",
-                "com.tvd12.ezyhttp.server.core.test.api"), 
+                "com.tvd12.ezyhttp.server.core.test.api"),
             packagesToScan);
         applicationContext.destroy();
     }
@@ -206,10 +206,10 @@ public class ApplicationContextBuilderTest {
 
         // when
         EzyPropertiesMap actual = MethodInvoker.create()
-                .object(sut)
-                .method("getPropertiesMap")
-                .param(EzyReflection.class, reflection)
-                .invoke(EzyPropertiesMap.class);
+            .object(sut)
+            .method("getPropertiesMap")
+            .param(EzyReflection.class, reflection)
+            .invoke(EzyPropertiesMap.class);
 
         // then
         Asserts.assertNull(actual);
@@ -229,10 +229,10 @@ public class ApplicationContextBuilderTest {
 
         // when
         ViewContext actual = MethodInvoker.create()
-                .object(sut)
-                .method("buildViewContext")
-                .param(EzyBeanContext.class, beanContext)
-                .invoke(ViewContext.class);
+            .object(sut)
+            .method("buildViewContext")
+            .param(EzyBeanContext.class, beanContext)
+            .invoke(ViewContext.class);
 
         // then
         Asserts.assertEquals(viewContext, actual);
@@ -251,10 +251,10 @@ public class ApplicationContextBuilderTest {
 
         // when
         ViewContext actual = MethodInvoker.create()
-                .object(sut)
-                .method("buildViewContext")
-                .param(EzyBeanContext.class, beanContext)
-                .invoke(ViewContext.class);
+            .object(sut)
+            .method("buildViewContext")
+            .param(EzyBeanContext.class, beanContext)
+            .invoke(ViewContext.class);
 
         // then
         Asserts.assertNull(actual);
@@ -305,10 +305,10 @@ public class ApplicationContextBuilderTest {
 
         // when
         ViewContext actual = MethodInvoker.create()
-                .object(sut)
-                .method("buildViewContext")
-                .param(EzyBeanContext.class, beanContext)
-                .invoke(ViewContext.class);
+            .object(sut)
+            .method("buildViewContext")
+            .param(EzyBeanContext.class, beanContext)
+            .invoke(ViewContext.class);
 
         // then
         Asserts.assertEquals(viewContext, actual);
@@ -340,10 +340,10 @@ public class ApplicationContextBuilderTest {
 
         // when
         ResourceResolver actual = MethodInvoker.create()
-                .object(sut)
-                .method("getResourceResolver")
-                .param(EzyBeanContext.class, beanContext)
-                .invoke(ResourceResolver.class);
+            .object(sut)
+            .method("getResourceResolver")
+            .param(EzyBeanContext.class, beanContext)
+            .invoke(ResourceResolver.class);
 
         // then
         Asserts.assertEquals(resolver, actual);
@@ -351,9 +351,9 @@ public class ApplicationContextBuilderTest {
         verify(beanContext, times(1)).getSingleton(ResourceResolver.class);
     }
 
-    private static class InternalSingleton1  {}
+    private static class InternalSingleton1 { }
 
-    private static class InternalSingleton2  {}
+    private static class InternalSingleton2 { }
 
-    private static class InternalSingleton3  {}
+    private static class InternalSingleton3 { }
 }

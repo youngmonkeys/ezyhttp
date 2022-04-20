@@ -13,6 +13,7 @@ import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.test.assertion.Asserts;
+
 import static org.mockito.Mockito.*;
 
 public class RequestHandlersImplementerTest {
@@ -23,7 +24,7 @@ public class RequestHandlersImplementerTest {
         RequestHandlersImplementer sut = new RequestHandlersImplementer();
         Controller controller = new Controller();
         RequestHandlerManager manager = new RequestHandlerManager();
-        
+
         // when
         Throwable e = Asserts.assertThrows(() ->
             manager.addHandlers(sut.implement(
@@ -46,7 +47,7 @@ public class RequestHandlersImplementerTest {
         // when
         Throwable e = Asserts.assertThrows(() ->
             manager.addHandlers(sut.implement(
-                    Arrays.asList(controller2, controller3)
+                Arrays.asList(controller2, controller3)
             ))
         );
 
@@ -61,10 +62,10 @@ public class RequestHandlersImplementerTest {
         Controller controller = new Controller();
         RequestHandlerManager manager = new RequestHandlerManager();
         manager.setAllowOverrideURI(true);
-        
+
         // when
         manager.addHandlers(sut.implement(Collections.singletonList(controller)));
-        
+
         // then
         RequestURI uri = new RequestURI(HttpMethod.GET, "/get", false);
         Asserts.assertThat(manager.getHandlerListByURI().get(uri).size()).isEqualsTo(2);
@@ -77,14 +78,14 @@ public class RequestHandlersImplementerTest {
         Controller controller = new Controller();
         RequestHandlerManager manager = new RequestHandlerManager();
         manager.setAllowOverrideURI(true);
-        
+
         RequestURIDecorator requestURIDecorator = mock(RequestURIDecorator.class);
         when(requestURIDecorator.decorate(any(), any())).thenReturn("hello-world");
         sut.setRequestURIDecorator(requestURIDecorator);
-        
+
         // when
         manager.addHandlers(sut.implement(Collections.singletonList(controller)));
-        
+
         // then
         RequestURI uri = new RequestURI(HttpMethod.GET, "/hello-world", false);
         Asserts.assertThat(manager.getHandlerListByURI().get(uri).size()).isEqualsTo(2);
@@ -93,21 +94,25 @@ public class RequestHandlersImplementerTest {
     public static class Controller {
 
         @DoGet("/get")
-        public void doGet() {}
+        public void doGet() {
+        }
 
         @DoGet("/get")
-        public void doGet1() {}
+        public void doGet1() {
+        }
     }
 
     public static class Controller2 {
 
         @DoGet("/get")
-        public void doGet() {}
+        public void doGet() {
+        }
     }
 
     public static class Controller3 {
 
         @DoGet("/get")
-        public void doGet() {}
+        public void doGet() {
+        }
     }
 }

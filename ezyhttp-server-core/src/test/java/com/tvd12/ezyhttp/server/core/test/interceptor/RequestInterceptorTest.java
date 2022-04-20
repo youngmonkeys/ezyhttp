@@ -11,7 +11,6 @@ public class RequestInterceptorTest {
         // given
         RequestInterceptor sut = new RequestInterceptor() {};
 
-
         // when
         // then
         sut.preHandle(null, null);

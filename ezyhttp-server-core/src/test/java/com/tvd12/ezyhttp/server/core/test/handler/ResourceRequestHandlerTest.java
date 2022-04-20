@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import static org.mockito.Mockito.*;
 
 public class ResourceRequestHandlerTest {
-    
+
     @Test
     public void handleAsyncTest() throws Exception {
         // given
@@ -44,10 +44,10 @@ public class ResourceRequestHandlerTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         when(asyncContext.getResponse()).thenReturn(response);
 
         // when
@@ -81,7 +81,7 @@ public class ResourceRequestHandlerTest {
             new EzyAnywayInputStreamLoader(),
             downloadManager
         );
-        
+
         RequestArguments arguments = mock(RequestArguments.class);
 
         AsyncContext asyncContext = mock(AsyncContext.class);
@@ -89,16 +89,16 @@ public class ResourceRequestHandlerTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
         doThrow(IOException.class).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
-        
+
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         // when
         sut.handle(arguments);
-        
+
         // then
         Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
         Asserts.assertEquals("/index.html", sut.getRequestURI());
@@ -134,7 +134,7 @@ public class ResourceRequestHandlerTest {
             downloadManager,
             timeout
         );
-        
+
         RequestArguments arguments = mock(RequestArguments.class);
 
         AsyncContext asyncContext = mock(AsyncContext.class);
@@ -142,16 +142,16 @@ public class ResourceRequestHandlerTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
         doThrow(IOException.class).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
-        
+
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         // when
         sut.handle(arguments);
-        
+
         // then
         verify(arguments, times(1)).getAsyncContext();
         verify(response, times(1)).getOutputStream();

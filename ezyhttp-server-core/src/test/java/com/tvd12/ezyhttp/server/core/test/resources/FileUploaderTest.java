@@ -31,30 +31,30 @@ public class FileUploaderTest {
         AsyncContext asyncContext = mock(AsyncContext.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         Part part = mock(Part.class);
         File outputFile = new File("test-output/files");
         EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
             EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
         }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, part, outputFile, callback);
-        
+
         // then
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
         verify(response, times(1)).setStatus(StatusCodes.OK);
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void acceptFirstException() throws Exception {
@@ -67,24 +67,24 @@ public class FileUploaderTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         Part part = mock(Part.class);
         File outputFile = new File("test-output/files");
         EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
         doThrow(IllegalStateException.class).when(callback).apply();
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
             EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
         }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, part, outputFile, callback);
-        
+
         // then
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
@@ -93,7 +93,7 @@ public class FileUploaderTest {
         verify(asyncContext, times(1)).getRequest();
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void acceptFirstMaxUploadSizeException() throws Exception {
@@ -106,27 +106,27 @@ public class FileUploaderTest {
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(asyncContext.getResponse()).thenReturn(response);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         Part part = mock(Part.class);
         File outputFile = new File("test-output/files");
         EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
         doThrow(new MaxUploadSizeException(100)).when(callback).apply();
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
             EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onResponse(Boolean.TRUE);
             return null;
         }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, part, outputFile, callback);
-        
+
         // then
         verify(callback, times(1)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
@@ -137,7 +137,7 @@ public class FileUploaderTest {
         verify(asyncContext, times(1)).getRequest();
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void acceptFirstFailed() throws Exception {
@@ -154,19 +154,19 @@ public class FileUploaderTest {
         Part part = mock(Part.class);
         File outputFile = new File("test-output/files");
         EzyExceptionVoid callback = mock(EzyExceptionVoid.class);
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doAnswer(it -> {
             EzyResultCallback<Boolean> cb = it.getArgumentAt(3, EzyResultCallback.class);
             cb.onException(new Exception("just test"));
             return null;
         }).when(resourceUploadManager).drainAsync(any(), any(), any(long.class), any());
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, part, outputFile, callback);
-        
+
         // then
         verify(callback, times(0)).apply();
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());
@@ -175,7 +175,7 @@ public class FileUploaderTest {
         verify(asyncContext, times(1)).getRequest();
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void acceptSecondFailed() throws IOException {
@@ -185,19 +185,19 @@ public class FileUploaderTest {
         when(part.getInputStream()).thenThrow(IOException.class);
         File outputFile = new File("test-output/files");
         FileUploadCallback callback = mock(FileUploadCallback.class);
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, part, outputFile, callback);
-        
+
         // then
         verify(callback, times(1)).onFailure(any());
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @Test
     public void acceptThirdFileNotFound() {
         // given
@@ -207,19 +207,19 @@ public class FileUploaderTest {
         InputStream inputStream = mock(InputStream.class);
         File outputFile = new File("");
         FileUploadCallback callback = mock(FileUploadCallback.class);
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
-        
+
         FileUploader sut = new FileUploader(resourceUploadManager);
-        
+
         // when
         sut.accept(asyncContext, inputStream, outputFile, callback);
-        
+
         // then
         verify(callback, times(1)).onFailure(any());
         verify(asyncContext, times(1)).complete();
     }
-    
+
     @Test
     public void acceptFourthFailed() {
         // given
@@ -229,7 +229,7 @@ public class FileUploaderTest {
         InputStream inputStream = mock(InputStream.class);
         OutputStream outputStream = mock(OutputStream.class);
         FileUploadCallback callback = mock(FileUploadCallback.class);
-        
+
         ResourceUploadManager resourceUploadManager = mock(ResourceUploadManager.class);
         doThrow(IllegalStateException.class).when(resourceUploadManager)
             .drainAsync(
@@ -241,10 +241,10 @@ public class FileUploaderTest {
 
         int timeout = RandomUtil.randomSmallInt() + 1;
         FileUploader sut = new FileUploader(resourceUploadManager, timeout);
-        
+
         // when
         sut.accept(asyncContext, inputStream, outputStream, callback);
-        
+
         // then
         verify(callback, times(1)).onFailure(any());
         verify(resourceUploadManager, times(1)).drainAsync(any(), any(), any(long.class), any());

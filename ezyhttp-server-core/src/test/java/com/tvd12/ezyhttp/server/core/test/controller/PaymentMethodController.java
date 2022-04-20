@@ -8,7 +8,7 @@ import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 
 @Controller("/api/v1.2.2")
 public class PaymentMethodController {
-    
+
     @EzyManagement
     @EzyFeature("order")
     @EzyPayment

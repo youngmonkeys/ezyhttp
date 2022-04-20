@@ -1,14 +1,14 @@
 package com.tvd12.ezyhttp.server.core.test.interceptor;
 
-import java.lang.reflect.Method;
-
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.annotation.Interceptor;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 
-@Interceptor
-public class LoginInterceptor
+import java.lang.reflect.Method;
+
+@Interceptor(priority = Integer.MAX_VALUE)
+public class LoginInterceptorAfter
     extends EzyLoggable
     implements RequestInterceptor {
 

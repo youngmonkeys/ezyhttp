@@ -22,22 +22,19 @@ public class GlobalExceptionHandler {
     }
 
     @TryCatch(java.lang.ClassCastException.class)
-    public void handleException3(Exception e) {
-    }
+    public void handleException3(Exception e) {}
 
     @TryCatch(java.lang.RuntimeException.class)
     public void handleException4(
-            RequestArguments args,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            boolean booleanValue,
-            int intValue,
-            String stringValue,
-            Exception e) {
+        RequestArguments args,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        boolean booleanValue,
+        int intValue,
+        String stringValue,
+        Exception e) {
     }
 
     @TryCatch(java.lang.Exception.class)
-    public void handleException5() {
-    }
-
+    public void handleException5() {}
 }

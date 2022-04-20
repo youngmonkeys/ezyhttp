@@ -8,5 +8,4 @@ import com.tvd12.ezyhttp.server.core.test.event.EventService;
 @ComponentClasses(EventService.class)
 @ComponentsScan("com.tvd12.ezyhttp.server.core.test.event")
 @EzyPackagesToScan("com.tvd12.ezyhttp.server.core.test.api")
-public class GlobalConfig {
-}
+public class GlobalConfig { }

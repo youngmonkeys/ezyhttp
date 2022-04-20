@@ -29,12 +29,12 @@ public class RequestHandlerMethodTest extends BaseTest {
 
     @Test
     public void isPaymentAndFeatureTest() throws Exception {
-     // given
+        // given
         RequestHandlerMethod sut = new RequestHandlerMethod(
             "/get",
             new EzyMethod(InternalController.class.getDeclaredMethod("buySomething"))
         );
-        
+
         // when
         // then
         Asserts.assertTrue(sut.isPayment());

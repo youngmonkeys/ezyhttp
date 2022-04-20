@@ -6,5 +6,4 @@ import lombok.Data;
 public class HelloRequest {
 
     public String who;
-
 }

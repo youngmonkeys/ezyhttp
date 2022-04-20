@@ -67,8 +67,10 @@ public class EzyHttpApplication
         }
     }
 
-    protected static ApplicationContext
-    createApplicationContext(String basePackage, Class<?>... componentClasses) {
+    protected static ApplicationContext createApplicationContext(
+        String basePackage,
+        Class<?>... componentClasses
+    ) {
         return new ApplicationContextBuilder()
             .scan(basePackage)
             .addComponentClasses(componentClasses)

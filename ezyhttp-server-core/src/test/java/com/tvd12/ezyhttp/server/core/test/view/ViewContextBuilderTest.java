@@ -41,43 +41,40 @@ public class ViewContextBuilderTest {
             false
         );
     }
-    
+
     @AllArgsConstructor
     private static class InternalViewContext implements ViewContext {
 
         private final List<ViewDecorator> viewDecorators;
-        
+
         @Override
         public void render(
-            ServletContext servletContext, 
-            HttpServletRequest request, 
+            ServletContext servletContext,
+            HttpServletRequest request,
             HttpServletResponse response,
             View view
-        ) {
-        }
-        
+        ) {}
+
     }
-    
+
     private static class InternalViewContextBuilder extends ViewContextBuilder {
 
         @Override
         public InternalViewContext build() {
             return new InternalViewContext(viewDecorators);
         }
-        
+
     }
-    
+
     private static class ViewDecorator1 implements ViewDecorator {
         @Override
-        public void decorate(HttpServletRequest request, View view) {
-        }
+        public void decorate(HttpServletRequest request, View view) {}
     }
-    
+
     private static class ViewDecorator2 implements ViewDecorator {
         @Override
-        public void decorate(HttpServletRequest request, View view) {
-        }
-        
+        public void decorate(HttpServletRequest request, View view) {}
+
         @Override
         public int getPriority() {
             return -1;

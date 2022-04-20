@@ -12,7 +12,7 @@ public class PaymentController {
 
     @DoGet("/get-something")
     public void getSomeThing() {}
-    
+
     @EzyPayment
     @DoGet("/get-and-buy-something")
     public void getAndBuySomeThing() {}

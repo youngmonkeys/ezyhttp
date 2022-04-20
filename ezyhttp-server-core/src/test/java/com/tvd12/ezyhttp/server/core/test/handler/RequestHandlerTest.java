@@ -40,6 +40,5 @@ public class RequestHandlerTest {
         public String getResponseContentType() {
             return null;
         }
-
     }
 }

@@ -86,7 +86,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -94,7 +94,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -142,15 +142,15 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
         componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get";
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
@@ -159,17 +159,17 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
-        
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
-        
+
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
         RequestURIMeta uriMeta = RequestURIMeta.builder()
@@ -178,43 +178,43 @@ public class BlockingServletTest {
             .api(true)
             .build();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, uriMeta), requestHandler);
-        
+
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);
         componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         RequestURIManager requestURIManager = requestHandlerManager.getRequestURIManager();
         Asserts.assertTrue(requestURIManager.isAuthenticatedURI(HttpMethod.GET, "/get"));
         Asserts.assertTrue(requestURIManager.isAuthenticatedURI(HttpMethod.GET, "/get/"));
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).getContentType();
         verify(response, times(1)).getOutputStream();
         verify(response, times(1)).setStatus(StatusCodes.OK);
-        
+
         DataConverters dataConverters = componentManager.getDataConverters();
         BodySerializer bodySerializer = dataConverters.getBodySerializer(ContentTypes.APPLICATION_JSON);
         ExResponse responseData = new ExResponse(
             "Hello ParameterValue, HeaderValue, CookieValue"
         );
         verify(outputStream, times(1)).write(bodySerializer.serialize(responseData));
-        
+
         verify(interceptor, times(1)).preHandle(any(), any());
         verify(interceptor, times(1)).postHandle(any(), any());
         verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
         verify(watcher, times(1)).watchResponse(HttpMethod.GET, request, response);
-        
+
         componentManager.destroy();
     }
 
@@ -238,7 +238,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -246,7 +246,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -342,15 +342,15 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
-        
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
-        
+
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -378,43 +378,43 @@ public class BlockingServletTest {
             new RequestURI(HttpMethod.GET, "/management", true),
             mock(RequestHandler.class)
         );
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/management";
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(MANAGEMENT_POR);
-        
+
         when(request.getParameterNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
-        
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
-        
+
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).setStatus(StatusCodes.OK);
-        
+
         Asserts.assertEquals(componentManager.getServerPort(), PORT);
 
         componentManager.destroy();
@@ -462,10 +462,10 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
@@ -478,30 +478,30 @@ public class BlockingServletTest {
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get-handler-null";
-        
+
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
-        
+
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).setStatus(StatusCodes.OK);
-        
+
         componentManager.destroy();
     }
 
@@ -551,10 +551,10 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
@@ -567,35 +567,35 @@ public class BlockingServletTest {
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
-        
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get";
-        
+
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
-        
+
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).setStatus(StatusCodes.OK);
-        
+
         componentManager.destroy();
     }
 
@@ -604,10 +604,10 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
         when(
             unhandledErrorHandler.handleError(
@@ -619,37 +619,37 @@ public class BlockingServletTest {
             )
         ).thenReturn(null);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get";
-        
+
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
-        
+
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).getOutputStream();
         verify(response, times(1)).setStatus(StatusCodes.METHOD_NOT_ALLOWED);
-        
+
         verify(outputStream, times(1)).write("method GET not allowed".getBytes());
-        
+
         componentManager.destroy();
     }
 
@@ -658,10 +658,10 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
         ResponseEntity responseEntity = ResponseEntity.ok();
         when(
@@ -674,39 +674,39 @@ public class BlockingServletTest {
             )
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
-        
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get";
-        
+
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
         when(request.getServerPort()).thenReturn(PORT);
-        
+
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
         doThrow(
             new IllegalStateException("just test")
         ).when(response).setStatus(StatusCodes.OK);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandler requestHandler = new GetRequestHandler();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.POST, requestURI, false), requestHandler);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(2)).getRequestURI();
-        
+
         verify(response, times(1)).setStatus(StatusCodes.OK);
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-        
+
         componentManager.destroy();
     }
 
@@ -730,7 +730,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -738,7 +738,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -784,7 +784,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -792,15 +792,15 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         AsyncContext asyncContext = mock(AsyncContext.class);
         when(request.startAsync(request, response)).thenReturn(asyncContext);
         when(request.isAsyncStarted()).thenReturn(true);
@@ -834,12 +834,12 @@ public class BlockingServletTest {
 
         int defaultAsyncTimeout = RandomUtil.randomSmallInt() + 1;
         componentManager.setAsyncDefaultTimeout(defaultAsyncTimeout);
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/get";
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
@@ -848,23 +848,23 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
-        
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
-        
+
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         AsyncContext asyncContext = mock(AsyncContext.class);
         when(request.startAsync(request, response)).thenReturn(asyncContext);
         when(request.isAsyncStarted()).thenReturn(true);
@@ -873,25 +873,25 @@ public class BlockingServletTest {
             asyncListener.setValue(it.getArgumentAt(0, AsyncListener.class));
             return null;
         }).when(asyncContext).addListener(any(AsyncListener.class));
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestHandlerContentTypeNull requestHandler = new GetRequestHandlerContentTypeNull();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
-        
+
         // when
         sut.service(request, response);
-        
+
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         doThrow(IllegalStateException.class).when(interceptor).postHandle(any(), any());
         componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
         asyncListener.getValue().onComplete(new AsyncEvent(asyncContext));
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(2)).getRequestURI();
         verify(asyncContext, times(1)).addListener(any(AsyncListener.class));
         verify(asyncContext, times(1)).setTimeout(defaultAsyncTimeout);
-        
+
         componentManager.destroy();
     }
 
@@ -921,7 +921,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -968,7 +968,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1021,7 +1021,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1074,7 +1074,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1110,7 +1110,7 @@ public class BlockingServletTest {
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
         ExExceptionHandler exceptionHandler = new ExExceptionHandler("hello", null);
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
-        
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -1132,13 +1132,13 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
 
@@ -1168,7 +1168,7 @@ public class BlockingServletTest {
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
         ExExceptionHandler exceptionHandler = new ExExceptionHandler(null, null);
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
-        
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -1190,7 +1190,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1224,7 +1224,7 @@ public class BlockingServletTest {
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
         ExExceptionHandler exceptionHandler = new ExExceptionHandler("", null);
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
-        
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -1246,13 +1246,13 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
 
@@ -1280,7 +1280,7 @@ public class BlockingServletTest {
 
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
         exceptionHandlerManager.destroy();
-  
+
 
         BlockingServlet sut = new BlockingServlet();
         sut.init();
@@ -1302,13 +1302,13 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         GetRequestUnknownExceptionnHandler requestHandler = new GetRequestUnknownExceptionnHandler(null);
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
 
@@ -1346,7 +1346,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -1354,7 +1354,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] {
+            new Cookie[]{
                 new Cookie("cookie", "CookieValue"),
                 new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "{}")
             }
@@ -1417,7 +1417,7 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
 
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
@@ -1425,7 +1425,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1462,12 +1462,12 @@ public class BlockingServletTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setServerPort(PORT);
-        
+
         BlockingServlet sut = new BlockingServlet();
         sut.init();
-        
+
         String requestURI = "/put-with-redirect-attributes";
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getMethod()).thenReturn(HttpMethod.PUT.toString());
         when(request.getRequestURI()).thenReturn(requestURI);
@@ -1476,44 +1476,44 @@ public class BlockingServletTest {
             Collections.enumeration(Collections.singletonList("param"))
         );
         when(request.getParameter("param")).thenReturn("ParameterValue");
-        when(request.getParameterValues("param")).thenReturn(new String[] {"ParameterValue"});
-        
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
         when(request.getHeaderNames()).thenReturn(
             Collections.enumeration(Collections.singletonList("header"))
         );
         when(request.getHeader("header")).thenReturn("HeaderValue");
-        
+
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
-        
+
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
         PutWithRedirectAttributesRequestHandler requestHandler =
-                new PutWithRedirectAttributesRequestHandler();
+            new PutWithRedirectAttributesRequestHandler();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, requestURI, false), requestHandler);
-        
+
         RequestInterceptor interceptor = mock(RequestInterceptor.class);
         when(interceptor.preHandle(any(), any())).thenReturn(true);
         componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
-        
+
         HttpServletResponse response = mock(HttpServletResponse.class);
         when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
-        
+
         ServletOutputStream outputStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outputStream);
-        
+
         // when
         sut.service(request, response);
-        
+
         // then
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
-        
+
         verify(response, times(1)).sendRedirect("/home");
-        
+
         verify(interceptor, times(1)).preHandle(any(), any());
         verify(interceptor, times(1)).postHandle(any(), any());
-        
+
         componentManager.destroy();
     }
 
@@ -1549,7 +1549,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1607,7 +1607,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1663,7 +1663,7 @@ public class BlockingServletTest {
         when(request.getHeader("header")).thenReturn("HeaderValue");
 
         when(request.getCookies()).thenReturn(
-            new Cookie[] { new Cookie("cookie", "CookieValue") }
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
         );
 
         RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
@@ -1719,7 +1719,7 @@ public class BlockingServletTest {
     public static class GetRequestUnknownExceptionnHandler implements RequestHandler {
 
         private final String contentType;
-        
+
         @Override
         public Object handle(RequestArguments arguments) {
             throw new IllegalStateException("just test");
@@ -2025,81 +2025,81 @@ public class BlockingServletTest {
 
         @DoGet("/get")
         public ExResponse doGet(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return new ExResponse("Hello " + param + ", " + header + ", " + cookie);
         }
 
         @DoGet("/get-no-body")
         public ResponseEntity doGetNoBody(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return ResponseEntity.ok(null);
         }
 
         @DoGet("/post")
         public ResponseEntity doPost(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return ResponseEntity.builder()
-                    .header("foo", "bar")
-                    .body(new ExResponse("Hello " + param + ", " + header + ", " + cookie))
-                    .build();
+                .header("foo", "bar")
+                .body(new ExResponse("Hello " + param + ", " + header + ", " + cookie))
+                .build();
         }
 
         @DoGet("/put")
         public Redirect doPut(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return Redirect.builder()
-                    .addCookie("foo", "bar")
-                    .addHeader("hello", "world")
-                    .uri("/home")
-                    .build();
+                .addCookie("foo", "bar")
+                .addHeader("hello", "world")
+                .uri("/home")
+                .build();
         }
 
         @DoGet("/put-with-redirect-attributes")
         public Redirect doPutWithRedirectAttributes(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return Redirect.builder()
-                    .addCookie("foo", "bar")
-                    .addHeader("hello", "world")
-                    .uri("/home")
-                    .addAttribute("error", Collections.singletonMap("hello", "world"))
-                    .addAttributes(Collections.singletonMap("foo", "bar"))
-                    .build();
+                .addCookie("foo", "bar")
+                .addHeader("hello", "world")
+                .uri("/home")
+                .addAttribute("error", Collections.singletonMap("hello", "world"))
+                .addAttributes(Collections.singletonMap("foo", "bar"))
+                .build();
         }
 
         @DoGet("/delete")
         public View doDelete(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                @RequestArgument("param") String param,
-                @RequestArgument("header") String header,
-                @RequestCookie("cookie") String cookie) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
             return View.builder()
-                    .addCookie("foo", "bar")
-                    .addHeader("hello", "world")
-                    .addVariable("one", "1")
-                    .addVariables(Collections.singletonMap("two", "2"))
-                    .template("/home")
-                    .build();
+                .addCookie("foo", "bar")
+                .addHeader("hello", "world")
+                .addVariable("one", "1")
+                .addVariables(Collections.singletonMap("two", "2"))
+                .template("/home")
+                .build();
         }
     }
 

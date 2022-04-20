@@ -35,7 +35,7 @@ public class ControllerProxyTest extends BaseTest {
     public void isPaymentAndFeatureTest() {
         // given
         ControllerProxy sut = new ControllerProxy(new InternalController());
-        
+
         // when
         // then
         Asserts.assertTrue(sut.isPayment());
@@ -46,7 +46,7 @@ public class ControllerProxyTest extends BaseTest {
     public void isManagementTest() {
         // given
         ControllerProxy sut = new ControllerProxy(new InternalController());
-        
+
         // when
         // then
         Asserts.assertTrue(sut.isManagement());
@@ -55,5 +55,5 @@ public class ControllerProxyTest extends BaseTest {
     @EzyPayment
     @EzyManagement
     @EzyFeature("hello.world")
-    public static class InternalController {}
+    public static class InternalController { }
 }

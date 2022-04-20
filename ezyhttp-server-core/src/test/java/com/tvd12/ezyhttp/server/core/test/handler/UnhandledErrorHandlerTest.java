@@ -36,32 +36,32 @@ public class UnhandledErrorHandlerTest {
                 return result;
             }
         };
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET,
-                request,
-                response,
-                StatusCodes.BAD_REQUEST,
-                null
+            HttpMethod.GET,
+            request,
+            response,
+            StatusCodes.BAD_REQUEST,
+            null
         );
-        
+
         // then
         Asserts.assertEquals(result, actual);
-        
+
         verify(response, times(1)).setContentType(null);
         verify(response, times(1)).setContentType(ContentTypes.APPLICATION_JSON);
     }
-    
+
     @Test
     public void returnView() {
         // given
         View result = View.builder()
-                .template("foo")
-                .build();
+            .template("foo")
+            .build();
         UnhandledErrorHandler sut = new UnhandledErrorHandler() {
             @Override
             public Object processError(
@@ -74,27 +74,27 @@ public class UnhandledErrorHandlerTest {
                 return result;
             }
         };
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         when(response.getContentType()).thenReturn(ContentTypes.TEXT_HTML_UTF8);
-        
+
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET,
-                request,
-                response,
-                StatusCodes.BAD_REQUEST,
-                null
+            HttpMethod.GET,
+            request,
+            response,
+            StatusCodes.BAD_REQUEST,
+            null
         );
-        
+
         // then
         Asserts.assertEquals(result, actual);
-        
+
         verify(response, times(1)).setContentType(ContentTypes.TEXT_HTML_UTF8);
     }
-    
+
     @Test
     public void returnString() {
         // given
@@ -111,42 +111,43 @@ public class UnhandledErrorHandlerTest {
                 return result;
             }
         };
-        
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET,
-                request,
-                response,
-                StatusCodes.BAD_REQUEST,
-                null
+            HttpMethod.GET,
+            request,
+            response,
+            StatusCodes.BAD_REQUEST,
+            null
         );
-        
+
         // then
         Asserts.assertEquals(result, actual);
-        
+
         verify(response, times(1)).setContentType(ContentTypes.APPLICATION_JSON);
     }
-    
+
     @Test
     public void defaultNull() {
         // given
-        UnhandledErrorHandler sut = new UnhandledErrorHandler() {};
-        
+        UnhandledErrorHandler sut = new UnhandledErrorHandler() {
+        };
+
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        
+
         // when
         Object actual = sut.handleError(
-                HttpMethod.GET,
-                request,
-                response,
-                StatusCodes.BAD_REQUEST,
-                null
+            HttpMethod.GET,
+            request,
+            response,
+            StatusCodes.BAD_REQUEST,
+            null
         );
-        
+
         // then
         Asserts.assertNull(actual);
     }

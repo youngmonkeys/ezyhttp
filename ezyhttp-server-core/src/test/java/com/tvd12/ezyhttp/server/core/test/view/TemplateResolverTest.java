@@ -20,13 +20,13 @@ public class TemplateResolverTest {
 
         // when
         TemplateResolver sut = TemplateResolver.builder()
-                .prefix(prefix)
-                .suffix(suffix)
-                .cacheTTLMs(cacheTTLMs)
-                .cacheable(cacheable)
-                .templateMode(templateMode)
-                .messagesLocation(messagesLocation)
-                .build();
+            .prefix(prefix)
+            .suffix(suffix)
+            .cacheTTLMs(cacheTTLMs)
+            .cacheable(cacheable)
+            .templateMode(templateMode)
+            .messagesLocation(messagesLocation)
+            .build();
 
         // then
         Asserts.assertEquals(prefix, sut.getPrefix());

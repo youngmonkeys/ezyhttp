@@ -16,10 +16,10 @@ public class ExceptionHandlerImplementerTest {
         // given
         ExceptionHandlerProxy handler = new ExceptionHandlerProxy(new ExceptionHandler());
         ExceptionHandlerMethod handlerMethod = new ExceptionHandlerMethod(
-                new EzyMethod(ExceptionHandler.class.getDeclaredMethod("handle", Exception.class)));
+            new EzyMethod(ExceptionHandler.class.getDeclaredMethod("handle", Exception.class)));
         ExceptionHandlerImplementer sut = new ExceptionHandlerImplementer(
-                handler,
-                handlerMethod);
+            handler,
+            handlerMethod);
 
         // when
         Throwable e = Asserts.assertThrows(sut::implement);

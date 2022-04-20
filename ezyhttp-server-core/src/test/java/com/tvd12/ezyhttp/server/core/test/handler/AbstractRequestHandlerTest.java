@@ -62,6 +62,7 @@ public class AbstractRequestHandlerTest {
             public Object handleRequest(RequestArguments arguments) throws Exception {
                 throw new Exception("just test");
             }
+
             @Override
             protected Object handleException(RequestArguments arguments, Exception e) {
                 return response;
@@ -81,27 +82,28 @@ public class AbstractRequestHandlerTest {
     public void handleExceptionAndAsync() throws Exception {
         // given
         ExResponse response = new ExResponse("Hello World");
-        
+
         ExRequestHandler sut = new ExRequestHandler() {
             @Override
             public Object handleRequest(RequestArguments arguments) throws Exception {
                 throw new Exception("just test");
             }
+
             @Override
             protected Object handleException(RequestArguments arguments, Exception e) {
                 return response;
             }
         };
-        
+
         RequestArguments requestArguments = mock(RequestArguments.class);
         when(requestArguments.isAsyncStarted()).thenReturn(true);
-        
+
         AsyncContext asyncContext = mock(AsyncContext.class);
         when(requestArguments.getAsyncContext()).thenReturn(asyncContext);
-        
+
         // when
         Object actual = sut.handle(requestArguments);
-        
+
         // then
         Asserts.assertEquals(response, actual);
         verify(asyncContext, times(1)).complete();
@@ -117,14 +119,14 @@ public class AbstractRequestHandlerTest {
         ExRequestHandler sut = new ExRequestHandler();
 
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeHeader")
-                .param(int.class, index)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializeHeader")
+            .param(int.class, index)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
 
         // then
         Asserts.assertEquals(1, actual);
@@ -142,13 +144,13 @@ public class AbstractRequestHandlerTest {
         // when
         Throwable e = Asserts.assertThrows(() -> {
             MethodInvoker.create()
-            .object(sut)
-            .method("deserializeHeader")
-            .param(int.class, index)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
+                .object(sut)
+                .method("deserializeHeader")
+                .param(int.class, index)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
 
         // then
@@ -165,14 +167,14 @@ public class AbstractRequestHandlerTest {
         ExRequestHandler sut = new ExRequestHandler();
 
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeHeader")
-                .param(String.class, name)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializeHeader")
+            .param(String.class, name)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
 
         // then
         Asserts.assertEquals(1, actual);
@@ -190,13 +192,13 @@ public class AbstractRequestHandlerTest {
         // when
         Throwable e = Asserts.assertThrows(() -> {
             MethodInvoker.create()
-            .object(sut)
-            .method("deserializeHeader")
-            .param(String.class, name)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
+                .object(sut)
+                .method("deserializeHeader")
+                .param(String.class, name)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
 
         // then
@@ -213,14 +215,14 @@ public class AbstractRequestHandlerTest {
         ExRequestHandler sut = new ExRequestHandler();
 
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeParameter")
-                .param(int.class, index)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializeParameter")
+            .param(int.class, index)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
 
         // then
         Asserts.assertEquals(1, actual);
@@ -238,13 +240,13 @@ public class AbstractRequestHandlerTest {
         // when
         Throwable e = Asserts.assertThrows(() -> {
             MethodInvoker.create()
-            .object(sut)
-            .method("deserializeParameter")
-            .param(int.class, index)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
+                .object(sut)
+                .method("deserializeParameter")
+                .param(int.class, index)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
 
         // then
@@ -261,14 +263,14 @@ public class AbstractRequestHandlerTest {
         ExRequestHandler sut = new ExRequestHandler();
 
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeParameter")
-                .param(String.class, name)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializeParameter")
+            .param(String.class, name)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
 
         // then
         Asserts.assertEquals(1, actual);
@@ -286,13 +288,13 @@ public class AbstractRequestHandlerTest {
         // when
         Throwable e = Asserts.assertThrows(() -> {
             MethodInvoker.create()
-            .object(sut)
-            .method("deserializeParameter")
-            .param(String.class, name)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
+                .object(sut)
+                .method("deserializeParameter")
+                .param(String.class, name)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
 
         // then
@@ -305,59 +307,83 @@ public class AbstractRequestHandlerTest {
         int index = 0;
         String value = "1";
         Class<?> type = int.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializePathVariable")
-                .param(int.class, index)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
-        
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializePathVariable")
+            .param(int.class, index)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
+
         // then
         Asserts.assertEquals(1, actual);
     }
-    
+
     @Test
     public void deserializePathVariableFailed() {
         // given
         int index = 0;
         String value = "abc";
         Class<?> type = int.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
         Throwable e = Asserts.assertThrows(() -> {
             MethodInvoker.create()
-            .object(sut)
-            .method("deserializePathVariable")
-            .param(int.class, index)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
+                .object(sut)
+                .method("deserializePathVariable")
+                .param(int.class, index)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(DeserializePathVariableException.class);
     }
-    
+
     @Test
     public void deserializePathVariable2Test() {
         // given
         String name = "name";
         String value = "1";
         Class<?> type = int.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
-        int actual = (int)MethodInvoker.create()
+        int actual = (int) MethodInvoker.create()
+            .object(sut)
+            .method("deserializePathVariable")
+            .param(String.class, name)
+            .param(String.class, value)
+            .param(Class.class, type)
+            .param(Class.class, null)
+            .invoke();
+
+        // then
+        Asserts.assertEquals(1, actual);
+    }
+
+    @Test
+    public void deserializePathVariable2Failed() {
+        // given
+        String name = "name";
+        String value = "abc";
+        Class<?> type = int.class;
+
+        ExRequestHandler sut = new ExRequestHandler();
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> {
+            MethodInvoker.create()
                 .object(sut)
                 .method("deserializePathVariable")
                 .param(String.class, name)
@@ -365,71 +391,23 @@ public class AbstractRequestHandlerTest {
                 .param(Class.class, type)
                 .param(Class.class, null)
                 .invoke();
-        
-        // then
-        Asserts.assertEquals(1, actual);
-    }
-    
-    @Test
-    public void deserializePathVariable2Failed() {
-        // given
-        String name = "name";
-        String value = "abc";
-        Class<?> type = int.class;
-        
-        ExRequestHandler sut = new ExRequestHandler();
-        
-        // when
-        Throwable e = Asserts.assertThrows(() -> {
-            MethodInvoker.create()
-            .object(sut)
-            .method("deserializePathVariable")
-            .param(String.class, name)
-            .param(String.class, value)
-            .param(Class.class, type)
-            .param(Class.class, null)
-            .invoke();
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(DeserializePathVariableException.class);
     }
-    
+
     @Test
     public void deserializeCookieTest() {
         // given
         int index = 0;
         String value = "1";
         Class<?> type = int.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeCookie")
-                .param(int.class, index)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
-        
-        // then
-        Asserts.assertEquals(1, actual);
-    }
-    
-    @Test
-    public void deserializeCookieFailed() {
-        // given
-        int index = 0;
-        String value = "abc";
-        Class<?> type = int.class;
-        
-        ExRequestHandler sut = new ExRequestHandler();
-        
-        // when
-        Throwable e = Asserts.assertThrows(() -> {
-            MethodInvoker.create()
+        int actual = (int) MethodInvoker.create()
             .object(sut)
             .method("deserializeCookie")
             .param(int.class, index)
@@ -437,47 +415,47 @@ public class AbstractRequestHandlerTest {
             .param(Class.class, type)
             .param(Class.class, null)
             .invoke();
+
+        // then
+        Asserts.assertEquals(1, actual);
+    }
+
+    @Test
+    public void deserializeCookieFailed() {
+        // given
+        int index = 0;
+        String value = "abc";
+        Class<?> type = int.class;
+
+        ExRequestHandler sut = new ExRequestHandler();
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> {
+            MethodInvoker.create()
+                .object(sut)
+                .method("deserializeCookie")
+                .param(int.class, index)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(DeserializeCookieException.class);
     }
-    
+
     @Test
     public void deserializeCookie2Test() {
         // given
         String name = "name";
         String value = "1";
         Class<?> type = int.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
-        int actual = (int)MethodInvoker.create()
-                .object(sut)
-                .method("deserializeCookie")
-                .param(String.class, name)
-                .param(String.class, value)
-                .param(Class.class, type)
-                .param(Class.class, null)
-                .invoke();
-        
-        // then
-        Asserts.assertEquals(1, actual);
-    }
-    
-    @Test
-    public void deserializeCookie2Failed() {
-        // given
-        String name = "name";
-        String value = "abc";
-        Class<?> type = int.class;
-        
-        ExRequestHandler sut = new ExRequestHandler();
-        
-        // when
-        Throwable e = Asserts.assertThrows(() -> {
-            MethodInvoker.create()
+        int actual = (int) MethodInvoker.create()
             .object(sut)
             .method("deserializeCookie")
             .param(String.class, name)
@@ -485,12 +463,36 @@ public class AbstractRequestHandlerTest {
             .param(Class.class, type)
             .param(Class.class, null)
             .invoke();
+
+        // then
+        Asserts.assertEquals(1, actual);
+    }
+
+    @Test
+    public void deserializeCookie2Failed() {
+        // given
+        String name = "name";
+        String value = "abc";
+        Class<?> type = int.class;
+
+        ExRequestHandler sut = new ExRequestHandler();
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> {
+            MethodInvoker.create()
+                .object(sut)
+                .method("deserializeCookie")
+                .param(String.class, name)
+                .param(String.class, value)
+                .param(Class.class, type)
+                .param(Class.class, null)
+                .invoke();
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(DeserializeCookieException.class);
     }
-    
+
     @Test
     public void deserializeBodyTest() throws Exception {
         // given
@@ -501,20 +503,20 @@ public class AbstractRequestHandlerTest {
         when(bodyData.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
 
         Class<?> type = ExRequest.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
         ExRequest actual = MethodInvoker.create()
-                .object(sut)
-                .method("deserializeBody")
-                .param(BodyData.class, bodyData)
-                .param(Class.class, type)
-                .invoke(ExRequest.class);
-        
+            .object(sut)
+            .method("deserializeBody")
+            .param(BodyData.class, bodyData)
+            .param(Class.class, type)
+            .invoke(ExRequest.class);
+
         // then
         Asserts.assertEquals(new ExRequest("Monkey"), actual);
-        
+
         verify(bodyData, times(1)).getContentType();
     }
 
@@ -528,22 +530,22 @@ public class AbstractRequestHandlerTest {
         when(bodyData.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
 
         Class<?> type = ExRequest.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
         Throwable e = Asserts.assertThrows(() -> {
-             MethodInvoker.create()
-             .object(sut)
-             .method("deserializeBody")
-             .param(BodyData.class, bodyData)
-             .param(Class.class, type)
-             .invoke(ExRequest.class);
+            MethodInvoker.create()
+                .object(sut)
+                .method("deserializeBody")
+                .param(BodyData.class, bodyData)
+                .param(Class.class, type)
+                .invoke(ExRequest.class);
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(DeserializeBodyException.class);
-        
+
         verify(bodyData, times(1)).getContentType();
     }
 
@@ -556,25 +558,25 @@ public class AbstractRequestHandlerTest {
         when(bodyData.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
 
         Class<?> type = ExRequest.class;
-        
+
         ExRequestHandler sut = new ExRequestHandler();
-        
+
         // when
         Throwable e = Asserts.assertThrows(() -> {
-             MethodInvoker.create()
-             .object(sut)
-             .method("deserializeBody")
-             .param(BodyData.class, bodyData)
-             .param(Class.class, type)
-             .invoke(ExRequest.class);
+            MethodInvoker.create()
+                .object(sut)
+                .method("deserializeBody")
+                .param(BodyData.class, bodyData)
+                .param(Class.class, type)
+                .invoke(ExRequest.class);
         });
-        
+
         // then
         Asserts.assertThat(e.getCause().getCause()).isEqualsType(HttpBadRequestException.class);
-        
+
         verify(bodyData, times(1)).getContentType();
     }
-    
+
     public static class ExRequestHandler extends AbstractRequestHandler {
 
         @Override

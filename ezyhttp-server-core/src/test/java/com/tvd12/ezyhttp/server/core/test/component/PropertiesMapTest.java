@@ -13,5 +13,4 @@ public class PropertiesMapTest implements EzyPropertiesMap {
     public Map<String, String> keyMap() {
         return Collections.singletonMap("first", "one");
     }
-
 }

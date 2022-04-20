@@ -14,7 +14,7 @@ public class EmptyRequestHandlerTest {
         EmptyRequestHandler sut = EmptyRequestHandler.getInstance();
         sut.setController(new Object());
         sut.setHandlerMethod(null);
-        
+
         // when
         // then
         Asserts.assertNull(sut.handle(null));

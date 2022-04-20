@@ -15,7 +15,7 @@ public class ResourceResolverTest {
         // given
         ResourceResolver sut = new ResourceResolver();
         sut.register("static/css");
-        sut.register(new String[] { "templates/js" });
+        sut.register(new String[]{"templates/js"});
 
         // when
         Map<String, Resource> resources = sut.getResources();

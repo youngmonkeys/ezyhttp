@@ -21,7 +21,7 @@ public class RequestHandlerManagerTest {
         RequestHandler requestHandler = mock(RequestHandler.class);
         RequestURI requestURI = new RequestURI(
             HttpMethod.GET,
-            "/get", 
+            "/get",
             RequestURIMeta.builder()
                 .api(true)
                 .authenticated(true)
@@ -33,10 +33,10 @@ public class RequestHandlerManagerTest {
                 .build()
         );
         sut.addHandler(requestURI, requestHandler);
-        
+
         // when
         FeatureURIManager featureURIManager = sut.getFeatureURIManager();
-        
+
         // then
         Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get"), "hello.world");
         Asserts.assertEquals(featureURIManager.getFeatureByURI(HttpMethod.GET, "/get/"), "hello.world");

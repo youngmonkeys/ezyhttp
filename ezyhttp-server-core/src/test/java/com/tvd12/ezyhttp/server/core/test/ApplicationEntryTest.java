@@ -7,6 +7,5 @@ import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 public class ApplicationEntryTest implements ApplicationEntry {
 
     @Override
-    public void start() {
-    }
+    public void start() {}
 }

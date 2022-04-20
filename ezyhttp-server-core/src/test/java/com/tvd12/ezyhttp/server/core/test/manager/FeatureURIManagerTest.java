@@ -20,7 +20,7 @@ public class FeatureURIManagerTest {
         sut.addFeatureURI("hello", HttpMethod.POST, "/a");
         sut.addFeatureURI("hello", HttpMethod.POST, "/b");
         sut.addFeatureURI("world", HttpMethod.PUT, "/c");
-        
+
         // when
         Asserts.assertEquals(
             sut.getFeatures(),
@@ -30,7 +30,7 @@ public class FeatureURIManagerTest {
         Asserts.assertEquals(sut.getFeatureByURI(HttpMethod.GET, "/a"), "hello");
         Asserts.assertEquals(sut.getFeatureByURI(HttpMethod.PUT, "/c"), "world");
         Asserts.assertNull(sut.getFeatureByURI(HttpMethod.TRACE, "I don't know"));
-        
+
         Asserts.assertEquals(
             sut.getURIsByFeature("hello"),
             EzyMapBuilder.mapBuilder()

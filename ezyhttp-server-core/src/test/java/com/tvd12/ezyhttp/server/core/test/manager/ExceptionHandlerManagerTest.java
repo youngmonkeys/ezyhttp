@@ -26,7 +26,7 @@ public class ExceptionHandlerManagerTest {
         Asserts.assertEquals(uncaughtExceptionHandler, sut.getUncaughtExceptionHandler(Exception.class));
     }
 
-    public static class ExExceptionHandler {}
+    public static class ExExceptionHandler { }
 
     public static class ExUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
@@ -34,6 +34,5 @@ public class ExceptionHandlerManagerTest {
         public Object handleException(RequestArguments arguments, Exception exception) {
             return null;
         }
-
     }
 }

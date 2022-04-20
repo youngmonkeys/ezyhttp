@@ -7,5 +7,4 @@ import com.tvd12.ezyhttp.server.core.annotation.PropertiesSources;
 @ComponentsScan
 @EzyPackagesToScan
 @PropertiesSources("application2.yaml")
-public class GlobalConfig2 {
-}
+public class GlobalConfig2 { }

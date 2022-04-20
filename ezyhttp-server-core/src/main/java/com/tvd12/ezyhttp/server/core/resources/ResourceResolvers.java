@@ -31,8 +31,9 @@ public final class ResourceResolvers {
         return resourceResolver;
     }
 
-    public static ResourceDownloadManager
-    createDownloadManager(EzyPropertyFetcher propertyFetcher) {
+    public static ResourceDownloadManager createDownloadManager(
+        EzyPropertyFetcher propertyFetcher
+    ) {
         int capacity = propertyFetcher
             .getProperty(RESOURCE_DOWNLOAD_CAPACITY, int.class,
                 ResourceDownloadManager.DEFAULT_CAPACITY);

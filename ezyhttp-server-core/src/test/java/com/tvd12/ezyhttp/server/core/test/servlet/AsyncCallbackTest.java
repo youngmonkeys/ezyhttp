@@ -16,12 +16,13 @@ public class AsyncCallbackTest {
     @Test
     public void test() throws Exception {
         // given
-        AsyncCallback callback = event -> {};
+        AsyncCallback callback = event -> {
+        };
         ServletRequest request = mock(ServletRequest.class);
-        
+
         AsyncContext asyncContext = mock(AsyncContext.class);
         when(asyncContext.getRequest()).thenReturn(request);
-        
+
         AsyncEvent event = new AsyncEvent(asyncContext);
 
         // when
@@ -35,7 +36,8 @@ public class AsyncCallbackTest {
     @Test
     public void onErrorWithHttpServletResponse() {
         // given
-        AsyncCallback callback = event -> {};
+        AsyncCallback callback = event -> {
+        };
 
         AsyncContext asyncContext = mock(AsyncContext.class);
 
@@ -59,7 +61,8 @@ public class AsyncCallbackTest {
     @Test
     public void onErrorFailed() {
         // given
-        AsyncCallback callback = event -> {};
+        AsyncCallback callback = event -> {
+        };
 
         AsyncContext asyncContext = mock(AsyncContext.class);
         doThrow(RuntimeException.class).when(asyncContext).complete();
@@ -84,7 +87,8 @@ public class AsyncCallbackTest {
     @Test
     public void onTimeoutWithHttpServletResponse() {
         // given
-        AsyncCallback callback = event -> {};
+        AsyncCallback callback = event -> {
+        };
 
         AsyncContext asyncContext = mock(AsyncContext.class);
 
@@ -108,7 +112,8 @@ public class AsyncCallbackTest {
     @Test
     public void onTimeoutFailed() {
         // given
-        AsyncCallback callback = event -> {};
+        AsyncCallback callback = event -> {
+        };
 
         AsyncContext asyncContext = mock(AsyncContext.class);
         doThrow(RuntimeException.class).when(asyncContext).complete();

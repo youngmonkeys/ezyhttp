@@ -26,7 +26,7 @@ public class EzyHttpApplicationTest {
     public void postTest() {
         ComponentManager.getInstance().destroy();
     }
-    
+
     @Test
     public void test() throws Exception {
         // given
@@ -56,8 +56,8 @@ public class EzyHttpApplicationTest {
     public void startWith2Params() throws Exception {
         // given
         EzyHttpApplication sut = EzyHttpApplication.start(
-                EzyHttpApplicationTest.class,
-                getClass()
+            EzyHttpApplicationTest.class,
+            getClass()
         );
         ApplicationContext applicationContext = sut.getApplicationContext();
         EzyBeanContext beanContext = applicationContext.getBeanContext();
@@ -89,7 +89,7 @@ public class EzyHttpApplicationTest {
         EzyHttpApplication sut = new EzyHttpApplication(context);
 
         // when
-        Throwable e = Asserts.assertThrows(() -> sut.start());
+        Throwable e = Asserts.assertThrows(sut::start);
 
         // then
         Asserts.assertThat(e).isEqualsType(IllegalStateException.class);
@@ -104,10 +104,10 @@ public class EzyHttpApplicationTest {
         System.setProperty(EzyBeanContext.ACTIVE_PROFILES_KEY, "enable");
         ApplicationContext applicationContext = sut.getApplicationContext();
         EzyBeanContext beanContext = applicationContext.getBeanContext();
-        
+
         // when
         boolean bannerPrintable = beanContext.getProperty("banner.printable", boolean.class);
-        
+
         // then
         Asserts.assertFalse(bannerPrintable);
         sut.stop();

@@ -16,14 +16,14 @@ public class RequestHandlerImplementerTest {
         // given
         ControllerProxy controller = new ControllerProxy(new Controller());
         RequestHandlerMethod handlerMethod = new RequestHandlerMethod(
-                "/",
-                new EzyMethod(Controller.class.getDeclaredMethod("doGet")));
+            "/",
+            new EzyMethod(Controller.class.getDeclaredMethod("doGet")));
         RequestHandlerImplementer sut = new RequestHandlerImplementer(
-                controller,
-                handlerMethod);
+            controller,
+            handlerMethod);
 
         // when
-        Throwable e = Asserts.assertThrows(() -> sut.implement());
+        Throwable e = Asserts.assertThrows(sut::implement);
 
         // then
         Asserts.assertEquals(0, handlerMethod.getParameterTypes().length);

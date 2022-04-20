@@ -22,7 +22,7 @@ public class ResourceResolversTest {
         ).thenReturn(true);
         when(
             propertyFetcher.getProperty(RESOURCE_LOCATIONS, String[].class)
-        ).thenReturn(new String[] { "static" });
+        ).thenReturn(new String[]{"static"});
 
         when(
             propertyFetcher.getProperty(RESOURCE_PATTERN, String.class)
@@ -45,7 +45,7 @@ public class ResourceResolversTest {
         ).thenReturn(true);
         when(
             propertyFetcher.getProperty(RESOURCE_LOCATIONS, String[].class)
-        ).thenReturn(new String[] { "static" });
+        ).thenReturn(new String[]{"static"});
 
         // when
         ResourceResolver resourceResolver = ResourceResolvers.createResourdeResolver(propertyFetcher);

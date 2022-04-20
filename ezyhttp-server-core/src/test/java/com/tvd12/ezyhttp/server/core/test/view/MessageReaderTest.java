@@ -39,12 +39,12 @@ public class MessageReaderTest {
                 return answer;
             }
         };
-        
+
         String folderPath = "messages";
-        
+
         // when
         Map<String, Properties> map = reader.read(folderPath);
-        
+
         // then
         Asserts.assertEquals(4, map.size());
         Asserts.assertEquals(2, map.get("").size());

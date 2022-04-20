@@ -362,8 +362,8 @@ public class RequestHandlerImplementer
     protected Class<?> getGenericType(Parameter parameter) {
         Type parameterizedType = parameter.getParameterizedType();
         if (parameterizedType instanceof ParameterizedType) {
-            ParameterizedType aType = (ParameterizedType) parameterizedType;
-            Type[] parameterArgTypes = aType.getActualTypeArguments();
+            ParameterizedType argumentType = (ParameterizedType) parameterizedType;
+            Type[] parameterArgTypes = argumentType.getActualTypeArguments();
             return (Class<?>) parameterArgTypes[0];
         }
         return null;

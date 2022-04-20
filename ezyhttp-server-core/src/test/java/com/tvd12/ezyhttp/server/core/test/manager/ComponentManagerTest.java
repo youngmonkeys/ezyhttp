@@ -12,7 +12,7 @@ public class ComponentManagerTest {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
         componentManager.setExposeManagementURIs(true);
-        
+
         // when
         // then
         Asserts.assertTrue(componentManager.isExposeManagementURIs());
