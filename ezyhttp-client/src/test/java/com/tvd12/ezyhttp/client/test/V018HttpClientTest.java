@@ -1,12 +1,12 @@
 package com.tvd12.ezyhttp.client.test;
 
-import java.util.List;
-
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.request.DeleteRequest;
 import com.tvd12.ezyhttp.client.request.GetRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
+
+import java.util.List;
 
 public class V018HttpClientTest {
 

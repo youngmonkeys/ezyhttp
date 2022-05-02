@@ -1,23 +1,24 @@
 package com.tvd12.ezyhttp.client.test.server;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.codec.JsonBodyConverter;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+
 public class TestBlockingServlet extends HttpServlet {
     private static final long serialVersionUID = 1321397014207226911L;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final JsonBodyConverter jsonBodyConverter = new JsonBodyConverter(objectMapper);
+    private final ObjectMapper objectMapper
+        = new ObjectMapper();
+    private final JsonBodyConverter jsonBodyConverter
+        = new JsonBodyConverter(objectMapper);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

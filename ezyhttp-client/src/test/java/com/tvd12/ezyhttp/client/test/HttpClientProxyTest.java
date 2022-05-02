@@ -217,7 +217,7 @@ public class HttpClientProxyTest extends BaseTest {
     }
 
     @Test
-    public void excecuteJsonTest() throws Exception {
+    public void executeJsonTest() throws Exception {
         // given
         HttpClientProxy sut = newClientProxy();
 
@@ -251,7 +251,7 @@ public class HttpClientProxyTest extends BaseTest {
     }
 
     @Test
-    public void excecuteExceptionTest() throws Exception {
+    public void executeExceptionTest() throws Exception {
         // given
         HttpClientProxy sut = newClientProxy();
 

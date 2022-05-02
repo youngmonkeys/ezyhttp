@@ -1,19 +1,14 @@
 package com.tvd12.ezyhttp.client.test.request;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
+import org.testng.annotations.Test;
+
+import java.util.*;
 
 public class RequestEntityTest {
 

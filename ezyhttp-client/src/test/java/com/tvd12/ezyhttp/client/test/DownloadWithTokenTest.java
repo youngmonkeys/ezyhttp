@@ -1,10 +1,10 @@
 package com.tvd12.ezyhttp.client.test;
 
-import java.io.File;
-
 import com.tvd12.ezyhttp.client.HttpClientProxy;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
+
+import java.io.File;
 
 public class DownloadWithTokenTest {
 

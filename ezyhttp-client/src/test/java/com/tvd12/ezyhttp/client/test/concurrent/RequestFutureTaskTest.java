@@ -1,9 +1,8 @@
 package com.tvd12.ezyhttp.client.test.concurrent;
 
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
 
 public class RequestFutureTaskTest {
 

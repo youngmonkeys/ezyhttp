@@ -1,14 +1,13 @@
 package com.tvd12.ezyhttp.client.test.request;
 
-import java.net.URI;
-import java.net.URL;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
+import org.testng.annotations.Test;
+
+import java.net.URI;
+import java.net.URL;
 
 public class DownloadRequestTest {
 
