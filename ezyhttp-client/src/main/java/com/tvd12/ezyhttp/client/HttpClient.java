@@ -368,7 +368,6 @@ public class HttpClient extends EzyLoggable {
                 byte[] buffer = new byte[1024];
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     if (cancellationToken.isCancelled()) {
-                        Files.deleteIfExists(downloadingFilePath);
                         break;
                     }
                     outputStream.write(buffer, 0, bytesRead);
@@ -376,6 +375,7 @@ public class HttpClient extends EzyLoggable {
             }
         }
         if (cancellationToken.isCancelled()) {
+            Files.deleteIfExists(downloadingFilePath);
             throw new DownloadCancelledException(fileURL);
         }
         Files.move(
