@@ -496,17 +496,17 @@ public class HttpClientProxyTest extends BaseTest {
     public void maxCapacity() {
         // given
         HttpClientProxy sut = HttpClientProxy.builder()
-                .autoStart(true)
-                .requestQueueCapacity(1)
-                .threadPoolSize(1)
-                .build();
+            .autoStart(true)
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
 
         PostRequest request = new PostRequest()
-                .setConnectTimeout(15000)
-                .setEntity(String.class)
-                .setResponseType(TestResponse.class)
-                .setResponseType(StatusCodes.OK, TestResponse.class)
-                .setURL("http://127.0.0.1:18081/greet");
+            .setConnectTimeout(15000)
+            .setEntity(String.class)
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL("http://127.0.0.1:18081/greet");
 
         // when
         AtomicReference<Throwable> ref = new AtomicReference<>();
@@ -525,7 +525,7 @@ public class HttpClientProxyTest extends BaseTest {
         for (Thread thread : threads) {
             thread.start();
         }
-        while(ref.get() == null) {
+        while (ref.get() == null) {
             EzyThreads.sleep(3);
         }
 
