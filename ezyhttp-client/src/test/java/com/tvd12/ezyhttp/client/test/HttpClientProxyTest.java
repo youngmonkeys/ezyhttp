@@ -4,6 +4,7 @@ import com.tvd12.ezyfox.concurrent.EzyFutureMap;
 import com.tvd12.ezyfox.exception.BadRequestException;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyProcessor;
+import com.tvd12.ezyfox.util.EzyThreads;
 import com.tvd12.ezyfox.util.EzyWrap;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.HttpClientProxy;
@@ -39,6 +40,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.mockito.Mockito.*;
 
@@ -506,15 +508,29 @@ public class HttpClientProxyTest extends BaseTest {
             .setResponseType(StatusCodes.OK, TestResponse.class)
             .setURL("http://127.0.0.1:18081/greet");
 
-        RequestQueue queue = FieldUtil.getFieldValue(sut, "requestQueue");
-        for (int i = 0; i < 1000; ++i)
-            queue.add(request);
-
         // when
-        Throwable e = Asserts.assertThrows(() -> sut.call(request, 150000));
+        AtomicReference<Throwable> ref = new AtomicReference<>();
+        Thread[] threads = new Thread[4];
+        for (int i = 0; i < threads.length; ++i) {
+            threads[i] = new Thread(() -> {
+                while (ref.get() == null) {
+                    try {
+                        sut.call(request, 150000);
+                    } catch (Exception e) {
+                        ref.set(e);
+                    }
+                }
+            });
+        }
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        while (ref.get() == null) {
+            EzyThreads.sleep(3);
+        }
 
         // then
-        Asserts.assertThat(e).isEqualsType(RequestQueueFullException.class);
+        Asserts.assertThat(ref.get()).isEqualsType(RequestQueueFullException.class);
         sut.close();
         sut.stop();
     }
