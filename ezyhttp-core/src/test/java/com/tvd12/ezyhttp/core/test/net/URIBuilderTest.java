@@ -72,4 +72,30 @@ public class URIBuilderTest {
         // then
         Asserts.assertEquals("", path);
     }
+
+    @Test
+    public void addQueryParamIfNotNullWithNullTest() {
+        // given
+        // when
+        URI uri = new URIBuilder()
+            .addPath("/hello")
+            .addQueryParamIfNotNull("foo", null)
+            .build();
+
+        // then
+        Asserts.assertEquals(uri, URI.create("/hello"));
+    }
+
+    @Test
+    public void addQueryParamIfNotNullTest() {
+        // given
+        // when
+        URI uri = new URIBuilder()
+            .addPath("/hello")
+            .addQueryParamIfNotNull("foo", "bar")
+            .build();
+
+        // then
+        Asserts.assertEquals(uri, URI.create("/hello?foo=bar"));
+    }
 }

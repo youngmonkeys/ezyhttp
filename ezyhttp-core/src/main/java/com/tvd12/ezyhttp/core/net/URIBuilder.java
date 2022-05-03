@@ -13,14 +13,14 @@ public class URIBuilder implements EzyBuilder<URI> {
 
     protected List<String> paths;
     protected Map<String, String> queryParams;
-    protected final StringBuilder buidler;
+    protected final StringBuilder builder;
 
     public URIBuilder() {
         this("");
     }
 
     public URIBuilder(String str) {
-        this.buidler = new StringBuilder(str);
+        this.builder = new StringBuilder(str);
     }
 
     public URIBuilder addPath(String path) {
@@ -41,17 +41,24 @@ public class URIBuilder implements EzyBuilder<URI> {
         return this;
     }
 
+    public URIBuilder addQueryParamIfNotNull(String name, String value) {
+        if (value != null) {
+            addQueryParam(name, value);
+        }
+        return this;
+    }
+
     @Override
     public URI build() {
         String path = buildPath();
         if (path != null) {
-            buidler.append(path);
+            builder.append(path);
         }
         String query = buildQuery();
         if (query != null) {
-            buidler.append("?").append(query);
+            builder.append("?").append(query);
         }
-        return URI.create(buidler.toString());
+        return URI.create(builder.toString());
     }
 
     protected String buildPath() {
