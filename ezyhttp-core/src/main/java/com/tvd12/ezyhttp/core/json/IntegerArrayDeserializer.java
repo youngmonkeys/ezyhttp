@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.tvd12.ezyfox.io.EzyStringConveter;
+import com.tvd12.ezyfox.io.EzyStringConverter;
 
 public class IntegerArrayDeserializer extends StdDeserializer<Integer[]> {
     private static final long serialVersionUID = -4497810070359275209L;
@@ -21,7 +21,7 @@ public class IntegerArrayDeserializer extends StdDeserializer<Integer[]> {
         DeserializationContext ctxt
     ) throws IOException {
         if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-            return EzyStringConveter.stringToWrapperIntArray(p.getValueAsString());
+            return EzyStringConverter.stringToWrapperIntArray(p.getValueAsString());
         }
         return ctxt.readValue(p, Integer[].class);
     }
