@@ -414,6 +414,7 @@ public class BlockingServlet extends HttpServlet {
                 Cookie attributesCookie = new Cookie(
                     CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
                     EzyBase64.encodeUtf(attributesValue));
+                attributesCookie.setPath("/");
                 attributesCookie.setMaxAge(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_MAX_AGE);
                 response.addCookie(attributesCookie);
             }
