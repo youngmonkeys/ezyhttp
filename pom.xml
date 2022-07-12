@@ -66,6 +66,7 @@
         <ezy.version>1.2.4</ezy.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <jetty.version>9.4.46.v20220331</jetty.version>
+        <tomcat.version>8.5.81</tomcat.version>
         <thymeleaf.version>3.0.15.RELEASE</thymeleaf.version>
         <layout.dialect.version>3.1.0</layout.dialect.version>
     </properties>
@@ -111,5 +112,6 @@
         <module>ezyhttp-server-thymeleaf</module>
         <module>ezyhttp-server-graphql</module>
         <module>ezyhttp-server-management</module>
+        <module>ezyhttp-server-tomcat</module>
     </modules>
 </project>

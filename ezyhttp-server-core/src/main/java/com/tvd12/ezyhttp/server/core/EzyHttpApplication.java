@@ -23,13 +23,17 @@ public class EzyHttpApplication
         this.applicationContext = applicationContext;
     }
 
-    public static EzyHttpApplication start(Class<?> bootstrapClass) throws Exception {
+    public static EzyHttpApplication start(
+        Class<?> bootstrapClass
+    ) throws Exception {
         String basePackage = bootstrapClass.getPackage().getName();
         return start(basePackage, bootstrapClass);
     }
 
     public static EzyHttpApplication start(
-        Class<?> bootstrapClass, Class<?>... componentClasses) throws Exception {
+        Class<?> bootstrapClass,
+        Class<?>... componentClasses
+    ) throws Exception {
         String basePackage = bootstrapClass.getPackage().getName();
         Set<Class<?>> classSet = new HashSet<>();
         classSet.add(bootstrapClass);
@@ -40,7 +44,8 @@ public class EzyHttpApplication
 
     public static EzyHttpApplication start(
         String basePackage,
-        Class<?>... componentClasses) throws Exception {
+        Class<?>... componentClasses
+    ) throws Exception {
         ApplicationContext applicationContext
             = createApplicationContext(basePackage, componentClasses);
         EzyHttpApplication application = new EzyHttpApplication(applicationContext);
@@ -60,8 +65,12 @@ public class EzyHttpApplication
         }
         entry.init();
         entry.start();
-        boolean printBanner = applicationContext.getProperty("banner.printable", boolean.class,
-            true);
+        boolean printBanner = applicationContext
+            .getProperty(
+                "banner.printable",
+                boolean.class,
+                true
+            );
         if (printBanner) {
             logger.info("\n{}\n", new BannerPrinter().getBannerText());
         }
