@@ -53,4 +53,23 @@ public class RequestURITest {
         Asserts.assertTrue(ur122.isPayment());
         Asserts.assertEquals(ur122.getFeature(), "hello.world");
     }
+
+    @Test
+    public void equalsTest() {
+        // given
+        RequestURI sut = new RequestURI(
+            HttpMethod.GET,
+            "/",
+            true
+        );
+
+        // when
+        // then
+        //noinspection ConstantConditions
+        Asserts.assertFalse(sut.equals(null));
+        //noinspection EqualsWithItself
+        Asserts.assertTrue(sut.equals(sut));
+        //noinspection EqualsBetweenInconvertibleTypes
+        Asserts.assertFalse(sut.equals(this));
+    }
 }

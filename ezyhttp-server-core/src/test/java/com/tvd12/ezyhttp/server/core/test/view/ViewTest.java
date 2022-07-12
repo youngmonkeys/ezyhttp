@@ -144,4 +144,19 @@ public class ViewTest {
             .toMap();
         Asserts.assertEquals(sut.getVariable("hello"), map);
     }
+
+    @Test
+    public void setVariableIfAbsentTest() {
+        // given
+        View sut = View.builder()
+            .template("abc")
+            .addVariable("hello", "world")
+            .build();
+
+        // when
+        sut.setVariableIfAbsent("hello", "Other");
+
+        // then
+        Asserts.assertEquals(sut.getVariable("hello"), "world");
+    }
 }

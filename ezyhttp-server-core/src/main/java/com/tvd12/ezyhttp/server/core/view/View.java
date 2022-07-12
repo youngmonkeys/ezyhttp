@@ -54,6 +54,10 @@ public class View {
         this.variables.put(name, value);
     }
 
+    public void setVariableIfAbsent(String name, Object value) {
+        this.variables.putIfAbsent(name, value);
+    }
+
     public void setVariables(Map<String, Object> variables) {
         this.variables.putAll(variables);
     }
