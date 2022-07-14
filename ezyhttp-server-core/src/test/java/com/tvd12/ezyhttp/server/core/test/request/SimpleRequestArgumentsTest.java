@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;

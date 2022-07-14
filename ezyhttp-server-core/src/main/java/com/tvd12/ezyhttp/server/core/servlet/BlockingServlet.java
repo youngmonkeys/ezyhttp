@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.PathVariables;
