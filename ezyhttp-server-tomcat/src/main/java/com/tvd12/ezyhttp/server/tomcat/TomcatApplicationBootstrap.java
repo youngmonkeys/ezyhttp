@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.apache.catalina.Context;
 import org.apache.catalina.Server;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -88,9 +89,9 @@ public class TomcatApplicationBootstrap
 
     @Override
     public void start() throws Exception {
-        tomcat = newTomcat(host, port);
+        tomcat = newTomcat(host, port, true);
         if (managementEnable) {
-            managementTomcat = newTomcat(managementHost, managementPort);
+            managementTomcat = newTomcat(managementHost, managementPort, false);
         }
         startTomcat(tomcat);
         logger.info("http server started on: {}:{}", host, port);
@@ -100,7 +101,11 @@ public class TomcatApplicationBootstrap
         }
     }
 
-    protected Tomcat newTomcat(String host, int port) throws Exception {
+    protected Tomcat newTomcat(
+        String host,
+        int port,
+        boolean normalServer
+    ) throws Exception {
         final Tomcat answer = new Tomcat();
         answer.setHostname(host);
         answer.setPort(port);
@@ -113,6 +118,7 @@ public class TomcatApplicationBootstrap
             "",
             actualContextPath
         );
+        context.setSessionTimeout(idleTimeout);
         final Wrapper wrapper = answer.addServlet(
             "",
             "Servlet",
@@ -140,6 +146,14 @@ public class TomcatApplicationBootstrap
         if (corsEnable) {
             addCorsFilter(context);
         }
+        final Connector connector = answer.getConnector();
+        connector.setProperty(
+            "minSpareThreads",
+            String.valueOf(normalServer ? minThreads : 1)
+        );
+        connector.setProperty("maxThreads", String.valueOf(maxThreads));
+        connector.setProperty("connectionTimeout", String.valueOf(idleTimeout));
+        connector.setProperty("keepAliveTimeout", String.valueOf(idleTimeout));
         return answer;
     }
 
