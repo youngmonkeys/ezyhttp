@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import javax.servlet.http.Cookie;
 
@@ -56,6 +57,16 @@ public class View {
 
     public void setVariableIfAbsent(String name, Object value) {
         this.variables.putIfAbsent(name, value);
+    }
+
+    public void setVariableIfAbsent(
+        String name,
+        Supplier<Object> valueSupplier
+    ) {
+        this.variables.computeIfAbsent(
+            name,
+            k -> valueSupplier.get()
+        );
     }
 
     public void setVariables(Map<String, Object> variables) {

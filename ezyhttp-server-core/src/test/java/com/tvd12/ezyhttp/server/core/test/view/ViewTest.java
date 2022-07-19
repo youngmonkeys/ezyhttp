@@ -159,4 +159,33 @@ public class ViewTest {
         // then
         Asserts.assertEquals(sut.getVariable("hello"), "world");
     }
+
+    @Test
+    public void setVariableIfAbsentWithSupplierTest() {
+        // given
+        View sut = View.builder()
+            .template("abc")
+            .build();
+
+        // when
+        sut.setVariableIfAbsent("hello", () -> "world");
+
+        // then
+        Asserts.assertEquals(sut.getVariable("hello"), "world");
+    }
+
+    @Test
+    public void setVariableIfAbsentWithSupplierButExistTest() {
+        // given
+        View sut = View.builder()
+            .template("abc")
+            .addVariable("hello", "world")
+            .build();
+
+        // when
+        sut.setVariableIfAbsent("hello", () -> "Other");
+
+        // then
+        Asserts.assertEquals(sut.getVariable("hello"), "world");
+    }
 }
