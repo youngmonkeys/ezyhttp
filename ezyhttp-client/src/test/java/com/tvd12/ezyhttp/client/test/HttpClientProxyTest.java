@@ -10,6 +10,7 @@ import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.HttpClientProxy;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
@@ -25,6 +26,7 @@ import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
+import com.tvd12.test.util.RandomUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -801,6 +803,149 @@ public class HttpClientProxyTest extends BaseTest {
 
         // then
         Asserts.assertTrue(new File("test-output/no-commit/download-test.xml").exists());
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void downloadToOutputFileTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        DownloadFileResult result = sut.download(
+            fileUrl,
+            new File("test-output/no-commit"),
+            outFileName
+        );
+
+        // then
+        Asserts.assertEquals(result.getNewFileName(), outFileName + ".xsd");
+        Asserts.assertEquals(result.getOriginalFileName(), "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/" + outFileName + ".xsd").exists());
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void downloadToOutputFileWithCancelledTokenTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        DownloadFileResult result = sut.download(
+            fileUrl,
+            new File("test-output/no-commit"),
+            outFileName,
+            DownloadCancellationToken.ALWAYS_RUN
+        );
+
+        // then
+        Asserts.assertEquals(result.getNewFileName(), outFileName + ".xsd");
+        Asserts.assertEquals(result.getOriginalFileName(), "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/" + outFileName + ".xsd").exists());
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void downloadToOutputFileButCancelTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
+        File outFile = new File("test-output/no-commit/download-test.xml");
+        EzyFileUtil.createFileIfNotExists(outFile);
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        DownloadCancellationToken cancelledException = new DownloadCancellationToken();
+        cancelledException.cancel();
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            sut.download(
+                fileUrl,
+                outFile.getParentFile(),
+                outFileName,
+                cancelledException
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, DownloadCancelledException.class);
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void downloadToOutputFileWithRequestTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        DownloadFileResult result = sut.download(
+            new DownloadRequest(fileUrl),
+            new File("test-output/no-commit"),
+            outFileName
+        );
+
+        // then
+        Asserts.assertEquals(result.getNewFileName(), outFileName + ".xsd");
+        Asserts.assertEquals(result.getOriginalFileName(), "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/" + outFileName + ".xsd").exists());
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void downloadToOutputFileWithRequestAndCancelledTokenTest() throws Exception {
+        // given
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        DownloadFileResult result = sut.download(
+            new DownloadRequest(fileUrl),
+            new File("test-output/no-commit"),
+            outFileName,
+            DownloadCancellationToken.ALWAYS_RUN
+        );
+
+        // then
+        Asserts.assertEquals(result.getNewFileName(), outFileName + ".xsd");
+        Asserts.assertEquals(result.getOriginalFileName(), "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/" + outFileName + ".xsd").exists());
         sut.close();
         sut.stop();
     }

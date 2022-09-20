@@ -2,6 +2,9 @@ package com.tvd12.ezyhttp.client.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.client.HttpClient;
+import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
+import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.GetRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
@@ -556,20 +559,102 @@ public class HttpClientTest {
     }
 
     @Test
-    public void getDownloadFileNameTest() {
+    public void downloadToOutFileWithRedirect() throws Exception {
+        downloadToOutFileWithRedirect(
+            HttpURLConnection.HTTP_MOVED_TEMP,
+            "hello=world"
+        );
+        downloadToOutFileWithRedirect(
+            HttpURLConnection.HTTP_MOVED_PERM,
+            "hello=world"
+        );
+        downloadToOutFileWithRedirect(
+            HttpURLConnection.HTTP_SEE_OTHER,
+            null
+        );
+    }
+
+    private void downloadToOutFileWithRedirect(
+        int firstResponseCode,
+        String cookie
+    ) throws Exception {
         // given
         HttpClient sut = HttpClient.builder()
             .build();
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        when(connection.getResponseCode()).thenReturn(firstResponseCode);
 
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        when(connection.getHeaderField("Location")).thenReturn(fileUrl);
+        when(connection.getHeaderField("Set-Cookie")).thenReturn(cookie);
+
+        File outFolder = new File("test-output/no-commit");
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        DownloadFileResult result = MethodInvoker.create()
+            .object(sut)
+            .method("download")
+            .param(HttpURLConnection.class, connection)
+            .param(new DownloadRequest(fileUrl))
+            .param(File.class, outFolder)
+            .param(String.class, outFileName)
+            .param(DownloadCancellationToken.class, DownloadCancellationToken.ALWAYS_RUN)
+            .invoke(DownloadFileResult.class);
+
+        // then
+        Asserts.assertEquals(result.getNewFileName(), outFileName + ".xsd");
+        Asserts.assertEquals(result.getOriginalFileName(), "ezy-settings-1.0.0.xsd");
+        Asserts.assertTrue(new File("test-output/no-commit/" + outFileName + ".xsd").exists());
+        verify(connection, times(1)).getResponseCode();
+        verify(connection, times(1)).getHeaderField("Location");
+        verify(connection, times(1)).getHeaderField("Set-Cookie");
+        verify(connection, times(1)).disconnect();
+    }
+
+    @Test
+    public void downloadToOutFileError() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .build();
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        when(connection.getResponseCode()).thenReturn(400);
+
+        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+
+        File outFolder = new File("test-output/no-commit");
+        String outFileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            MethodInvoker.create()
+                .object(sut)
+                .method("download")
+                .param(HttpURLConnection.class, connection)
+                .param(new DownloadRequest(fileUrl))
+                .param(File.class, outFolder)
+                .param(String.class, outFileName)
+                .param(DownloadCancellationToken.class, DownloadCancellationToken.ALWAYS_RUN)
+                .invoke(DownloadFileResult.class)
+        );
+
+        // then
+        Asserts.assertEqualsType(e.getCause().getCause(), HttpBadRequestException.class);
+        verify(connection, times(1)).getResponseCode();
+        verify(connection, times(1)).disconnect();
+    }
+
+    @Test
+    public void getDownloadFileNameTest() {
+        // given
+        String fileUrl = "https://example.com/file.jpg";
         String contentDisposition = "Content-Disposition: attachment; filename=\"filename.jpg\"";
 
         // when
-        String actual = MethodInvoker.create()
-            .object(sut)
-            .method("getDownloadFileName")
-            .param("fileUrl")
-            .param(contentDisposition)
-            .call();
+        String actual = HttpClient.getDownloadFileName(
+            fileUrl,
+            contentDisposition
+        );
 
         // then
         Asserts.assertEquals(actual, "filename.jpg");
@@ -578,21 +663,31 @@ public class HttpClientTest {
     @Test
     public void getDownloadFileNameWithEmptyDispositionTest() {
         // given
-        HttpClient sut = HttpClient.builder()
-            .build();
-
+        String fileUrl = "https://example.com/file.jpg";
         String contentDisposition = "";
 
         // when
-        String actual = MethodInvoker.create()
-            .object(sut)
-            .method("getDownloadFileName")
-            .param("https://example.com/file.jpg")
-            .param(contentDisposition)
-            .call();
+        String actual = HttpClient.getDownloadFileName(
+            fileUrl,
+            contentDisposition
+        );
 
         // then
         Asserts.assertEquals(actual, "file.jpg");
+    }
+
+    @Test
+    public void getDownloadFileNameWithQueryParamTest() {
+        // given
+        String fileUrl = "http://example.com/filename.jpg?hello=world";
+        // when
+        String actual = HttpClient.getDownloadFileName(
+            fileUrl,
+            null
+        );
+
+        // then
+        Asserts.assertEquals(actual, "filename.jpg");
     }
 
     @Test
@@ -619,7 +714,7 @@ public class HttpClientTest {
     }
 
     @Test
-    public void getDownloadFileNameWithemiColonTest() {
+    public void getDownloadFileNameWithSemiColonTest() {
         // given
         String contentDisposition = "filename=hello;";
 
@@ -664,6 +759,25 @@ public class HttpClientTest {
 
         // then
         Asserts.assertEquals(actual, "hello");
+    }
+
+    @Test
+    public void makeDownloadFileNameWithoutExtension() {
+        // given
+        String fileUrl = "http://example.com/filename";
+        String fileName = RandomUtil.randomShortAlphabetString();
+
+        // when
+        String actual = MethodInvoker.create()
+            .staticClass(HttpClient.class)
+            .method("makeDownloadFileName")
+            .param(String.class, null)
+            .param(String.class, fileUrl)
+            .param(String.class, fileName)
+            .call();
+
+        // then
+        Asserts.assertEquals(actual, fileName);
     }
 
     @BeforeTest

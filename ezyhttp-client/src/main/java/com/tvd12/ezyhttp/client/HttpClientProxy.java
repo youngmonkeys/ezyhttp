@@ -1,27 +1,12 @@
 package com.tvd12.ezyhttp.client;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import com.tvd12.ezyfox.concurrent.EzyExecutors;
-import com.tvd12.ezyfox.concurrent.EzyFuture;
-import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
-import com.tvd12.ezyfox.concurrent.EzyFutureMap;
-import com.tvd12.ezyfox.concurrent.EzyFutureTask;
-import com.tvd12.ezyfox.util.EzyCloseable;
-import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyfox.util.EzyProcessor;
-import com.tvd12.ezyfox.util.EzyStartable;
-import com.tvd12.ezyfox.util.EzyStoppable;
+import com.tvd12.ezyfox.concurrent.*;
+import com.tvd12.ezyfox.util.*;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
@@ -29,6 +14,14 @@ import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestQueue;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithException;
 
@@ -324,6 +317,100 @@ public class HttpClientProxy
         DownloadCancellationToken cancellationToken
     ) throws Exception {
         client.download(request, outputStream, cancellationToken);
+    }
+
+    /**
+     * Downloads a file from a URL and store to
+     * <code>storeLocation/fileName.extension</code> file.
+     *
+     * @param fileUrl           HTTP URL of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
+     * @param fileName          the output file name
+     * @return the downloaded result
+     * @throws IOException when there is any I/O error
+     */
+    public DownloadFileResult download(
+        String fileUrl,
+        File storeLocation,
+        String fileName
+    ) throws Exception {
+        return client.download(
+            fileUrl,
+            storeLocation,
+            fileName
+        );
+    }
+
+    /**
+     * Downloads a file from a URL and store to
+     * <code>storeLocation/fileName.extension</code> file.
+     *
+     * @param fileUrl           HTTP URL of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
+     * @param fileName          the output file name
+     * @param cancellationToken the token to cancel
+     * @return the downloaded result
+     * @throws IOException when there is any I/O error
+     */
+    public DownloadFileResult download(
+        String fileUrl,
+        File storeLocation,
+        String fileName,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        return client.download(
+            fileUrl,
+            storeLocation,
+            fileName,
+            cancellationToken
+        );
+    }
+
+    /**
+     * Downloads a file from a URL and store to
+     * <code>storeLocation/fileName.extension</code> file.
+     *
+     * @param request           the request of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
+     * @param fileName          the output file name
+     * @return the downloaded result
+     * @throws IOException when there is any I/O error
+     */
+    public DownloadFileResult download(
+        DownloadRequest request,
+        File storeLocation,
+        String fileName
+    ) throws Exception {
+        return client.download(
+            request,
+            storeLocation,
+            fileName
+        );
+    }
+
+    /**
+     * Downloads a file from a URL and store to
+     * <code>storeLocation/fileName.extension</code> file.
+     *
+     * @param request           the request of the file to be downloaded
+     * @param storeLocation     path of the directory to save the file
+     * @param fileName          the output file name
+     * @param cancellationToken the token to cancel
+     * @return the downloaded result
+     * @throws IOException when there is any I/O error
+     */
+    public DownloadFileResult download(
+        DownloadRequest request,
+        File storeLocation,
+        String fileName,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        return client.download(
+            request,
+            storeLocation,
+            fileName,
+            cancellationToken
+        );
     }
 
     public static Builder builder() {
