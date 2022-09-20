@@ -1,27 +1,11 @@
 package com.tvd12.ezyhttp.client;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
@@ -38,6 +22,21 @@ import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.util.EzyFileUtil.getFileExtension;
 import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWAYS_RUN;
 
 public class HttpClient extends EzyLoggable {
@@ -165,7 +164,11 @@ public class HttpClient extends EzyLoggable {
                     int responseContentLength = connection.getContentLength();
                     Class<?> responseType = responseTypes.get(responseCode);
                     responseBody = deserializeResponseBody(
-                        responseContentType, responseContentLength, inputStream, responseType);
+                        responseContentType,
+                        responseContentLength,
+                        inputStream,
+                        responseType
+                    );
                 } finally {
                     inputStream.close();
                 }
@@ -349,7 +352,6 @@ public class HttpClient extends EzyLoggable {
         DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
-
         if (responseCode >= 400) {
             throw processDownloadError(connection, fileURL, responseCode);
         }
@@ -461,11 +463,9 @@ public class HttpClient extends EzyLoggable {
         DownloadCancellationToken cancellationToken
     ) throws Exception {
         int responseCode = connection.getResponseCode();
-
         if (responseCode >= 400) {
             throw processDownloadError(connection, fileURL, responseCode);
         }
-
         try (InputStream inputStream = connection.getInputStream()) {
             int bytesRead;
             byte[] buffer = new byte[1024];
@@ -478,6 +478,132 @@ public class HttpClient extends EzyLoggable {
         }
         if (cancellationToken.isCancelled()) {
             throw new DownloadCancelledException(fileURL);
+        }
+    }
+
+    public DownloadFileResult download(
+        String fileUrl,
+        File storeLocation,
+        String fileName
+    ) throws Exception {
+        return download(
+            fileUrl,
+            storeLocation,
+            fileName,
+            ALWAYS_RUN
+        );
+    }
+
+    public DownloadFileResult download(
+        String fileUrl,
+        File storeLocation,
+        String fileName,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        return download(
+            new DownloadRequest(fileUrl),
+            storeLocation,
+            fileName,
+            cancellationToken
+        );
+    }
+
+    public DownloadFileResult download(
+        DownloadRequest request,
+        File storeLocation,
+        String fileName
+    ) throws Exception {
+        return download(
+            request,
+            storeLocation,
+            fileName,
+            ALWAYS_RUN
+        );
+    }
+
+    public DownloadFileResult download(
+        DownloadRequest request,
+        File storeLocation,
+        String fileName,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        String fileURL = request.getFileURL();
+        HttpURLConnection connection = connect(fileURL);
+        try {
+            decorateConnection(connection, request);
+            connection.connect();
+            return download(
+                connection,
+                request,
+                storeLocation,
+                fileName,
+                cancellationToken
+            );
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    @SuppressWarnings("MethodLength")
+    private DownloadFileResult download(
+        HttpURLConnection originalConnection,
+        DownloadRequest request,
+        File storeLocation,
+        String fileName,
+        DownloadCancellationToken cancellationToken
+    ) throws Exception {
+        HttpURLConnection connection = originalConnection;
+        try {
+            String fileURL = request.getFileURL();
+            String newFileURL = fileURL;
+            while (true) {
+                int responseCode = connection.getResponseCode();
+                if (responseCode >= 400) {
+                    throw processDownloadError(connection, newFileURL, responseCode);
+                }
+                boolean redirect = responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                    || responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER;
+                if (redirect) {
+                    newFileURL = connection.getHeaderField("Location");
+                    String cookies = connection.getHeaderField("Set-Cookie");
+                    connection.disconnect();
+                    connection = (HttpURLConnection) new URL(newFileURL).openConnection();
+                    decorateConnection(connection, request);
+                    if (cookies != null) {
+                        connection.setRequestProperty("Cookie", cookies);
+                    }
+                } else {
+                    break;
+                }
+            }
+            String disposition = connection.getHeaderField("Content-Disposition");
+            String originalFileName = getDownloadFileName(newFileURL, disposition);
+            String newFileName = makeDownloadFileName(disposition, newFileURL, fileName);
+            try (
+                InputStream inputStream = connection.getInputStream();
+                OutputStream outputStream = new FileOutputStream(
+                    storeLocation
+                        .toPath()
+                        .resolve(newFileName)
+                        .toFile()
+                )
+            ) {
+                int bytesRead;
+                byte[] buffer = new byte[1024];
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    if (cancellationToken.isCancelled()) {
+                        break;
+                    }
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            if (cancellationToken.isCancelled()) {
+                throw new DownloadCancelledException(fileURL);
+            }
+            return new DownloadFileResult(originalFileName, newFileName);
+        } finally {
+            connection.disconnect();
         }
     }
 
@@ -517,6 +643,18 @@ public class HttpClient extends EzyLoggable {
         return translateErrorCode(responseCode, responseBody);
     }
 
+    private static String makeDownloadFileName(
+        String contentDisposition,
+        String fileURL,
+        String fileName
+    ) {
+        String originalFileName = getDownloadFileName(fileURL, contentDisposition);
+        String fileExtension = getFileExtension(originalFileName);
+        return isBlank(fileExtension)
+            ? fileName
+            : fileName + "." + fileExtension;
+    }
+
     public static String getDownloadFileName(
         String fileURL,
         String contentDisposition
@@ -551,6 +689,9 @@ public class HttpClient extends EzyLoggable {
         }
         if (EzyStrings.isBlank(answer)) {
             answer = fileURL.substring(fileURL.lastIndexOf("/") + 1);
+        }
+        if (answer.contains("?")) {
+            answer = answer.substring(0, answer.indexOf('?'));
         }
         return answer;
     }
