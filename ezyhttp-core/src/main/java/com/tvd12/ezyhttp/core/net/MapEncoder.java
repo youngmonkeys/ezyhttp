@@ -28,7 +28,10 @@ public final class MapEncoder {
             }
             builder.append(URLEncoder.encode(entry.getKey(), EzyStrings.UTF_8));
             builder.append("=");
-            builder.append(URLEncoder.encode(entry.getValue().toString(), EzyStrings.UTF_8));
+            Object value = entry.getValue();
+            if (value != null) {
+                builder.append(URLEncoder.encode(value.toString(), EzyStrings.UTF_8));
+            }
         }
         return builder.toString();
     }
