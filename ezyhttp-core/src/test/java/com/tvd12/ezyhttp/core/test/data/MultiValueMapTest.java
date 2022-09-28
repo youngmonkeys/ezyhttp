@@ -1,10 +1,6 @@
 package com.tvd12.ezyhttp.core.test.data;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.testng.annotations.Test;
 
@@ -45,11 +41,15 @@ public class MultiValueMapTest {
         values.put("c", 100);
         values.put("d", "good");
         values.put("e", true);
+        TreeMap<String, Object> cookieValues = new TreeMap<>();
+        cookieValues.put("accessToken", "123abc");
+        cookieValues.put("hello", "world");
         MultiValueMap sut = MultiValueMap.builder()
             .setValue("1", "hello")
             .setValues("2", Arrays.asList("foo", "bar"))
             .setValues("3", Collections.emptyList())
             .setValues("m", values)
+            .setValues("Cookie", cookieValues)
             .build();
 
         // when
@@ -60,6 +60,7 @@ public class MultiValueMapTest {
         expectation.put("1", "hello");
         expectation.put("2", "foo;bar");
         expectation.put("m", "a;b=;c=100;d=good;e=true");
+        expectation.put("Cookie", "accessToken=123abc;hello=world");
         Asserts.assertEquals(expectation, actual1);
     }
 
