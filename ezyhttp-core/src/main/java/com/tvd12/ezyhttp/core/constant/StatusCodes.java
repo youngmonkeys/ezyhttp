@@ -6,6 +6,7 @@ public final class StatusCodes {
     public static final int CREATED = 201;
     public static final int ACCEPTED = 202;
     public static final int NO_CONTENT = 204;
+    public static final int PARTIAL_CONTENT = 206;
     public static final int MOVED_PERMANENTLY = 301;
     public static final int MOVED_TEMPORARILY = 302;
     public static final int BAD_REQUEST = 400;

@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.core.constant;
 
-import java.util.Map;
-
 import com.tvd12.ezyfox.util.EzyEnums;
-
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 public enum ContentType {
@@ -13,7 +12,7 @@ public enum ContentType {
     ABI_WORD_DOCUMENT(ContentTypes.ABI_WORD_DOCUMENT, "abw"),
     ARCHIVE_DOCUMENT(ContentTypes.ARCHIVE_DOCUMENT, "arc"),
     AUDIO_VIDEO_INTERLEAVE(ContentTypes.AUDIO_VIDEO_INTERLEAVE, "avi"),
-    AMAZONE_KINDLE_EBOOK(ContentTypes.AMAZONE_KINDLE_EBOOK, "azw"),
+    AMAZON_KINDLE_EBOOK(ContentTypes.AMAZONE_KINDLE_EBOOK, "azw"),
     BZIP(ContentTypes.BZIP, "bz"),
     BZIP2(ContentTypes.BZIP2, "bz2"),
     CD_AUDIO(ContentTypes.CD_AUDIO, "cda"),
@@ -98,6 +97,9 @@ public enum ContentType {
     private final String extension;
     private final String value;
 
+    private static final Map<String, ContentType> VALUE_BY_MIME_TYPE =
+        EzyEnums.enumMap(ContentType.class, it -> it.value);
+
     private static final Map<String, ContentType> VALUE_BY_EXTENSION =
         EzyEnums.enumMap(ContentType.class, it -> it.extension);
 
@@ -106,11 +108,29 @@ public enum ContentType {
         this.extension = extension;
     }
 
-    public static ContentType ofExtension(String extension) {
-        ContentType value = VALUE_BY_EXTENSION.get(extension);
-        if (value == null) {
-            value = APPLICATION_OCTET_STREAM;
-        }
+    public String getMimeType() {
         return value;
+    }
+
+    public static ContentType ofMimeType(String mimeType) {
+        return VALUE_BY_MIME_TYPE.get(mimeType);
+    }
+
+    public static ContentType ofExtension(String extension) {
+        return VALUE_BY_EXTENSION.getOrDefault(
+            extension,
+            APPLICATION_OCTET_STREAM
+        );
+    }
+
+    public static String getExtensionOfMimeType(
+        String mimeType,
+        String defaultExtension
+    ) {
+        ContentType contentType = VALUE_BY_MIME_TYPE.get(mimeType);
+        if (contentType != null) {
+            return contentType.getExtension();
+        }
+        return defaultExtension;
     }
 }

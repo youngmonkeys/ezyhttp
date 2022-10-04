@@ -8,6 +8,7 @@
             <package name="com.tvd12.ezyhttp.core.test.constant"></package>
             <package name="com.tvd12.ezyhttp.core.test.data"></package>
             <package name="com.tvd12.ezyhttp.core.test.exception"></package>
+            <package name="com.tvd12.ezyhttp.core.test.io"></package>
             <package name="com.tvd12.ezyhttp.core.test.json"></package>
             <package name="com.tvd12.ezyhttp.core.test.net"></package>
             <package name="com.tvd12.ezyhttp.core.test.resources"></package>

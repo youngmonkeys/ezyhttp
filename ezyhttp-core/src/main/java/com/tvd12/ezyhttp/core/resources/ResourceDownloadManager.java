@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.core.resources;
 
+import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
@@ -92,6 +93,9 @@ public class ResourceDownloadManager
                     outputStream.write(buffer, 0, read);
                     done = false;
                 }
+            } catch (EOFException e) {
+                exception = e;
+                logger.info("download's broken cause by output stream has closed");
             } catch (Exception e) {
                 exception = e;
                 logger.info("download error", e);

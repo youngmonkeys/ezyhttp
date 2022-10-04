@@ -166,6 +166,31 @@ public class ResourceDownloadManagerTest extends BaseTest {
     }
 
     @Test
+    public void drainFailedDueToOutputStreamEnd() throws Exception {
+        // given
+        info("start drainFailedDueToOutputStream");
+        ResourceDownloadManager sut = new ResourceDownloadManager();
+
+        int size = ResourceDownloadManager.DEFAULT_BUFFER_SIZE * 3;
+
+        byte[] inputBytes = RandomUtil.randomByteArray(size);
+        InputStream inputStream = new ByteArrayInputStream(inputBytes);
+
+        OutputStream outputStream = mock(OutputStream.class);
+        EOFException exception = new EOFException("just test");
+        doThrow(exception).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
+
+        // when
+        Throwable throwable = Asserts.assertThrows(() -> sut.drain(inputStream, outputStream));
+
+        // then
+        sut.stop();
+        Asserts.assertEqualsType(throwable, EOFException.class);
+        info("finish drainFailedDueToOutputStream");
+        sut.destroy();
+    }
+
+    @Test
     public void drainFailedDueToOutputStreamDueToError() throws Exception {
         // given
         info("start drainFailedDueToOutputStreamDueToError");
