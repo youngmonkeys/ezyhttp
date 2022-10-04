@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.core.test.constant;
 
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyhttp.core.constant.ContentType;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
 
 public class ContentTypeTest {
 
@@ -30,11 +29,48 @@ public class ContentTypeTest {
         Asserts.assertEquals(ContentType.ofExtension("html"), ContentType.TEXT_HTML_UTF8);
         Asserts.assertEquals(ContentType.ofExtension("txt"), ContentType.TEXT_PLAIN);
         Asserts.assertEquals(ContentType.ofExtension(null), ContentType.APPLICATION_OCTET_STREAM);
+
+        Asserts.assertEquals(ContentType.ofMimeType(ContentTypes.MP3), ContentType.MP3);
+        Asserts.assertNull(ContentType.ofMimeType("not found"));
+        Asserts.assertEquals(
+            ContentType.MP3.getValue(),
+            ContentType.MP3.getMimeType()
+        );
     }
 
     @Test
     public void commonTest() {
         Asserts.assertEquals("json", ContentType.APPLICATION_JSON.getExtension());
         Asserts.assertEquals(ContentTypes.APPLICATION_JSON, ContentType.APPLICATION_JSON.getValue());
+    }
+
+    @Test
+    public void getExtensionOfMimeTypeTest() {
+        // given
+        String defaultExtension = "mp3";
+
+        // when
+        String actual = ContentType.getExtensionOfMimeType(
+            ContentTypes.MP3,
+            defaultExtension
+        );
+
+        // then
+        Asserts.assertEquals(actual, ContentType.MP3.getExtension());
+    }
+
+    @Test
+    public void getExtensionOfMimeTypeButDefaultTest() {
+        // given
+        String defaultExtension = "mp3";
+
+        // when
+        String actual = ContentType.getExtensionOfMimeType(
+            "not found",
+            defaultExtension
+        );
+
+        // then
+        Asserts.assertEquals(actual, defaultExtension);
     }
 }

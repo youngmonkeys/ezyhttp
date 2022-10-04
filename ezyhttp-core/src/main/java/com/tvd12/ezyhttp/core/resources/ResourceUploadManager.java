@@ -94,7 +94,7 @@ public class ResourceUploadManager
                 }
             } catch (Exception e) {
                 exception = e;
-                logger.info("upload error", e);
+                logger.info("upload broken", e);
             } catch (Throwable e) {
                 exception = new IllegalStateException(e);
                 logger.info("upload fatal error", e);
