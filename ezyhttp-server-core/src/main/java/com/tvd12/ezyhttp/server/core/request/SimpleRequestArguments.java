@@ -23,6 +23,8 @@ import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
 public class SimpleRequestArguments implements RequestArguments {
@@ -53,11 +55,14 @@ public class SimpleRequestArguments implements RequestArguments {
     @Getter
     protected Map<String, Object> redirectionAttributes;
 
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(SimpleRequestArguments.class);
+
     @Override
     public <T> T getArgument(Object key) {
         Object argument = arguments != null ? arguments.get(key) : null;
         if (argument == null && debug) {
-            throw new NullPointerException("there is no value for argment: " + key);
+            LOGGER.error("there is no value for argment: {}", key);
         }
         return (T) argument;
     }
