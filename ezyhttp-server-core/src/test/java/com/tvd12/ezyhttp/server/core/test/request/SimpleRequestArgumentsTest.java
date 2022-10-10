@@ -97,10 +97,10 @@ public class SimpleRequestArgumentsTest {
         sut.setDebug(true);
 
         // when
-        Throwable e = Asserts.assertThrows(() -> sut.getArgument("unknown"));
+        Object actual = sut.getArgument("unknown");
 
         // then
-        Asserts.assertEqualsType(e, NullPointerException.class);
+        Asserts.assertNull(actual);
         sut.release();
     }
 
