@@ -286,8 +286,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         Set<Class<?>> providerClasses = reflection
             .getExtendsClasses(EzyPackagesToScanProvider.class);
         for (Class<?> clazz : providerClasses) {
-            EzyPackagesToScanProvider provider =
-                (EzyPackagesToScanProvider) EzyClasses.newInstance(clazz);
+            EzyPackagesToScanProvider provider = EzyClasses.newInstance(clazz);
             answer.addAll(provider.provide());
         }
         return answer;
@@ -323,7 +322,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         if (propertiesMapClass == null) {
             return null;
         }
-        return (EzyPropertiesMap) EzyClasses.newInstance(propertiesMapClass);
+        return EzyClasses.newInstance(propertiesMapClass);
     }
 
     protected Map<String, Class> getServiceClasses(EzyReflection reflection) {
@@ -409,8 +408,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
                     .viewDialects(beanContext.getSingletonsOf(ViewDialect.class))
                     .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
                     .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
-                    .absentMessageResolver(beanContext
-                        .getSingleton(AbsentMessageResolver.class))
+                    .absentMessageResolver(beanContext.getSingleton(AbsentMessageResolver.class))
                     .build();
             }
         }
@@ -445,12 +443,14 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
                 false,
                 true,
                 true,
-                resource.getFullPath());
+                resource.getFullPath()
+            );
             RequestHandler requestHandler = new ResourceRequestHandler(
                 resource.getPath(),
                 resource.getUri(),
                 resource.getExtension(),
-                downloadManager);
+                downloadManager
+            );
             requestHandlerManager.addHandler(requestURI, requestHandler);
         }
     }
