@@ -1458,6 +1458,65 @@ public class BlockingServletTest {
     }
 
     @Test
+    public void doPutWithSpaceTest() throws Exception {
+        // given
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setServerPort(PORT);
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+
+        String requestURI = "/put%20with%20space";
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.PUT.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+
+        when(request.getCookies()).thenReturn(
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
+        );
+
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        PutRequestHandler requestHandler = new PutRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.PUT, "/put with space", false), requestHandler);
+
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        when(interceptor.preHandle(any(), any())).thenReturn(true);
+        componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        verify(request, times(1)).getMethod();
+        verify(request, times(1)).getRequestURI();
+
+        verify(response, times(1)).sendRedirect("/home");
+
+        verify(interceptor, times(1)).preHandle(any(), any());
+        verify(interceptor, times(1)).postHandle(any(), any());
+
+        componentManager.destroy();
+    }
+
+    @Test
     public void doPutWithRedirectTest() throws Exception {
         // given
         ComponentManager componentManager = ComponentManager.getInstance();
@@ -2058,6 +2117,20 @@ public class BlockingServletTest {
 
         @DoGet("/put")
         public Redirect doPut(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestArgument("param") String param,
+            @RequestArgument("header") String header,
+            @RequestCookie("cookie") String cookie) {
+            return Redirect.builder()
+                .addCookie("foo", "bar")
+                .addHeader("hello", "world")
+                .uri("/home")
+                .build();
+        }
+
+        @DoGet("/put with space")
+        public Redirect doPutWithSpace(
             HttpServletRequest request,
             HttpServletResponse response,
             @RequestArgument("param") String param,

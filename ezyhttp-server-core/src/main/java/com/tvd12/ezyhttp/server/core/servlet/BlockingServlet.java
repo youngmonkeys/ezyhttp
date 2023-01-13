@@ -1,26 +1,5 @@
 package com.tvd12.ezyhttp.server.core.servlet;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
@@ -39,16 +18,28 @@ import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
-import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
-import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
-import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
-import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
-import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
+import com.tvd12.ezyhttp.server.core.manager.*;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncListener;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class BlockingServlet extends HttpServlet {
     private static final long serialVersionUID = -3874017929628817672L;
@@ -169,10 +160,14 @@ public class BlockingServlet extends HttpServlet {
         String requestURI = request.getRequestURI();
         String matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
         if (matchedURI == null) {
-            if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
-                responseString(response, "uri " + requestURI + " not found");
+            requestURI = URLDecoder.decode(requestURI, EzyStrings.UTF_8);
+            matchedURI = requestHandlerManager.getMatchedURI(method, requestURI);
+            if (matchedURI == null) {
+                if (!handleError(method, request, response, HttpServletResponse.SC_NOT_FOUND)) {
+                    responseString(response, "uri " + requestURI + " not found");
+                }
+                return;
             }
-            return;
         }
         request.setAttribute(CoreConstants.ATTRIBUTE_MATCHED_URI, matchedURI);
         boolean isManagementURI = requestURIManager.isManagementURI(method, matchedURI);
