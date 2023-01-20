@@ -11,7 +11,9 @@ public final class ResourceResolvers {
 
     private ResourceResolvers() {}
 
-    public static ResourceResolver createResourdeResolver(EzyPropertyFetcher propertyFetcher) {
+    public static ResourceResolver createResourceResolver(
+        EzyPropertyFetcher propertyFetcher
+    ) {
         boolean resourceEnable = propertyFetcher
             .getProperty(RESOURCE_ENABLE, boolean.class, false);
         if (!resourceEnable) {
@@ -46,7 +48,9 @@ public final class ResourceResolvers {
         return new ResourceDownloadManager(capacity, threadPoolSize, bufferSize);
     }
 
-    public static ResourceUploadManager createUploadManager(EzyPropertyFetcher propertyFetcher) {
+    public static ResourceUploadManager createUploadManager(
+        EzyPropertyFetcher propertyFetcher
+    ) {
         int capacity = propertyFetcher
             .getProperty(RESOURCE_UPLOAD_CAPACITY, int.class,
                 ResourceUploadManager.DEFAULT_CAPACITY);

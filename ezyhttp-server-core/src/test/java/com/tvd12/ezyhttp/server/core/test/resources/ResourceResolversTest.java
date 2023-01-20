@@ -29,7 +29,7 @@ public class ResourceResolversTest {
         ).thenReturn("static/.+");
 
         // when
-        ResourceResolver resourceResolver = ResourceResolvers.createResourdeResolver(propertyFetcher);
+        ResourceResolver resourceResolver = ResourceResolvers.createResourceResolver(propertyFetcher);
 
         // then
         assert resourceResolver != null;
@@ -48,7 +48,7 @@ public class ResourceResolversTest {
         ).thenReturn(new String[]{"static"});
 
         // when
-        ResourceResolver resourceResolver = ResourceResolvers.createResourdeResolver(propertyFetcher);
+        ResourceResolver resourceResolver = ResourceResolvers.createResourceResolver(propertyFetcher);
 
         // then
         assert resourceResolver != null;

@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.view;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
@@ -31,7 +32,7 @@ public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
 
     public ViewContextBuilder viewDecorators(List<ViewDecorator> viewDecorators) {
         this.viewDecorators.addAll(viewDecorators);
-        this.viewDecorators.sort((a, b) -> a.getPriority() - b.getPriority());
+        this.viewDecorators.sort(Comparator.comparingInt(ViewDecorator::getPriority));
         return this;
     }
 

@@ -53,7 +53,7 @@ public class ThymeleafMessageResolver implements IMessageResolver {
     }
 
     private Map<String, Properties> readMessages() {
-        MessageReader messageReader = new MessageReader();
+        MessageReader messageReader = MessageReader.getDefault();
         return messageReader.read(messageLocation);
     }
 

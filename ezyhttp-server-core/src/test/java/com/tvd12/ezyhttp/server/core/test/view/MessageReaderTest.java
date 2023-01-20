@@ -15,7 +15,7 @@ public class MessageReaderTest {
     @Test
     public void test() {
         // given
-        MessageReader reader = new MessageReader();
+        MessageReader reader = MessageReader.getDefault();
 
         String folderPath = "messages";
 

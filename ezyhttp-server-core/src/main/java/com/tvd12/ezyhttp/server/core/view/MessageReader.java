@@ -18,7 +18,12 @@ import lombok.AllArgsConstructor;
 
 public class MessageReader {
 
+    private static final MessageReader DEFAULT = new MessageReader();
     private static final String MESSAGES_FILE_PATTERN = "^messages(|[_\\-\\w\\d]+).properties";
+
+    public static MessageReader getDefault() {
+        return DEFAULT;
+    }
 
     public Map<String, Properties> read(String folderPath) {
         List<MessagesFile> files = getMessagesFiles(folderPath);
