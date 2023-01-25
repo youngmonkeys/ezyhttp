@@ -4,7 +4,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface ViewContext {
 
@@ -20,4 +23,18 @@ public interface ViewContext {
         String key,
         Object... parameters
     );
+
+    default Map<String, String> resolveMessages(
+        Locale locale,
+        Collection<String> keys
+    ) {
+        return keys
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    it -> it,
+                    it -> resolveMessage(locale, it)
+                )
+            );
+    }
 }
