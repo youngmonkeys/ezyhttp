@@ -1,10 +1,10 @@
 package com.tvd12.ezyhttp.server.core.view;
 
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Locale;
 
 public interface ViewContext {
 
@@ -14,4 +14,10 @@ public interface ViewContext {
         HttpServletResponse response,
         View view
     ) throws IOException;
+
+    String resolveMessage(
+        Locale locale,
+        String key,
+        Object... parameters
+    );
 }

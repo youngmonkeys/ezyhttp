@@ -1,21 +1,15 @@
 package com.tvd12.ezyhttp.server.thymeleaf;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-
-import org.thymeleaf.context.ITemplateContext;
-import org.thymeleaf.messageresolver.IMessageResolver;
-
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.MessageReader;
-
 import lombok.Getter;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.messageresolver.IMessageResolver;
+
+import java.text.MessageFormat;
+import java.util.*;
 
 public class ThymeleafMessageResolver implements IMessageResolver {
 
@@ -64,7 +58,7 @@ public class ThymeleafMessageResolver implements IMessageResolver {
         for (String language : messagesMap.keySet()) {
             Properties messages = messagesMap.get(language);
             answer
-                .computeIfAbsent(language, (k) -> new Properties())
+                .computeIfAbsent(language, k -> new Properties())
                 .putAll(messages);
             answer
                 .computeIfAbsent(language.toLowerCase(), k -> new Properties())
@@ -101,20 +95,34 @@ public class ThymeleafMessageResolver implements IMessageResolver {
         ITemplateContext context,
         Class<?> origin,
         String key,
-        Object[] parameters) {
+        Object[] parameters
+    ) {
         Locale locale = context.getLocale();
-        String message;
+        return resolveMessage(
+            locale,
+            key,
+            parameters
+        );
+    }
+
+    public String resolveMessage(
+        Locale locale,
+        String key,
+        Object[] parameters
+    ) {
+        String message = null;
         Properties messages = messagesByLocale.get(locale);
-        if (messages == null) {
-            messages = messagesByLanguage.get(locale.getLanguage());
-        }
-        if (messages == null) {
-            message = defaultMessages.getProperty(key);
-        } else {
+        if (messages != null) {
             message = messages.getProperty(key);
-            if (message == null) {
-                message = defaultMessages.getProperty(key);
+        }
+        if (message == null) {
+            messages = messagesByLanguage.get(locale.getLanguage());
+            if (messages != null) {
+                message = messages.getProperty(key);
             }
+        }
+        if (message == null) {
+            message = defaultMessages.getProperty(key);
         }
         return message != null ? formatMessage(locale, message, parameters) : null;
     }
@@ -124,11 +132,24 @@ public class ThymeleafMessageResolver implements IMessageResolver {
         ITemplateContext context,
         Class<?> origin,
         String key,
-        Object[] parameters) {
+        Object[] parameters
+    ) {
+        return createAbsentMessageRepresentation(
+            context.getLocale(),
+            key,
+            parameters
+        );
+    }
+
+    public String createAbsentMessageRepresentation(
+        Locale locale,
+        String key,
+        Object[] parameters
+    ) {
         if (absentMessageResolver != null) {
             String message = absentMessageResolver.resolve(
-                context.getLocale(),
-                origin,
+                locale,
+                getClass(),
                 key,
                 parameters
             );
