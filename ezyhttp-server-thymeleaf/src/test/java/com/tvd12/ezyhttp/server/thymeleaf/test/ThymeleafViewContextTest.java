@@ -1,19 +1,8 @@
 package com.tvd12.ezyhttp.server.thymeleaf.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.tvd12.ezyhttp.server.core.view.*;
+import com.tvd12.ezyhttp.server.thymeleaf.ThymeleafViewContextBuilder;
+import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
@@ -25,13 +14,13 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.unbescape.html.HtmlEscape;
 
-import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
-import com.tvd12.ezyhttp.server.core.view.View;
-import com.tvd12.ezyhttp.server.core.view.ViewContext;
-import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
-import com.tvd12.ezyhttp.server.core.view.ViewDialect;
-import com.tvd12.ezyhttp.server.thymeleaf.ThymeleafViewContextBuilder;
-import com.tvd12.test.assertion.Asserts;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 public class ThymeleafViewContextTest {
 
@@ -151,6 +140,65 @@ public class ThymeleafViewContextTest {
 
         // then
         Asserts.assertNotNull(viewContext);
+    }
+
+    @Test
+    public void resolveMessageTest() {
+        // given
+        TemplateResolver resolver = TemplateResolver.builder()
+            .build();
+        ViewContext viewContext = new ThymeleafViewContextBuilder()
+            .templateResolver(resolver)
+            .build();
+
+        Locale locale = Locale.US;
+        String key = "hello_world";
+        Object[] parameters = new Object[] {key};
+
+        // when
+        String actual = viewContext.resolveMessage(
+            locale,
+            key,
+            parameters
+        );
+
+        // then
+        Asserts.assertEquals(actual, "hello_world");
+    }
+
+    @Test
+    public void resolveMessageWithMessageProviderTest() {
+        // given
+        Locale locale = Locale.US;
+        TemplateResolver resolver = TemplateResolver.builder()
+            .build();
+        Properties properties = new Properties();
+        properties.setProperty("hello_world", "Hello World");
+        MessageProvider messageProvider = mock(MessageProvider.class);
+        when(messageProvider.provide()).thenReturn(
+            Collections.singletonMap(
+                locale.getLanguage(),
+                properties
+            )
+        );
+        ViewContext viewContext = new ThymeleafViewContextBuilder()
+            .templateResolver(resolver)
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
+
+        String key = "hello_world";
+        Object[] parameters = new Object[] {key};
+
+        // when
+        String actual = viewContext.resolveMessage(
+            locale,
+            key,
+            parameters
+        );
+
+        // then
+        Asserts.assertEquals(actual, "Hello World");
+        verify(messageProvider, times(1)).provide();
     }
 
     private static class VewHelloDialect

@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core.test.view;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,14 @@ public class ViewContextBuilderTest {
             View view
         ) {}
 
+        @Override
+        public String resolveMessage(
+            Locale locale,
+            String key,
+            Object... parameters
+        ) {
+            return key;
+        }
     }
 
     private static class InternalViewContextBuilder extends ViewContextBuilder {

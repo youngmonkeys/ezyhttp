@@ -1,13 +1,14 @@
 package com.tvd12.ezyhttp.server.core.test.component;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 @EzySingleton
 public class ViewContextBuilderTest extends ViewContextBuilder {
@@ -26,5 +27,14 @@ public class ViewContextBuilderTest extends ViewContextBuilder {
             HttpServletResponse response,
             View view
         ) {}
+
+        @Override
+        public String resolveMessage(
+            Locale locale,
+            String key,
+            Object... parameters
+        ) {
+            return key;
+        }
     }
 }
