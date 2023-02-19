@@ -64,7 +64,7 @@
     </developers>
 
     <properties>
-        <ezy.version>1.2.5</ezy.version>
+        <ezy.version>1.2.6</ezy.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <jetty.version>9.4.50.v20221201</jetty.version>
         <tomcat.version>8.5.85</tomcat.version>
