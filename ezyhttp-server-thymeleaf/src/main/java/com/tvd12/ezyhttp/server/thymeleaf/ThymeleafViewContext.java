@@ -3,7 +3,8 @@ package com.tvd12.ezyhttp.server.thymeleaf;
 import com.tvd12.ezyhttp.server.core.view.*;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.context.IContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -51,14 +52,11 @@ public class ThymeleafViewContext implements ViewContext {
         for (ViewDecorator viewDecorator : viewDecorators) {
             viewDecorator.decorate(request, view);
         }
-        WebContext ctx = new WebContext(
-            request,
-            response,
-            servletContext,
-            view.getLocale()
+        IContext context = new Context(
+            view.getLocale(),
+            view.getVariables()
         );
-        ctx.setVariables(view.getVariables());
-        templateEngine.process(view.getTemplate(), ctx, response.getWriter());
+        templateEngine.process(view.getTemplate(), context, response.getWriter());
     }
 
     @Override
