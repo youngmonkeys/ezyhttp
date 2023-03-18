@@ -33,13 +33,18 @@ public class ViewTest {
             .addVariable("variable1", "variable1Value")
             .addVariable("variable2", "variable2Value")
             .appendToVariable("list", "a")
-            .appendToVariable("list", "b")
+            .appendValueToVariable("list", "b")
+            .appendValuesToVariable("list", new String[] {"c", "d"})
+            .appendValuesToVariable("list", Arrays.asList("e", "f"))
             .build();
 
         // when
         sut.setVariable("setValue", "value");
         sut.setVariables(Collections.singletonMap("mapKey", "mapValue"));
-        sut.appendToVariable("list", "c");
+        sut.appendToVariable("list", "g");
+        sut.appendValueToVariable("list", "h");
+        sut.appendValuesToVariable("list", new String[] {"i", "j"});
+        sut.appendValuesToVariable("list", Arrays.asList("k", "l"));
 
         // then
         Asserts.assertEquals("index.html", sut.getTemplate());
@@ -59,12 +64,16 @@ public class ViewTest {
                 .put("variable1", "variable1Value")
                 .put("variable2", "variable2Value")
                 .put("setValue", "value")
-                .put("list", Arrays.asList("a", "b", "c"))
+                .put("list", Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"))
                 .put("mapKey", "mapValue")
                 .build(),
             sut.getVariables());
         Asserts.assertEquals(sut.getVariable("setValue"), "value");
-        Asserts.assertEquals(sut.getVariable("list"), Arrays.asList("a", "b", "c"), false);
+        Asserts.assertEquals(
+            sut.getVariable("list"),
+            Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"),
+            false
+        );
         Asserts.assertTrue(sut.containsVariable("variable1"));
         Asserts.assertFalse(sut.containsVariable("i don't know"));
         Asserts.assertEquals(sut.getCookies().get(2).getPath(), "/path");

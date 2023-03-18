@@ -1,22 +1,14 @@
 package com.tvd12.ezyhttp.server.core.view;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
-
-import javax.servlet.http.Cookie;
-
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.servlet.http.Cookie;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 @Getter
 public class View {
@@ -73,10 +65,6 @@ public class View {
         this.variables.putAll(variables);
     }
 
-    public void appendToVariable(String name, Object value) {
-        appendToVariable(variables, name, value);
-    }
-
     @SuppressWarnings("unchecked")
     public static void appendToVariable(
         Map<String, Object> variables,
@@ -87,6 +75,27 @@ public class View {
             variableName,
             k -> new ArrayList<>())
         ).add(value);
+    }
+
+    public void appendToVariable(String name, Object value) {
+        appendToVariable(variables, name, value);
+    }
+
+    public void appendValueToVariable(String name, Object value) {
+        appendToVariable(variables, name, value);
+    }
+
+    public void appendValuesToVariable(String name, Object[] values) {
+        for (Object value : values) {
+            appendToVariable(variables, name, value);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void appendValuesToVariable(String name, Collection values) {
+        for (Object value : values) {
+            appendToVariable(variables, name, value);
+        }
     }
 
     public void putKeyValueToVariable(
@@ -163,6 +172,32 @@ public class View {
 
         public Builder appendToVariable(String variableName, Object value) {
             View.appendToVariable(variables, variableName, value);
+            return this;
+        }
+
+        public Builder appendValueToVariable(String variableName, Object value) {
+            View.appendToVariable(variables, variableName, value);
+            return this;
+        }
+
+        public Builder appendValuesToVariable(
+            String variableName,
+            Object[] values
+        ) {
+            for (Object value : values) {
+                View.appendToVariable(variables, variableName, value);
+            }
+            return this;
+        }
+
+        @SuppressWarnings("rawtypes")
+        public Builder appendValuesToVariable(
+            String variableName,
+            Collection values
+        ) {
+            for (Object value : values) {
+                View.appendToVariable(variables, variableName, value);
+            }
             return this;
         }
 
