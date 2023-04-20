@@ -1,13 +1,5 @@
 package com.tvd12.ezyhttp.server.core.reflect;
 
-import static com.tvd12.ezyhttp.server.core.annotation.Annotations.REQUEST_HANDLER_ANNOTATIONS;
-
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.tvd12.ezyfox.annotation.EzyFeature;
 import com.tvd12.ezyfox.annotation.EzyManagement;
 import com.tvd12.ezyfox.annotation.EzyPayment;
@@ -18,8 +10,15 @@ import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 import com.tvd12.ezyhttp.server.core.handler.ManagementController;
 import com.tvd12.ezyhttp.server.core.util.ControllerAnnotations;
-
 import lombok.Getter;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.tvd12.ezyhttp.server.core.annotation.Annotations.REQUEST_HANDLER_ANNOTATIONS;
 
 @Getter
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -57,19 +56,19 @@ public class ControllerProxy {
 
     public boolean isManagement() {
         return instance instanceof ManagementController
-            || clazz.isAnnotated(EzyManagement.class);
+            || isAnnotationPresent(EzyManagement.class);
     }
 
     public boolean isApi() {
-        return clazz.isAnnotated(Api.class);
+        return isAnnotationPresent(Api.class);
     }
 
     public boolean isAuthenticated() {
-        return clazz.isAnnotated(Authenticated.class);
+        return isAnnotationPresent(Authenticated.class);
     }
 
     public boolean isPayment() {
-        return clazz.isAnnotated(EzyPayment.class);
+        return isAnnotationPresent(EzyPayment.class);
     }
 
     public String getFeature() {
@@ -109,6 +108,19 @@ public class ControllerProxy {
 
     public String getControllerName() {
         return clazz.getClazz().getSimpleName();
+    }
+
+    private boolean isAnnotationPresent(
+        Class<? extends Annotation> annotationClass
+    ) {
+        Class<?> javaClass = clazz.getClazz();
+        while (javaClass != Object.class) {
+            if (javaClass.isAnnotationPresent(annotationClass)) {
+                return true;
+            }
+            javaClass = javaClass.getSuperclass();
+        }
+        return false;
     }
 
     @Override
