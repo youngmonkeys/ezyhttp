@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
@@ -580,14 +581,14 @@ public class HttpClient extends EzyLoggable {
             String disposition = connection.getHeaderField("Content-Disposition");
             String originalFileName = getDownloadFileName(newFileURL, disposition);
             String newFileName = makeDownloadFileName(disposition, newFileURL, fileName);
+            File storeFile = storeLocation
+                .toPath()
+                .resolve(newFileName)
+                .toFile();
+            EzyFileUtil.createFileIfNotExists(storeFile);
             try (
                 InputStream inputStream = connection.getInputStream();
-                OutputStream outputStream = new FileOutputStream(
-                    storeLocation
-                        .toPath()
-                        .resolve(newFileName)
-                        .toFile()
-                )
+                OutputStream outputStream = new FileOutputStream(storeFile)
             ) {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
