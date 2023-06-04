@@ -1,7 +1,5 @@
 package com.tvd12.ezyhttp.server.management;
 
-import static com.tvd12.ezyhttp.server.management.constant.ManagementConstants.DEFAULT_FEATURE_NAME;
-
 import com.tvd12.ezyfox.annotation.EzyFeature;
 import com.tvd12.ezyfox.monitor.EzyCpuMonitor;
 import com.tvd12.ezyfox.monitor.EzyGcMonitor;
@@ -14,9 +12,14 @@ import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.handler.ManagementController;
 import com.tvd12.ezyhttp.server.management.data.CpuPoint;
+import com.tvd12.ezyhttp.server.management.data.DiskPoint;
 import com.tvd12.ezyhttp.server.management.data.MemoryPoint;
 import com.tvd12.ezyhttp.server.management.data.ThreadCountPoint;
 import com.tvd12.ezyhttp.server.management.monitor.SystemMonitor;
+
+import java.io.File;
+
+import static com.tvd12.ezyhttp.server.management.constant.ManagementConstants.DEFAULT_FEATURE_NAME;
 
 @Api
 @Authenticated
@@ -81,6 +84,17 @@ public class MetricsController implements ManagementController {
             .maxMemory(memoryMonitor.getMaxMemory())
             .freeMemory(memoryMonitor.getFreeMemory())
             .totalMemory(memoryMonitor.getTotalMemory())
+            .build();
+    }
+
+    @EzyFeature(DEFAULT_FEATURE_NAME)
+    @DoGet("/management/free-disk-space")
+    public DiskPoint freeDiskSpaceGet() {
+        File file = new File("/");
+        return DiskPoint.builder()
+            .freeSpace(file.getFreeSpace())
+            .totalSpace(file.getTotalSpace())
+            .usableSpace(file.getUsableSpace())
             .build();
     }
 
