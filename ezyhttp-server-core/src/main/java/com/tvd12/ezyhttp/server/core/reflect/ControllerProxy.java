@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tvd12.ezyfox.reflect.EzyClasses.isAnnotationPresentIncludeSuper;
 import static com.tvd12.ezyhttp.server.core.annotation.Annotations.REQUEST_HANDLER_ANNOTATIONS;
 
 @Getter
@@ -113,14 +114,10 @@ public class ControllerProxy {
     private boolean isAnnotationPresent(
         Class<? extends Annotation> annotationClass
     ) {
-        Class<?> javaClass = clazz.getClazz();
-        while (javaClass != Object.class) {
-            if (javaClass.isAnnotationPresent(annotationClass)) {
-                return true;
-            }
-            javaClass = javaClass.getSuperclass();
-        }
-        return false;
+        return isAnnotationPresentIncludeSuper(
+            clazz.getClazz(),
+            annotationClass
+        );
     }
 
     @Override

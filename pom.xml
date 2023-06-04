@@ -6,10 +6,10 @@
     <parent>
         <groupId>com.tvd12</groupId>
         <artifactId>ezyfox</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
     <artifactId>ezyhttp</artifactId>
-    <version>1.1.7</version>
+    <version>1.1.8</version>
     <packaging>pom</packaging>
 
     <name>ezyhttp</name>
@@ -64,7 +64,7 @@
     </developers>
 
     <properties>
-        <ezy.version>1.2.7</ezy.version>
+        <ezy.version>1.2.8</ezy.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <jetty.version>9.4.50.v20221201</jetty.version>
         <tomcat.version>8.5.85</tomcat.version>
