@@ -88,7 +88,7 @@ public class MetricsController implements ManagementController {
     }
 
     @EzyFeature(DEFAULT_FEATURE_NAME)
-    @DoGet("/management/free-disk-space")
+    @DoGet("/management/disk-space")
     public DiskPoint freeDiskSpaceGet() {
         File file = new File("/");
         return DiskPoint.builder()
