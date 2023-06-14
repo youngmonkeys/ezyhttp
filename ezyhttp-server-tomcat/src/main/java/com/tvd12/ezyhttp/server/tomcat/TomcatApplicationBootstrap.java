@@ -49,10 +49,11 @@ public class TomcatApplicationBootstrap
     protected String contextPath;
 
     @EzyProperty("server.multipart.location")
-    protected String multipartLocation = "tmp";
+    protected String multipartLocation =
+        System.getProperty("java.io.tmpdir");
 
     @EzyProperty("server.multipart.file_size_threshold")
-    protected String multipartFileSizeThreshold = "5MB";
+    protected String multipartFileSizeThreshold = "1MB";
 
     @EzyProperty("server.multipart.max_file_size")
     protected String multipartMaxFileSize = "5MB";
