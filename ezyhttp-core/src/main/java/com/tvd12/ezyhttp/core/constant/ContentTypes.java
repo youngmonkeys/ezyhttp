@@ -70,6 +70,7 @@ public final class ContentTypes {
     public static final String APPLICATION_X_WWW_FORM_URLENCODED
         = "application/x-www-form-urlencoded";
     public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    public static final String APPLICATION_WASM = "application/wasm";
     public static final String FONT_OTF = "font/otf";
     public static final String FONT_TTF = "font/ttf";
     public static final String FONT_WOFF = "font/woff";

@@ -75,6 +75,7 @@ public enum ContentType {
     APPLICATION_JSON(ContentTypes.APPLICATION_JSON, "json"),
     APPLICATION_X_WWW_FORM_URLENCODED(ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED, ""),
     APPLICATION_OCTET_STREAM(ContentTypes.APPLICATION_OCTET_STREAM, ""),
+    APPLICATION_WASM(ContentTypes.APPLICATION_WASM, "wasm"),
     FONT_OTF(ContentTypes.FONT_OTF, "otf"),
     FONT_TTF(ContentTypes.FONT_TTF, "ttf"),
     FONT_WOFF(ContentTypes.FONT_WOFF, "woff"),
