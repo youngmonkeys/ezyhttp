@@ -14,12 +14,10 @@ import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.exception.EzyFileNotFoundException;
 import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
-import com.tvd12.ezyhttp.core.constant.ContentType;
-import com.tvd12.ezyhttp.core.constant.Headers;
-import com.tvd12.ezyhttp.core.constant.HttpMethod;
-import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.constant.*;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.core.io.BytesRangeFileInputStream;
+import com.tvd12.ezyhttp.core.resources.ActualContentTypeDetector;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
@@ -111,7 +109,17 @@ public class ResourceRequestHandler implements RequestHandler {
         }
         final HttpServletResponse servletResponse =
             (HttpServletResponse) asyncContext.getResponse();
-        servletResponse.setContentType(getResponseContentType());
+        String contentType = getResponseContentType();
+        String actualContentType = ActualContentTypeDetector.getInstance()
+            .detect(resourcePath, contentType);
+        servletResponse.setContentType(actualContentType);
+        ContentEncoding contentEncoding = ContentEncoding.ofMimeType(contentType);
+        if (contentEncoding != null) {
+            servletResponse.setHeader(
+                Headers.CONTENT_ENCODING,
+                contentEncoding.getValue()
+            );
+        }
         final InputStream inputStream;
         int statusCode = StatusCodes.OK;
         final String range = arguments.getHeader("Range");
