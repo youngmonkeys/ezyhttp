@@ -4,9 +4,7 @@ import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.exception.EzyFileNotFoundException;
 import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
-import com.tvd12.ezyhttp.core.constant.ContentTypes;
-import com.tvd12.ezyhttp.core.constant.HttpMethod;
-import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.constant.*;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
@@ -348,5 +346,37 @@ public class ResourceRequestHandlerTest {
         verify(asyncContext, times(1)).setTimeout(timeout);
         verify(asyncContext, times(1)).getResponse();
         verify(asyncContext, times(1)).complete();
+    }
+
+    @Test
+    public void handleResourceWithTwoPartsExtension() throws Exception {
+        // given
+        String resourcePath = "static/wasm/resource.wasm.gz";
+        String resourceURI = "/wasm/resource.wasm.gz";
+        String resourceExtension = "gz";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        verify(response, times(1))
+            .setHeader(Headers.CONTENT_ENCODING, ContentEncoding.GZIP.getValue());
+        verify(response, times(1))
+            .setContentType(ContentTypes.APPLICATION_WASM);
     }
 }

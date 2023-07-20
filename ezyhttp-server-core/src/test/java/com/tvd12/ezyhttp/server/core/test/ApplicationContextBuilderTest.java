@@ -111,7 +111,7 @@ public class ApplicationContextBuilderTest {
         Asserts.assertNotNull(userService0);
         Asserts.assertNotNull(viewContextBuilder);
         Asserts.assertNotNull(resourceDownloadManager);
-        Asserts.assertEquals(4, resourceResolver.getResources().size());
+        Asserts.assertEquals(5, resourceResolver.getResources().size());
         Asserts.assertNotNull(eventService);
         Asserts.assertNotNull(sourceService);
         Asserts.assertNotNull(helloValue);
