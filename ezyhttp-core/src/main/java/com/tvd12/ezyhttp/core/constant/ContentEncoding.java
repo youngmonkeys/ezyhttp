@@ -8,21 +8,20 @@ import java.util.Map;
 @Getter
 public enum ContentEncoding {
     
-    GZIP(ContentType.GZIP, "gzip");
+    GZIP(ContentType.GZIP.getMimeType(), "gzip");
     
-    private final ContentType contentType;
+    private final String mimeType;
     private final String value;
     
-    private static final Map<ContentType, ContentEncoding> VALUE_BY_CONTENT_TYPE =
-        EzyEnums.enumMap(ContentEncoding.class, it -> it.contentType);
+    private static final Map<String, ContentEncoding> VALUE_BY_MIME_TYPE =
+        EzyEnums.enumMap(ContentEncoding.class, it -> it.mimeType);
 
-    ContentEncoding(ContentType contentType, String value) {
-        this.contentType = contentType;
+    ContentEncoding(String mimeType, String value) {
+        this.mimeType = mimeType;
         this.value = value;
     }
     
     public static ContentEncoding ofMimeType(String mimeType) {
-        ContentType contentType = ContentType.ofMimeType(mimeType);
-        return VALUE_BY_CONTENT_TYPE.get(contentType);
+        return VALUE_BY_MIME_TYPE.get(mimeType);
     }
 }

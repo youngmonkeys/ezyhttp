@@ -33,6 +33,8 @@ public class ResourceRequestHandler implements RequestHandler {
     private final EzyInputStreamLoader inputStreamLoader;
     private final ResourceDownloadManager downloadManager;
     private final int defaultTimeout;
+    private final ActualContentTypeDetector actualContentTypeDetector =
+        ActualContentTypeDetector.getInstance();
 
     public ResourceRequestHandler(
         String resourcePath,
@@ -110,10 +112,11 @@ public class ResourceRequestHandler implements RequestHandler {
         final HttpServletResponse servletResponse =
             (HttpServletResponse) asyncContext.getResponse();
         String contentType = getResponseContentType();
-        String actualContentType = ActualContentTypeDetector.getInstance()
+        String actualContentType = actualContentTypeDetector
             .detect(resourcePath, contentType);
         servletResponse.setContentType(actualContentType);
-        ContentEncoding contentEncoding = ContentEncoding.ofMimeType(contentType);
+        ContentEncoding contentEncoding = ContentEncoding
+            .ofMimeType(contentType);
         if (contentEncoding != null) {
             servletResponse.setHeader(
                 Headers.CONTENT_ENCODING,

@@ -1,46 +1,62 @@
 package com.tvd12.ezyhttp.core.resources;
 
+import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.tvd12.ezyhttp.core.constant.Constants.EMPTY_STRING;
+
 public class ActualContentTypeDetector {
     
-    private static final Set<String> NEED_TO_DETECT_ACTUAL_CONTENT_TYPES = new HashSet<>();
-    private static final Map<String, String> ACTUAL_CONTENT_TYPE_BY_EXTENSION = new HashMap<>();
-    private static final ActualContentTypeDetector INSTANCE = new ActualContentTypeDetector();
+    private final Set<String> needToDetectActualContentTypes;
+    private final Map<String, String> actualContentTypeByExtension;
+    private static final ActualContentTypeDetector INSTANCE =
+        new ActualContentTypeDetector();
 
-    private ActualContentTypeDetector() {}
+    private ActualContentTypeDetector() {
+        this.needToDetectActualContentTypes = Sets.newHashSet(
+            ContentTypes.GZIP
+        );
+        actualContentTypeByExtension = EzyMapBuilder.mapBuilder()
+            .put("wasm.gz", ContentTypes.APPLICATION_WASM)
+            .toMap();
+    }
     
     public static ActualContentTypeDetector getInstance() {
         return INSTANCE;
     }
 
-    static {
-        NEED_TO_DETECT_ACTUAL_CONTENT_TYPES.add(ContentTypes.GZIP);
-        ACTUAL_CONTENT_TYPE_BY_EXTENSION.put("wasm.gz", ContentTypes.APPLICATION_WASM);
-    }
-    
     public String detect(
         String resourcePath,
         String originalContentType
     ) {
-        if (!NEED_TO_DETECT_ACTUAL_CONTENT_TYPES.contains(originalContentType)) {
+        if (!needToDetectActualContentTypes.contains(originalContentType)) {
             return originalContentType;
         }
-        int lastPeriod = resourcePath.lastIndexOf('.');
-        int secondLastPeriod = resourcePath.lastIndexOf('.', lastPeriod - 1);
-        if (secondLastPeriod == -1) {
-            return originalContentType;
-        } else {
-            String actualExtension = resourcePath.substring(secondLastPeriod + 1);
-            if (!ACTUAL_CONTENT_TYPE_BY_EXTENSION.containsKey(actualExtension)) {
-                return originalContentType;
+        String twoPartsExtension = extractTwoPartsExtension(resourcePath);
+        return actualContentTypeByExtension.getOrDefault(
+            twoPartsExtension,
+            originalContentType
+        );
+    }
+
+    private String extractTwoPartsExtension(String resourcePath) {
+        int dotCount = 0;
+        for (int i = resourcePath.length() - 1; i >= 0; --i) {
+            char ch = resourcePath.charAt(i);
+            if (ch == '.') {
+                ++dotCount;
             }
-            return ACTUAL_CONTENT_TYPE_BY_EXTENSION.get(actualExtension);
+            if (dotCount == 2) {
+                return resourcePath.substring(i + 1);
+            }
+            if (ch == '/' || ch == '\\') {
+                break;
+            }
         }
+        return EMPTY_STRING;
     }
 }
