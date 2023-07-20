@@ -48,7 +48,7 @@ public class EzyHttpApplicationTest {
         Asserts.assertNotNull(userService);
         Asserts.assertNotNull(viewContextBuilder);
         Asserts.assertNotNull(resourceDownloadManager);
-        Asserts.assertEquals(4, resourceResolver.getResources().size());
+        Asserts.assertEquals(5, resourceResolver.getResources().size());
         sut.stop();
     }
 
@@ -77,7 +77,7 @@ public class EzyHttpApplicationTest {
         Asserts.assertNotNull(userService);
         Asserts.assertNotNull(viewContextBuilder);
         Asserts.assertNotNull(resourceDownloadManager);
-        Asserts.assertEquals(4, resourceResolver.getResources().size());
+        Asserts.assertEquals(5, resourceResolver.getResources().size());
         Asserts.assertFalse(bootstraps.isEmpty());
         sut.stop();
     }

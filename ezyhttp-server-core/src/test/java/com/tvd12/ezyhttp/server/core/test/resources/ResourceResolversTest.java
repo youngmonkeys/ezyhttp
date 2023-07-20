@@ -33,7 +33,7 @@ public class ResourceResolversTest {
 
         // then
         assert resourceResolver != null;
-        Asserts.assertEquals(4, resourceResolver.getResources().size());
+        Asserts.assertEquals(5, resourceResolver.getResources().size());
     }
 
     @Test
@@ -52,6 +52,6 @@ public class ResourceResolversTest {
 
         // then
         assert resourceResolver != null;
-        Asserts.assertEquals(4, resourceResolver.getResources().size());
+        Asserts.assertEquals(5, resourceResolver.getResources().size());
     }
 }
