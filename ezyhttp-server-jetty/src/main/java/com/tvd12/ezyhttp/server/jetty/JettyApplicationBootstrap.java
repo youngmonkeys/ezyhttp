@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.jetty;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -8,8 +10,10 @@ import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
@@ -58,6 +62,24 @@ public class JettyApplicationBootstrap
     @EzyProperty("server.multipart.max_request_size")
     protected String multipartMaxRequestSize = "5MB";
 
+    @EzyProperty("server.compression.enable")
+    protected boolean compressionEnable = true;
+
+    @EzyProperty("server.compression.min_size")
+    protected String compressionMinSize;
+
+    @EzyProperty("server.compression.inclusive_methods")
+    protected String[] compressionInclusiveMethods;
+
+    @EzyProperty("server.compression.exclusive_methods")
+    protected String[] compressionExclusiveMethods;
+
+    @EzyProperty("server.compression.inclusive_mime_types")
+    protected String[] compressionInclusiveMimeTypes;
+
+    @EzyProperty("server.compression.exclusive_mime_types")
+    protected String[] compressionExclusiveMimeTypes;
+
     @EzyProperty("cors.enable")
     protected boolean corsEnable;
 
@@ -95,7 +117,12 @@ public class JettyApplicationBootstrap
             connectors.add(managementConnector);
         }
         server.setConnectors(connectors.toArray(new Connector[0]));
-        ServletContextHandler servletHandler = newServletHandler();
+        Handler servletHandler = newServletHandler();
+        if (compressionEnable) {
+            GzipHandler gzipHandler = newGzipHandler();
+            gzipHandler.setHandler(servletHandler);
+            servletHandler = gzipHandler;
+        }
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
@@ -116,10 +143,29 @@ public class JettyApplicationBootstrap
             ));
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
-            FilterHolder crossOriginFilter = newCrossOriginFilter();
-            addFilter(servletHandler, crossOriginFilter);
+            addFilter(servletHandler, newCrossOriginFilter());
         }
         return servletHandler;
+    }
+
+    protected GzipHandler newGzipHandler() {
+        GzipHandler gzipHandler = new GzipHandler();
+        if (isNotEmpty(compressionMinSize)) {
+            gzipHandler.setMinGzipSize((int) FileSizes.toByteSize(compressionMinSize));
+        }
+        if (compressionInclusiveMethods != null) {
+            gzipHandler.setIncludedMethods(compressionInclusiveMethods);
+        }
+        if (compressionExclusiveMethods != null) {
+            gzipHandler.setExcludedMethods(compressionExclusiveMethods);
+        }
+        if (compressionInclusiveMimeTypes != null) {
+            gzipHandler.setIncludedMimeTypes(compressionInclusiveMimeTypes);
+        }
+        if (compressionExclusiveMimeTypes != null) {
+            gzipHandler.setExcludedMimeTypes(compressionExclusiveMimeTypes);
+        }
+        return gzipHandler;
     }
 
     protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
