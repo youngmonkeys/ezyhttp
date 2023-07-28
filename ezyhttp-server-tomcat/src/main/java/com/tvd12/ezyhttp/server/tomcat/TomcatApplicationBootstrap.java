@@ -1,5 +1,7 @@
 package com.tvd12.ezyhttp.server.tomcat;
 
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +21,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
@@ -31,7 +34,7 @@ import lombok.Setter;
 @ApplicationBootstrap
 public class TomcatApplicationBootstrap
     extends EzyLoggable
-    implements ApplicationEntry {
+    implements ApplicationEntry, EzyStoppable {
 
     @EzyProperty("server.port")
     protected int port = 8080;
@@ -198,5 +201,15 @@ public class TomcatApplicationBootstrap
         tomcatToStart.start();
         final Server server = tomcatToStart.getServer();
         startTomcatThreadFactory.newThread(server::await).start();
+    }
+
+    @Override
+    public void stop() {
+        if (tomcat != null) {
+            processWithLogException(tomcat::destroy);
+        }
+        if (managementTomcat != null) {
+            processWithLogException(managementTomcat::destroy);
+        }
     }
 }

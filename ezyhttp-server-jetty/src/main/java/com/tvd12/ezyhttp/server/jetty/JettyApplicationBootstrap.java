@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.jetty;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -21,6 +22,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
@@ -32,7 +34,7 @@ import lombok.Setter;
 @ApplicationBootstrap
 public class JettyApplicationBootstrap
     extends EzyLoggable
-    implements ApplicationEntry {
+    implements ApplicationEntry, EzyStoppable {
 
     @EzyProperty("server.port")
     protected int port = 8080;
@@ -68,17 +70,17 @@ public class JettyApplicationBootstrap
     @EzyProperty("server.compression.min_size")
     protected String compressionMinSize;
 
-    @EzyProperty("server.compression.inclusive_methods")
-    protected String[] compressionInclusiveMethods;
+    @EzyProperty("server.compression.included_methods")
+    protected String[] compressionIncludedMethods;
 
-    @EzyProperty("server.compression.exclusive_methods")
-    protected String[] compressionExclusiveMethods;
+    @EzyProperty("server.compression.excluded_methods")
+    protected String[] compressionExcludedMethods;
 
-    @EzyProperty("server.compression.inclusive_mime_types")
-    protected String[] compressionInclusiveMimeTypes;
+    @EzyProperty("server.compression.included_mime_types")
+    protected String[] compressionIncludedMimeTypes;
 
-    @EzyProperty("server.compression.exclusive_mime_types")
-    protected String[] compressionExclusiveMimeTypes;
+    @EzyProperty("server.compression.excluded_mime_types")
+    protected String[] compressionExcludedMimeTypes;
 
     @EzyProperty("cors.enable")
     protected boolean corsEnable;
@@ -153,17 +155,17 @@ public class JettyApplicationBootstrap
         if (isNotEmpty(compressionMinSize)) {
             gzipHandler.setMinGzipSize((int) FileSizes.toByteSize(compressionMinSize));
         }
-        if (compressionInclusiveMethods != null) {
-            gzipHandler.setIncludedMethods(compressionInclusiveMethods);
+        if (compressionIncludedMethods != null) {
+            gzipHandler.setIncludedMethods(compressionIncludedMethods);
         }
-        if (compressionExclusiveMethods != null) {
-            gzipHandler.setExcludedMethods(compressionExclusiveMethods);
+        if (compressionExcludedMethods != null) {
+            gzipHandler.setExcludedMethods(compressionExcludedMethods);
         }
-        if (compressionInclusiveMimeTypes != null) {
-            gzipHandler.setIncludedMimeTypes(compressionInclusiveMimeTypes);
+        if (compressionIncludedMimeTypes != null) {
+            gzipHandler.setIncludedMimeTypes(compressionIncludedMimeTypes);
         }
-        if (compressionExclusiveMimeTypes != null) {
-            gzipHandler.setExcludedMimeTypes(compressionExclusiveMimeTypes);
+        if (compressionExcludedMimeTypes != null) {
+            gzipHandler.setExcludedMimeTypes(compressionExcludedMimeTypes);
         }
         return gzipHandler;
     }
@@ -196,5 +198,12 @@ public class JettyApplicationBootstrap
         CrossOriginFilter corsFilter = new CrossOriginFilter();
         filter.setFilter(corsFilter);
         return filter;
+    }
+
+    @Override
+    public void stop() {
+        if (server != null) {
+            processWithLogException(server::stop);
+        }
     }
 }
