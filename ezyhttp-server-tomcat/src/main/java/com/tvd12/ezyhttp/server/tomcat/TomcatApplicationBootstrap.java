@@ -1,13 +1,15 @@
 package com.tvd12.ezyhttp.server.tomcat;
 
-import com.tvd12.ezyfox.annotation.EzyProperty;
-import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
-import com.tvd12.ezyhttp.core.util.FileSizes;
-import com.tvd12.ezyhttp.server.core.ApplicationEntry;
-import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
-import lombok.AccessLevel;
-import lombok.Setter;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ThreadFactory;
+
+import javax.servlet.MultipartConfigElement;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Server;
 import org.apache.catalina.Wrapper;
@@ -17,18 +19,22 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
-import javax.servlet.MultipartConfigElement;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.ThreadFactory;
+import com.tvd12.ezyfox.annotation.EzyProperty;
+import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyStoppable;
+import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
+import com.tvd12.ezyhttp.core.util.FileSizes;
+import com.tvd12.ezyhttp.server.core.ApplicationEntry;
+import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+
+import lombok.AccessLevel;
+import lombok.Setter;
 
 @Setter
 @ApplicationBootstrap
 public class TomcatApplicationBootstrap
     extends EzyLoggable
-    implements ApplicationEntry {
+    implements ApplicationEntry, EzyStoppable {
 
     @EzyProperty("server.port")
     protected int port = 8080;
@@ -60,6 +66,12 @@ public class TomcatApplicationBootstrap
 
     @EzyProperty("server.multipart.max_request_size")
     protected String multipartMaxRequestSize = "5MB";
+
+    @EzyProperty("server.compression.enable")
+    protected boolean compressionEnable = true;
+
+    @EzyProperty("server.compression.min_size")
+    protected String compressionMinSize = "32B";
 
     @EzyProperty("cors.enable")
     protected boolean corsEnable;
@@ -155,6 +167,13 @@ public class TomcatApplicationBootstrap
         connector.setProperty("maxThreads", String.valueOf(maxThreads));
         connector.setProperty("connectionTimeout", String.valueOf(idleTimeout));
         connector.setProperty("keepAliveTimeout", String.valueOf(idleTimeout));
+        if (compressionEnable) {
+            connector.setProperty("compression", "on");
+            connector.setProperty(
+                "compressionMinSize",
+                String.valueOf(FileSizes.toByteSize(compressionMinSize))
+            );
+        }
         return answer;
     }
 
@@ -182,5 +201,15 @@ public class TomcatApplicationBootstrap
         tomcatToStart.start();
         final Server server = tomcatToStart.getServer();
         startTomcatThreadFactory.newThread(server::await).start();
+    }
+
+    @Override
+    public void stop() {
+        if (tomcat != null) {
+            processWithLogException(tomcat::destroy);
+        }
+        if (managementTomcat != null) {
+            processWithLogException(managementTomcat::destroy);
+        }
     }
 }

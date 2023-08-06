@@ -1,5 +1,8 @@
 package com.tvd12.ezyhttp.server.jetty;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -8,8 +11,10 @@ import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
@@ -17,6 +22,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
@@ -28,7 +34,7 @@ import lombok.Setter;
 @ApplicationBootstrap
 public class JettyApplicationBootstrap
     extends EzyLoggable
-    implements ApplicationEntry {
+    implements ApplicationEntry, EzyStoppable {
 
     @EzyProperty("server.port")
     protected int port = 8080;
@@ -57,6 +63,24 @@ public class JettyApplicationBootstrap
 
     @EzyProperty("server.multipart.max_request_size")
     protected String multipartMaxRequestSize = "5MB";
+
+    @EzyProperty("server.compression.enable")
+    protected boolean compressionEnable = true;
+
+    @EzyProperty("server.compression.min_size")
+    protected String compressionMinSize;
+
+    @EzyProperty("server.compression.included_methods")
+    protected String[] compressionIncludedMethods;
+
+    @EzyProperty("server.compression.excluded_methods")
+    protected String[] compressionExcludedMethods;
+
+    @EzyProperty("server.compression.included_mime_types")
+    protected String[] compressionIncludedMimeTypes;
+
+    @EzyProperty("server.compression.excluded_mime_types")
+    protected String[] compressionExcludedMimeTypes;
 
     @EzyProperty("cors.enable")
     protected boolean corsEnable;
@@ -95,7 +119,12 @@ public class JettyApplicationBootstrap
             connectors.add(managementConnector);
         }
         server.setConnectors(connectors.toArray(new Connector[0]));
-        ServletContextHandler servletHandler = newServletHandler();
+        Handler servletHandler = newServletHandler();
+        if (compressionEnable) {
+            GzipHandler gzipHandler = newGzipHandler();
+            gzipHandler.setHandler(servletHandler);
+            servletHandler = gzipHandler;
+        }
         server.setHandler(servletHandler);
         server.start();
         logger.info("http server started on: {}:{}", host, port);
@@ -116,10 +145,29 @@ public class JettyApplicationBootstrap
             ));
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
-            FilterHolder crossOriginFilter = newCrossOriginFilter();
-            addFilter(servletHandler, crossOriginFilter);
+            addFilter(servletHandler, newCrossOriginFilter());
         }
         return servletHandler;
+    }
+
+    protected GzipHandler newGzipHandler() {
+        GzipHandler gzipHandler = new GzipHandler();
+        if (isNotEmpty(compressionMinSize)) {
+            gzipHandler.setMinGzipSize((int) FileSizes.toByteSize(compressionMinSize));
+        }
+        if (compressionIncludedMethods != null) {
+            gzipHandler.setIncludedMethods(compressionIncludedMethods);
+        }
+        if (compressionExcludedMethods != null) {
+            gzipHandler.setExcludedMethods(compressionExcludedMethods);
+        }
+        if (compressionIncludedMimeTypes != null) {
+            gzipHandler.setIncludedMimeTypes(compressionIncludedMimeTypes);
+        }
+        if (compressionExcludedMimeTypes != null) {
+            gzipHandler.setExcludedMimeTypes(compressionExcludedMimeTypes);
+        }
+        return gzipHandler;
     }
 
     protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
@@ -150,5 +198,12 @@ public class JettyApplicationBootstrap
         CrossOriginFilter corsFilter = new CrossOriginFilter();
         filter.setFilter(corsFilter);
         return filter;
+    }
+
+    @Override
+    public void stop() {
+        if (server != null) {
+            processWithLogException(server::stop);
+        }
     }
 }
