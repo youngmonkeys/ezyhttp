@@ -35,7 +35,8 @@ public class View {
     }
 
     public boolean containsVariable(String name) {
-        return variables.containsKey(name);
+        Object value = variables.get(name);
+        return value != null;
     }
 
     @SuppressWarnings("unchecked")
