@@ -7,8 +7,10 @@ import com.tvd12.ezyhttp.core.util.FileSizes;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
@@ -65,7 +67,10 @@ public class TestApplicationBootstrap extends EzyLoggable {
         List<Connector> connectors = new ArrayList<>();
         connectors.add(connector);
         server.setConnectors(connectors.toArray(new Connector[0]));
-        ServletContextHandler servletHandler = newServletHandler();
+        Handler servletHandler = newServletHandler();
+        GzipHandler gzipHandler = newGzipHandler();
+        gzipHandler.setHandler(servletHandler);
+        servletHandler = gzipHandler;
         server.setHandler(servletHandler);
         EzyProcessor.processSilently(server::start);
         logger.info("http server started on: {}:{}", host, port);
@@ -82,5 +87,12 @@ public class TestApplicationBootstrap extends EzyLoggable {
                 (int) FileSizes.toByteSize(multipartFileSizeThreshold)
             ));
         return servletHandler;
+    }
+
+    protected GzipHandler newGzipHandler() {
+        GzipHandler gzipHandler = new GzipHandler();
+        gzipHandler.setMinGzipSize(128);
+        gzipHandler.setIncludedMethods("GET", "POST");
+        return gzipHandler;
     }
 }

@@ -29,4 +29,17 @@ public class ContentEncodingTest {
             ContentType.GZIP.getMimeType()
         );
     }
+
+    @Test
+    public void ofValueNullTest() {
+        Asserts.assertNull(ContentEncoding.ofValue(null));
+    }
+
+    @Test
+    public void offNonNullValueTest() {
+        Asserts.assertEquals(
+            ContentEncoding.ofValue("gzip"),
+            ContentEncoding.GZIP
+        );
+    }
 }

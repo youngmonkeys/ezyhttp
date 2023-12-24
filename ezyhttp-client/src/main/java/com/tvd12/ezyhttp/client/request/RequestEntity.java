@@ -110,6 +110,10 @@ public class RequestEntity {
             return this;
         }
 
+        public Builder accept(String contentEncoding) {
+            return header(Headers.ACCEPT_ENCODING, contentEncoding);
+        }
+
         public Builder contentType(String contentType) {
             return header(Headers.CONTENT_TYPE, contentType);
         }

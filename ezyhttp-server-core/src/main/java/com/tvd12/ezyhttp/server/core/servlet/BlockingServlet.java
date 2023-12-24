@@ -89,7 +89,7 @@ public class BlockingServlet extends HttpServlet {
     protected void doGet(
         HttpServletRequest request,
         HttpServletResponse response
-    ) throws ServletException, IOException {
+    ) throws IOException {
         doHandleRequest(HttpMethod.GET, request, response);
     }
 

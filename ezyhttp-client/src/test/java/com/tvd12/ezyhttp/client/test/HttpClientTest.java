@@ -14,6 +14,7 @@ import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.codec.TextBodyConverter;
+import com.tvd12.ezyhttp.core.constant.ContentEncoding;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.*;
@@ -137,6 +138,38 @@ public class HttpClientTest {
 
         // then
         TestResponse expectation = new TestResponse("Greet Monkey!");
+        Asserts.assertEquals(expectation, actual);
+    }
+
+    @Test
+    public void callAcceptGzipTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .objectMapper(new Object())
+            .objectMapper(new ObjectMapper())
+            .build();
+
+        String who = RandomUtil.randomAlphabetString(128);
+        PostRequest request = new PostRequest()
+            .setConnectTimeout(-1)
+            .setReadTimeout(1500000)
+            .setEntity(
+                RequestEntity.builder()
+                    .body(new TestRequest(who))
+                    .header("hello", "world")
+                    .header("foo", "bar")
+                    .accept(ContentEncoding.GZIP.getValue())
+                    .build()
+            )
+            .setResponseType(TestResponse.class)
+            .setResponseType(StatusCodes.OK, TestResponse.class)
+            .setURL(URI.create("http://127.0.0.1:18081/greet"));
+
+        // when
+        TestResponse actual = sut.call(request);
+
+        // then
+        TestResponse expectation = new TestResponse("Greet " + who + "!");
         Asserts.assertEquals(expectation, actual);
     }
 
