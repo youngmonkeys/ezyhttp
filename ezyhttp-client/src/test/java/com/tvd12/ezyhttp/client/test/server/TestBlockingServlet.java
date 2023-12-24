@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.client.test.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.codec.JsonBodyConverter;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 
 import javax.servlet.ServletException;
@@ -57,6 +58,7 @@ public class TestBlockingServlet extends HttpServlet {
                 }
 
                 String message = "{\"message\":\"Greet " + who + "!\"}";
+                resp.setContentType(ContentTypes.APPLICATION_JSON);
                 resp.getOutputStream().write(message.getBytes());
                 resp.setStatus(StatusCodes.OK);
                 break;

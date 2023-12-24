@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.data.BodyData;
 
+import static com.tvd12.ezyfox.stream.EzyInputStreams.DEFAULT_BUFFER_SIZE;
+
 public interface BodyDeserializer {
 
     default <T> T deserialize(
@@ -34,15 +36,10 @@ public interface BodyDeserializer {
         InputStream inputStream,
         int contentLength
     ) throws IOException {
-        byte[] bytes;
-        int readBytes;
-        if (contentLength > 0) {
-            bytes = new byte[contentLength];
-            readBytes = inputStream.read(bytes);
-        } else {
-            bytes = EzyInputStreams.toByteArray(inputStream);
-            readBytes = bytes.length;
-        }
-        return new String(bytes, 0, readBytes, StandardCharsets.UTF_8);
+        byte[] bytes = EzyInputStreams.toByteArray(
+            inputStream,
+            contentLength > 0 ? contentLength : DEFAULT_BUFFER_SIZE
+        );
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }

@@ -17,18 +17,18 @@ public class DownloadRequestTest {
         String fileURL = "https://youngmonkeys.org";
         int readTimeout = RandomUtil.randomInt();
         int connectionTimeout = RandomUtil.randomInt();
-        DownloadRequest sut = new DownloadRequest();
 
         MultiValueMap headers = MultiValueMap.builder()
             .setValue("hello", "world")
             .build();
 
-        sut.setFileURL(fileURL);
-        sut.setFileURL(new URL(fileURL));
-        sut.setFileURL(URI.create(fileURL));
-        sut.setReadTimeout(readTimeout);
-        sut.setConnectTimeout(connectionTimeout);
-        sut.setHeaders(headers);
+        DownloadRequest sut = new DownloadRequest()
+            .setFileURL(fileURL)
+            .setFileURL(new URL(fileURL))
+            .setFileURL(URI.create(fileURL))
+            .setReadTimeout(readTimeout)
+            .setConnectTimeout(connectionTimeout)
+            .setHeaders(headers);
 
         // when
         // then
