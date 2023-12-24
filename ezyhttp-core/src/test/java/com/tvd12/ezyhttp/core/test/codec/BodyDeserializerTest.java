@@ -36,7 +36,7 @@ public class BodyDeserializerTest {
         String actual = sut.deserializeToString(inputStream, contentLength);
 
         // then
-        Asserts.assertEquals("ab", actual);
+        Asserts.assertEquals("abc", actual);
     }
 
     @Test

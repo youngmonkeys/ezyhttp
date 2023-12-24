@@ -97,7 +97,7 @@ public class BlockingServlet extends HttpServlet {
     protected void doPost(
         HttpServletRequest request,
         HttpServletResponse response
-    ) throws ServletException, IOException {
+    ) throws IOException {
         doHandleRequest(HttpMethod.POST, request, response);
     }
 
@@ -113,7 +113,7 @@ public class BlockingServlet extends HttpServlet {
     protected void doDelete(
         HttpServletRequest request,
         HttpServletResponse response
-    ) throws ServletException, IOException {
+    ) throws IOException {
         doHandleRequest(HttpMethod.DELETE, request, response);
     }
 

@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.core.constant;
 
 public final class Headers {
 
+    public static final String ACCEPT_ENCODING = "Accept-Encoding";
     public static final String ACCEPT_RANGES = "accept-ranges";
     public static final String CONTENT_ENCODING = "Content-Encoding";
     public static final String CONTENT_RANGE = "Content-Range";

@@ -9,7 +9,7 @@
         <version>1.0.6</version>
     </parent>
     <artifactId>ezyhttp</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <packaging>pom</packaging>
 
     <name>ezyhttp</name>

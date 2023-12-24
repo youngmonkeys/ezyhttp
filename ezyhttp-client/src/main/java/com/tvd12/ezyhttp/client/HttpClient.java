@@ -14,10 +14,7 @@ import com.tvd12.ezyhttp.client.request.RequestEntity;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
-import com.tvd12.ezyhttp.core.constant.ContentTypes;
-import com.tvd12.ezyhttp.core.constant.Headers;
-import com.tvd12.ezyhttp.core.constant.HttpMethod;
-import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.constant.*;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
@@ -35,10 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.EzyFileUtil.getFileExtension;
 import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWAYS_RUN;
+import static com.tvd12.ezyhttp.core.constant.Headers.ACCEPT_ENCODING;
 
 public class HttpClient extends EzyLoggable {
 
@@ -83,7 +82,8 @@ public class HttpClient extends EzyLoggable {
         String url,
         RequestEntity entity,
         Map<Integer, Class<?>> responseTypes,
-        int connectTimeout, int readTimeout
+        int connectTimeout,
+        int readTimeout
     ) throws Exception {
         if (url == null) {
             throw new IllegalArgumentException("url can not be null");
@@ -114,6 +114,12 @@ public class HttpClient extends EzyLoggable {
                         requestHeader.getValue()
                     );
                 }
+            }
+            if (connection.getRequestProperty(ACCEPT_ENCODING) == null) {
+                connection.setRequestProperty(
+                    ACCEPT_ENCODING,
+                    ContentEncoding.GZIP.getValue()
+                );
             }
             Object requestBody = null;
             if (method != HttpMethod.GET && entity != null) {
@@ -156,9 +162,13 @@ public class HttpClient extends EzyLoggable {
             if (responseContentType == null) {
                 responseContentType = ContentTypes.APPLICATION_JSON;
             }
-            InputStream inputStream = responseCode >= 400
-                ? connection.getErrorStream()
-                : connection.getInputStream();
+            String contentEncoding = responseHeaders.getValue("Content-Encoding");
+            InputStream inputStream = decorateInputStream(
+                contentEncoding,
+                responseCode >= 400
+                    ? connection.getErrorStream()
+                    : connection.getInputStream()
+            );
             Object responseBody = null;
             if (inputStream != null) {
                 try {
@@ -197,7 +207,8 @@ public class HttpClient extends EzyLoggable {
     protected Object deserializeResponseBody(
         String contentType,
         int contentLength,
-        InputStream inputStream, Class<?> responseType
+        InputStream inputStream,
+        Class<?> responseType
     ) throws IOException {
         BodyDeserializer deserializer = dataConverters.getBodyDeserializer(contentType);
         Object body;
@@ -365,7 +376,13 @@ public class HttpClient extends EzyLoggable {
         Files.deleteIfExists(downloadingFilePath);
         Files.createFile(downloadingFilePath);
 
-        try (InputStream inputStream = connection.getInputStream()) {
+        String contentEncoding = connection.getHeaderField("Content-Encoding");
+        try (
+            InputStream inputStream = decorateInputStream(
+                contentEncoding,
+                connection.getInputStream()
+            )
+        ) {
             try (FileOutputStream outputStream = new FileOutputStream(downloadingFile)) {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
@@ -467,7 +484,13 @@ public class HttpClient extends EzyLoggable {
         if (responseCode >= 400) {
             throw processDownloadError(connection, fileURL, responseCode);
         }
-        try (InputStream inputStream = connection.getInputStream()) {
+        String contentEncoding = connection.getHeaderField("Content-Encoding");
+        try (
+            InputStream inputStream = decorateInputStream(
+                contentEncoding,
+                connection.getInputStream()
+            )
+        ) {
             int bytesRead;
             byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -586,9 +609,13 @@ public class HttpClient extends EzyLoggable {
                 .resolve(newFileName)
                 .toFile();
             EzyFileUtil.createFileIfNotExists(storeFile);
+            String contentEncoding = connection.getHeaderField("Content-Encoding");
             try (
-                InputStream inputStream = connection.getInputStream();
-                OutputStream outputStream = new FileOutputStream(storeFile)
+                InputStream inputStream = decorateInputStream(
+                    contentEncoding,
+                    connection.getInputStream()
+                );
+                OutputStream outputStream = Files.newOutputStream(storeFile.toPath())
             ) {
                 int bytesRead;
                 byte[] buffer = new byte[1024];
@@ -625,12 +652,28 @@ public class HttpClient extends EzyLoggable {
         }
     }
 
+    private InputStream decorateInputStream(
+        String contentEncoding,
+        InputStream inputStream
+    ) throws IOException {
+        ContentEncoding contentEncodingEnum = ContentEncoding
+            .ofValue(contentEncoding);
+        if (contentEncodingEnum == ContentEncoding.GZIP) {
+            return new GZIPInputStream(inputStream);
+        }
+        return inputStream;
+    }
+
     private Exception processDownloadError(
         HttpURLConnection connection,
         String fileURL,
         int responseCode
     ) throws Exception {
-        InputStream inputStream = connection.getErrorStream();
+        String contentEncoding = connection.getHeaderField("Content-Encoding");
+        InputStream inputStream = decorateInputStream(
+            contentEncoding,
+            connection.getErrorStream()
+        );
         Object responseBody = "";
         if (inputStream != null) {
             try {
