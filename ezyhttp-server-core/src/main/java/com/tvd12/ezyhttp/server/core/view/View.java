@@ -63,7 +63,9 @@ public class View {
     }
 
     public void setVariables(Map<String, Object> variables) {
-        this.variables.putAll(variables);
+        if (variables != null) {
+            this.variables.putAll(variables);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -167,7 +169,9 @@ public class View {
         }
 
         public Builder addVariables(Map<String, Object> variables) {
-            this.variables.putAll(variables);
+            if (variables != null) {
+                this.variables.putAll(variables);
+            }
             return this;
         }
 

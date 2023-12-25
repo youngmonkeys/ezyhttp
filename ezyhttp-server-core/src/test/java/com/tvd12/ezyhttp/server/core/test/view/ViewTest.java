@@ -36,6 +36,7 @@ public class ViewTest {
             .appendValueToVariable("list", "b")
             .appendValuesToVariable("list", new String[] {"c", "d"})
             .appendValuesToVariable("list", Arrays.asList("e", "f"))
+            .addVariables(null)
             .build();
 
         // when
@@ -45,6 +46,7 @@ public class ViewTest {
         sut.appendValueToVariable("list", "h");
         sut.appendValuesToVariable("list", new String[] {"i", "j"});
         sut.appendValuesToVariable("list", Arrays.asList("k", "l"));
+        sut.setVariables(null);
 
         // then
         Asserts.assertEquals("index.html", sut.getTemplate());
