@@ -1,14 +1,15 @@
 package com.tvd12.ezyhttp.core.test.net;
 
-import java.util.List;
-import java.util.Map.Entry;
-
-import org.testng.annotations.Test;
-
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.net.PathVariables;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.performance.Performance;
+import org.testng.annotations.Test;
+
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class PathVariablesTest extends BaseTest {
 
@@ -29,5 +30,52 @@ public class PathVariablesTest extends BaseTest {
         Asserts.assertFalse(PathVariables.isPathVariable("{a"));
         Asserts.assertFalse(PathVariables.isPathVariable("a"));
         Asserts.assertFalse(PathVariables.isPathVariable("a}"));
+    }
+
+    @Test
+    public void anyPathTest() {
+        // given
+        String template = "/market/items/{projectName}/java/docs/*";
+        String uri = "/market/items/hello/java/docs/world/index.html";
+
+        // when
+        List<Entry<String, String>> actual = PathVariables.getVariables(
+            template,
+            uri
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual.stream()
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)),
+            EzyMapBuilder.mapBuilder()
+                .put("projectName", "hello")
+                .put("*", "world/index.html")
+                .build()
+        );
+    }
+
+    @Test
+    public void anyPathComplexTest() {
+        // given
+        String template = "/versions/{ezyplatformVersion}/java-docs/{moduleName}/*";
+        String uri = "/versions/0.0.2/java-docs/ezyplatform-web/org/youngmonkeys/ezyplatform/web/package-frame.html";
+
+        // when
+        List<Entry<String, String>> actual = PathVariables.getVariables(
+            template,
+            uri
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual.stream()
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)),
+            EzyMapBuilder.mapBuilder()
+                .put("ezyplatformVersion", "0.0.2")
+                .put("moduleName", "ezyplatform-web")
+                .put("*", "org/youngmonkeys/ezyplatform/web/package-frame.html")
+                .build()
+        );
     }
 }

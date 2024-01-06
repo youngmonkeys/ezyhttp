@@ -1,10 +1,10 @@
 package com.tvd12.ezyhttp.core.net;
 
+import com.tvd12.ezyfox.util.EzyEntry;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-
-import com.tvd12.ezyfox.util.EzyEntry;
 
 public final class PathVariables {
 
@@ -23,6 +23,17 @@ public final class PathVariables {
                 String varName = getVariableName(templatePath);
                 String varValue = uriPaths[i];
                 answer.add(EzyEntry.of(varName, varValue));
+            } else if (templatePath.equals("*")) {
+                StringBuilder varValue = new StringBuilder();
+                int lastIndex = uriPaths.length - 1;
+                for (; i < uriPaths.length; ++i) {
+                    varValue.append(uriPaths[i]);
+                    if (i < lastIndex) {
+                        varValue.append("/");
+                    }
+                }
+                answer.add(EzyEntry.of("*", varValue.toString()));
+                break;
             }
         }
         return answer;

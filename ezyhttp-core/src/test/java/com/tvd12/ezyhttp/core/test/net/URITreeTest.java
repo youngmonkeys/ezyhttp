@@ -64,4 +64,20 @@ public class URITreeTest {
         Asserts.assertNull(tree.getMatchedURI("/api/v1/hello/{world}/{foo}"));
         Asserts.assertNull(tree.getMatchedURI("/api/v1/hello/{world}/{foo}/{bar}/unknown"));
     }
+
+    @Test
+    public void matchAllTest() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/market/items/hello/java/docs/*");
+
+        // when
+        // then
+        System.out.println(tree);
+        Asserts.assertNull(tree.getMatchedURI("/market/items/hello/java"));
+        Asserts.assertNull(tree.getMatchedURI("/market/items/hello/java/docs"));
+        Asserts.assertNull(tree.getMatchedURI("/market/items/hello/java/docs/"));
+        Asserts.assertNotNull(tree.getMatchedURI("/market/items/hello/java/docs/index.html"));
+        Asserts.assertNotNull(tree.getMatchedURI("/market/items/hello/java/docs/com/tvd12/index.html"));
+    }
 }
