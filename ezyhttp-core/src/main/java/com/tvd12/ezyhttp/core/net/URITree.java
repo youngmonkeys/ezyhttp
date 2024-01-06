@@ -41,7 +41,8 @@ public class URITree {
                 child = lastChild.children.get("{}");
             }
             if (child == null) {
-                return null;
+                child = lastChild.children.get("*");
+                return child == null ? null : child.uri;
             }
             lastChild = child;
         }
