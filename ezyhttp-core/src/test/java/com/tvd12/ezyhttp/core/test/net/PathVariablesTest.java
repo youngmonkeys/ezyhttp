@@ -5,6 +5,7 @@ import com.tvd12.ezyhttp.core.net.PathVariables;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.performance.Performance;
+import com.tvd12.test.reflect.MethodInvoker;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -23,6 +24,29 @@ public class PathVariablesTest extends BaseTest {
             .test(() -> PathVariables.getVariables(uri11, check11))
             .getTime();
         System.out.println(time);
+    }
+
+    @Test
+    public void testWithEncodedUri() {
+        // given
+        String uri11 = "/api/v1/customer/{name}/create";
+        String check11 = "/api/v1/customer/Hello%20World/create";
+
+        // when
+        List<Entry<String, String>> actual = PathVariables.getVariables(
+            uri11,
+            check11
+        );
+
+        // then
+        System.out.println(actual);
+        Asserts.assertEquals(
+            actual.stream()
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)),
+            EzyMapBuilder.mapBuilder()
+                .put("name", "Hello World")
+                .build()
+        );
     }
 
     @Test
@@ -59,7 +83,7 @@ public class PathVariablesTest extends BaseTest {
     public void anyPathComplexTest() {
         // given
         String template = "/versions/{ezyplatformVersion}/java-docs/{moduleName}/*";
-        String uri = "/versions/0.0.2/java-docs/ezyplatform-web/org/youngmonkeys/ezyplatform/web/package-frame.html";
+        String uri = "/versions/0.0.2/java-docs/ezyplatform-web/org/youngmonkeys/Hello%20World/web/package-frame.html";
 
         // when
         List<Entry<String, String>> actual = PathVariables.getVariables(
@@ -74,8 +98,20 @@ public class PathVariablesTest extends BaseTest {
             EzyMapBuilder.mapBuilder()
                 .put("ezyplatformVersion", "0.0.2")
                 .put("moduleName", "ezyplatform-web")
-                .put("*", "org/youngmonkeys/ezyplatform/web/package-frame.html")
+                .put("*", "org/youngmonkeys/Hello World/web/package-frame.html")
                 .build()
         );
+    }
+
+    @Test
+    public void decodeUriPathValueCaseExceptionTest() {
+        // given
+        Object actual = MethodInvoker.create()
+            .staticClass(PathVariables.class)
+            .method("decodeUriPathValue")
+            .param(String.class, null)
+            .invoke();
+
+        Asserts.assertNull(actual);
     }
 }
