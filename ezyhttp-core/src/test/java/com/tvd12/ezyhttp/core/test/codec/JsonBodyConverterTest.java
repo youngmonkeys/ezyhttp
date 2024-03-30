@@ -117,6 +117,23 @@ public class JsonBodyConverterTest {
         verify(bodyData, times(1)).getInputStream();
     }
 
+    @Test
+    public void deserializeStringToStringTest() throws Exception {
+        // given
+        JsonBodyConverter sut = new JsonBodyConverter(new ObjectMapper());
+
+        String body = "{\"hello\":\"world\",\"foo\":\"bar\"}";
+
+        // when
+        String actual = sut.deserialize(
+            new ByteArrayInputStream(body.getBytes()),
+            String.class
+        );
+
+        // then
+        Asserts.assertEquals(body, actual);
+    }
+
 
     @Data
     @AllArgsConstructor

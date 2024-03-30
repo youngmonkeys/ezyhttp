@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 
@@ -310,5 +311,24 @@ public class BytesRangeFileInputStreamTest {
 
         // then
         Asserts.assertEqualsType(e, IllegalArgumentException.class);
+    }
+
+    @Test
+    public void seekIoErrorTest() {
+        // given
+        final String pomFilePath = "pom.xml";
+        final String range = "bytes=-1-2";
+
+        // when
+        final Throwable e = Asserts.assertThrows(
+            () -> new BytesRangeFileInputStream(
+                pomFilePath,
+                -1,
+                -2
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, IOException.class);
     }
 }

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.data.BodyData;
 
 public class JsonBodyConverter implements BodyConverter {
@@ -33,8 +34,11 @@ public class JsonBodyConverter implements BodyConverter {
         return deserialize(inputStream, bodyType);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(InputStream inputStream, Class<T> bodyType) throws IOException {
-        return objectMapper.readValue(inputStream, bodyType);
+        return bodyType == String.class
+            ? (T) EzyInputStreams.toStringUtf8(inputStream)
+            : objectMapper.readValue(inputStream, bodyType);
     }
 }
