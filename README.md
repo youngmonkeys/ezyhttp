@@ -2,7 +2,7 @@
 
 # Documentation
 
-[https://youngmonkeys.org/ezy-http](https://youngmonkeys.org/project/ezy-http/)
+[https://youngmonkeys.org/projects/ezyhttp](https://youngmonkeys.org/projects/ezyhttp)
 
 # Synopsis
 
@@ -112,15 +112,11 @@ In an effort to bring HTTP to EzyFox ecosystem and help everyone to study one do
 
 # API Reference
 
-[https://youngmonkeys.org/ezy-http](https://youngmonkeys.org/project/ezy-http/)
+[https://youngmonkeys.org/projects/ezyhttp](https://youngmonkeys.org/projects/ezyhttp)
 
 # Tests
 
 mvn test
-
-# Contributors
-
-- [DungTV](mailto:itprono3@gmail.com)
 
 # License
 
