@@ -106,18 +106,19 @@ public class CustomerService {
 }
 ```
 
-# Motivation
-
-In an effort to bring HTTP to EzyFox ecosystem and help everyone to study one do everything
-
-# API Reference
-
-[https://youngmonkeys.org/projects/ezyhttp](https://youngmonkeys.org/projects/ezyhttp)
-
-# Tests
-
-mvn test
-
 # License
 
 - Apache License, Version 2.0
+
+# Support Us
+
+[Make a Meaningful Donation](https://youngmonkeys.org/donate/)
+
+Currently, our operating budget is fully supported by our own salaries, and all product development is still based on voluntary contributions from a few organization members. The low budget is causing significant difficulties for us. Therefore, with a clear roadmap and an ambitious goal to provide intellectual products for the community, we would greatly appreciate your support in the form of a donation to help us take further steps. Thank you in advance for your meaningful contributions!
+
+# Contact Us
+
+- Get in touch with us on [Facebook](https://www.facebook.com/youngmonkeys.org)
+- Ask us on [stackask.com](https://stackask.com)
+- Email us at [contact@youngmonkeys.org](mailto:contact@youngmonkeys.org)
+- Chat with us on [Discord](https://discord.gg/hKV2cbaT5h)
