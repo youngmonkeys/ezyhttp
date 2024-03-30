@@ -80,4 +80,16 @@ public class URITreeTest {
         Asserts.assertNotNull(tree.getMatchedURI("/market/items/hello/java/docs/index.html"));
         Asserts.assertNotNull(tree.getMatchedURI("/market/items/hello/java/docs/com/tvd12/index.html"));
     }
+
+    @Test
+    public void matchUpperCaseTest() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/api/v1/oa/{code}/webhook");
+
+        // when
+        // then
+        System.out.println(tree);
+        Asserts.assertNotNull(tree.getMatchedURI("/api/v1/oa/ZALO/webhook"));
+    }
 }
