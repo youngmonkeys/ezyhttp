@@ -1,17 +1,15 @@
 package com.tvd12.ezyhttp.core.test.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.Files;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyhttp.core.io.BytesRangeFileInputStream;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import java.nio.file.Files;
 
 public class BytesRangeFileInputStreamTest {
 
@@ -311,6 +309,6 @@ public class BytesRangeFileInputStreamTest {
         );
 
         // then
-        Asserts.assertEqualsType(e, IOException.class);
+        Asserts.assertEqualsType(e, IllegalArgumentException.class);
     }
 }

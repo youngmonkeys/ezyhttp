@@ -15,17 +15,35 @@ public class BytesRange {
 
     public BytesRange(String[] fromTo) {
         this(
-            Long.parseLong(fromTo[0].trim()),
-            fromTo.length == 1 ? 0 : Long.parseLong(fromTo[1].trim())
+            toBytesOrThrow(fromTo[0]),
+            fromTo.length == 1 ? 0 : toBytesOrThrow(fromTo[1])
         );
     }
 
+    public static long toBytesOrThrow(String value) {
+        long answer;
+        try {
+            answer = Long.parseLong(value.trim());
+        } catch (Throwable e) {
+            throw new IllegalArgumentException(e);
+        }
+        if (answer < 0) {
+            throw new IllegalArgumentException(
+                "byte range can not accept nagative (" + answer + ") value"
+            );
+        }
+        return answer;
+    }
+
     private static String[] extractRange(String range) {
-        final int equalsIndex = range.indexOf('=');
+        int splitIndex = range.indexOf('=');
+        if (splitIndex < 0) {
+            splitIndex = range.indexOf(':');
+        }
         String actualRange = range;
-        if (equalsIndex >= 0) {
+        if (splitIndex >= 0) {
             actualRange = range
-                .substring(equalsIndex + 1)
+                .substring(splitIndex + 1)
                 .trim();
         }
         final int dashIndex = actualRange.lastIndexOf('-');

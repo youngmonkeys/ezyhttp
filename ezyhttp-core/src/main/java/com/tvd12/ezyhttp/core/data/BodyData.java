@@ -6,6 +6,8 @@ import java.util.Map;
 
 public interface BodyData {
 
+    Map<String, String> getHeaders();
+
     Map<String, String> getParameters();
 
     String getContentType();

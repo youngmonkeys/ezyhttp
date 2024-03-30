@@ -1,18 +1,5 @@
 package com.tvd12.ezyhttp.server.core.request;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyBase64;
@@ -20,11 +7,22 @@ import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.net.PathVariables;
 import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @SuppressWarnings("unchecked")
 public class SimpleRequestArguments implements RequestArguments {
@@ -92,6 +90,11 @@ public class SimpleRequestArguments implements RequestArguments {
             return null;
         }
         return parameterMap.get(name);
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        return headerMap;
     }
 
     @Override
