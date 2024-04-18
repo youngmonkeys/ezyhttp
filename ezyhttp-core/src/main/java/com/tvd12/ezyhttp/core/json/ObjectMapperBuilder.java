@@ -19,6 +19,8 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.function.Consumer;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
     private Consumer<ObjectMapper> decorator;
@@ -63,7 +65,11 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return new Date(p.getValueAsLong());
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-                return EzyDates.parse(p.getValueAsString());
+                String value = p.getValueAsString();
+                if (isBlank(value)) {
+                    return null;
+                }
+                return EzyDates.parse(value);
             } else {
                 throw new IOException(
                     "can deserialize value: " + p.getValueAsString() + " to Date"
@@ -85,7 +91,11 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return Instant.ofEpochMilli(p.getValueAsLong());
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-                return EzyDates.parse(p.getValueAsString()).toInstant();
+                String value = p.getValueAsString();
+                if (isBlank(value)) {
+                    return null;
+                }
+                return EzyDates.parse(value).toInstant();
             } else {
                 throw new IOException(
                     "can deserialize value: " + p.getValueAsString() + " to Instant"
@@ -108,7 +118,11 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
                 return EzyDates.millisToDateTime(p.getValueAsLong())
                     .toLocalDate();
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-                return EzyDates.parseDate(p.getValueAsString());
+                String value = p.getValueAsString();
+                if (isBlank(value)) {
+                    return null;
+                }
+                return EzyDates.parseDate(value);
             } else {
                 throw new IOException(
                     "can deserialize value: " + p.getValueAsString() + " to LocalDate"
@@ -132,6 +146,9 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
                     .toLocalTime();
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 String value = p.getValueAsString();
+                if (isBlank(value)) {
+                    return null;
+                }
                 try {
                     return LocalTime.parse(value);
                 } catch (Exception e) {
@@ -159,6 +176,9 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
                 return EzyDates.millisToDateTime(p.getValueAsLong());
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
                 String value = p.getValueAsString();
+                if (isBlank(value)) {
+                    return null;
+                }
                 try {
                     return LocalDateTime.parse(value);
                 } catch (Exception e) {

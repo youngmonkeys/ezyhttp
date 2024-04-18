@@ -46,6 +46,18 @@ public class ObjectMapperBuilderTest {
     }
 
     @Test
+    public void instantEmptyTest() {
+        // given
+        String source = "";
+
+        // when
+        Instant actual = sut.convertValue(source, Instant.class);
+
+        // then
+        Asserts.assertNull(actual);
+    }
+
+    @Test
     public void instantFailedDueToBoolean() {
         // given
         // when
@@ -80,6 +92,18 @@ public class ObjectMapperBuilderTest {
     }
 
     @Test
+    public void dateEmptyTest() {
+        // given
+        String source = "";
+
+        // when
+        Date actual = sut.convertValue(source, Date.class);
+
+        // then
+        Asserts.assertNull(actual);
+    }
+
+    @Test
     public void dateFailedDueToBoolean() {
         // given
         // when
@@ -99,6 +123,18 @@ public class ObjectMapperBuilderTest {
 
         // then
         Asserts.assertEquals(EzyDates.parseDate(source), actual);
+    }
+
+    @Test
+    public void localDateEmptyTest() {
+        // given
+        String source = "";
+
+        // when
+        LocalDate actual = sut.convertValue(source, LocalDate.class);
+
+        // then
+        Asserts.assertNull(actual);
     }
 
     @Test
@@ -148,6 +184,18 @@ public class ObjectMapperBuilderTest {
     }
 
     @Test
+    public void localTimeEmptyTest() {
+        // given
+        String source = "";
+
+        // when
+        LocalTime actual = sut.convertValue(source, LocalTime.class);
+
+        // then
+        Asserts.assertNull(actual);
+    }
+
+    @Test
     public void localTimeLongTest() {
         // given
         long source = System.currentTimeMillis();
@@ -191,6 +239,18 @@ public class ObjectMapperBuilderTest {
 
         // then
         Asserts.assertEquals(LocalDateTime.parse(source), actual);
+    }
+
+    @Test
+    public void localDateTimeEmptyTest() {
+        // given
+        String source = "";
+
+        // when
+        LocalDateTime actual = sut.convertValue(source, LocalDateTime.class);
+
+        // then
+        Asserts.assertNull(actual);
     }
 
     @Test
