@@ -1,5 +1,11 @@
 package com.tvd12.ezyhttp.core.test.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyDates;
+import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
+import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -8,13 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-
-import org.testng.annotations.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tvd12.ezyfox.io.EzyDates;
-import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
-import com.tvd12.test.assertion.Asserts;
 
 public class ObjectMapperBuilderTest {
 
@@ -137,6 +136,18 @@ public class ObjectMapperBuilderTest {
     }
 
     @Test
+    public void localTimeWitMinuteTest() {
+        // given
+        String source = "20:00";
+
+        // when
+        LocalTime actual = sut.convertValue(source, LocalTime.class);
+
+        // then
+        Asserts.assertEquals(LocalTime.parse(source), actual);
+    }
+
+    @Test
     public void localTimeLongTest() {
         // given
         long source = System.currentTimeMillis();
@@ -168,6 +179,18 @@ public class ObjectMapperBuilderTest {
 
         // then
         Asserts.assertEquals(EzyDates.parseDateTime(source), actual);
+    }
+
+    @Test
+    public void localDateTimeJavaTest() {
+        // given
+        String source = "2021-01-30T10:20:30";
+
+        // when
+        LocalDateTime actual = sut.convertValue(source, LocalDateTime.class);
+
+        // then
+        Asserts.assertEquals(LocalDateTime.parse(source), actual);
     }
 
     @Test

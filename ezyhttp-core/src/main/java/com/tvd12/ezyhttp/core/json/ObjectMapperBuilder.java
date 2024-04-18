@@ -1,13 +1,5 @@
 package com.tvd12.ezyhttp.core.json;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.function.Consumer;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -18,6 +10,14 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzyDates;
 import com.tvd12.ezyfox.jackson.JacksonObjectMapperBuilder;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.function.Consumer;
 
 public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
 
@@ -131,7 +131,12 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
                 return EzyDates.millisToDateTime(p.getValueAsLong())
                     .toLocalTime();
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-                return EzyDates.parseTime(p.getValueAsString());
+                String value = p.getValueAsString();
+                try {
+                    return LocalTime.parse(value);
+                } catch (Exception e) {
+                    return EzyDates.parseTime(value);
+                }
             } else {
                 throw new IOException(
                     "can deserialize value: " + p.getValueAsString() + " to LocalTime"
@@ -153,7 +158,12 @@ public class ObjectMapperBuilder implements EzyBuilder<ObjectMapper> {
             if (p.currentTokenId() == JsonToken.VALUE_NUMBER_INT.id()) {
                 return EzyDates.millisToDateTime(p.getValueAsLong());
             } else if (p.currentTokenId() == JsonToken.VALUE_STRING.id()) {
-                return EzyDates.parseDateTime(p.getValueAsString());
+                String value = p.getValueAsString();
+                try {
+                    return LocalDateTime.parse(value);
+                } catch (Exception e) {
+                    return EzyDates.parseDateTime(value);
+                }
             } else {
                 throw new IOException(
                     "can deserialize value: " + p.getValueAsString() + " to LocalDateTime"
