@@ -143,6 +143,14 @@ public class SimpleRequestArgumentsTest {
         // then
         Asserts.assertNull(headerOverSize);
         Asserts.assertEquals("world", headerByName);
+        Asserts.assertEquals(
+            sut.getHeaders(),
+            EzyMapBuilder.mapBuilder()
+                .put("hello", "world")
+                .put("foo", "bar")
+                .toMap(),
+            false
+        );
         sut.release();
     }
 

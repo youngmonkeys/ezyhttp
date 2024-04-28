@@ -33,7 +33,8 @@ public interface ViewContext {
             .collect(
                 Collectors.toMap(
                     it -> it,
-                    it -> resolveMessage(locale, it)
+                    it -> resolveMessage(locale, it),
+                    (o, n) -> n
                 )
             );
     }

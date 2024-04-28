@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.core.test.view;
 
-import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.collect.Lists;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
@@ -10,9 +10,9 @@ import org.testng.annotations.Test;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public class ViewContextTest {
 
@@ -38,7 +38,7 @@ public class ViewContextTest {
             }
         };
 
-        Set<String> keys = Sets.newHashSet("hello", "world");
+        List<String> keys = Lists.newArrayList("hello", "world", "hello");
 
         // when
         Map<String, String> actual = sut.resolveMessages(
