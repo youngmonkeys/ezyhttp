@@ -1,11 +1,5 @@
 package com.tvd12.ezyhttp.server.core.asm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
@@ -14,8 +8,9 @@ import com.tvd12.ezyhttp.server.core.reflect.ControllerProxy;
 import com.tvd12.ezyhttp.server.core.reflect.RequestHandlerMethod;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.ezyhttp.server.core.request.RequestURIMeta;
-
 import lombok.Setter;
+
+import java.util.*;
 
 public class RequestHandlersImplementer extends EzyLoggable {
 
@@ -40,7 +35,14 @@ public class RequestHandlersImplementer extends EzyLoggable {
         Map<RequestURI, List<RequestHandler>> handlers = new HashMap<>();
         ControllerProxy proxy = new ControllerProxy(controller);
         String feature = proxy.getFeature();
+        List<RequestHandlerMethod> requestHandlerMethods = new ArrayList<>();
         for (RequestHandlerMethod method : proxy.getRequestHandlerMethods()) {
+            requestHandlerMethods.add(method);
+            requestHandlerMethods.addAll(
+                method.duplicatedToOtherRequestHandlerMethods()
+            );
+        }
+        for (RequestHandlerMethod method : requestHandlerMethods) {
             RequestHandlerImplementer implementer = newImplementer(proxy, method);
             RequestHandler handler = implementer.implement();
             HttpMethod httpMethod = handler.getMethod();

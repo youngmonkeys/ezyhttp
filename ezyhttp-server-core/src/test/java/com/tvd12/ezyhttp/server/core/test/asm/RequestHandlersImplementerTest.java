@@ -1,18 +1,22 @@
 package com.tvd12.ezyhttp.server.core.test.asm;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.testng.annotations.Test;
-
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.server.core.annotation.Api;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerException;
+import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -91,6 +95,58 @@ public class RequestHandlersImplementerTest {
         Asserts.assertThat(manager.getHandlerListByURI().get(uri).size()).isEqualsTo(2);
     }
 
+    @Test
+    public void implementOthersTest() {
+        // given
+        RequestHandlersImplementer sut = new RequestHandlersImplementer();
+        Controller4 controller = new Controller4();
+
+        // when
+        Map<RequestURI, List<RequestHandler>> handlers = sut.implement(
+            Collections.singletonList(controller)
+        );
+
+        // then
+        Asserts.assertEquals(handlers.size(), 3);
+        Asserts.assertEquals(
+            handlers.keySet(),
+            Sets.newHashSet(
+                new RequestURI(HttpMethod.GET, "/get", false, false, true, null),
+                new RequestURI(HttpMethod.GET, "/hello", false, false, true, null),
+                new RequestURI(HttpMethod.GET, "/world", false, false, true, null)
+            ),
+            false
+        );
+    }
+
+    @Test
+    public void implementOthersWithURIDecorator() {
+        // given
+        RequestHandlersImplementer sut = new RequestHandlersImplementer();
+        Controller4 controller = new Controller4();
+        RequestHandlerManager manager = new RequestHandlerManager();
+        manager.setAllowOverrideURI(true);
+
+        RequestURIDecorator requestURIDecorator = mock(RequestURIDecorator.class);
+        when(requestURIDecorator.decorate(any(), any())).thenReturn("hello-world");
+        sut.setRequestURIDecorator(requestURIDecorator);
+
+        // when
+        Map<RequestURI, List<RequestHandler>> handlers = sut.implement(
+            Collections.singletonList(controller)
+        );
+
+        // then
+        Asserts.assertEquals(handlers.size(), 1);
+        Asserts.assertEquals(
+            handlers.keySet(),
+            Sets.newHashSet(
+                new RequestURI(HttpMethod.GET, "hello-world", false, false, true, null)
+            ),
+            false
+        );
+    }
+
     public static class Controller {
 
         @DoGet("/get")
@@ -112,6 +168,14 @@ public class RequestHandlersImplementerTest {
     public static class Controller3 {
 
         @DoGet("/get")
+        public void doGet() {
+        }
+    }
+
+    public static class Controller4 {
+
+        @Api
+        @DoGet(uri = "/get", otherUris = {"/hello", "/world"})
         public void doGet() {
         }
     }
