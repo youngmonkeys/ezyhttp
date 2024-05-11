@@ -24,9 +24,9 @@ public @interface DoGet {
     String uri() default "";
 
     /**
-     * request uri.
+     * other request uris.
      *
-     * @return the uri
+     * @return the other request uris
      */
     String[] otherUris() default "";
 
