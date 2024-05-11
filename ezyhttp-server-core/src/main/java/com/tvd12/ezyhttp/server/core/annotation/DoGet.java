@@ -24,6 +24,13 @@ public @interface DoGet {
     String uri() default "";
 
     /**
+     * request uri.
+     *
+     * @return the uri
+     */
+    String[] otherUris() default "";
+
+    /**
      * accepted request body types.
      *
      * @return the accepted request body types
