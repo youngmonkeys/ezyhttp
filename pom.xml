@@ -9,7 +9,7 @@
         <version>1.0.6</version>
     </parent>
     <artifactId>ezyhttp</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
     <packaging>pom</packaging>
 
     <name>ezyhttp</name>
@@ -64,9 +64,9 @@
     </developers>
 
     <properties>
-        <ezy.version>1.2.8</ezy.version>
+        <ezy.version>1.2.9</ezy.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
-        <jetty.version>9.4.50.v20221201</jetty.version>
+        <jetty.version>9.4.56.v20240826</jetty.version>
         <tomcat.version>8.5.85</tomcat.version>
         <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <layout.dialect.version>3.2.0</layout.dialect.version>
