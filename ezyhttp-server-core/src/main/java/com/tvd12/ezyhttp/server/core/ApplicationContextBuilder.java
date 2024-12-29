@@ -31,13 +31,7 @@ import com.tvd12.ezyhttp.core.annotation.StringConvert;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
-import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
-import com.tvd12.ezyhttp.server.core.annotation.ComponentClasses;
-import com.tvd12.ezyhttp.server.core.annotation.ComponentsScan;
-import com.tvd12.ezyhttp.server.core.annotation.Controller;
-import com.tvd12.ezyhttp.server.core.annotation.ExceptionHandler;
-import com.tvd12.ezyhttp.server.core.annotation.PropertiesSources;
-import com.tvd12.ezyhttp.server.core.annotation.Service;
+import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.asm.ExceptionHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.constant.PropertyNames;
@@ -253,6 +247,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         Set bodyConverterClasses = reflection.getAnnotatedClasses(BodyConvert.class);
         Set stringConverterClasses = reflection.getAnnotatedClasses(StringConvert.class);
         Set bootstrapClasses = reflection.getAnnotatedClasses(ApplicationBootstrap.class);
+        Set configurationAfterApplicationReadyClasses = reflection.getAnnotatedClasses(
+            EzyConfigurationAfterApplicationReady.class
+        );
         Map<String, Class> serviceClasses = getServiceClasses(reflection);
         EzyPropertiesMap propertiesMap = getPropertiesMap(reflection);
         EzyBeanContext beanContext = newBeanContextBuilder()
@@ -265,6 +262,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
             .addSingletonClasses(bodyConverterClasses)
             .addSingletonClasses(stringConverterClasses)
             .addSingletonClasses(bootstrapClasses)
+            .addSingletonClasses(configurationAfterApplicationReadyClasses)
             .propertiesMap(propertiesMap)
             .addSingleton("systemObjectMapper", objectMapper)
             .addSingleton("componentManager", componentManager)
