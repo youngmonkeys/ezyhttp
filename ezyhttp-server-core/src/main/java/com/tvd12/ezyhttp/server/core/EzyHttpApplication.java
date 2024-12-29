@@ -1,22 +1,27 @@
 package com.tvd12.ezyhttp.server.core;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.tvd12.ezyfox.bean.EzyBeanConfig;
+import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStartable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import com.tvd12.ezyhttp.server.core.annotation.EzyConfigurationAfterApplicationReady;
 import com.tvd12.ezyhttp.server.core.util.BannerPrinter;
-
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.tvd12.ezyhttp.server.core.util.EzyConfigurationAfterApplicationReadyAnnotations.sortConfigurationAfterApplicationReadyObjects;
+
+@Getter
 public class EzyHttpApplication
     extends EzyLoggable
     implements EzyStartable, EzyStoppable {
 
-    @Getter
     protected final ApplicationContext applicationContext;
 
     public EzyHttpApplication(ApplicationContext applicationContext) {
@@ -42,6 +47,7 @@ public class EzyHttpApplication
         return start(basePackage, classArray);
     }
 
+    @SuppressWarnings("rawtypes")
     public static EzyHttpApplication start(
         String basePackage,
         Class<?>... componentClasses
@@ -50,6 +56,11 @@ public class EzyHttpApplication
             = createApplicationContext(basePackage, componentClasses);
         EzyHttpApplication application = new EzyHttpApplication(applicationContext);
         application.start();
+        EzyBeanContext beanContext = applicationContext.getBeanContext();
+        List configurationAfterApplicationObjects = beanContext.getSingletons(
+            EzyConfigurationAfterApplicationReady.class
+        );
+        runConfigurationAfterApplicationObjects(configurationAfterApplicationObjects);
         return application;
     }
 
@@ -89,5 +100,19 @@ public class EzyHttpApplication
     @Override
     public void stop() {
         applicationContext.destroy();
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void runConfigurationAfterApplicationObjects(
+        List configurationAfterApplicationObjects
+    ) {
+        List<Object> objects = sortConfigurationAfterApplicationReadyObjects(
+            configurationAfterApplicationObjects
+        );
+        for (Object obj : objects) {
+            if (obj instanceof EzyBeanConfig) {
+                ((EzyBeanConfig) obj).config();
+            }
+        }
     }
 }
