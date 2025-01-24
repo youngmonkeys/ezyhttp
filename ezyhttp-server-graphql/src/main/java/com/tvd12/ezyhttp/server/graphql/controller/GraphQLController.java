@@ -140,7 +140,7 @@ public class GraphQLController implements IRequestController {
         Map parentMap = null;
         Stack<GraphQLField> stack = new Stack<>();
         stack.add(queryDefinition);
-        while (stack.size() > 0) {
+        while (!stack.isEmpty()) {
             GraphQLField parent = stack.pop();
             parentMap = parentMap == null
                 ? answer

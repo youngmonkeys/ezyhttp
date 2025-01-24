@@ -10,7 +10,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 public class TestBlockingServlet extends HttpServlet {
@@ -74,6 +78,37 @@ public class TestBlockingServlet extends HttpServlet {
                 String message = "{\"message\":\"Greet " + who + "!\"}";
                 resp.getOutputStream().write(message.getBytes());
                 resp.setStatus(StatusCodes.OK);
+                break;
+            }
+            case "/upload": {
+                String uploadDir = "uploaded-files";
+                File uploadDirFile = new File(uploadDir);
+                if (!uploadDirFile.exists()) {
+                    if (!uploadDirFile.mkdirs()) {
+                        throw new IllegalStateException("can not create directory");
+                    }
+                }
+                Part filePart = req.getPart("file");
+                if (filePart != null && filePart.getSize() > 0) {
+                    String fileName = filePart.getSubmittedFileName();
+                    File file = new File(uploadDir, fileName);
+                    if (!file.exists()) {
+                        if (!file.createNewFile()) {
+                            throw new IllegalStateException("can not create file");
+                        }
+                    }
+                    try (InputStream inputStream = filePart.getInputStream();
+                         FileOutputStream outputStream = new FileOutputStream(file)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    resp.getWriter().write("{\"ok\": true}");
+                } else {
+                    resp.getWriter().write("{\"ok\": false}");
+                }
                 break;
             }
             case "/no-content-error":

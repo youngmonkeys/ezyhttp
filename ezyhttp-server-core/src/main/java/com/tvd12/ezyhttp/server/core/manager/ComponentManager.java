@@ -55,7 +55,7 @@ public final class ComponentManager implements EzyDestroyable {
     }
 
     public void setUnhandledErrorHandler(List<UnhandledErrorHandler> handlers) {
-        if (handlers.size() > 0) {
+        if (!handlers.isEmpty()) {
             this.unhandledErrorHandler = handlers.get(0);
         }
     }

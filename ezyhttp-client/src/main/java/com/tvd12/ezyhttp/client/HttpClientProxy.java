@@ -6,12 +6,14 @@ import com.tvd12.ezyfox.util.*;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
 import com.tvd12.ezyhttp.client.concurrent.RequestFutureTask;
+import com.tvd12.ezyhttp.client.concurrent.UploadCancellationToken;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestQueue;
+import com.tvd12.ezyhttp.client.request.UploadRequest;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
@@ -411,6 +413,62 @@ public class HttpClientProxy
             fileName,
             cancellationToken
         );
+    }
+
+    /**
+     * Upload a file and get the result as object.
+     *
+     * @param request the upload request.
+     * @return  the upload result
+     * @throws Exception when there is any I/O error
+     */
+    public <T> T callUpload(
+        UploadRequest request
+    ) throws Exception {
+        return client.callUpload(request);
+    }
+
+    /**
+     * Upload a file and get the result as object.
+     *
+     * @param request the upload request.
+     * @param cancellationToken the token to cancel
+     * @return  the upload result
+     * @throws Exception when there is any I/O error
+     */
+    public <T> T callUpload(
+        UploadRequest request,
+        UploadCancellationToken cancellationToken
+    ) throws Exception {
+        return client.callUpload(request, cancellationToken);
+    }
+
+    /**
+     * Upload a file and get ResponseEntity result.
+     *
+     * @param request the upload request.
+     * @return  the upload result
+     * @throws Exception when there is any I/O error
+     */
+    public ResponseEntity upload(
+        UploadRequest request
+    ) throws Exception {
+        return client.upload(request);
+    }
+
+    /**
+     * Upload a file and get ResponseEntity result.
+     *
+     * @param request the upload request
+     * @param cancellationToken the token to cancel
+     * @return the upload result
+     * @throws Exception when there is any I/O error
+     */
+    public ResponseEntity upload(
+        UploadRequest request,
+        UploadCancellationToken cancellationToken
+    ) throws Exception {
+        return client.upload(request, cancellationToken);
     }
 
     public static Builder builder() {

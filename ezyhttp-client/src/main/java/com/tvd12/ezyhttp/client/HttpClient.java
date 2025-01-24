@@ -6,11 +6,14 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.concurrent.UploadCancellationToken;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
+import com.tvd12.ezyhttp.client.exception.UploadCancelledException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.Request;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
+import com.tvd12.ezyhttp.client.request.UploadRequest;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
@@ -23,6 +26,7 @@ import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +44,7 @@ import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWA
 import static com.tvd12.ezyhttp.core.constant.Headers.ACCEPT_ENCODING;
 import static com.tvd12.ezyhttp.core.constant.Headers.CONTENT_ENCODING;
 
+@SuppressWarnings("MethodCount")
 public class HttpClient extends EzyLoggable {
 
     protected final int defaultReadTimeout;
@@ -155,37 +160,15 @@ public class HttpClient extends EzyLoggable {
                     );
                 }
             }
-
-            int responseCode = connection.getResponseCode();
-            Map<String, List<String>> headerFields = connection.getHeaderFields();
-            MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
-            String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
-            if (responseContentType == null) {
-                responseContentType = ContentTypes.APPLICATION_JSON;
-            }
-            InputStream inputStream = decorateInputStream(
-                connection,
-                responseCode >= 400
-                    ? connection.getErrorStream()
-                    : connection.getInputStream()
+            ResponseEntity response = processConnectionResponse(connection, responseTypes);
+            logger.debug(
+                "end: {} - {} - {} - {}",
+                method,
+                url,
+                response.getStatus(),
+                response.getHeaders()
             );
-            Object responseBody = null;
-            if (inputStream != null) {
-                try {
-                    int responseContentLength = connection.getContentLength();
-                    Class<?> responseType = responseTypes.get(responseCode);
-                    responseBody = deserializeResponseBody(
-                        responseContentType,
-                        responseContentLength,
-                        inputStream,
-                        responseType
-                    );
-                } finally {
-                    inputStream.close();
-                }
-            }
-            logger.debug("end: {} - {} - {} - {}", method, url, responseCode, responseHeaders);
-            return new ResponseEntity(responseCode, responseHeaders, responseBody);
+            return response;
         } finally {
             connection.disconnect();
         }
@@ -202,6 +185,41 @@ public class HttpClient extends EzyLoggable {
     ) throws IOException {
         BodySerializer serializer = dataConverters.getBodySerializer(contentType);
         return serializer.serialize(requestBody);
+    }
+
+    protected ResponseEntity processConnectionResponse(
+        HttpURLConnection connection,
+        Map<Integer, Class<?>> responseTypes
+    ) throws Exception {
+        int responseCode = connection.getResponseCode();
+        Map<String, List<String>> headerFields = connection.getHeaderFields();
+        MultiValueMap responseHeaders = MultiValueMap.of(headerFields);
+        String responseContentType = responseHeaders.getValue(Headers.CONTENT_TYPE);
+        if (responseContentType == null) {
+            responseContentType = ContentTypes.APPLICATION_JSON;
+        }
+        InputStream inputStream = decorateInputStream(
+            connection,
+            responseCode >= 400
+                ? connection.getErrorStream()
+                : connection.getInputStream()
+        );
+        Object responseBody = null;
+        if (inputStream != null) {
+            try {
+                int responseContentLength = connection.getContentLength();
+                Class<?> responseType = responseTypes.get(responseCode);
+                responseBody = deserializeResponseBody(
+                    responseContentType,
+                    responseContentLength,
+                    inputStream,
+                    responseType
+                );
+            } finally {
+                inputStream.close();
+            }
+        }
+        return new ResponseEntity(responseCode, responseHeaders, responseBody);
     }
 
     protected Object deserializeResponseBody(
@@ -349,7 +367,7 @@ public class HttpClient extends EzyLoggable {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
-            decorateConnection(connection, request);
+            decorateDownloadConnection(connection, request);
             connection.connect();
             return download(connection, fileURL, storeLocation, cancellationToken);
         } finally {
@@ -465,7 +483,7 @@ public class HttpClient extends EzyLoggable {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
-            decorateConnection(connection, request);
+            decorateDownloadConnection(connection, request);
             connection.connect();
             download(connection, fileURL, outputStream, cancellationToken);
         } finally {
@@ -539,7 +557,7 @@ public class HttpClient extends EzyLoggable {
             request,
             storeLocation,
             fileName,
-            ALWAYS_RUN
+            DownloadCancellationToken.ALWAYS_RUN
         );
     }
 
@@ -552,7 +570,7 @@ public class HttpClient extends EzyLoggable {
         String fileURL = request.getFileURL();
         HttpURLConnection connection = connect(fileURL);
         try {
-            decorateConnection(connection, request);
+            decorateDownloadConnection(connection, request);
             connection.connect();
             return download(
                 connection,
@@ -591,7 +609,7 @@ public class HttpClient extends EzyLoggable {
                     String cookies = connection.getHeaderField("Set-Cookie");
                     connection.disconnect();
                     connection = (HttpURLConnection) new URL(newFileURL).openConnection();
-                    decorateConnection(connection, request);
+                    decorateDownloadConnection(connection, request);
                     if (cookies != null) {
                         connection.setRequestProperty("Cookie", cookies);
                     }
@@ -632,21 +650,16 @@ public class HttpClient extends EzyLoggable {
         }
     }
 
-    private void decorateConnection(
+    private void decorateDownloadConnection(
         HttpURLConnection connection,
         DownloadRequest request
     ) {
-        int connectTimeout = request.getReadTimeout();
-        int readTimeout = request.getReadTimeout();
-        connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
-        MultiValueMap requestHeaders = request.getHeaders();
-        if (requestHeaders != null) {
-            Map<String, String> encodedHeaders = requestHeaders.toMap();
-            for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
-                connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
-            }
-        }
+        decorateConnection(
+            connection,
+            request.getConnectTimeout(),
+            request.getReadTimeout(),
+            request.getHeaders()
+        );
     }
 
     private InputStream decorateInputStream(
@@ -744,6 +757,128 @@ public class HttpClient extends EzyLoggable {
             answer = answer.substring(0, answer.indexOf('?'));
         }
         return answer;
+    }
+
+    public <T> T callUpload(
+        UploadRequest request
+    ) throws Exception {
+        ResponseEntity response = upload(request);
+        return getResponseBody(response);
+    }
+
+    public <T> T callUpload(
+        UploadRequest request,
+        UploadCancellationToken cancellationToken
+    ) throws Exception {
+        ResponseEntity response = upload(request, cancellationToken);
+        return getResponseBody(response);
+    }
+
+    public ResponseEntity upload(
+        UploadRequest request
+    ) throws Exception {
+        return upload(
+            request,
+            UploadCancellationToken.ALWAYS_RUN
+        );
+    }
+
+    @SuppressWarnings("MethodLength")
+    public ResponseEntity upload(
+        UploadRequest request,
+        UploadCancellationToken cancellationToken
+    ) throws Exception {
+        String filePath = request.getFilePath();
+        InputStream requestInputStream = request.getInputStream();
+        if (filePath == null && requestInputStream == null) {
+            throw new IllegalArgumentException(
+                "upload required a file path or in input stream"
+            );
+        }
+        HttpURLConnection connection = connect(request.getURL());
+        try {
+            connection.setDoOutput(true);
+            connection.setRequestMethod(request.getMethod().toString());
+            decorateUploadConnection(connection, request);
+            String boundary = Long.toHexString(System.currentTimeMillis());
+            connection.setRequestProperty(
+                "Content-Type",
+                "multipart/form-data; boundary=" + boundary
+            );
+            OutputStream outputStream = connection.getOutputStream();
+            PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+                true
+            );
+            writer.append("--").append(boundary).append("\r\n");
+            String fileName = request.getFileName();
+            if (isBlank(fileName)) {
+                fileName = filePath != null
+                    ? EzyFileUtil.getFileName(filePath)
+                    : "unknown";
+            }
+            writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"")
+                .append(fileName)
+                .append("\"\r\n");
+            writer.append("Content-Type: application/octet-stream\r\n\r\n");
+            writer.flush();
+            InputStream inputStream = requestInputStream;
+            if (inputStream == null) {
+                inputStream = Files.newInputStream(Paths.get(filePath));
+            }
+            try {
+                byte[] buffer = new byte[1204];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    if (cancellationToken.isCancelled()) {
+                        break;
+                    }
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                if (cancellationToken.isCancelled()) {
+                    throw new UploadCancelledException(filePath);
+                }
+                outputStream.flush();
+            } finally {
+                if (requestInputStream == null) {
+                    inputStream.close();
+                }
+            }
+            writer.append("\r\n").append("--").append(boundary).append("--").append("\r\n");
+            writer.flush();
+            writer.close();
+            return processConnectionResponse(connection, request.getResponseTypes());
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private void decorateUploadConnection(
+        HttpURLConnection connection,
+        UploadRequest request
+    ) {
+        decorateConnection(
+            connection,
+            request.getConnectTimeout(),
+            request.getReadTimeout(),
+            request.getHeaders()
+        );
+    }
+
+    private void decorateConnection(
+        HttpURLConnection connection,
+        int connectTimeout,
+        int readTimeout,
+        MultiValueMap requestHeaders
+    ) {
+        connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
+        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
+        if (requestHeaders != null) {
+            Map<String, String> encodedHeaders = requestHeaders.toMap();
+            for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
+                connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+            }
+        }
     }
 
     public static Builder builder() {
