@@ -10,12 +10,15 @@ import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.HttpClientProxy;
 import com.tvd12.ezyhttp.client.callback.RequestCallback;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.concurrent.UploadCancellationToken;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.client.exception.ClientNotActiveException;
 import com.tvd12.ezyhttp.client.exception.DownloadCancelledException;
 import com.tvd12.ezyhttp.client.exception.RequestQueueFullException;
+import com.tvd12.ezyhttp.client.exception.UploadCancelledException;
 import com.tvd12.ezyhttp.client.request.*;
 import com.tvd12.ezyhttp.client.test.request.HelloRequest;
+import com.tvd12.ezyhttp.client.test.response.UploadResponse;
 import com.tvd12.ezyhttp.client.test.server.TestApplicationBootstrap;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
 import com.tvd12.ezyhttp.core.codec.BodyConverter;
@@ -36,10 +39,13 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -965,6 +971,200 @@ public class HttpClientProxyTest extends BaseTest {
             .build();
         EzyProcessor.processWithLogException(sut::start);
         return sut;
+    }
+
+    @Test
+    public void uploadFileTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml")
+            .setResponseType(UploadResponse.class);
+
+        // when
+        ResponseEntity result = sut.upload(request);
+
+        // then
+        Asserts.assertEquals(result.getStatus(), 200);
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void uploadFileWithCancellationTokenTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml")
+            .setResponseType(UploadResponse.class);
+        UploadCancellationToken cancellationToken = new UploadCancellationToken();
+
+        // when
+        ResponseEntity result = sut.upload(request, cancellationToken);
+
+        // then
+        Asserts.assertEquals(result.getStatus(), 200);
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml")
+            .setResponseType(UploadResponse.class);
+
+        // when
+        Object result = sut.callUpload(request);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            new UploadResponse(true),
+            false
+        );
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileWithCancelledTokenTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml");
+        UploadCancellationToken cancellationToken = new UploadCancellationToken();
+
+        // when
+        Object result = sut.callUpload(request, cancellationToken);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            Collections.singletonMap("ok", true),
+            false
+        );
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileWithCancelledTokenCancelTest() {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml");
+        UploadCancellationToken cancellationToken = new UploadCancellationToken();
+        cancellationToken.cancel();
+
+        // when
+        Throwable e = Asserts.assertThrows(
+            () -> sut.callUpload(request, cancellationToken)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, UploadCancelledException.class);
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileWithInputStreamTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setInputStream(inputStream);
+
+        // when
+        Object result = sut.callUpload(request);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            Collections.singletonMap("ok", false),
+            false
+        );
+        verify(inputStream).read(any(byte[].class));
+        verifyNoMoreInteractions(inputStream);
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileWithFileInputStreamTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        InputStream inputStream = Files.newInputStream(Paths.get("pom.xml"));
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setInputStream(inputStream)
+            .setFileName("pom");
+
+        // when
+        Object result = sut.callUpload(request);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            Collections.singletonMap("ok", true),
+            false
+        );
+        sut.close();
+        sut.stop();
+        inputStream.close();
+    }
+
+    @Test
+    public void callUploadFileWithoutFilePathOrInputStreamTest() {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload");
+        UploadCancellationToken cancellationToken = new UploadCancellationToken();
+
+        // when
+        Throwable e = Asserts.assertThrows(
+            () -> sut.callUpload(request, cancellationToken)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, IllegalArgumentException.class);
+        sut.close();
+        sut.stop();
     }
 
     @BeforeTest

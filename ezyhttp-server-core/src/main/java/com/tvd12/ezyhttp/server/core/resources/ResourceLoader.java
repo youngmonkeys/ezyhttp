@@ -94,7 +94,7 @@ public class ResourceLoader extends EzyLoggable {
         Queue<File> folders = new LinkedList<>();
         folders.offer(rootFolder);
 
-        while (folders.size() > 0) {
+        while (!folders.isEmpty()) {
             File folder = folders.poll();
             File[] fileList = listFile(folder);
 
