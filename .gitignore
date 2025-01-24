@@ -19,3 +19,5 @@ ezyhttp-server-graphql/test_cases.txt
 .idea/
 *.idea/
 *.iml
+uploaded-files/
+*/uploaded-files/
