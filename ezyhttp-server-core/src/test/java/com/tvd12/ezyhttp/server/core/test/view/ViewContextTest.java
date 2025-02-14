@@ -45,6 +45,7 @@ public class ViewContextTest {
             Locale.US,
             keys
         );
+        Throwable e = Asserts.assertThrows(sut::getMessageResolver);
 
         // then
         Asserts.assertEquals(
@@ -54,5 +55,6 @@ public class ViewContextTest {
                 .put("world", "WORLD")
                 .build()
         );
+        Asserts.assertEqualsType(e, UnsupportedOperationException.class);
     }
 }

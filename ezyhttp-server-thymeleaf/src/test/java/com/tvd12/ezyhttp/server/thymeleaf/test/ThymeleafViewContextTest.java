@@ -49,6 +49,7 @@ public class ThymeleafViewContextTest {
 
         // then
         Asserts.assertNotNull(viewContext);
+        Asserts.assertNotNull(viewContext.getMessageResolver());
     }
 
     @Test

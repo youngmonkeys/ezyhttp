@@ -109,4 +109,9 @@ public class ThymeleafViewContext implements ViewContext {
         }
         return templateEngine;
     }
+
+    @Override
+    public ThymeleafMessageResolver getMessageResolver() {
+        return messageResolver;
+    }
 }

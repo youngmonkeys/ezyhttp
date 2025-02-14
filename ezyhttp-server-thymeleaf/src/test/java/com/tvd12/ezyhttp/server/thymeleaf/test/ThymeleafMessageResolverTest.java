@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Properties;
 
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import org.testng.annotations.Test;
 import org.thymeleaf.context.ITemplateContext;
 
@@ -84,6 +85,82 @@ public class ThymeleafMessageResolverTest {
         Asserts.assertEquals("Great {0}!", greetMessage, false);
         Asserts.assertNull(unkown);
         Asserts.assertEquals("Bar", foo);
+    }
+
+    @Test
+    public void putI18nMessagesTest() {
+        // given
+        MessageProvider messageProvider = mock(MessageProvider.class);
+        Properties exmessages = new Properties();
+        exmessages.setProperty("ex.hello", "Ex Hello");
+        when(
+            messageProvider.provide()
+        ).thenReturn(Collections.singletonMap("en", exmessages));
+
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Collections.singletonList(messageProvider))
+            .build();
+        sut.putI18nMessages(
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "",
+                    EzyMapBuilder.mapBuilder()
+                        .put("new_key_1", "a")
+                        .toMap()
+                )
+                .put(
+                    "vi",
+                    EzyMapBuilder.mapBuilder()
+                        .put("new_key_2", "b")
+                        .toMap()
+                )
+                .put(
+                    "en",
+                    EzyMapBuilder.mapBuilder()
+                        .put("new_key_3", "c")
+                        .toMap()
+                )
+                .put(
+                    "en_US",
+                    EzyMapBuilder.mapBuilder()
+                        .put("new_key_3", "c")
+                        .put("home.welcome", "new welcome")
+                        .toMap()
+                )
+                .put(
+                    "kr_KR",
+                    EzyMapBuilder.mapBuilder()
+                        .put("new_key_4", "d")
+                        .toMap()
+                )
+                .toMap()
+        );
+        ITemplateContext context = mock(ITemplateContext.class);
+        when(context.getLocale()).thenReturn(new Locale("en", "US"));
+        Class<?> origin = getClass();
+
+        // when
+        String welcomeMessage = sut.resolveMessage(context, origin, "home.welcome", new Object[0]);
+        String greetTitle = sut.resolveMessage(context, origin, "greet.title", new Object[]{"Monkey"});
+        String greetMessage = sut.resolveMessage(context, origin, "greet.message", new Object[]{"Monkey"});
+        String unknown = sut.resolveMessage(context, origin, "unknown", new Object[0]);
+        String foo = sut.resolveMessage(context, origin, "foo", new Object[0]);
+        String newKey1 = sut.resolveMessage(context, origin, "new_key_1", new Object[0]);
+        String newKey2 = sut.resolveMessage(context, origin, "new_key_2", new Object[0]);
+        String newKey3 = sut.resolveMessage(context, origin, "new_key_3", new Object[0]);
+
+        // then
+        Asserts.assertEquals("DEFAULT", sut.getName());
+        Asserts.assertEquals(0, sut.getOrder());
+        Asserts.assertEquals("new welcome", welcomeMessage);
+        Asserts.assertEquals("Greet Monkey", greetTitle);
+        Asserts.assertEquals("Great Monkey!", greetMessage, false);
+        Asserts.assertNull(unknown);
+        Asserts.assertEquals("Bar", foo);
+        Asserts.assertEquals(newKey1, "a");
+        Asserts.assertEquals(newKey2, null);
+        Asserts.assertEquals(newKey3, "c");
     }
 
     @Test

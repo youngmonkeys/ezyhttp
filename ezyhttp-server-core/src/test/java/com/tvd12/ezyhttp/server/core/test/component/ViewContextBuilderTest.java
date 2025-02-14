@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.test.component;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
+import com.tvd12.ezyhttp.server.core.view.I18nMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
 import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
@@ -35,6 +36,11 @@ public class ViewContextBuilderTest extends ViewContextBuilder {
             Object... parameters
         ) {
             return key;
+        }
+
+        @Override
+        public I18nMessageResolver getMessageResolver() {
+            return new I18nMessageResolver() {};
         }
     }
 }

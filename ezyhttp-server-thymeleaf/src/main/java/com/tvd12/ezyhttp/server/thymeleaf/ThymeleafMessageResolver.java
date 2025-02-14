@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.thymeleaf;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.I18nMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.MessageReader;
 import lombok.Getter;
@@ -11,7 +12,12 @@ import org.thymeleaf.messageresolver.IMessageResolver;
 import java.text.MessageFormat;
 import java.util.*;
 
-public class ThymeleafMessageResolver implements IMessageResolver {
+import static com.tvd12.ezyhttp.core.constant.Constants.EMPTY_STRING;
+import static com.tvd12.ezyhttp.core.util.Locales.getLocaleFromLanguage;
+
+public class ThymeleafMessageResolver implements
+    I18nMessageResolver,
+    IMessageResolver {
 
     @Getter
     private final String name = NAME;
@@ -33,8 +39,9 @@ public class ThymeleafMessageResolver implements IMessageResolver {
         this.messageProviders = builder.messageProviders;
         this.absentMessageResolver = builder.absentMessageResolver;
         this.messagesByLanguage = collectMessages();
-        this.messagesByLocale = mapMessagesToLocal();
-        this.defaultMessages = messagesByLanguage.computeIfAbsent("", it -> new Properties());
+        this.messagesByLocale = mapMessagesToLocale();
+        this.defaultMessages = messagesByLanguage
+            .computeIfAbsent(EMPTY_STRING, it -> new Properties());
     }
 
     private Map<String, Properties> collectMessages() {
@@ -66,28 +73,36 @@ public class ThymeleafMessageResolver implements IMessageResolver {
         }
     }
 
-    private Map<Locale, Properties> mapMessagesToLocal() {
+    private Map<Locale, Properties> mapMessagesToLocale() {
         Map<Locale, Properties> messagesByLocale = new HashMap<>();
         for (String lang : messagesByLanguage.keySet()) {
-            if (lang.length() > 0) {
-                Locale locale;
-                if (lang.contains("_")) {
-                    int index = lang.indexOf('_');
-                    String language = lang.substring(0, index);
-                    String country = lang.substring(index + 1);
-                    locale = new Locale(language, country);
-                } else if (lang.contains("-")) {
-                    int index = lang.indexOf('-');
-                    String language = lang.substring(0, index);
-                    String country = lang.substring(index + 1);
-                    locale = new Locale(language, country);
-                } else {
-                    locale = new Locale(lang);
-                }
+            if (!lang.isEmpty()) {
+                Locale locale = getLocaleFromLanguage(lang);
                 messagesByLocale.put(locale, messagesByLanguage.get(lang));
             }
         }
         return messagesByLocale;
+    }
+
+    @Override
+    public void putI18nMessages(
+        Map<String, Map<String, String>> newMessagesByLanguage
+    ) {
+        for (String lang : newMessagesByLanguage.keySet()) {
+            Map<String, String> messages = newMessagesByLanguage
+                .get(lang);
+            messagesByLanguage
+                .computeIfAbsent(lang, k -> new Properties())
+                .putAll(messages);
+            if (lang.isEmpty()) {
+                defaultMessages.putAll(messages);
+            } else {
+                Locale locale = getLocaleFromLanguage(lang);
+                messagesByLocale
+                    .computeIfAbsent(locale, k -> new Properties())
+                    .putAll(messages);
+            }
+        }
     }
 
     @Override

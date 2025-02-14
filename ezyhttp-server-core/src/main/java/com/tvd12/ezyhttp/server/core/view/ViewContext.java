@@ -38,4 +38,8 @@ public interface ViewContext {
                 )
             );
     }
+
+    default I18nMessageResolver getMessageResolver() {
+        throw new UnsupportedOperationException("not implemented");
+    }
 }
