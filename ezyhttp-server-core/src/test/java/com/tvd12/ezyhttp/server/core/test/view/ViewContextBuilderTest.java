@@ -8,12 +8,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.tvd12.ezyhttp.server.core.view.*;
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyhttp.server.core.view.View;
-import com.tvd12.ezyhttp.server.core.view.ViewContext;
-import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
-import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import com.tvd12.test.assertion.Asserts;
 
 import lombok.AllArgsConstructor;
@@ -63,6 +60,11 @@ public class ViewContextBuilderTest {
             Object... parameters
         ) {
             return key;
+        }
+
+        @Override
+        public I18nMessageResolver getMessageResolver() {
+            return new I18nMessageResolver() {};
         }
     }
 

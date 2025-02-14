@@ -45,7 +45,7 @@ public class ViewContextTest {
             Locale.US,
             keys
         );
-        Throwable e = Asserts.assertThrows(sut::getI18nMessageResolver);
+        Throwable e = Asserts.assertThrows(sut::getMessageResolver);
 
         // then
         Asserts.assertEquals(
