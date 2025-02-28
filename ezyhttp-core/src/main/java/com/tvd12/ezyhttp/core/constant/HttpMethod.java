@@ -34,4 +34,8 @@ public enum HttpMethod implements EzyConstant {
             || this == HttpMethod.PUT
             || this == HttpMethod.PATCH;
     }
+
+    public boolean equalsValue(String value) {
+        return value != null && toString().equals(value);
+    }
 }
