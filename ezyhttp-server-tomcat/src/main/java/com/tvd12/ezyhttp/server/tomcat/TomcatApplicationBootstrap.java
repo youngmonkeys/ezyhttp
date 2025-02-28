@@ -1,24 +1,5 @@
 package com.tvd12.ezyhttp.server.tomcat;
 
-import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.ThreadFactory;
-
-import javax.servlet.MultipartConfigElement;
-
-import org.apache.catalina.Context;
-import org.apache.catalina.Server;
-import org.apache.catalina.Wrapper;
-import org.apache.catalina.connector.Connector;
-import org.apache.catalina.filters.CorsFilter;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.util.descriptor.web.FilterDef;
-import org.apache.tomcat.util.descriptor.web.FilterMap;
-
 import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStoppable;
@@ -26,9 +7,28 @@ import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
-
 import lombok.AccessLevel;
 import lombok.Setter;
+import org.apache.catalina.Context;
+import org.apache.catalina.Server;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.filters.CorsFilter;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.valves.RemoteIpValve;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterMap;
+
+import javax.servlet.MultipartConfigElement;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ThreadFactory;
+
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
+import static com.tvd12.ezyhttp.core.constant.Constants.HTTPS_PORT;
+import static com.tvd12.ezyhttp.core.constant.Constants.HTTP_PORT;
 
 @Setter
 @ApplicationBootstrap
@@ -156,6 +156,7 @@ public class TomcatApplicationBootstrap
             )
         );
         context.addServletMappingDecoded("/*", "Servlet");
+        setProtocolHeader(context);
         if (corsEnable) {
             addCorsFilter(context);
         }
@@ -175,6 +176,14 @@ public class TomcatApplicationBootstrap
             );
         }
         return answer;
+    }
+
+    private void setProtocolHeader(Context context) {
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setProtocolHeader("X-Forwarded-Proto");
+        remoteIpValve.setHttpServerPort(HTTP_PORT);
+        remoteIpValve.setHttpsServerPort(HTTPS_PORT);
+        context.getPipeline().addValve(remoteIpValve);
     }
 
     protected void addCorsFilter(Context context) {

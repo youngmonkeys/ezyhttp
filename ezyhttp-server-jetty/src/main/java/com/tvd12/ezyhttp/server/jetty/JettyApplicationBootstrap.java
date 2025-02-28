@@ -10,10 +10,7 @@ import java.util.List;
 import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -105,19 +102,13 @@ public class JettyApplicationBootstrap
 
     @Override
     public void start() throws Exception {
-        QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
+        QueuedThreadPool threadPool = new QueuedThreadPool(
+            maxThreads,
+            minThreads,
+            idleTimeout
+        );
         server = new Server(threadPool);
-        ServerConnector connector = new ServerConnector(server);
-        connector.setHost(host);
-        connector.setPort(port);
-        List<Connector> connectors = new ArrayList<>();
-        connectors.add(connector);
-        if (managementEnable) {
-            ServerConnector managementConnector = new ServerConnector(server);
-            managementConnector.setHost(managementHost);
-            managementConnector.setPort(managementPort);
-            connectors.add(managementConnector);
-        }
+        List<Connector> connectors = createConnectors();
         server.setConnectors(connectors.toArray(new Connector[0]));
         Handler servletHandler = newServletHandler();
         if (compressionEnable) {
@@ -131,6 +122,26 @@ public class JettyApplicationBootstrap
         if (managementEnable) {
             logger.info("management started on: {}:{}", managementHost, managementPort);
         }
+    }
+
+    private List<Connector> createConnectors() {
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.addCustomizer(new ForwardedRequestCustomizer());
+        ServerConnector connector = new ServerConnector(
+            server,
+            new HttpConnectionFactory(httpConfig)
+        );
+        connector.setHost(host);
+        connector.setPort(port);
+        List<Connector> connectors = new ArrayList<>();
+        connectors.add(connector);
+        if (managementEnable) {
+            ServerConnector managementConnector = new ServerConnector(server);
+            managementConnector.setHost(managementHost);
+            managementConnector.setPort(managementPort);
+            connectors.add(managementConnector);
+        }
+        return connectors;
     }
 
     protected ServletContextHandler newServletHandler() {

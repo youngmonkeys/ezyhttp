@@ -11,5 +11,8 @@ public final class Constants {
     };
     public static final String DEFAULT_PACKAGE_TO_SCAN = "com.tvd12.ezyhttp.server";
 
+    public static final int HTTP_PORT = 80;
+    public static final int HTTPS_PORT = 443;
+
     private Constants() {}
 }
