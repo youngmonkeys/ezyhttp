@@ -13,8 +13,9 @@ import lombok.Setter;
 
 @Setter
 @EzyConfigurationBefore
-public class ResourceDownloadManagerConfiguration
-    implements EzyBeanContextAware, EzyBeanConfig {
+public class ResourceDownloadManagerConfiguration implements
+    EzyBeanContextAware,
+    EzyBeanConfig {
 
     @EzyProperty(PropertyNames.RESOURCE_ENABLE)
     private boolean resourcesEnable = false;
@@ -24,7 +25,9 @@ public class ResourceDownloadManagerConfiguration
     @Override
     public void config() {
         if (resourcesEnable) {
-            context.getSingletonFactory().addSingleton(createDownloadManager(context));
+            context
+                .getSingletonFactory()
+                .addSingleton(createDownloadManager(context));
         }
     }
 }

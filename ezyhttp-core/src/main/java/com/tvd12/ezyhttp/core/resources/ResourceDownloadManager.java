@@ -51,7 +51,9 @@ public class ResourceDownloadManager
 
     public ResourceDownloadManager(
         int capacity,
-        int threadPoolSize, int bufferSize) {
+        int threadPoolSize,
+        int bufferSize
+    ) {
         this.capacity = capacity;
         this.threadPoolSize = threadPoolSize;
         this.bufferSize = bufferSize;
@@ -160,6 +162,7 @@ public class ResourceDownloadManager
         drain(entry, future);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void stop() {
         this.active = false;
@@ -175,7 +178,7 @@ public class ResourceDownloadManager
     }
 
     @AllArgsConstructor
-    private static class Entry {
+    protected static class Entry {
         private final InputStream inputStream;
         private final OutputStream outputStream;
 
