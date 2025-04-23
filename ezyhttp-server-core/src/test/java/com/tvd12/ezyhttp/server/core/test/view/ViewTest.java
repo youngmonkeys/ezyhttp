@@ -1,18 +1,16 @@
 package com.tvd12.ezyhttp.server.core.test.view;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
+
+import javax.servlet.http.Cookie;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 
 public class ViewTest {
 
@@ -44,9 +42,12 @@ public class ViewTest {
         sut.setVariables(Collections.singletonMap("mapKey", "mapValue"));
         sut.appendToVariable("list", "g");
         sut.appendValueToVariable("list", "h");
+        sut.appendValueToVariable("list", (Object) null);
         sut.appendValuesToVariable("list", new String[] {"i", "j"});
         sut.appendValuesToVariable("list", Arrays.asList("k", "l"));
         sut.setVariables(null);
+        sut.putKeyValueToVariable("zzz", null, null);
+        sut.putKeyValueToVariable("zzz", "hello", null);
 
         // then
         Asserts.assertEquals("index.html", sut.getTemplate());
@@ -92,6 +93,23 @@ public class ViewTest {
         // then
         Asserts.assertEquals("home.html", sut.getTemplate());
         Asserts.assertEquals(sut.getLocale(), Locale.CANADA);
+    }
+
+    @Test
+    public void setTemplateAndContentTypeTest() {
+        // given
+        View sut = View.builder()
+            .template("home.html")
+            .contentType(ContentTypes.TEXT_PLAIN)
+            .build();
+
+        // when
+        sut.setTemplate("world");
+        sut.setContentType(ContentTypes.TEXT_HTML_UTF8);
+
+        // then
+        Asserts.assertEquals("world", sut.getTemplate());
+        Asserts.assertEquals(sut.getContentType(), ContentTypes.TEXT_HTML_UTF8);
     }
 
     @Test

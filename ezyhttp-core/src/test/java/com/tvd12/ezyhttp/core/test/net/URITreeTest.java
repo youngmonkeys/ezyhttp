@@ -92,4 +92,17 @@ public class URITreeTest {
         System.out.println(tree);
         Asserts.assertNotNull(tree.getMatchedURI("/api/v1/oa/ZALO/webhook"));
     }
+
+    @Test
+    public void matchFirstVariableTest() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/{productCode}/checkout/shopping-cart");
+        tree.addURI("/co-chua/product");
+
+        // when
+        // then
+        System.out.println(tree);
+        Asserts.assertNotNull(tree.getMatchedURI("/co-chua/checkout/shopping-cart"));
+    }
 }

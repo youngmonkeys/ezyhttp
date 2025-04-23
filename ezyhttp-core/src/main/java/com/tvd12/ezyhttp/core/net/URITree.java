@@ -1,7 +1,9 @@
 package com.tvd12.ezyhttp.core.net;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 public class URITree {
 
@@ -19,34 +21,44 @@ public class URITree {
             if (PathVariables.isPathVariable(path)) {
                 path = "{}";
             }
-            URITree child = lastChild.children.get(path);
-            if (child == null) {
-                child = new URITree();
-                lastChild.children.put(path, child);
-            }
-            lastChild = child;
+            lastChild = lastChild
+                .children
+                .computeIfAbsent(path, k -> new URITree());
         }
         lastChild.uri = uri;
     }
 
     public String getMatchedURI(String uri) {
-        URITree lastChild = this;
         String[] paths = uri.split("/");
-        for (String path : paths) {
-            if (lastChild.children == null) {
+        Queue<TreeItem> queue = new LinkedList<>();
+        queue.offer(new TreeItem(0, this));
+        while (true) {
+            TreeItem item = queue.poll();
+            if (item == null) {
                 return null;
             }
-            URITree child = lastChild.children.get(path);
-            if (child == null) {
-                child = lastChild.children.get("{}");
+            if (item.index == paths.length) {
+                if (item.child.uri != null) {
+                    return item.child.uri;
+                }
+                continue;
             }
-            if (child == null) {
-                child = lastChild.children.get("*");
-                return child == null ? null : child.uri;
+            if (item.child.children == null) {
+                continue;
             }
-            lastChild = child;
+            URITree childA = item.child.children.get(paths[item.index]);
+            if (childA != null) {
+                queue.offer(new TreeItem(item.index + 1, childA));
+            }
+            URITree childB = item.child.children.get("{}");
+            if (childB != null) {
+                queue.offer(new TreeItem(item.index + 1, childB));
+            }
+            URITree childC = item.child.children.get("*");
+            if (childC != null) {
+                return childC.uri;
+            }
         }
-        return lastChild.uri;
     }
 
     @Override
@@ -55,5 +67,15 @@ public class URITree {
             return uri;
         }
         return children.toString();
+    }
+
+    private static class TreeItem {
+        private final int index;
+        private final URITree child;
+
+        private TreeItem(int index, URITree child) {
+            this.index = index;
+            this.child = child;
+        }
     }
 }

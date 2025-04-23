@@ -15,8 +15,10 @@ public class View {
 
     @Setter
     private Locale locale;
-    private final String template;
-    private final String contentType;
+    @Setter
+    private String template;
+    @Setter
+    private String contentType;
     private final List<Cookie> cookies;
     private final Map<String, String> headers;
     private final Map<String, Object> variables;
@@ -74,10 +76,12 @@ public class View {
         String variableName,
         Object value
     ) {
-        ((List<Object>) variables.computeIfAbsent(
-            variableName,
-            k -> new ArrayList<>())
-        ).add(value);
+        if (value != null) {
+            ((List<Object>) variables.computeIfAbsent(
+                variableName,
+                k -> new ArrayList<>())
+            ).add(value);
+        }
     }
 
     public void appendToVariable(String name, Object value) {
@@ -116,10 +120,12 @@ public class View {
         String key,
         Object value
     ) {
-        ((Map<String, Object>) variables.computeIfAbsent(
-            variableName,
-            k -> new HashMap<>())
-        ).put(key, value);
+        if (key != null && value != null) {
+            ((Map<String, Object>) variables.computeIfAbsent(
+                variableName,
+                k -> new HashMap<>())
+            ).put(key, value);
+        }
     }
 
     public void putKeyValuesToVariable(
