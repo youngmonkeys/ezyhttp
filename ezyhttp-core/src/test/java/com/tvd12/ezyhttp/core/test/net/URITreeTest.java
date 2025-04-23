@@ -1,12 +1,28 @@
 package com.tvd12.ezyhttp.core.test.net;
 
+import com.tvd12.ezyhttp.core.net.URITree;
+import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.performance.Performance;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyhttp.core.net.URITree;
-import com.tvd12.test.assertion.Asserts;
-
 public class URITreeTest {
+
+    public static void main(String[] args) {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/{productCode}/checkout/shopping-cart");
+        tree.addURI("/co-chua/product");
+
+        // when
+        // then
+        System.out.println(tree);
+        long time = Performance.create()
+            .test(() -> tree.getMatchedURI("/co-chua/checkout/shopping-cart"))
+            .getTime();
+
+        System.out.println("elapsed time: " + time);
+    }
 
     @Test
     public void test() {
