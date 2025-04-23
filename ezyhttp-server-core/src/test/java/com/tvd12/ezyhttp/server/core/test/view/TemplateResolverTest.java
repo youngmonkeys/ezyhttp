@@ -13,6 +13,7 @@ public class TemplateResolverTest {
         // given
         String prefix = RandomUtil.randomShortAlphabetString();
         String suffix = RandomUtil.randomShortAlphabetString();
+        String characterEncoding = RandomUtil.randomShortAlphabetString();
         int cacheTTLMs = RandomUtil.randomInt();
         boolean cacheable = RandomUtil.randomBoolean();
         String templateMode = RandomUtil.randomShortAlphabetString();
@@ -22,6 +23,7 @@ public class TemplateResolverTest {
         TemplateResolver sut = TemplateResolver.builder()
             .prefix(prefix)
             .suffix(suffix)
+            .characterEncoding(characterEncoding)
             .cacheTTLMs(cacheTTLMs)
             .cacheable(cacheable)
             .templateMode(templateMode)
@@ -35,5 +37,17 @@ public class TemplateResolverTest {
         Asserts.assertEquals(cacheable, sut.isCacheable());
         Asserts.assertEquals(templateMode, sut.getTemplateMode());
         Asserts.assertEquals(messagesLocation, sut.getMessagesLocation());
+        Asserts.assertEquals(characterEncoding, sut.getCharacterEncoding());
+    }
+
+    @Test
+    public void defaultValueTest() {
+        // given
+        // when
+        TemplateResolver sut = TemplateResolver.builder()
+            .build();
+
+        // then
+        Asserts.assertEquals(sut.getCharacterEncoding(), "UTF-8");
     }
 }

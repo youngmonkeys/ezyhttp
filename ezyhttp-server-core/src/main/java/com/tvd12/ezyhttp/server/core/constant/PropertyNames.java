@@ -25,6 +25,8 @@ public final class PropertyNames {
     public static final String VIEW_TEMPLATE_MODE = "view.template.mode";
     public static final String VIEW_TEMPLATE_PREFIX = "view.template.prefix";
     public static final String VIEW_TEMPLATE_SUFFIX = "view.template.suffix";
+    public static final String VIEW_TEMPLATE_CHARACTER_ENCODING =
+        "view.template.character_encoding";
     public static final String VIEW_TEMPLATE_CACHE_TTL_MS = "view.template.cache_ttl_ms";
     public static final String VIEW_TEMPLATE_CACHEABLE = "view.template.cacheable";
     public static final String VIEW_TEMPLATE_MESSAGES_LOCATION = "view.template.messages_location";
