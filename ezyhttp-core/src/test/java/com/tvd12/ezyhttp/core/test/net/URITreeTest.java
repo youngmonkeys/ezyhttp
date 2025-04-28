@@ -121,4 +121,44 @@ public class URITreeTest {
         System.out.println(tree);
         Asserts.assertNotNull(tree.getMatchedURI("/co-chua/checkout/shopping-cart"));
     }
+
+    @Test
+    public void matchFirstVariable2Test() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/co-chua/{name}");
+        tree.addURI("/co-chua/product");
+
+        // when
+        // then
+        System.out.println(tree);
+        Asserts.assertNotNull(tree.getMatchedURI("/co-chua/product"));
+    }
+
+    @Test
+    public void matchFirstVariable3Test() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/{name}/product/hello");
+        tree.addURI("/co-chua/product");
+
+        // when
+        // then
+        System.out.println(tree);
+        Asserts.assertNotNull(tree.getMatchedURI("/co-chua/product"));
+    }
+
+    @Test
+    public void matchFirstVariable4Test() {
+        // given
+        URITree tree = new URITree();
+        tree.addURI("/{name1}/{name2}/hello");
+        tree.addURI("/co-chua/{name}/{zzz}");
+
+        // when
+        // then
+        System.out.println(tree);
+        System.out.println(tree.getMatchedURI("/co-chua/product/hello"));
+        Asserts.assertNotNull(tree.getMatchedURI("/co-chua/product/hello"));
+    }
 }
