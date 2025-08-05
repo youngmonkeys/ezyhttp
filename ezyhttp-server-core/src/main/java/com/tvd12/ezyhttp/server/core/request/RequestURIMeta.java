@@ -9,6 +9,7 @@ public class RequestURIMeta {
 
     private final boolean api;
     private final boolean authenticated;
+    private final boolean authenticatable;
     private final boolean management;
     private final boolean resource;
     private final boolean payment;
@@ -18,6 +19,7 @@ public class RequestURIMeta {
     protected RequestURIMeta(Builder builder) {
         this.api = builder.api;
         this.authenticated = builder.authenticated;
+        this.authenticatable = builder.authenticatable;
         this.management = builder.management;
         this.resource = builder.resource;
         this.payment = builder.payment;
@@ -33,6 +35,7 @@ public class RequestURIMeta {
 
         private boolean api;
         private boolean authenticated;
+        private boolean authenticatable;
         private boolean management;
         private boolean resource;
         private boolean payment;
@@ -46,6 +49,11 @@ public class RequestURIMeta {
 
         public Builder authenticated(boolean authenticated) {
             this.authenticated = authenticated;
+            return this;
+        }
+
+        public Builder authenticatable(boolean authenticatable) {
+            this.authenticatable = authenticatable;
             return this;
         }
 

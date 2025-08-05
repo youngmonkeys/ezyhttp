@@ -12,9 +12,9 @@ import lombok.Setter;
 
 import java.util.*;
 
+@Setter
 public class RequestHandlersImplementer extends EzyLoggable {
 
-    @Setter
     private RequestURIDecorator requestURIDecorator;
 
     public Map<RequestURI, List<RequestHandler>> implement(
@@ -51,6 +51,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
             RequestURIMeta uriMeta = RequestURIMeta.builder()
                 .api(method.isApi() || proxy.isApi())
                 .authenticated(method.isAuthenticated() || proxy.isAuthenticated())
+                .authenticatable(method.isAuthenticatable() || proxy.isAuthenticatable())
                 .management(method.isManagement() || proxy.isManagement())
                 .payment(method.isPayment() || proxy.isPayment())
                 .feature(methodFeature != null ? methodFeature : feature)

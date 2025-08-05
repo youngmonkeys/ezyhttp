@@ -139,6 +139,10 @@ public class RequestHandlerMethod extends HandlerMethod {
         return method.isAnnotated(Authenticated.class);
     }
 
+    public boolean isAuthenticatable() {
+        return method.isAnnotated(Authenticatable.class);
+    }
+
     public boolean isAsync() {
         return method.isAnnotated(Async.class);
     }

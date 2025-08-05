@@ -2,11 +2,15 @@ package com.tvd12.ezyhttp.server.graphql;
 
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.reflect.EzyGenerics;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 
 public interface GraphQLDataFetcher<A, D> {
 
-    D getData(A argument);
+    D getData(
+        RequestArguments arguments,
+        A parameters
+    );
 
     default String getQueryName() {
         if (getClass().isAnnotationPresent(GraphQLQuery.class)) {

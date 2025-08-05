@@ -88,6 +88,10 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
             this.requestURIManager.addAuthenticatedURI(uri.getMethod(), uri.getUri());
             this.requestURIManager.addAuthenticatedURI(uri.getMethod(), uri.getSameURI());
         }
+        if (uri.isAuthenticatable()) {
+            this.requestURIManager.addAuthenticatableURI(uri.getMethod(), uri.getUri());
+            this.requestURIManager.addAuthenticatableURI(uri.getMethod(), uri.getSameURI());
+        }
         if (uri.isManagement()) {
             this.requestURIManager.addManagementURI(uri.getMethod(), uri.getUri());
             this.requestURIManager.addManagementURI(uri.getMethod(), uri.getSameURI());

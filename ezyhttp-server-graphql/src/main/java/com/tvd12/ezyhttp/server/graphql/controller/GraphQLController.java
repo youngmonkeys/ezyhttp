@@ -3,11 +3,9 @@ package com.tvd12.ezyhttp.server.graphql.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.server.core.annotation.DoGet;
-import com.tvd12.ezyhttp.server.core.annotation.DoPost;
-import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
-import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.*;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
@@ -15,6 +13,7 @@ import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 
 import java.util.*;
 
+@Api
 public class GraphQLController implements IRequestController {
 
     private final ObjectMapper objectMapper;
@@ -41,10 +40,11 @@ public class GraphQLController implements IRequestController {
      */
     @DoGet("/graphql")
     public Object doGet(
+        RequestArguments arguments,
         @RequestParam("query") String query,
         @RequestParam("variables") String variables
     ) throws Exception {
-        return fetch(query, variables);
+        return fetch(arguments, query, variables);
     }
 
     /**
@@ -64,8 +64,12 @@ public class GraphQLController implements IRequestController {
      * @throws Exception when have any error
      */
     @DoPost("/graphql")
-    public Object doPost(@RequestBody GraphQLRequest request) throws Exception {
+    public Object doPost(
+        RequestArguments arguments,
+        @RequestBody GraphQLRequest request
+    ) throws Exception {
         return fetch(
+            arguments,
             request.getQuery(),
             request.getVariables()
         );
@@ -73,6 +77,7 @@ public class GraphQLController implements IRequestController {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Object fetch(
+        RequestArguments arguments,
         String query,
         Object variables
     ) throws Exception {
@@ -89,19 +94,22 @@ public class GraphQLController implements IRequestController {
                 );
             }
             Class<?> argumentType = dataFetcher.getArgumentType();
-            Object argument = variables;
+            Object parameters = variables;
             if (argumentType != null) {
                 if (variables instanceof String) {
-                    argument = objectMapper.readValue((String) variables, argumentType);
+                    parameters = objectMapper.readValue((String) variables, argumentType);
                 } else {
-                    argument = objectMapper.convertValue(variables, argumentType);
+                    parameters = objectMapper.convertValue(variables, argumentType);
                 }
             } else {
                 if (variables instanceof String) {
-                    argument = objectMapper.readValue((String) variables, Map.class);
+                    parameters = objectMapper.readValue((String) variables, Map.class);
                 }
             }
-            Object data = dataFetcher.getData(argument);
+            Object data = dataFetcher.getData(
+                arguments,
+                parameters
+            );
             try {
                 Object currentResponse = mapToResponse(data, queryDefinition, query);
                 answer.put(queryName, currentResponse);

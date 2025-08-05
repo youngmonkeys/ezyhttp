@@ -14,6 +14,7 @@ public class RequestURIManager implements EzyDestroyable {
 
     private final Map<HttpMethod, Set<String>> apiURIs;
     private final Map<HttpMethod, Set<String>> authenticatedURIs;
+    private final Map<HttpMethod, Set<String>> authenticatableURIs;
     private final Map<HttpMethod, Set<String>> handledURIs;
     private final Map<HttpMethod, Set<String>> managementURIs;
     private final Map<HttpMethod, Set<String>> paymentURIs;
@@ -21,6 +22,7 @@ public class RequestURIManager implements EzyDestroyable {
     public RequestURIManager() {
         this.apiURIs = new ConcurrentHashMap<>();
         this.authenticatedURIs = new ConcurrentHashMap<>();
+        this.authenticatableURIs = new ConcurrentHashMap<>();
         this.handledURIs = new ConcurrentHashMap<>();
         this.managementURIs = new ConcurrentHashMap<>();
         this.paymentURIs = new ConcurrentHashMap<>();
@@ -61,6 +63,12 @@ public class RequestURIManager implements EzyDestroyable {
 
     public void addAuthenticatedURI(HttpMethod method, String uri) {
         this.authenticatedURIs
+            .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
+            .add(uri);
+    }
+
+    public void addAuthenticatableURI(HttpMethod method, String uri) {
+        this.authenticatableURIs
             .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
             .add(uri);
     }

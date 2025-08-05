@@ -1,7 +1,6 @@
 package com.tvd12.ezyhttp.server.core.request;
 
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +12,7 @@ public class RequestURI {
     protected final HttpMethod method;
     protected final boolean api;
     protected final boolean authenticated;
+    protected final boolean authenticatable;
     protected final boolean management;
     protected final boolean resource;
     protected final boolean payment;
@@ -29,6 +29,7 @@ public class RequestURI {
         this.management = management;
         this.api = false;
         this.authenticated = false;
+        this.authenticatable = false;
         this.resource = false;
         this.payment = false;
         this.feature = null;
@@ -49,6 +50,7 @@ public class RequestURI {
             RequestURIMeta.builder()
                 .api(api)
                 .authenticated(false)
+                .authenticatable(false)
                 .management(management)
                 .resource(resource)
                 .resourceFullPath(resourceFullPath)
@@ -65,6 +67,7 @@ public class RequestURI {
         this.uri = standardizeURI(uri);
         this.api = meta.isApi();
         this.authenticated = meta.isAuthenticated();
+        this.authenticatable = meta.isAuthenticatable();
         this.management = meta.isManagement();
         this.resource = meta.isResource();
         this.payment = meta.isPayment();
