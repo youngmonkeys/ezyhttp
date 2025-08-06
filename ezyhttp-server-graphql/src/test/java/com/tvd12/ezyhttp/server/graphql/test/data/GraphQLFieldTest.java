@@ -25,6 +25,8 @@ public class GraphQLFieldTest {
 
         // then
         Asserts.assertTrue(isEqual);
+        Asserts.assertTrue(fieldA.equals(fieldA));
+        Asserts.assertFalse(fieldA.equals(new Object()));
         Asserts.assertEquals(fieldA.toString(), fieldName + ", []");
         Asserts.assertEquals(fieldB.toString(), fieldName + ", [" + fieldA + "]");
         Asserts.assertEquals(fieldA.hashCode(), fieldName.hashCode());

@@ -6,9 +6,9 @@ import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.ezyfox.bean.impl.EzySimpleBeanContext;
 import com.tvd12.ezyhttp.server.graphql.config.GraphQLConfiguration;
+import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
-import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
@@ -39,6 +39,7 @@ public class GraphQLConfigurationTest {
         sut.setSingletonFactory(singletonFactory);
         sut.setObjectMapper(new ObjectMapper());
         sut.setGraphQLEnable(true);
+        sut.setGraphQLAuthenticated(true);
 
         // when
         sut.config();
@@ -53,6 +54,34 @@ public class GraphQLConfigurationTest {
 
         // then
         Asserts.assertNotNull(controller);
+        Asserts.assertTrue(controller.isAuthenticated());
         Asserts.assertTrue(dataFetchers.containsKey("A"));
+    }
+
+    @Test
+    public void enableFalseTest() throws NoSuchFieldException, IllegalAccessException {
+        // given
+        EzyBeanContextBuilder builder = new EzySimpleBeanContext.Builder();
+
+        Set<String> packagesToScan = RandomUtil.randomSet(8, String.class);
+        packagesToScan.add("com.tvd12.ezyhttp.server.graphql.test.config");
+
+        for (String p : packagesToScan) {
+            builder.scan(p);
+        }
+
+        EzyBeanContext context = builder.build();
+
+        GraphQLConfiguration sut = new GraphQLConfiguration();
+        EzySingletonFactory singletonFactory = context.getSingletonFactory();
+        sut.setSingletonFactory(singletonFactory);
+        sut.setObjectMapper(new ObjectMapper());
+        sut.setGraphQLEnable(false);
+
+        // when
+        sut.config();
+
+        // then
+        Asserts.assertNull(context.getSingleton(GraphQLController.class));
     }
 }

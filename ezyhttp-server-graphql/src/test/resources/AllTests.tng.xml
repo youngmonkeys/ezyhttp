@@ -9,7 +9,9 @@
             <package name="com.tvd12.ezyhttp.server.graphql.test.data" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.datafetcher" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.fetcher" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.interceptor" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.scheme" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.util" />
         </packages>
     </test>
 </suite>

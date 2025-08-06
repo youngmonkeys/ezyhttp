@@ -5,21 +5,25 @@ import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 
 public interface GraphQLInterceptor {
 
-    boolean preHandle(
+    default boolean preHandle(
         RequestArguments arguments,
         String queryGroup,
         String queryName,
         Object requestParameter,
         GraphQLDataFetcher<?, ?> dataFetcher
-    );
+    ) {
+        return true;
+    }
 
-    void postHandle(
+    default void postHandle(
         RequestArguments arguments,
         String queryGroup,
         String queryName,
         Object responseData,
         GraphQLDataFetcher<?, ?> dataFetcher
-    );
+    ) {}
 
-    int getPriority();
+    default int getPriority() {
+        return 0;
+    }
 }

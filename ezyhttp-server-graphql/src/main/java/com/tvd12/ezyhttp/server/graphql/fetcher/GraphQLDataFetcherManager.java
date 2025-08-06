@@ -54,7 +54,6 @@ public class GraphQLDataFetcherManager {
     }
 
     public static class Builder implements EzyBuilder<GraphQLDataFetcherManager> {
-
         private final Map<String, GraphQLDataFetcher> dataFetchers =
             new HashMap<>();
         private final Map<String, String> groupNameByQueryName =
