@@ -546,7 +546,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToFileTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -566,7 +566,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToFileWithCancellationTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -590,7 +590,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToFileButCancelTest() {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -616,7 +616,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToFileByRequestTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
         DownloadRequest request = new DownloadRequest()
             .setFileURL(fileUrl)
             .setConnectTimeout(5000)
@@ -645,7 +645,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToFileByRequestWithCancellationTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
         DownloadRequest request = new DownloadRequest()
             .setFileURL(fileUrl)
             .setConnectTimeout(5000)
@@ -678,7 +678,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputStreamTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -701,7 +701,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputStreamWithCancellationTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -724,7 +724,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputStreamButCancelTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -752,7 +752,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputStreamByRequestTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
         DownloadRequest request = new DownloadRequest()
             .setFileURL(fileUrl)
             .setConnectTimeout(5000)
@@ -784,7 +784,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputStreamByRequestWithCancellationTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
         DownloadRequest request = new DownloadRequest()
             .setFileURL(fileUrl)
             .setConnectTimeout(5000)
@@ -816,7 +816,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputFileTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -843,7 +843,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputFileWithCancelledTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -871,7 +871,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputFileButCancelTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -904,7 +904,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputFileWithRequestTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)
@@ -931,7 +931,7 @@ public class HttpClientProxyTest extends BaseTest {
     @Test
     public void downloadToOutputFileWithRequestAndCancelledTokenTest() throws Exception {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         HttpClientProxy sut = HttpClientProxy.builder()
             .requestQueueCapacity(1)

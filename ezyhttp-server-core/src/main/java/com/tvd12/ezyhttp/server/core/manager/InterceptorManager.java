@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Getter
 public class InterceptorManager implements EzyDestroyable {
 
-    @Getter
-    public final List<RequestInterceptor> requestInterceptors;
+    protected final List<RequestInterceptor> requestInterceptors;
 
     public InterceptorManager() {
         this.requestInterceptors = new ArrayList<>();

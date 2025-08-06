@@ -1,7 +1,8 @@
 package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLAbstractDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,10 @@ import lombok.Getter;
 public class GraphQLYouDataFetcher
     extends GraphQLAbstractDataFetcher<Object, GraphQLYouDataFetcher.YouResponse> {
 
-    public YouResponse getData(Object argument) {
+    public YouResponse getData(
+        RequestArguments arguments,
+        Object argument
+    ) {
         return YouResponse.builder()
             .friends("A, B")
             .build();

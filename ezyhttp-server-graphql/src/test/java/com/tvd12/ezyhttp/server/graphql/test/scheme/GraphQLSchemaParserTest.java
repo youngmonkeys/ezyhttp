@@ -1,7 +1,7 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.scheme;
 
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchema;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;

@@ -25,6 +25,7 @@ public class RequestHandlerManagerTest {
             RequestURIMeta.builder()
                 .api(true)
                 .authenticated(true)
+                .authenticatable(true)
                 .management(true)
                 .resource(true)
                 .payment(true)

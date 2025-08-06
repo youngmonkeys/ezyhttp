@@ -1,4 +1,6 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.query;
+
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 
 public class GraphQLQueryDefinition extends GraphQLField {
 

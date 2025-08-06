@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.config;
 
 import java.util.List;
 
@@ -11,6 +11,9 @@ import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyfox.bean.annotation.EzyConfigurationAfter;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptorManager;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import lombok.Setter;
 
 @Setter
@@ -22,6 +25,9 @@ public class GraphQLConfiguration implements
     @EzyProperty("graphql.enable")
     private boolean graphQLEnable;
 
+    @EzyProperty("graphql.authenticated")
+    private boolean graphQLAuthenticated;
+
     @EzyAutoBind
     private ObjectMapper objectMapper;
 
@@ -30,21 +36,27 @@ public class GraphQLConfiguration implements
     @SuppressWarnings("rawtypes")
     @Override
     public void config() {
+        if (!graphQLEnable) {
+            return;
+        }
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
-
         GraphQLDataFetcherManager.Builder dataFetcherManagerBuilder =
-                GraphQLDataFetcherManager.builder();
+            GraphQLDataFetcherManager.builder();
         List singletons = singletonFactory.getSingletons();
         for (Object singleton : singletons) {
             dataFetcherManagerBuilder.addDataFetcher(singleton);
         }
         GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder
-                .build();
+            .build();
+        GraphQLInterceptorManager interceptorManager =
+            new GraphQLInterceptorManager(singletonFactory);
         GraphQLController controller = GraphQLController.builder()
-                .objectMapper(objectMapper)
-                .dataFetcherManager(dataFetcherManager)
-                .schemaParser(schemaParser)
-                .build();
+            .authenticated(graphQLAuthenticated)
+            .objectMapper(objectMapper)
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .interceptorManager(interceptorManager)
+            .build();
         singletonFactory.addSingleton(controller);
     }
 }

@@ -2,29 +2,48 @@ package com.tvd12.ezyhttp.server.graphql.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.server.core.annotation.DoGet;
-import com.tvd12.ezyhttp.server.core.annotation.DoPost;
-import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
-import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
+import com.tvd12.ezyhttp.server.core.annotation.*;
+import com.tvd12.ezyhttp.server.core.handler.AuthenticatedController;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
-import com.tvd12.ezyhttp.server.graphql.*;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptor;
+import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptorManager;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
+import lombok.Getter;
 
 import java.util.*;
 
-public class GraphQLController implements IRequestController {
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
 
+@Api
+@Authenticatable
+public class GraphQLController
+    implements IRequestController, AuthenticatedController {
+
+    @Getter
+    private final boolean authenticated;
     private final ObjectMapper objectMapper;
     private final GraphQLSchemaParser schemaParser;
     private final GraphQLDataFetcherManager dataFetcherManager;
+    private final GraphQLInterceptorManager interceptorManager;
 
     public GraphQLController(Builder builder) {
+        this.authenticated = builder.authenticated;
         this.objectMapper = builder.objectMapper;
         this.schemaParser = builder.schemaParser;
         this.dataFetcherManager = builder.dataFetcherManager;
+        this.interceptorManager = builder.interceptorManager;
     }
 
     /**
@@ -41,10 +60,11 @@ public class GraphQLController implements IRequestController {
      */
     @DoGet("/graphql")
     public Object doGet(
+        RequestArguments arguments,
         @RequestParam("query") String query,
         @RequestParam("variables") String variables
     ) throws Exception {
-        return fetch(query, variables);
+        return fetch(arguments, query, variables);
     }
 
     /**
@@ -64,15 +84,20 @@ public class GraphQLController implements IRequestController {
      * @throws Exception when have any error
      */
     @DoPost("/graphql")
-    public Object doPost(@RequestBody GraphQLRequest request) throws Exception {
+    public Object doPost(
+        RequestArguments arguments,
+        @RequestBody GraphQLRequest request
+    ) throws Exception {
         return fetch(
+            arguments,
             request.getQuery(),
             request.getVariables()
         );
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked", "MethodLength"})
     private Object fetch(
+        RequestArguments arguments,
         String query,
         Object variables
     ) throws Exception {
@@ -88,25 +113,58 @@ public class GraphQLController implements IRequestController {
                     "not found data fetcher with queryName: " + queryName
                 );
             }
-            Class<?> argumentType = dataFetcher.getArgumentType();
-            Object argument = variables;
-            if (argumentType != null) {
+            Class<?> parameterType = dataFetcher.getParameterType();
+            Object parameter = variables;
+            if (parameterType != null) {
                 if (variables instanceof String) {
-                    argument = objectMapper.readValue((String) variables, argumentType);
+                    parameter = objectMapper.readValue((String) variables, parameterType);
                 } else {
-                    argument = objectMapper.convertValue(variables, argumentType);
+                    parameter = objectMapper.convertValue(variables, parameterType);
                 }
             } else {
                 if (variables instanceof String) {
-                    argument = objectMapper.readValue((String) variables, Map.class);
+                    parameter = objectMapper.readValue((String) variables, Map.class);
                 }
             }
-            Object data = dataFetcher.getData(argument);
+            List<GraphQLInterceptor> interceptors = interceptorManager
+                .getRequestInterceptors();
+            String queryGroup = dataFetcherManager.getGroupNameByQueryName(queryName);
+            for (GraphQLInterceptor interceptor : interceptors) {
+                boolean ok = interceptor.preHandle(
+                    arguments,
+                    queryGroup,
+                    queryName,
+                    parameter,
+                    dataFetcher
+                );
+                if (!ok) {
+                    throw new HttpNotAcceptableException(
+                        EzyMapBuilder.mapBuilder()
+                            .put("controller", "GraphQL")
+                            .put("queryGroup", queryGroup)
+                            .put("queryName", queryName)
+                            .toMap()
+                    );
+                }
+            }
+            Object data = dataFetcher.getData(
+                arguments,
+                parameter
+            );
             try {
                 Object currentResponse = mapToResponse(data, queryDefinition, query);
                 answer.put(queryName, currentResponse);
             } catch (GraphQLObjectMapperException e) {
                 answer.put(queryName, data);
+            }
+            for (GraphQLInterceptor interceptor : interceptors) {
+                interceptor.postHandle(
+                    arguments,
+                    queryGroup,
+                    queryName,
+                    answer,
+                    dataFetcher
+                );
             }
         }
         return answer;
@@ -135,7 +193,6 @@ public class GraphQLController implements IRequestController {
         GraphQLField queryDefinition,
         String query
     ) {
-
         Map answer = new HashMap<>();
         Map parentMap = null;
         Stack<GraphQLField> stack = new Stack<>();
@@ -147,26 +204,31 @@ public class GraphQLController implements IRequestController {
                 : (Map) parentMap.get(parent.getName());
 
             for (GraphQLField field : parent.getFields()) {
-                Object value = dataMap.get(field.getName());
+                String fieldName = field.getName();
+                if (fieldName.equals(ALL_FIELDS)) {
+                    parentMap.putAll(dataMap);
+                    continue;
+                }
+                Object value = dataMap.get(fieldName);
                 if (value == null) {
                     continue;
                 }
                 if (field.getFields().isEmpty()) {
-                    parentMap.put(field.getName(), value);
+                    parentMap.put(fieldName, value);
                     continue;
                 }
                 if (value instanceof Map) {
                     Object newItem = new HashMap<>();
-                    parentMap.put(field.getName(), newItem);
+                    parentMap.put(fieldName, newItem);
                     stack.push(field);
                 } else if (value instanceof List) {
                     parentMap.put(
-                        field.getName(),
+                        fieldName,
                         filterDataList((List) value, field, query)
                     );
                 } else {
                     throw new GraphQLInvalidSchemeException(
-                        "invalid schema: " + query + " at: " + field.getName()
+                        "invalid schema: " + query + " at: " + fieldName
                     );
                 }
             }
@@ -191,9 +253,16 @@ public class GraphQLController implements IRequestController {
     }
 
     public static class Builder implements EzyBuilder<GraphQLController> {
+        private boolean authenticated;
         private ObjectMapper objectMapper;
         private GraphQLSchemaParser schemaParser;
         private GraphQLDataFetcherManager dataFetcherManager;
+        private GraphQLInterceptorManager interceptorManager;
+
+        public Builder authenticated(boolean authenticated) {
+            this.authenticated = authenticated;
+            return this;
+        }
 
         public Builder objectMapper(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
@@ -207,6 +276,11 @@ public class GraphQLController implements IRequestController {
 
         public Builder dataFetcherManager(GraphQLDataFetcherManager dataFetcherManager) {
             this.dataFetcherManager = dataFetcherManager;
+            return this;
+        }
+
+        public Builder interceptorManager(GraphQLInterceptorManager interceptorManager) {
+            this.interceptorManager = interceptorManager;
             return this;
         }
 

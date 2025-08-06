@@ -1,12 +1,17 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.fetcher;
 
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.reflect.EzyGenerics;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataSchema;
 
 public interface GraphQLDataFetcher<A, D> {
 
-    D getData(A argument);
+    D getData(
+        RequestArguments arguments,
+        A parameter
+    );
 
     default String getQueryName() {
         if (getClass().isAnnotationPresent(GraphQLQuery.class)) {
@@ -18,7 +23,7 @@ public interface GraphQLDataFetcher<A, D> {
         );
     }
 
-    default Class<?> getArgumentType() {
+    default Class<?> getParameterType() {
         try {
             Class<?> readerClass = getClass();
             Class<?>[] args = EzyGenerics.getGenericInterfacesArguments(
@@ -30,5 +35,13 @@ public interface GraphQLDataFetcher<A, D> {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    default GraphQLDataSchema getRequestScheme() {
+        return null;
+    }
+
+    default GraphQLDataSchema getResponseScheme() {
+        return null;
     }
 }

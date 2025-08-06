@@ -1,7 +1,8 @@
 package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLAbstractDataFetcher;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -13,7 +14,10 @@ import java.util.List;
 public class GraphQLMeDataFetcher
     extends GraphQLAbstractDataFetcher<GraphQLMeDataFetcher.MeRequest, GraphQLMeDataFetcher.MeResponse> {
 
-    public MeResponse getData(MeRequest argument) {
+    public MeResponse getData(
+        RequestArguments arguments,
+        MeRequest parameter
+    ) {
         return MeResponse.builder()
             .id(1)
             .name("Dzung")

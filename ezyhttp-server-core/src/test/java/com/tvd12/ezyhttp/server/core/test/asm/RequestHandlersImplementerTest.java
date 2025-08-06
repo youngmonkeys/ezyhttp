@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.core.test.asm;
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.Api;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticatable;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.asm.RequestHandlersImplementer;
 import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerException;
@@ -147,6 +148,62 @@ public class RequestHandlersImplementerTest {
         );
     }
 
+    @Test
+    public void implementWithAuthenticatableMethod() {
+        // given
+        RequestHandlersImplementer sut = new RequestHandlersImplementer();
+        Controller5 controller = new Controller5();
+        RequestHandlerManager manager = new RequestHandlerManager();
+        manager.setAllowOverrideURI(true);
+
+        RequestURIDecorator requestURIDecorator = mock(RequestURIDecorator.class);
+        when(requestURIDecorator.decorate(any(), any())).thenReturn("hello-world");
+        sut.setRequestURIDecorator(requestURIDecorator);
+
+        // when
+        Map<RequestURI, List<RequestHandler>> handlers = sut.implement(
+            Collections.singletonList(controller)
+        );
+
+        // then
+        Asserts.assertEquals(handlers.size(), 1);
+        Asserts.assertEquals(
+            handlers.keySet(),
+            Sets.newHashSet(
+                new RequestURI(HttpMethod.GET, "hello-world", false, false, true, null)
+            ),
+            false
+        );
+    }
+
+    @Test
+    public void implementWithAuthenticatableClass() {
+        // given
+        RequestHandlersImplementer sut = new RequestHandlersImplementer();
+        Controller6 controller = new Controller6();
+        RequestHandlerManager manager = new RequestHandlerManager();
+        manager.setAllowOverrideURI(true);
+
+        RequestURIDecorator requestURIDecorator = mock(RequestURIDecorator.class);
+        when(requestURIDecorator.decorate(any(), any())).thenReturn("hello-world");
+        sut.setRequestURIDecorator(requestURIDecorator);
+
+        // when
+        Map<RequestURI, List<RequestHandler>> handlers = sut.implement(
+            Collections.singletonList(controller)
+        );
+
+        // then
+        Asserts.assertEquals(handlers.size(), 1);
+        Asserts.assertEquals(
+            handlers.keySet(),
+            Sets.newHashSet(
+                new RequestURI(HttpMethod.GET, "hello-world", false, false, true, null)
+            ),
+            false
+        );
+    }
+
     public static class Controller {
 
         @DoGet("/get")
@@ -175,6 +232,22 @@ public class RequestHandlersImplementerTest {
     public static class Controller4 {
 
         @Api
+        @DoGet(uri = "/get", otherUris = {"/hello", "/world"})
+        public void doGet() {
+        }
+    }
+
+    public static class Controller5 {
+
+        @Authenticatable
+        @DoGet(uri = "/get", otherUris = {"/hello", "/world"})
+        public void doGet() {
+        }
+    }
+
+    @Authenticatable
+    public static class Controller6 {
+
         @DoGet(uri = "/get", otherUris = {"/hello", "/world"})
         public void doGet() {
         }

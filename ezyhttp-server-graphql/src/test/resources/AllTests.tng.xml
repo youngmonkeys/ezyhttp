@@ -3,11 +3,15 @@
 <suite name="AllTests">
     <test name="All">
         <packages>
-            <package name="com.tvd12.ezyhttp.testing"></package>
-            <package name="com.tvd12.ezyhttp.testing.codec"></package>
-            <package name="com.tvd12.ezyhttp.testing.net"></package>
-            <package name="com.tvd12.ezyhttp.testing.json"></package>
-            <package name="com.tvd12.ezyhttp.server.graphql.test"></package>
+            <package name="com.tvd12.ezyhttp.server.graphql.test" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.config" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.controller" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.data" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.datafetcher" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.fetcher" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.interceptor" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.scheme" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.util" />
         </packages>
     </test>
 </suite>

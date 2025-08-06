@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.GraphQLNoNameDataFetcher;
 import com.tvd12.test.assertion.Asserts;
@@ -13,7 +13,7 @@ public class GraphQLAbstractDataFetcherTest {
         GraphQLNoNameDataFetcher noNameDataFetcher = new GraphQLNoNameDataFetcher();
 
         // when
-        Class c = noNameDataFetcher.getArgumentType();
+        Class c = noNameDataFetcher.getParameterType();
 
         // then
         Asserts.assertNull(c);

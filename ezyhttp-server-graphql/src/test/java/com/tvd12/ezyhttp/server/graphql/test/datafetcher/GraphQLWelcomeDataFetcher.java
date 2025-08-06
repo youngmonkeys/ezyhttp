@@ -1,7 +1,8 @@
 package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.GraphQLWelcomeDataFetcher.WelcomeRequest;
 import lombok.Data;
 
@@ -9,8 +10,11 @@ import lombok.Data;
 @EzySingleton
 public class GraphQLWelcomeDataFetcher implements GraphQLDataFetcher<WelcomeRequest, String> {
 
-    public String getData(WelcomeRequest argument) {
-        return "Welcome " + argument.getName();
+    public String getData(
+        RequestArguments arguments,
+        WelcomeRequest parameter
+    ) {
+        return "Welcome " + parameter.getName();
     }
 
     @Override
