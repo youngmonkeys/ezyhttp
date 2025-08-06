@@ -36,6 +36,9 @@ public class GraphQLConfiguration implements
     @SuppressWarnings("rawtypes")
     @Override
     public void config() {
+        if (!graphQLEnable) {
+            return;
+        }
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcherManager.Builder dataFetcherManagerBuilder =
             GraphQLDataFetcherManager.builder();

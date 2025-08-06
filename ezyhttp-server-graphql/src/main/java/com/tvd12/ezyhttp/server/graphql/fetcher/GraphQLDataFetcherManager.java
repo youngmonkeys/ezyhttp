@@ -31,25 +31,22 @@ public class GraphQLDataFetcherManager {
     public Map<String, List<String>> getQueryNameByGroupName() {
         return queryNamesByGroupName.entrySet()
         .stream()
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> new ArrayList<>(entry.getValue())
-        ));
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new ArrayList<>(entry.getValue())
+            )
+        );
     }
 
     public Map<String, List<String>> getSortedQueryNameByGroupName() {
-        return queryNamesByGroupName.entrySet()
-            .stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                e -> {
-                    List<String> list = new ArrayList<>(e.getValue());
-                    Collections.sort(list);
-                    return list;
-                },
-                (a, b) -> a,
-                TreeMap::new
-            ));
+        Map<String, List<String>> result = new TreeMap<>();
+        for (Map.Entry<String, Set<String>> entry : queryNamesByGroupName.entrySet()) {
+            List<String> list = new ArrayList<>(entry.getValue());
+            Collections.sort(list);
+            result.put(entry.getKey(), list);
+        }
+        return result;
     }
 
     public static Builder builder() {

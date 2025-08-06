@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.scheme;
 
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
 import com.tvd12.test.assertion.Asserts;

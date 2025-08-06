@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.GraphQLNoNameDataFetcher;
 import com.tvd12.test.assertion.Asserts;

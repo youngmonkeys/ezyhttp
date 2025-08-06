@@ -1,7 +1,8 @@
-package com.tvd12.ezyhttp.server.graphql.test;
+package com.tvd12.ezyhttp.server.graphql.test.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
+import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
@@ -69,6 +70,7 @@ public class GraphQLControllerTest {
         Object heroResult = controller.doGet(arguments, heroQuery, null);
 
         // then
+        Asserts.assertFalse(controller.isAuthenticated());
         Asserts.assertEquals(meResult.toString(), "{me={bank={id=1}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}");
         Asserts.assertEquals(heroResult.toString(), "{hero=Hero 007}");
 
@@ -100,10 +102,14 @@ public class GraphQLControllerTest {
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder().build();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        GraphQLController controller = GraphQLController.builder()
-            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
-
         RequestArguments arguments = mock(RequestArguments.class);
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .build();
+
         String heroQuery = "{hero}";
 
         // when
@@ -111,6 +117,62 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertEquals(HttpNotFoundException.class.toString(), e.getClass().toString());
+    }
+
+    @Test
+    public void testInterceptorFalse() {
+        // given
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
+        GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+            .addDataFetcher(heroDataFetcher)
+            .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(false);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
+        String heroQuery = "{hero}";
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
+
+        // then
+        Asserts.assertEqualsType(e, HttpNotAcceptableException.class);
+
+        verify(interceptorManager, times(1)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(1)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
     }
 
     @Test

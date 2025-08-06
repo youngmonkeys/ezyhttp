@@ -13,23 +13,18 @@ public class GraphQLDataSchema {
     protected final String type;
     protected final String format;
     protected final String description;
-    protected final String example;
-    protected final List<GraphQLDataSchema> items;
+    protected final GraphQLDataSchema items;
     protected final List<GraphQLDataSchema> properties;
+    protected final Object examples;
 
     protected GraphQLDataSchema(Builder builder) {
         this.name = builder.name;
         this.type = builder.type;
         this.format = builder.format;
         this.description = builder.description;
-        this.example = builder.example;
         this.items = builder.items;
         this.properties = builder.properties;
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
+        this.examples = builder.examples;
     }
 
     public static Builder builder() {
@@ -41,12 +36,17 @@ public class GraphQLDataSchema {
         protected String type;
         protected String format;
         protected String description;
-        protected String example;
-        protected List<GraphQLDataSchema> items;
+        protected GraphQLDataSchema items;
         protected List<GraphQLDataSchema> properties;
+        protected Object examples;
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
             return this;
         }
 
@@ -60,18 +60,18 @@ public class GraphQLDataSchema {
             return this;
         }
 
-        public Builder example(String example) {
-            this.example = example;
-            return this;
-        }
-
-        public Builder items(List<GraphQLDataSchema> items) {
+        public Builder items(GraphQLDataSchema items) {
             this.items = items;
             return this;
         }
 
         public Builder properties(List<GraphQLDataSchema> properties) {
             this.properties = properties;
+            return this;
+        }
+
+        public Builder examples(Object examples) {
+            this.examples = examples;
             return this;
         }
 

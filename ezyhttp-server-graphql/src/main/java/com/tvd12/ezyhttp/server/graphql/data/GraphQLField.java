@@ -1,12 +1,11 @@
 package com.tvd12.ezyhttp.server.graphql.data;
 
+import com.tvd12.ezyfox.builder.EzyBuilder;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.tvd12.ezyfox.builder.EzyBuilder;
-
-import lombok.Getter;
 
 @Getter
 public class GraphQLField {
@@ -28,7 +27,13 @@ public class GraphQLField {
 
     @Override
     public boolean equals(Object obj) {
-        return name.equals(((GraphQLField) obj).name);
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof GraphQLField) {
+            return name.equals(((GraphQLField) obj).name);
+        }
+        return false;
     }
 
     @Override
