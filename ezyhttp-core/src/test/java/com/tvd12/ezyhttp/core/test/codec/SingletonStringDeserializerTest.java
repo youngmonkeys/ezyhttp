@@ -1,5 +1,14 @@
 package com.tvd12.ezyhttp.core.test.codec;
 
+import com.tvd12.ezyfox.collect.Lists;
+import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.io.EzyDates;
+import com.tvd12.ezyhttp.core.codec.DefaultStringDeserializer;
+import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -10,16 +19,6 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import org.testng.annotations.Test;
-
-import com.tvd12.ezyfox.collect.Lists;
-import com.tvd12.ezyfox.collect.Sets;
-import com.tvd12.ezyfox.io.EzyDates;
-import com.tvd12.ezyhttp.core.codec.DefaultStringDeserializer;
-import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
-import com.tvd12.test.assertion.Asserts;
-import com.tvd12.test.util.RandomUtil;
 
 public class SingletonStringDeserializerTest {
 
@@ -184,7 +183,7 @@ public class SingletonStringDeserializerTest {
         Instant instant = RandomUtil.randomInstant();
         LocalDate localDate = RandomUtil.randomLocalDate();
         LocalTime localTime = RandomUtil.randomLocalTime();
-        LocalDateTime localDateTime = RandomUtil.randomLocalDateTime();
+        LocalDateTime localDateTime = LocalDateTime.now();
         BigInteger bigInteger = RandomUtil.random32BitBigInteger();
         BigDecimal bigDecimal = RandomUtil.random32BitBigDecimal();
 

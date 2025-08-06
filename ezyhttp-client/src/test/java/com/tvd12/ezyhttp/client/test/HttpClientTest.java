@@ -558,7 +558,7 @@ public class HttpClientTest {
     @Test
     public void downloadToFileNotFoundTest() {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
+        String fileUrl = "https://youngmonkeys.org/api/v1/media/not-found";
 
         HttpClient sut = HttpClient.builder()
             .build();
@@ -575,7 +575,7 @@ public class HttpClientTest {
     @Test
     public void downloadToOutputStreamNotFoundTest() {
         // given
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd/not-found-here";
+        String fileUrl = "https://youngmonkeys.org/api/v1/media/not-found";
 
         HttpClient sut = HttpClient.builder()
             .build();
@@ -617,7 +617,7 @@ public class HttpClientTest {
         HttpURLConnection connection = mock(HttpURLConnection.class);
         when(connection.getResponseCode()).thenReturn(firstResponseCode);
 
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
         when(connection.getHeaderField("Location")).thenReturn(fileUrl);
         when(connection.getHeaderField("Set-Cookie")).thenReturn(cookie);
 
@@ -653,7 +653,7 @@ public class HttpClientTest {
         HttpURLConnection connection = mock(HttpURLConnection.class);
         when(connection.getResponseCode()).thenReturn(400);
 
-        String fileUrl = "https://resources.tvd12.com/ezy-settings-1.0.0.xsd";
+        String fileUrl = "https://youngmonkeys.org/ezy-settings-1.0.0.xsd";
 
         File outFolder = new File("test-output/no-commit");
         String outFileName = RandomUtil.randomShortAlphabetString();
