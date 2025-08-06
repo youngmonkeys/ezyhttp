@@ -93,7 +93,7 @@ public class GraphQLController
         );
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked", "MethodLength"})
     private Object fetch(
         RequestArguments arguments,
         String query,

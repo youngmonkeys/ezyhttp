@@ -4,17 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
-import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
-import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptor;
+import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptorManager;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.mock;
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("rawtypes")
 public class GraphQLControllerTest {
@@ -27,13 +31,34 @@ public class GraphQLControllerTest {
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
             .addDataFetcher(meDataFetcher)
-            .addDataFetcher(heroDataFetcher).build();
+            .addDataFetcher(heroDataFetcher)
+            .build();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        GraphQLController controller = GraphQLController.builder()
-            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
-
         RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
         GraphQLRequest meRequest = new GraphQLRequest();
         meRequest.setQuery("query{    me   {     name bank{id} friends{name} address}}");
 
@@ -46,6 +71,26 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertEquals(meResult.toString(), "{me={bank={id=1}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}");
         Asserts.assertEquals(heroResult.toString(), "{hero=Hero 007}");
+
+        verify(interceptorManager, times(2)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(2)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verify(interceptor, times(2)).postHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
     }
 
     @Test
@@ -73,14 +118,36 @@ public class GraphQLControllerTest {
         // given
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcher welcomeDataFetcher = new GraphQLWelcomeDataFetcher();
+
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-            .addDataFetcher(welcomeDataFetcher).build();
+            .addDataFetcher(welcomeDataFetcher)
+            .build();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        GraphQLController controller = GraphQLController.builder()
-            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
-
         RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
         String welcomeQuery = "{welcome}";
         String variables = "{\"name\": \"Foo\"}";
         GraphQLRequest welcomeRequest = new GraphQLRequest();
@@ -94,6 +161,26 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertEquals(welcomeResult1.toString(), "{welcome=Welcome Foo}");
         Asserts.assertEquals(welcomeResult2.toString(), "{welcome=Welcome Foo}");
+
+        verify(interceptorManager, times(2)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(2)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verify(interceptor, times(2)).postHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
     }
 
     @Test
@@ -102,13 +189,34 @@ public class GraphQLControllerTest {
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
         GraphQLDataFetcher fooDataFetcher = new GraphQLFooDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
-            .addDataFetcher(fooDataFetcher).build();
+            .addDataFetcher(fooDataFetcher)
+            .build();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        GraphQLController controller = GraphQLController.builder()
-            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
-
         RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
         String fooQuery = "{foo}";
 
         // when
@@ -118,6 +226,26 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertEquals(fooResult1.toString(), "{foo=Foo {value=Bar}}");
         Asserts.assertEquals(fooResult2.toString(), "{foo=Foo null}");
+
+        verify(interceptorManager, times(2)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(2)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verify(interceptor, times(2)).postHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
     }
 
     @Test
@@ -130,10 +258,30 @@ public class GraphQLControllerTest {
             .build();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        GraphQLController controller = GraphQLController.builder()
-            .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
-
         RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
         GraphQLRequest youRequest = new GraphQLRequest();
         youRequest.setQuery("query{you{friends{name}}}}");
 
@@ -142,6 +290,19 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertEquals(GraphQLInvalidSchemeException.class.toString(), e.getClass().toString());
+
+        verify(interceptorManager, times(1)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(1)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
     }
 
     @Test

@@ -50,8 +50,9 @@ public class GraphQLConfiguration implements
         GraphQLController controller = GraphQLController.builder()
             .authenticated(graphQLAuthenticated)
             .objectMapper(objectMapper)
-            .dataFetcherManager(dataFetcherManager)
             .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .interceptorManager(interceptorManager)
             .build();
         singletonFactory.addSingleton(controller);
     }
