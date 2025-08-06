@@ -3,7 +3,7 @@ package com.tvd12.ezyhttp.server.graphql.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_QL_GROUP_NAME;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryGroupExtractors.extractQueryGroup;
 
 public class GraphQLQueryGroupExtractorsTest {

@@ -1,7 +1,7 @@
 package com.tvd12.ezyhttp.server.graphql.util;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
-import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_QL_GROUP_NAME;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
 
 public final class GraphQLQueryGroupExtractors {
 

@@ -4,7 +4,6 @@ public final class Constants {
 
     public static final String EMPTY_STRING = "";
     public static final String DEFAULT_URI = "/";
-    public static final String DEFAULT_QL_GROUP_NAME = "default";
     public static final String EXTENSION_CLASS = ".class";
     public static final String[] DEFAULT_PROPERTIES_FILES = new String[]{
         "application.properties",

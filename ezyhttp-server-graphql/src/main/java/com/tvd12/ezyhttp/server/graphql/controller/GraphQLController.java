@@ -24,6 +24,8 @@ import lombok.Getter;
 
 import java.util.*;
 
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
+
 @Api
 @Authenticatable
 public class GraphQLController
@@ -202,26 +204,31 @@ public class GraphQLController
                 : (Map) parentMap.get(parent.getName());
 
             for (GraphQLField field : parent.getFields()) {
-                Object value = dataMap.get(field.getName());
+                String fieldName = field.getName();
+                if (fieldName.equals(ALL_FIELDS)) {
+                    parentMap.putAll(dataMap);
+                    continue;
+                }
+                Object value = dataMap.get(fieldName);
                 if (value == null) {
                     continue;
                 }
                 if (field.getFields().isEmpty()) {
-                    parentMap.put(field.getName(), value);
+                    parentMap.put(fieldName, value);
                     continue;
                 }
                 if (value instanceof Map) {
                     Object newItem = new HashMap<>();
-                    parentMap.put(field.getName(), newItem);
+                    parentMap.put(fieldName, newItem);
                     stack.push(field);
                 } else if (value instanceof List) {
                     parentMap.put(
-                        field.getName(),
+                        fieldName,
                         filterDataList((List) value, field, query)
                     );
                 } else {
                     throw new GraphQLInvalidSchemeException(
-                        "invalid schema: " + query + " at: " + field.getName()
+                        "invalid schema: " + query + " at: " + fieldName
                     );
                 }
             }

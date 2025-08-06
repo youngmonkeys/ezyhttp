@@ -96,6 +96,145 @@ public class GraphQLControllerTest {
     }
 
     @Test
+    public void getAllFieldsTest() throws Exception {
+        // given
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
+        GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
+        GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+            .addDataFetcher(meDataFetcher)
+            .addDataFetcher(heroDataFetcher)
+            .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
+        GraphQLRequest meRequest = new GraphQLRequest();
+        meRequest.setQuery("query{me{*}}");
+
+        // when
+        Object meResult = controller.doPost(arguments, meRequest);
+
+        // then
+        Asserts.assertFalse(controller.isAuthenticated());
+        Asserts.assertEquals(meResult.toString(), "{me={bank={id=100}, address=null, nickName=Hello, name=Dzung, id=1, friends=[{id=1, name=Foo}, {id=1, name=Bar}]}}");
+
+        verify(interceptorManager, times(1)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(1)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verify(interceptor, times(1)).postHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
+    }
+
+    @Test
+    public void getAllFriendFields() throws Exception {
+        // given
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
+        GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
+        GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
+            .addDataFetcher(meDataFetcher)
+            .addDataFetcher(heroDataFetcher)
+            .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        GraphQLInterceptor interceptor = mock(GraphQLInterceptor.class);
+        when(
+            interceptor.preHandle(
+                any(RequestArguments.class),
+                any(String.class),
+                any(String.class),
+                any(Object.class),
+                any(GraphQLDataFetcher.class)
+            )
+        ).thenReturn(true);
+
+        GraphQLInterceptorManager interceptorManager = mock(GraphQLInterceptorManager.class);
+        when(interceptorManager.getRequestInterceptors()).thenReturn(
+            Collections.singletonList(interceptor)
+        );
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .interceptorManager(interceptorManager)
+            .build();
+
+        GraphQLRequest meRequest = new GraphQLRequest();
+        meRequest.setQuery("query{me{name bank{id} friends{*}}}");
+
+        String heroQuery = "{hero}";
+
+        // when
+        Object meResult = controller.doPost(arguments, meRequest);
+        Object heroResult = controller.doGet(arguments, heroQuery, null);
+
+        // then
+        Asserts.assertFalse(controller.isAuthenticated());
+        Asserts.assertEquals(meResult.toString(), "{me={bank={id=1}, name=Dzung, friends=[{name=Foo, id=1}, {name=Bar, id=1}]}}");
+        Asserts.assertEquals(heroResult.toString(), "{hero=Hero 007}");
+
+        verify(interceptorManager, times(2)).getRequestInterceptors();
+        verifyNoMoreInteractions(interceptorManager);
+
+        verify(interceptor, times(2)).preHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verify(interceptor, times(2)).postHandle(
+            any(RequestArguments.class),
+            any(String.class),
+            any(String.class),
+            any(Object.class),
+            any(GraphQLDataFetcher.class)
+        );
+        verifyNoMoreInteractions(interceptor);
+        verifyNoMoreInteractions(arguments);
+    }
+
+
+    @Test
     public void testFetcherNotFoundException() {
         // given
         GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
