@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.fetcher;
 
 import java.lang.reflect.Type;
 
@@ -10,7 +10,7 @@ public abstract class GraphQLAbstractDataFetcher<A, D>
     implements GraphQLDataFetcher<A, D> {
 
     @Override
-    public Class<?> getArgumentType() {
+    public Class<?> getParameterType() {
         try {
             Type genericSuperclass = getClass().getGenericSuperclass();
             Class<?>[] args = EzyGenerics.getTwoGenericClassArguments(genericSuperclass);

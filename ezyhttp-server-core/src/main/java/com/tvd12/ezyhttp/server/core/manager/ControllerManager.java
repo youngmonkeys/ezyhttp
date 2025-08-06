@@ -8,9 +8,9 @@ import com.tvd12.ezyfox.util.EzyDestroyable;
 
 import lombok.Getter;
 
+@Getter
 public class ControllerManager implements EzyDestroyable {
 
-    @Getter
     protected final List<Object> controllers;
 
     public ControllerManager() {

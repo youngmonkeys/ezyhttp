@@ -9,7 +9,7 @@ import com.tvd12.ezyhttp.server.core.annotation.Api;
 import com.tvd12.ezyhttp.server.core.annotation.Authenticatable;
 import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
-import com.tvd12.ezyhttp.server.core.handler.ManagementController;
+import com.tvd12.ezyhttp.server.core.handler.*;
 import com.tvd12.ezyhttp.server.core.util.ControllerAnnotations;
 import lombok.Getter;
 
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.reflect.EzyClasses.isAnnotationPresentIncludeSuper;
 import static com.tvd12.ezyhttp.server.core.annotation.Annotations.REQUEST_HANDLER_ANNOTATIONS;
 
@@ -57,29 +58,53 @@ public class ControllerProxy {
     }
 
     public boolean isManagement() {
-        return instance instanceof ManagementController
+        boolean answer = instance instanceof ManagementController
             || isAnnotationPresent(EzyManagement.class);
+        if (!answer && instance instanceof ManageableController) {
+            answer = ((ManageableController) instance).isManagement();
+        }
+        return answer;
     }
 
     public boolean isApi() {
-        return isAnnotationPresent(Api.class);
+        boolean answer = isAnnotationPresent(Api.class);
+        if (!answer && instance instanceof ApiController) {
+            answer = ((ApiController) instance).isApi();
+        }
+        return answer;
     }
 
     public boolean isAuthenticated() {
-        return isAnnotationPresent(Authenticated.class);
+        boolean answer = isAnnotationPresent(Authenticated.class);
+        if (!answer && instance instanceof AuthenticatedController) {
+            answer = ((AuthenticatedController) instance).isAuthenticated();
+        }
+        return answer;
     }
 
-     public boolean isAuthenticatable() {
-        return isAnnotationPresent(Authenticatable.class);
+    public boolean isAuthenticatable() {
+        boolean answer = isAnnotationPresent(Authenticatable.class);
+        if (!answer && instance instanceof AuthenticatableController) {
+            answer = ((AuthenticatableController) instance).isAuthenticatable();
+        }
+        return answer;
     }
 
     public boolean isPayment() {
-        return isAnnotationPresent(EzyPayment.class);
+        boolean answer = isAnnotationPresent(EzyPayment.class);
+        if (!answer && instance instanceof ManageableController) {
+            answer = ((PaymentController) instance).isPayment();
+        }
+        return answer;
     }
 
     public String getFeature() {
         EzyFeature annotation = clazz.getAnnotation(EzyFeature.class);
-        return annotation != null ? annotation.value() : null;
+        String answer = annotation != null ? annotation.value() : null;
+        if (isBlank(answer) && instance instanceof ManageableController) {
+            answer = ((FeatureController) instance).getFeature();
+        }
+        return answer;
     }
 
     public List<ExceptionHandlerMethod> fetchExceptionHandlerMethods() {

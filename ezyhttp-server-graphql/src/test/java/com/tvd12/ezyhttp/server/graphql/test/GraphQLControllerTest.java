@@ -3,15 +3,18 @@ package com.tvd12.ezyhttp.server.graphql.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcher;
-import com.tvd12.ezyhttp.server.graphql.GraphQLDataFetcherManager;
-import com.tvd12.ezyhttp.server.graphql.GraphQLSchemaParser;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
+
+import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("rawtypes")
 public class GraphQLControllerTest {
@@ -30,14 +33,15 @@ public class GraphQLControllerTest {
         GraphQLController controller = GraphQLController.builder()
             .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
+        RequestArguments arguments = mock(RequestArguments.class);
         GraphQLRequest meRequest = new GraphQLRequest();
         meRequest.setQuery("query{    me   {     name bank{id} friends{name} address}}");
 
         String heroQuery = "{hero}";
 
         // when
-        Object meResult = controller.doPost(meRequest);
-        Object heroResult = controller.doGet(heroQuery, null);
+        Object meResult = controller.doPost(arguments, meRequest);
+        Object heroResult = controller.doGet(arguments, heroQuery, null);
 
         // then
         Asserts.assertEquals(meResult.toString(), "{me={bank={id=1}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}");
@@ -54,10 +58,11 @@ public class GraphQLControllerTest {
         GraphQLController controller = GraphQLController.builder()
             .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
+        RequestArguments arguments = mock(RequestArguments.class);
         String heroQuery = "{hero}";
 
         // when
-        Throwable e = Asserts.assertThrows(() -> controller.doGet(heroQuery, null));
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
 
         // then
         Asserts.assertEquals(HttpNotFoundException.class.toString(), e.getClass().toString());
@@ -75,6 +80,7 @@ public class GraphQLControllerTest {
         GraphQLController controller = GraphQLController.builder()
             .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
+        RequestArguments arguments = mock(RequestArguments.class);
         String welcomeQuery = "{welcome}";
         String variables = "{\"name\": \"Foo\"}";
         GraphQLRequest welcomeRequest = new GraphQLRequest();
@@ -82,8 +88,8 @@ public class GraphQLControllerTest {
         welcomeRequest.setVariables(variables);
 
         // when
-        Object welcomeResult1 = controller.doGet(welcomeQuery, variables);
-        Object welcomeResult2 = controller.doPost(welcomeRequest);
+        Object welcomeResult1 = controller.doGet(arguments, welcomeQuery, variables);
+        Object welcomeResult2 = controller.doPost(arguments, welcomeRequest);
 
         // then
         Asserts.assertEquals(welcomeResult1.toString(), "{welcome=Welcome Foo}");
@@ -102,11 +108,12 @@ public class GraphQLControllerTest {
         GraphQLController controller = GraphQLController.builder()
             .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
+        RequestArguments arguments = mock(RequestArguments.class);
         String fooQuery = "{foo}";
 
         // when
-        Object fooResult1 = controller.doGet(fooQuery, "{\"value\": \"Bar\"}");
-        Object fooResult2 = controller.doGet(fooQuery, null);
+        Object fooResult1 = controller.doGet(arguments, fooQuery, "{\"value\": \"Bar\"}");
+        Object fooResult2 = controller.doGet(arguments, fooQuery, null);
 
         // then
         Asserts.assertEquals(fooResult1.toString(), "{foo=Foo {value=Bar}}");
@@ -126,11 +133,12 @@ public class GraphQLControllerTest {
         GraphQLController controller = GraphQLController.builder()
             .schemaParser(schemaParser).dataFetcherManager(dataFetcherManager).objectMapper(objectMapper).build();
 
+        RequestArguments arguments = mock(RequestArguments.class);
         GraphQLRequest youRequest = new GraphQLRequest();
         youRequest.setQuery("query{you{friends{name}}}}");
 
         // when
-        Throwable e = Asserts.assertThrows(() -> controller.doPost(youRequest));
+        Throwable e = Asserts.assertThrows(() -> controller.doPost(arguments, youRequest));
 
         // then
         Asserts.assertEquals(GraphQLInvalidSchemeException.class.toString(), e.getClass().toString());

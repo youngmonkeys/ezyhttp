@@ -1,6 +1,6 @@
 package com.tvd12.ezyhttp.server.graphql.test;
 
-import com.tvd12.ezyhttp.server.graphql.GraphQLField;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;

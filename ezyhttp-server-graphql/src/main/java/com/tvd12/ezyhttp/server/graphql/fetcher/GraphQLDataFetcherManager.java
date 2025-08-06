@@ -1,22 +1,27 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.fetcher;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
-import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_QL_GROUP_NAME;
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryGroupExtractors.extractQueryGroup;
 
 @SuppressWarnings("rawtypes")
 public class GraphQLDataFetcherManager {
 
     private final Map<String, GraphQLDataFetcher> dataFetchers;
+    private final Map<String, String> groupNameByQueryName;
     private final Map<String, Set<String>> queryNamesByGroupName;
 
     protected GraphQLDataFetcherManager(Builder builder) {
         this.dataFetchers = builder.dataFetchers;
+        this.groupNameByQueryName = builder.groupNameByQueryName;
         this.queryNamesByGroupName = builder.queryNamesByGroupName;
+    }
+
+    public String getGroupNameByQueryName(String queryName) {
+        return groupNameByQueryName.get(queryName);
     }
 
     public GraphQLDataFetcher getDataFetcher(String queryName) {
@@ -53,8 +58,12 @@ public class GraphQLDataFetcherManager {
 
     public static class Builder implements EzyBuilder<GraphQLDataFetcherManager> {
 
-        private final Map<String, GraphQLDataFetcher> dataFetchers = new HashMap<>();
-        private final Map<String, Set<String>> queryNamesByGroupName = new HashMap<>();
+        private final Map<String, GraphQLDataFetcher> dataFetchers =
+            new HashMap<>();
+        private final Map<String, String> groupNameByQueryName =
+            new HashMap<>();
+        private final Map<String, Set<String>> queryNamesByGroupName =
+            new HashMap<>();
 
         public Builder addDataFetcher(Object fetcher) {
             if (fetcher instanceof GraphQLDataFetcher) {
@@ -64,17 +73,15 @@ public class GraphQLDataFetcherManager {
             return this;
         }
 
-        public Builder addDataFetcher(String queryName, GraphQLDataFetcher fetcher) {
-            String group = DEFAULT_QL_GROUP_NAME;
-            if (isNotBlank(queryName)) {
-                int dotIndex = queryName.indexOf('.');
-                if (dotIndex > 0) {
-                    group = queryName.substring(0, dotIndex);
-                }
-            }
+        public Builder addDataFetcher(
+            String queryName,
+            GraphQLDataFetcher fetcher
+        ) {
             this.dataFetchers.put(queryName, fetcher);
+            String groupName = extractQueryGroup(queryName);
+            this.groupNameByQueryName.put(queryName, groupName);
             this.queryNamesByGroupName.computeIfAbsent(
-                group,
+                groupName,
                 k -> new HashSet<>()
             ).add(queryName);
             return this;

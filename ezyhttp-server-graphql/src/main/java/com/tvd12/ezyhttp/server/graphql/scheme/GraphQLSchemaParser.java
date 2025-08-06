@@ -1,4 +1,7 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.scheme;
+
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 
 import java.util.Stack;
 

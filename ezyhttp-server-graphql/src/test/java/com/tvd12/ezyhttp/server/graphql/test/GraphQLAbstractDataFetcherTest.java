@@ -13,7 +13,7 @@ public class GraphQLAbstractDataFetcherTest {
         GraphQLNoNameDataFetcher noNameDataFetcher = new GraphQLNoNameDataFetcher();
 
         // when
-        Class c = noNameDataFetcher.getArgumentType();
+        Class c = noNameDataFetcher.getParameterType();
 
         // then
         Asserts.assertNull(c);

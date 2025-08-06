@@ -1,7 +1,7 @@
 package com.tvd12.ezyhttp.server.boot.test.graphql;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyhttp.server.graphql.GraphQLAbstractDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLAbstractDataFetcher;
 
 
 @EzySingleton

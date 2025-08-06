@@ -1,15 +1,16 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.scheme;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import lombok.Getter;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+@Getter
 public class GraphQLSchema {
 
-    @Getter
     private final List<GraphQLQueryDefinition> queryDefinitions;
 
     public GraphQLSchema(Builder builder) {

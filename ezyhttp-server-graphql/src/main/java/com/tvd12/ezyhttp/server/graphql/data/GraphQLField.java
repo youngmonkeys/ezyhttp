@@ -1,4 +1,4 @@
-package com.tvd12.ezyhttp.server.graphql;
+package com.tvd12.ezyhttp.server.graphql.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,9 @@ public class GraphQLField {
 
     protected GraphQLField(Builder builder) {
         this.name = builder.name;
-        this.fields = builder.fields != null ? builder.fields : Collections.emptyList();
+        this.fields = builder.fields != null
+            ? builder.fields
+            : Collections.emptyList();
     }
 
     @Override
