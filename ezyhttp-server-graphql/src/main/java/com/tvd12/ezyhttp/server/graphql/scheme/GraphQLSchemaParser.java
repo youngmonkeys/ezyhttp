@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.PREFIX_QUERY;
 import static java.util.Collections.singletonMap;
 
 @AllArgsConstructor
@@ -23,25 +22,16 @@ public final class GraphQLSchemaParser {
         String queryToParse,
         Map<String, Object> variables
     ) {
-        String query = queryToParse;
-        if (query == null) {
-            query = EMPTY_STRING;
-        }
-
-        int i = 0;
-        if (query.startsWith(PREFIX_QUERY)) {
-            i = PREFIX_QUERY.length();
-        }
+        String query = standardize(queryToParse);
+        System.out.println(query);
 
         Stack<GraphQLField.Builder> stack = new Stack<>();
         GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 
         int queryLength = query.length();
-        i = ignoreSpaceAndPlus(query, i, queryLength);
-
         int nameLength = 0;
         char[] nameBuffer = new char[128];
-        for (; i < queryLength; ++i) {
+        for (int i = 0; i < queryLength; ++i) {
             char ch = query.charAt(i);
             if (ch == '{') {
                 if (stack.isEmpty()) {
@@ -62,69 +52,25 @@ public final class GraphQLSchemaParser {
             }
 
             if (ch == '(') {
-                StringBuilder builder = new StringBuilder("{");
-                Stack<Character> stateStack = new Stack<>();
-                for (++i; i < queryLength; ++i) {
-                    ch = query.charAt(i);
-                    char prevCh = query.charAt(i - 1);
-                    if (ch == '"' && prevCh != '\\') {
-                        if (stateStack.isEmpty()) {
-                            stateStack.push(ch);
-                        } else {
-                            stateStack.pop();
-                        }
-                    }
-                    if (stateStack.isEmpty()) {
-                        if (ch == ')') {
-                            builder.append("}");
-                            break;
-                        } else if (ch == '$') {
-                            StringBuilder varNameBuilder = new StringBuilder();
-                            for (++i; i < queryLength; ++i) {
-                                ch = query.charAt(i);
-                                if (ch == ' ') {
-                                    continue;
-                                }
-                                if (ch != ',' && ch != ')') {
-                                    varNameBuilder.append(ch);
-                                } else {
-                                    --i;
-                                    break;
-                                }
-                            }
-                            String varName = varNameBuilder.toString();
-                            Object value = variables.get(varName);
-                            if (value != null) {
-                                if (value instanceof String) {
-                                    builder
-                                        .append("\"")
-                                        .append(value)
-                                        .append("\"");
-                                } else {
-                                    builder.append(value);
-                                }
-                            }
-                        }
-                    }
-                    builder.append(ch);
-                }
-                if (stack.isEmpty()) {
-                    continue;
-                }
                 GraphQLField.Builder childBuilder = stack.peek();
+                String arguments = "{" +
+                    extractQueryArguments(query, i, queryLength, variables) +
+                    '}';
                 try {
-                    childBuilder.argumentName(
+                    childBuilder.arguments(
                         objectMapper.readValue(
-                            builder.toString(),
+                            arguments,
                             Map.class
                         )
                     );
                 } catch (Exception e) {
                     throw new GraphQLObjectMapperException(
                         singletonMap("arguments", "invalid"),
+                        "invalid arguments json: " + arguments,
                         e
                     );
                 }
+                i += arguments.length() - 1;
                 continue;
             }
 
@@ -132,19 +78,26 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     continue;
                 }
+                System.out.println(stack);
                 if (stack.size() == 1) {
                     GraphQLField.Builder item = stack.pop();
                     if (nameLength > 0) {
-                        item.name(String.copyValueOf(nameBuffer, 0, nameLength));
+                        item.name(
+                            String.copyValueOf(nameBuffer, 0, nameLength)
+                        );
                         nameLength = 0;
                     }
-                    schemaBuilder.addQueryDefinition((GraphQLQueryDefinition) item.build());
+                    schemaBuilder.addQueryDefinition(
+                        (GraphQLQueryDefinition) item.build()
+                    );
                     continue;
                 }
 
                 GraphQLField.Builder childBuilder = stack.pop();
                 if (nameLength > 0) {
-                    childBuilder.name(String.copyValueOf(nameBuffer, 0, nameLength));
+                    childBuilder.name(
+                        String.copyValueOf(nameBuffer, 0, nameLength)
+                    );
                     nameLength = 0;
                 }
 
@@ -153,11 +106,14 @@ public final class GraphQLSchemaParser {
 
                 if (stack.size() == 1) {
                     GraphQLField.Builder item = stack.pop();
-                    schemaBuilder.addQueryDefinition((GraphQLQueryDefinition) item.build());
+                    schemaBuilder.addQueryDefinition(
+                        (GraphQLQueryDefinition) item.build()
+                    );
                 }
             } else if (ch == ' ') { // ',' '\t' '\n' '+' have been removed
                 if (stack.isEmpty()) {
-                    GraphQLQueryDefinition.Builder queryBuilder = GraphQLQueryDefinition.builder();
+                    GraphQLQueryDefinition.Builder queryBuilder =
+                        GraphQLQueryDefinition.builder();
                     stack.add(queryBuilder);
                     nameLength = 0;
                     continue;
@@ -167,16 +123,21 @@ public final class GraphQLSchemaParser {
                     GraphQLField.Builder item = stack.pop();
                     item.name(String.copyValueOf(nameBuffer, 0, nameLength));
                     nameLength = 0;
-                    schemaBuilder.addQueryDefinition((GraphQLQueryDefinition) item.build());
+                    schemaBuilder.addQueryDefinition(
+                        (GraphQLQueryDefinition) item.build()
+                    );
 
-                    GraphQLQueryDefinition.Builder queryBuilder = GraphQLQueryDefinition.builder();
+                    GraphQLQueryDefinition.Builder queryBuilder =
+                        GraphQLQueryDefinition.builder();
                     stack.add(queryBuilder);
                     continue;
                 }
 
                 GraphQLField.Builder childBuilder = stack.pop();
                 if (nameLength > 0) {
-                    childBuilder.name(String.copyValueOf(nameBuffer, 0, nameLength));
+                    childBuilder.name(
+                        String.copyValueOf(nameBuffer, 0, nameLength)
+                    );
                     nameLength = 0;
                 }
 
@@ -192,36 +153,6 @@ public final class GraphQLSchemaParser {
         return schemaBuilder.build();
     }
 
-    private int ignoreSpace(
-        String query,
-        int start,
-        int queryLength
-    ) {
-        int i = start;
-        for (; i < queryLength; ++i) {
-            char ch = query.charAt(i);
-            if (ch != ' ' && ch != '\t' && ch != '\n') {
-                break;
-            }
-        }
-        return i;
-    }
-
-    private int ignoreSpaceAndPlus(
-        String query,
-        int start,
-        int queryLength
-    ) {
-        int i = start;
-        for (; i < queryLength; ++i) {
-            char ch = query.charAt(i);
-            if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '+') {
-                break;
-            }
-        }
-        return i;
-    }
-
     /**
      * Remove redundant '\t', '\n', '+', ',', ' ' in query.
      *
@@ -230,18 +161,35 @@ public final class GraphQLSchemaParser {
      */
     private String standardize(String query) {
         if (query == null) {
-            return "";
+            return EMPTY_STRING;
         }
         String trimedQuery = query.trim();
-        //StringBuilder forwardStandard = forwardStandardize(trimedQuery);
-        //StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
-        return trimedQuery;
+        StringBuilder forwardStandard = forwardStandardize(trimedQuery);
+        StringBuilder backwardStandard = backwardStandardize(
+            forwardStandard.toString()
+        );
+        return removeQueryPrefix(backwardStandard.toString());
     }
 
     private StringBuilder forwardStandardize(String query) {
+        int queryLength = query.length();
         StringBuilder answer = new StringBuilder();
-        for (int i = 0; i < query.length(); ++i) {
+        for (int i = 0; i < queryLength; ++i) {
             char ch = query.charAt(i);
+            if (ch == '(') {
+                StringBuilder arguments = extractQueryArguments(
+                    query,
+                    i,
+                    queryLength,
+                    null
+                );
+                answer
+                    .append('(')
+                    .append(arguments)
+                    .append(')');
+                i += arguments.length() + 1;
+                continue;
+            }
             if (ch == '{' || ch == '}') {
                 answer.append(ch);
             } else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
@@ -257,8 +205,9 @@ public final class GraphQLSchemaParser {
     }
 
     private StringBuilder backwardStandardize(String query) {
+        int queryLength = query.length();
         StringBuilder answer = new StringBuilder();
-        for (int i = query.length() - 1; i >= 0; --i) {
+        for (int i = queryLength- 1; i >= 0; --i) {
             char ch = query.charAt(i);
             if (ch == '{' || ch == '}') {
                 answer.insert(0, ch);
@@ -280,5 +229,56 @@ public final class GraphQLSchemaParser {
             return s.substring(prefix.length());
         }
         return s;
+    }
+
+    private StringBuilder extractQueryArguments(
+        String query,
+        int start,
+        int queryLength,
+        Map<String, Object> variables
+    ) {
+        int quoteCount = 0;
+        int quotesCount = 0;
+        StringBuilder builder = new StringBuilder();
+        for (int i = start + 1; i < queryLength; ++i) {
+            char ch = query.charAt(i);
+            if (ch == '\'') {
+                quoteCount = quoteCount == 0 ? 1 : 0;
+            } else if (ch == '"') {
+                quotesCount = quotesCount == 0 ? 1 : 0;
+            } else if (ch == ')' && quoteCount == 0 && quotesCount == 0) {
+                ++i;
+                break;
+            } else if (variables != null && ch == '$') {
+                StringBuilder varNameBuilder = new StringBuilder();
+                for (++i; i < queryLength; ++i) {
+                    ch = query.charAt(i);
+                    if (ch == ' ') {
+                        continue;
+                    }
+                    if (ch != ',' && ch != ')') {
+                        varNameBuilder.append(ch);
+                    } else {
+                        --i;
+                        break;
+                    }
+                }
+                String varName = varNameBuilder.toString();
+                Object value = variables.get(varName);
+                if (value != null) {
+                    if (value instanceof String) {
+                        builder
+                            .append("\"")
+                            .append(value)
+                            .append("\"");
+                    } else {
+                        builder.append(value);
+                    }
+                }
+                continue;
+            }
+            builder.append(ch);
+        }
+        return builder;
     }
 }

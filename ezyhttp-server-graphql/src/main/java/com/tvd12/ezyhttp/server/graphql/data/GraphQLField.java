@@ -25,7 +25,7 @@ public class GraphQLField {
 
     @Override
     public String toString() {
-        return name + ", " + fields;
+        return toString(name, arguments, fields);
     }
 
     @Override
@@ -44,6 +44,24 @@ public class GraphQLField {
         return name.hashCode();
     }
 
+    private static String toString(
+        String name,
+        Map<String, Object> arguments,
+        List<GraphQLField> fields
+    ) {
+        StringBuilder builder = new StringBuilder();
+        if (name != null) {
+            builder.append(name);
+        }
+        if (arguments != null && !arguments.isEmpty()) {
+            builder.append("(").append(arguments).append(")");
+        }
+        if (fields != null) {
+            builder.append(", ").append(fields);
+        }
+        return builder.toString();
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -58,7 +76,7 @@ public class GraphQLField {
             return this;
         }
 
-        public Builder argumentName(Map<String, Object> arguments) {
+        public Builder arguments(Map<String, Object> arguments) {
             this.arguments = arguments;
             return this;
         }
@@ -74,6 +92,11 @@ public class GraphQLField {
         @Override
         public GraphQLField build() {
             return new GraphQLField(this);
+        }
+
+         @Override
+        public String toString() {
+            return GraphQLField.toString(name, arguments, fields);
         }
     }
 }
