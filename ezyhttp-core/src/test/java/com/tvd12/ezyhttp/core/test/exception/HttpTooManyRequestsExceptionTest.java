@@ -20,4 +20,23 @@ public class HttpTooManyRequestsExceptionTest {
         Asserts.assertEquals(code, sut.getCode());
         Asserts.assertEquals(data, sut.getData());
     }
+
+    @Test
+    public void withCauseTest() {
+        // given
+        int code = StatusCodes.TOO_MANY_REQUESTS;
+        String data = "error";
+        Exception cause = new Exception("test");
+
+        // when
+        HttpTooManyRequestsException sut = new HttpTooManyRequestsException(
+            data,
+            cause
+        );
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+        Asserts.assertEquals(sut.getCause(), cause);
+    }
 }

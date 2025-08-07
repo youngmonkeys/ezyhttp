@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.core.test.exception;
 
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
 
 public class HttpNotAcceptableExceptionTest {
 
@@ -20,5 +19,24 @@ public class HttpNotAcceptableExceptionTest {
         // then
         Asserts.assertEquals(code, sut.getCode());
         Asserts.assertEquals(data, sut.getData());
+    }
+
+    @Test
+    public void withCauseTest() {
+        // given
+        int code = StatusCodes.NOT_ACCEPTABLE;
+        String data = "error";
+        Exception cause = new Exception("test");
+
+        // when
+        HttpNotAcceptableException sut = new HttpNotAcceptableException(
+            data,
+            cause
+        );
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+        Asserts.assertEquals(sut.getCause(), cause);
     }
 }
