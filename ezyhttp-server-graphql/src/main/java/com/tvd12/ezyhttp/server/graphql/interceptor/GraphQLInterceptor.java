@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.graphql.interceptor;
 
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 
 public interface GraphQLInterceptor {
 
@@ -9,7 +10,7 @@ public interface GraphQLInterceptor {
         RequestArguments arguments,
         String queryGroup,
         String queryName,
-        Object requestParameter,
+        GraphQLQueryDefinition queryDefinition,
         GraphQLDataFetcher<?, ?> dataFetcher
     ) {
         return true;
@@ -19,6 +20,7 @@ public interface GraphQLInterceptor {
         RequestArguments arguments,
         String queryGroup,
         String queryName,
+        GraphQLQueryDefinition queryDefinition,
         Object responseData,
         GraphQLDataFetcher<?, ?> dataFetcher
     ) {}

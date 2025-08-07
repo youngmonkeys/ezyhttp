@@ -24,6 +24,7 @@ public class GraphQLInterceptorTest {
             null,
             null,
             null,
+            null,
             null
         );
         int priority = interceptor.getPriority();

@@ -1,22 +1,47 @@
 package com.tvd12.ezyhttp.server.graphql.scheme;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
+import lombok.AllArgsConstructor;
 
+import java.util.Map;
 import java.util.Stack;
 
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.PREFIX_QUERY;
+import static java.util.Collections.singletonMap;
+
+@AllArgsConstructor
 public final class GraphQLSchemaParser {
 
-    @SuppressWarnings("MethodLength")
-    public GraphQLSchema parseQuery(String queryToParse) {
-        String query = standardize(queryToParse);
+    private final ObjectMapper objectMapper;
+
+    @SuppressWarnings({"unchecked", "MethodLength"})
+    public GraphQLSchema parseQuery(
+        String queryToParse,
+        Map<String, Object> variables
+    ) {
+        String query = queryToParse;
+        if (query == null) {
+            query = EMPTY_STRING;
+        }
+
+        int i = 0;
+        if (query.startsWith(PREFIX_QUERY)) {
+            i = PREFIX_QUERY.length();
+        }
 
         Stack<GraphQLField.Builder> stack = new Stack<>();
         GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 
+        int queryLength = query.length();
+        i = ignoreSpaceAndPlus(query, i, queryLength);
+
         int nameLength = 0;
         char[] nameBuffer = new char[128];
-        for (int i = 0; i < query.length(); ++i) {
+        for (; i < queryLength; ++i) {
             char ch = query.charAt(i);
             if (ch == '{') {
                 if (stack.isEmpty()) {
@@ -33,6 +58,73 @@ public final class GraphQLSchemaParser {
                 }
                 GraphQLField.Builder childBuilder = GraphQLField.builder();
                 stack.add(childBuilder);
+                continue;
+            }
+
+            if (ch == '(') {
+                StringBuilder builder = new StringBuilder("{");
+                Stack<Character> stateStack = new Stack<>();
+                for (++i; i < queryLength; ++i) {
+                    ch = query.charAt(i);
+                    char prevCh = query.charAt(i - 1);
+                    if (ch == '"' && prevCh != '\\') {
+                        if (stateStack.isEmpty()) {
+                            stateStack.push(ch);
+                        } else {
+                            stateStack.pop();
+                        }
+                    }
+                    if (stateStack.isEmpty()) {
+                        if (ch == ')') {
+                            builder.append("}");
+                            break;
+                        } else if (ch == '$') {
+                            StringBuilder varNameBuilder = new StringBuilder();
+                            for (++i; i < queryLength; ++i) {
+                                ch = query.charAt(i);
+                                if (ch == ' ') {
+                                    continue;
+                                }
+                                if (ch != ',' && ch != ')') {
+                                    varNameBuilder.append(ch);
+                                } else {
+                                    --i;
+                                    break;
+                                }
+                            }
+                            String varName = varNameBuilder.toString();
+                            Object value = variables.get(varName);
+                            if (value != null) {
+                                if (value instanceof String) {
+                                    builder
+                                        .append("\"")
+                                        .append(value)
+                                        .append("\"");
+                                } else {
+                                    builder.append(value);
+                                }
+                            }
+                        }
+                    }
+                    builder.append(ch);
+                }
+                if (stack.isEmpty()) {
+                    continue;
+                }
+                GraphQLField.Builder childBuilder = stack.peek();
+                try {
+                    childBuilder.argumentName(
+                        objectMapper.readValue(
+                            builder.toString(),
+                            Map.class
+                        )
+                    );
+                } catch (Exception e) {
+                    throw new GraphQLObjectMapperException(
+                        singletonMap("arguments", "invalid"),
+                        e
+                    );
+                }
                 continue;
             }
 
@@ -100,6 +192,36 @@ public final class GraphQLSchemaParser {
         return schemaBuilder.build();
     }
 
+    private int ignoreSpace(
+        String query,
+        int start,
+        int queryLength
+    ) {
+        int i = start;
+        for (; i < queryLength; ++i) {
+            char ch = query.charAt(i);
+            if (ch != ' ' && ch != '\t' && ch != '\n') {
+                break;
+            }
+        }
+        return i;
+    }
+
+    private int ignoreSpaceAndPlus(
+        String query,
+        int start,
+        int queryLength
+    ) {
+        int i = start;
+        for (; i < queryLength; ++i) {
+            char ch = query.charAt(i);
+            if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '+') {
+                break;
+            }
+        }
+        return i;
+    }
+
     /**
      * Remove redundant '\t', '\n', '+', ',', ' ' in query.
      *
@@ -111,9 +233,9 @@ public final class GraphQLSchemaParser {
             return "";
         }
         String trimedQuery = query.trim();
-        StringBuilder forwardStandard = forwardStandardize(trimedQuery);
-        StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
-        return removeQueryPrefix(backwardStandard.toString());
+        //StringBuilder forwardStandard = forwardStandardize(trimedQuery);
+        //StringBuilder backwardStandard = backwardStandardize(forwardStandard.toString());
+        return trimedQuery;
     }
 
     private StringBuilder forwardStandardize(String query) {

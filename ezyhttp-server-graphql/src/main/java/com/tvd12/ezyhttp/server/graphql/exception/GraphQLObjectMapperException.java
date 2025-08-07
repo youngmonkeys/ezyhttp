@@ -1,9 +1,40 @@
 package com.tvd12.ezyhttp.server.graphql.exception;
 
+import lombok.Getter;
+
+@Getter
 public class GraphQLObjectMapperException extends IllegalArgumentException {
     private static final long serialVersionUID = 3508582611517214186L;
 
-    public GraphQLObjectMapperException(String s) {
-        super(s);
+    private final Object errors;
+
+    public GraphQLObjectMapperException(
+        Object errors
+    ) {
+        this(errors, errors.toString());
+    }
+
+    public GraphQLObjectMapperException(
+        Object errors,
+        String message
+    ) {
+        super(message);
+        this.errors = errors;
+    }
+
+    public GraphQLObjectMapperException(
+        Object errors,
+        Throwable cause
+    ) {
+        this(errors, errors.toString(), cause);
+    }
+
+    public GraphQLObjectMapperException(
+        Object errors,
+        String message,
+        Throwable cause
+    ) {
+        super(message, cause);
+        this.errors = errors;
     }
 }

@@ -8,4 +8,8 @@ public class HttpNotFoundException extends HttpRequestException {
     public HttpNotFoundException(Object data) {
         super(StatusCodes.NOT_FOUND, data);
     }
+
+    public HttpNotFoundException(Object data, Throwable cause) {
+        super(StatusCodes.NOT_FOUND, data, cause);
+    }
 }

@@ -6,15 +6,18 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class GraphQLField {
 
     protected final String name;
+    protected final Map<String, Object> arguments;
     protected final List<GraphQLField> fields;
 
     protected GraphQLField(Builder builder) {
         this.name = builder.name;
+        this.arguments = builder.arguments;
         this.fields = builder.fields != null
             ? builder.fields
             : Collections.emptyList();
@@ -47,10 +50,16 @@ public class GraphQLField {
 
     public static class Builder implements EzyBuilder<GraphQLField> {
         private String name;
+        private Map<String, Object> arguments;
         private List<GraphQLField> fields;
 
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder argumentName(Map<String, Object> arguments) {
+            this.arguments = arguments;
             return this;
         }
 

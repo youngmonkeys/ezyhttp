@@ -12,12 +12,14 @@ import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptor;
 import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptorManager;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.ezyhttp.server.graphql.test.datafetcher.*;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -27,7 +29,9 @@ public class GraphQLControllerTest {
     @Test
     public void test() throws Exception {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
@@ -43,7 +47,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -81,13 +85,14 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verify(interceptor, times(2)).postHandle(
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
+            any(GraphQLQueryDefinition.class),
             any(Object.class),
             any(GraphQLDataFetcher.class)
         );
@@ -98,7 +103,9 @@ public class GraphQLControllerTest {
     @Test
     public void getAllFieldsTest() throws Exception {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
@@ -114,7 +121,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -148,13 +155,14 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verify(interceptor, times(1)).postHandle(
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
+            any(GraphQLQueryDefinition.class),
             any(Object.class),
             any(GraphQLDataFetcher.class)
         );
@@ -165,7 +173,9 @@ public class GraphQLControllerTest {
     @Test
     public void getAllFriendFields() throws Exception {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher meDataFetcher = new GraphQLMeDataFetcher();
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
@@ -181,7 +191,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -219,13 +229,14 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verify(interceptor, times(2)).postHandle(
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
+            any(GraphQLQueryDefinition.class),
             any(Object.class),
             any(GraphQLDataFetcher.class)
         );
@@ -237,7 +248,9 @@ public class GraphQLControllerTest {
     @Test
     public void testFetcherNotFoundException() {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder().build();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -261,7 +274,9 @@ public class GraphQLControllerTest {
     @Test
     public void testInterceptorFalse() {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher heroDataFetcher = new GraphQLHeroDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
             .addDataFetcher(heroDataFetcher)
@@ -275,7 +290,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(false);
@@ -307,7 +322,7 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
@@ -317,7 +332,9 @@ public class GraphQLControllerTest {
     @Test
     public void testQueryWithVariables() throws Exception {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher welcomeDataFetcher = new GraphQLWelcomeDataFetcher();
 
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
@@ -332,7 +349,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -350,13 +367,16 @@ public class GraphQLControllerTest {
             .build();
 
         String welcomeQuery = "{welcome}";
-        String variables = "{\"name\": \"Foo\"}";
+        Map<String, Object> variables = Collections.singletonMap(
+            "name", "Foo"
+        );
+        String variablesString = "{\"name\":\"Foo\"}";
         GraphQLRequest welcomeRequest = new GraphQLRequest();
         welcomeRequest.setQuery(welcomeQuery);
         welcomeRequest.setVariables(variables);
 
         // when
-        Object welcomeResult1 = controller.doGet(arguments, welcomeQuery, variables);
+        Object welcomeResult1 = controller.doGet(arguments, welcomeQuery, variablesString);
         Object welcomeResult2 = controller.doPost(arguments, welcomeRequest);
 
         // then
@@ -370,13 +390,14 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verify(interceptor, times(2)).postHandle(
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
+            any(GraphQLQueryDefinition.class),
             any(Object.class),
             any(GraphQLDataFetcher.class)
         );
@@ -387,7 +408,9 @@ public class GraphQLControllerTest {
     @Test
     public void testQueryWithNullVariableType() throws Exception {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher fooDataFetcher = new GraphQLFooDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
             .addDataFetcher(fooDataFetcher)
@@ -401,7 +424,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -435,13 +458,14 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verify(interceptor, times(2)).postHandle(
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
+            any(GraphQLQueryDefinition.class),
             any(Object.class),
             any(GraphQLDataFetcher.class)
         );
@@ -452,7 +476,9 @@ public class GraphQLControllerTest {
     @Test
     public void testInvalidScheme() {
         // given
-        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser();
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
         GraphQLDataFetcher meDataFetcher = new GraphQLYouDataFetcher();
         GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder()
             .addDataFetcher(meDataFetcher)
@@ -466,7 +492,7 @@ public class GraphQLControllerTest {
                 any(RequestArguments.class),
                 any(String.class),
                 any(String.class),
-                any(Object.class),
+                any(GraphQLQueryDefinition.class),
                 any(GraphQLDataFetcher.class)
             )
         ).thenReturn(true);
@@ -499,7 +525,7 @@ public class GraphQLControllerTest {
             any(RequestArguments.class),
             any(String.class),
             any(String.class),
-            any(Object.class),
+            any(GraphQLQueryDefinition.class),
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);

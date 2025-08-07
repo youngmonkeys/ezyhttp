@@ -24,7 +24,9 @@ import lombok.Getter;
 
 import java.util.*;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
+import static java.util.Collections.singletonMap;
 
 @Api
 @Authenticatable
@@ -58,13 +60,28 @@ public class GraphQLController
      * @return the result
      * @throws Exception when have any error
      */
+    @SuppressWarnings("unchecked")
     @DoGet("/graphql")
     public Object doGet(
         RequestArguments arguments,
         @RequestParam("query") String query,
         @RequestParam("variables") String variables
     ) throws Exception {
-        return fetch(arguments, query, variables);
+        Map<String, Object> variableMap = Collections.emptyMap();
+        if (isNotBlank(variables)) {
+            try {
+                variableMap = objectMapper.readValue(
+                    variables,
+                    Map.class
+                );
+            } catch (Exception e) {
+                throw new GraphQLObjectMapperException(
+                    singletonMap("variables", "invalid"),
+                    e
+                );
+            }
+        }
+        return fetch(arguments, query, variableMap);
     }
 
     /**
@@ -99,42 +116,33 @@ public class GraphQLController
     private Object fetch(
         RequestArguments arguments,
         String query,
-        Object variables
+        Map<String, Object> variables
     ) throws Exception {
-        GraphQLSchema schema = schemaParser.parseQuery(query);
-        List<GraphQLQueryDefinition> queryDefinitions = schema.getQueryDefinitions();
+        GraphQLSchema schema = schemaParser.parseQuery(query, variables);
+        List<GraphQLQueryDefinition> queryDefinitions = schema
+            .getQueryDefinitions();
         Map answer = new HashMap<>();
 
         for (GraphQLQueryDefinition queryDefinition : queryDefinitions) {
             String queryName = queryDefinition.getName();
-            GraphQLDataFetcher dataFetcher = dataFetcherManager.getDataFetcher(queryName);
+            GraphQLDataFetcher dataFetcher = dataFetcherManager
+                .getDataFetcher(queryName);
             if (dataFetcher == null) {
                 throw new HttpNotFoundException(
                     "not found data fetcher with queryName: " + queryName
                 );
             }
-            Class<?> parameterType = dataFetcher.getParameterType();
-            Object parameter = variables;
-            if (parameterType != null) {
-                if (variables instanceof String) {
-                    parameter = objectMapper.readValue((String) variables, parameterType);
-                } else {
-                    parameter = objectMapper.convertValue(variables, parameterType);
-                }
-            } else {
-                if (variables instanceof String) {
-                    parameter = objectMapper.readValue((String) variables, Map.class);
-                }
-            }
             List<GraphQLInterceptor> interceptors = interceptorManager
                 .getRequestInterceptors();
-            String queryGroup = dataFetcherManager.getGroupNameByQueryName(queryName);
+            String queryGroup = dataFetcherManager.getGroupNameByQueryName(
+                queryName
+            );
             for (GraphQLInterceptor interceptor : interceptors) {
                 boolean ok = interceptor.preHandle(
                     arguments,
                     queryGroup,
                     queryName,
-                    parameter,
+                    queryDefinition,
                     dataFetcher
                 );
                 if (!ok) {
@@ -149,10 +157,14 @@ public class GraphQLController
             }
             Object data = dataFetcher.getData(
                 arguments,
-                parameter
+                queryDefinition
             );
             try {
-                Object currentResponse = mapToResponse(data, queryDefinition, query);
+                Object currentResponse = mapToResponse(
+                    data,
+                    queryDefinition,
+                    query
+                );
                 answer.put(queryName, currentResponse);
             } catch (GraphQLObjectMapperException e) {
                 answer.put(queryName, data);
@@ -162,6 +174,7 @@ public class GraphQLController
                     arguments,
                     queryGroup,
                     queryName,
+                    queryDefinition,
                     answer,
                     dataFetcher
                 );
@@ -181,7 +194,7 @@ public class GraphQLController
             dataMap = objectMapper.convertValue(data, Map.class);
         } catch (Exception e) {
             throw new GraphQLObjectMapperException(
-                "Could not convert: " + data.getClass() + " to Map"
+                singletonMap("response", "invalid")
             );
         }
         return filterDataMap(dataMap, queryDefinition, query);
@@ -274,12 +287,16 @@ public class GraphQLController
             return this;
         }
 
-        public Builder dataFetcherManager(GraphQLDataFetcherManager dataFetcherManager) {
+        public Builder dataFetcherManager(
+            GraphQLDataFetcherManager dataFetcherManager
+        ) {
             this.dataFetcherManager = dataFetcherManager;
             return this;
         }
 
-        public Builder interceptorManager(GraphQLInterceptorManager interceptorManager) {
+        public Builder interceptorManager(
+            GraphQLInterceptorManager interceptorManager
+        ) {
             this.interceptorManager = interceptorManager;
             return this;
         }

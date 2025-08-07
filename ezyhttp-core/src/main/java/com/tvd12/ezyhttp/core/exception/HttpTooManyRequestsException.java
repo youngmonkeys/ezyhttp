@@ -8,4 +8,8 @@ public class HttpTooManyRequestsException extends HttpRequestException {
     public HttpTooManyRequestsException(Object data) {
         super(StatusCodes.TOO_MANY_REQUESTS, data);
     }
+
+    public HttpTooManyRequestsException(Object data, Throwable cause) {
+        super(StatusCodes.TOO_MANY_REQUESTS, data, cause);
+    }
 }
