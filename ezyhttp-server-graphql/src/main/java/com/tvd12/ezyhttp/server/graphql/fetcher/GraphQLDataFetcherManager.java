@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryGroupExtractors.extractQueryGroup;
 
-@SuppressWarnings("rawtypes")
 public class GraphQLDataFetcherManager {
 
     private final Map<String, GraphQLDataFetcher> dataFetchers;
@@ -61,12 +60,8 @@ public class GraphQLDataFetcherManager {
         private final Map<String, Set<String>> queryNamesByGroupName =
             new HashMap<>();
 
-        public Builder addDataFetcher(Object fetcher) {
-            if (fetcher instanceof GraphQLDataFetcher) {
-                GraphQLDataFetcher f = (GraphQLDataFetcher) fetcher;
-                return addDataFetcher(f.getQueryName(), f);
-            }
-            return this;
+        public Builder addDataFetcher(GraphQLDataFetcher fetcher) {
+            return addDataFetcher(fetcher.getQueryName(), fetcher);
         }
 
         public Builder addDataFetcher(

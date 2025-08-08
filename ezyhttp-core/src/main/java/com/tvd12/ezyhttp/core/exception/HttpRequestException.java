@@ -9,8 +9,21 @@ public class HttpRequestException extends RuntimeException {
     protected final int code;
     protected final Object data;
 
-    public HttpRequestException(int code, Object data) {
+    public HttpRequestException(
+        int code,
+        Object data
+    ) {
         super("code: " + code + ", data: " + data);
+        this.code = code;
+        this.data = data;
+    }
+
+    public HttpRequestException(
+        int code,
+        Object data,
+        Throwable cause
+    ) {
+        super("code: " + code + ", data: " + data, cause);
         this.code = code;
         this.data = data;
     }

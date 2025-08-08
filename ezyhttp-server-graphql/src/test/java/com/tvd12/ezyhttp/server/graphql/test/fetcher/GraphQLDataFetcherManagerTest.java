@@ -4,6 +4,7 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.testng.collections.Sets;
@@ -52,12 +53,12 @@ public class GraphQLDataFetcherManagerTest {
         );
     }
 
-    private static class Fetcher1 implements GraphQLDataFetcher<String, String> {
+    private static class Fetcher1 implements GraphQLDataFetcher {
 
         @Override
         public String getData(
             RequestArguments arguments,
-            String parameter
+            GraphQLQueryDefinition query
         ) {
             return null;
         }
@@ -68,12 +69,12 @@ public class GraphQLDataFetcherManagerTest {
         }
     }
 
-    private static class Fetcher11 implements GraphQLDataFetcher<String, String> {
+    private static class Fetcher11 implements GraphQLDataFetcher {
 
         @Override
         public String getData(
             RequestArguments arguments,
-            String parameter
+            GraphQLQueryDefinition query
         ) {
             return null;
         }
@@ -84,12 +85,12 @@ public class GraphQLDataFetcherManagerTest {
         }
     }
 
-    private static class Fetcher2 implements GraphQLDataFetcher<String, String> {
+    private static class Fetcher2 implements GraphQLDataFetcher {
 
         @Override
         public String getData(
             RequestArguments arguments,
-            String parameter
+            GraphQLQueryDefinition query
         ) {
             return null;
         }
@@ -100,12 +101,12 @@ public class GraphQLDataFetcherManagerTest {
         }
     }
 
-    private static class Fetcher22 implements GraphQLDataFetcher<String, String> {
+    private static class Fetcher22 implements GraphQLDataFetcher {
 
         @Override
         public String getData(
             RequestArguments arguments,
-            String parameter
+            GraphQLQueryDefinition query
         ) {
             return null;
         }

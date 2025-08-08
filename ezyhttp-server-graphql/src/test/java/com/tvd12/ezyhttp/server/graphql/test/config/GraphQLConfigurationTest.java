@@ -1,6 +1,5 @@
 package com.tvd12.ezyhttp.server.graphql.test.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyBeanContextBuilder;
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
@@ -20,7 +19,7 @@ import java.util.Set;
 public class GraphQLConfigurationTest {
 
     @Test
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("unchecked")
     public void test() throws NoSuchFieldException, IllegalAccessException {
         // given
         EzyBeanContextBuilder builder = new EzySimpleBeanContext.Builder();
@@ -37,7 +36,6 @@ public class GraphQLConfigurationTest {
         GraphQLConfiguration sut = new GraphQLConfiguration();
         EzySingletonFactory singletonFactory = context.getSingletonFactory();
         sut.setSingletonFactory(singletonFactory);
-        sut.setObjectMapper(new ObjectMapper());
         sut.setGraphQLEnable(true);
         sut.setGraphQLAuthenticated(true);
 
@@ -75,7 +73,6 @@ public class GraphQLConfigurationTest {
         GraphQLConfiguration sut = new GraphQLConfiguration();
         EzySingletonFactory singletonFactory = context.getSingletonFactory();
         sut.setSingletonFactory(singletonFactory);
-        sut.setObjectMapper(new ObjectMapper());
         sut.setGraphQLEnable(false);
 
         // when

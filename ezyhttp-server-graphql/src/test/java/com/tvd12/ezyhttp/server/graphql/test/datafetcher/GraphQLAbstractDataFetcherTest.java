@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 
-import com.tvd12.ezyhttp.server.graphql.test.datafetcher.GraphQLNoNameDataFetcher;
+import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-@SuppressWarnings("rawtypes")
 public class GraphQLAbstractDataFetcherTest {
 
     @Test
@@ -13,9 +12,11 @@ public class GraphQLAbstractDataFetcherTest {
         GraphQLNoNameDataFetcher noNameDataFetcher = new GraphQLNoNameDataFetcher();
 
         // when
-        Class c = noNameDataFetcher.getParameterType();
+        Throwable e = Asserts.assertThrows(() ->
+            System.out.println(noNameDataFetcher.getQueryName())
+        );
 
         // then
-        Asserts.assertNull(c);
+        Asserts.assertEqualsType(e, EzyNotImplementedException.class);
     }
 }

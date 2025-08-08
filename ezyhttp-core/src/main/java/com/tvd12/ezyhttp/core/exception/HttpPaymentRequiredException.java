@@ -8,4 +8,8 @@ public class HttpPaymentRequiredException extends HttpRequestException {
     public HttpPaymentRequiredException(Object data) {
         super(StatusCodes.PAYMENT_REQUIRED, data);
     }
+
+    public HttpPaymentRequiredException(Object data, Throwable cause) {
+        super(StatusCodes.PAYMENT_REQUIRED, data, cause);
+    }
 }

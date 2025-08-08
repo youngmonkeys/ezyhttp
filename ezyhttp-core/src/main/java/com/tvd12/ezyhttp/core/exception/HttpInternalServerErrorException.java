@@ -8,4 +8,8 @@ public class HttpInternalServerErrorException extends HttpRequestException {
     public HttpInternalServerErrorException(Object data) {
         super(StatusCodes.INTERNAL_SERVER_ERROR, data);
     }
+
+    public HttpInternalServerErrorException(Object data, Throwable cause) {
+        super(StatusCodes.INTERNAL_SERVER_ERROR, data, cause);
+    }
 }

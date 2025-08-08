@@ -20,4 +20,23 @@ public class HttpPaymentRequiredExceptionTest {
         Asserts.assertEquals(code, sut.getCode());
         Asserts.assertEquals(data, sut.getData());
     }
+
+    @Test
+    public void withCauseTest() {
+        // given
+        int code = StatusCodes.PAYMENT_REQUIRED;
+        String data = "error";
+        Exception cause = new Exception("test");
+
+        // when
+        HttpPaymentRequiredException sut = new HttpPaymentRequiredException(
+            data,
+            cause
+        );
+
+        // then
+        Asserts.assertEquals(code, sut.getCode());
+        Asserts.assertEquals(data, sut.getData());
+        Asserts.assertEquals(sut.getCause(), cause);
+    }
 }

@@ -8,4 +8,8 @@ public class HttpConflictException extends HttpRequestException {
     public HttpConflictException(Object data) {
         super(StatusCodes.CONFLICT, data);
     }
+
+    public HttpConflictException(Object data, Throwable cause) {
+        super(StatusCodes.CONFLICT, data, cause);
+    }
 }

@@ -8,6 +8,7 @@
             <package name="com.tvd12.ezyhttp.server.graphql.test.controller" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.data" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.datafetcher" />
+            <package name="com.tvd12.ezyhttp.server.graphql.test.exception" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.fetcher" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.interceptor" />
             <package name="com.tvd12.ezyhttp.server.graphql.test.scheme" />

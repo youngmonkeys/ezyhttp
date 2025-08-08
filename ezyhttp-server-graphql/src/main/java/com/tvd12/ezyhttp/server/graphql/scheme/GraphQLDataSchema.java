@@ -13,6 +13,7 @@ public class GraphQLDataSchema {
     protected final String type;
     protected final String format;
     protected final String description;
+    protected final List<GraphQLDataSchema> arguments;
     protected final GraphQLDataSchema items;
     protected final List<GraphQLDataSchema> properties;
     protected final Object examples;
@@ -22,6 +23,7 @@ public class GraphQLDataSchema {
         this.type = builder.type;
         this.format = builder.format;
         this.description = builder.description;
+        this.arguments = builder.arguments;
         this.items = builder.items;
         this.properties = builder.properties;
         this.examples = builder.examples;
@@ -36,6 +38,7 @@ public class GraphQLDataSchema {
         protected String type;
         protected String format;
         protected String description;
+        protected List<GraphQLDataSchema> arguments;
         protected GraphQLDataSchema items;
         protected List<GraphQLDataSchema> properties;
         protected Object examples;
@@ -57,6 +60,11 @@ public class GraphQLDataSchema {
 
         public Builder description(String description) {
             this.description = description;
+            return this;
+        }
+
+        public Builder arguments(List<GraphQLDataSchema> arguments) {
+            this.arguments = arguments;
             return this;
         }
 
