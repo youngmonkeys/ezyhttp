@@ -1,29 +1,27 @@
 package com.tvd12.ezyhttp.server.boot.test.graphql;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
-import com.tvd12.ezyhttp.server.boot.test.graphql.GraphQLMeDataFetcher.MeRequest;
-import com.tvd12.ezyhttp.server.boot.test.graphql.GraphQLMeDataFetcher.MeResponse;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLAbstractDataFetcher;
-
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 @EzySingleton
 public class GraphQLMeDataFetcher
-    extends GraphQLAbstractDataFetcher<MeRequest, MeResponse> {
+    extends GraphQLAbstractDataFetcher {
 
     @Override
     public MeResponse getData(
         RequestArguments arguments,
-        MeRequest parameter
+        GraphQLQueryDefinition query
     ) {
         return MeResponse.builder()
-            .id(1)
+            .id(query.getArgumentValue("id", long.class))
             .name("Dzung")
             .nickName("Hello")
             .friends(

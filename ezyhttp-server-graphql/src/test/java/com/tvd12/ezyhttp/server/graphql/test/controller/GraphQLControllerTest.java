@@ -9,6 +9,7 @@ import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptor;
@@ -548,5 +549,31 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertEquals(EzyNotImplementedException.class.toString(), e.getClass().toString());
+    }
+
+    @Test
+    public void doGetTestException() {
+        // given
+        GraphQLSchemaParser schemaParser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        GraphQLDataFetcherManager dataFetcherManager = GraphQLDataFetcherManager.builder().build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        GraphQLController controller = GraphQLController.builder()
+            .schemaParser(schemaParser)
+            .dataFetcherManager(dataFetcherManager)
+            .objectMapper(objectMapper)
+            .build();
+
+        String heroQuery = "{hero}";
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, "abc"));
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
     }
 }

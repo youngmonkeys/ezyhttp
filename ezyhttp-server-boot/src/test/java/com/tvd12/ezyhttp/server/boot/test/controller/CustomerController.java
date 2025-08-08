@@ -80,7 +80,7 @@ public class CustomerController {
             if (customer.getAge() < 1)
                 errors.put("age", "invalid");
         }
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             throw new HttpBadRequestException(errors);
     }
 }

@@ -20,13 +20,14 @@ public class GraphQLDataSchemaTest {
         String type = GraphQLDataTypes.BOOLEAN;
         String format = RandomUtil.randomShortAlphabetString();
         String description = RandomUtil.randomShortAlphabetString();
+        List<GraphQLDataSchema> arguments = Collections.emptyList();
 
         GraphQLDataSchema items = GraphQLDataSchema.builder()
-                .name(RandomUtil.randomShortAlphabetString())
-                .type(RandomUtil.randomShortAlphabetString())
-                .format(GraphQLDataFormats.DOUBLE)
-                .description(RandomUtil.randomShortAlphabetString())
-                .build();
+            .name(RandomUtil.randomShortAlphabetString())
+            .type(RandomUtil.randomShortAlphabetString())
+            .format(GraphQLDataFormats.DOUBLE)
+            .description(RandomUtil.randomShortAlphabetString())
+            .build();
 
         List<GraphQLDataSchema> properties = Collections.singletonList(
             GraphQLDataSchema.builder()
@@ -53,6 +54,7 @@ public class GraphQLDataSchemaTest {
             .items(items)
             .properties(properties)
             .examples(examples)
+            .arguments(arguments)
             .build();
 
         // then
@@ -63,6 +65,7 @@ public class GraphQLDataSchemaTest {
         Asserts.assertEquals(instance.getExamples(), examples);
         Asserts.assertEquals(instance.getItems(), items);
         Asserts.assertEquals(instance.getProperties(), properties);
+        Asserts.assertEquals(instance.getArguments(), arguments);
 
         System.out.println(instance);
     }
