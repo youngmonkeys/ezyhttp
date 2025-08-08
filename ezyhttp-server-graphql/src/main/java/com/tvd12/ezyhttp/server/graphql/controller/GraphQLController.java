@@ -59,6 +59,7 @@ public class GraphQLController
      * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{myVariable: $someValue}{id+name+friends{name}}}&amp;variables={"id" : 1}'
      * </code>
      *
+     * @param arguments the request arguments
      * @param query     GraphQL query
      * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</code>
      * @return the result
@@ -99,6 +100,7 @@ public class GraphQLController
      *      }'
      * </pre>
      *
+     * @param arguments the request arguments
      * @param request the request body
      * @return the result
      */

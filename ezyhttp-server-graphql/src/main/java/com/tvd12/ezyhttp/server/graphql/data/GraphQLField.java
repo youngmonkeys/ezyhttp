@@ -87,8 +87,6 @@ public class GraphQLField {
      *                     reach the target field.
      * @param <T>          the expected return type of the argument value.
      * @return the value of the specified argument if found; otherwise, null.
-     *
-     * <p>
      * How it works:
      * <ul>
      *   <li>Starts from the current field ({@code this}).</li>
@@ -97,7 +95,7 @@ public class GraphQLField {
      *   from the final field.</li>
      *   <li>Returns {@code null} if any field in the path is missing.</li>
      * </ul>
-     * </p>
+     *
      */
     public <T> T getFieldArgumentValue(
         String argumentName,
@@ -126,14 +124,13 @@ public class GraphQLField {
      * @param <T>          the expected return type.
      * @return the transformed value of the specified argument if found and convertible;
      *         otherwise, null.
-     * <p>
      * How it works:
      * - Delegates to {@link #getFieldArgumentValue(String, String...)} to retrieve
      *   the raw argument value.
      * - If the value is non-null, uses {@code EzySingletonOutputTransformer} to transform
      *   it into the specified type.
      * - Returns null if the argument is not found or the value is null.
-     * </p>
+     *
      * @throws ClassCastException if the transformation result cannot be cast
      *         to the specified type.
      */
