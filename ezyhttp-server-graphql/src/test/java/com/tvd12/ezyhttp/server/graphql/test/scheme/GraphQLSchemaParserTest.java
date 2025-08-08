@@ -3,14 +3,18 @@ package com.tvd12.ezyhttp.server.graphql.test.scheme;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
+import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.reflect.MethodInvoker;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 public class GraphQLSchemaParserTest {
 
@@ -255,5 +259,246 @@ public class GraphQLSchemaParserTest {
                 .toMap(),
             false
         );
+    }
+
+    @Test
+    public void parseQueryNormal() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            "{me(id: 1){}}",
+            Collections.emptyMap()
+        );
+
+        // then
+        Asserts.assertEquals(
+            schema.getQueryDefinitions().get(0).getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("id", 1)
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void parseQueryNormalWithArgs() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            "{me(id:   1, name: {'value' : \"hello\"}, age: {value: $variable  , level:  $level   }){}}",
+            EzyMapBuilder.mapBuilder()
+                .put("variable", 33)
+                .put("level", 2025)
+                .toMap()
+        );
+
+        // then
+        Asserts.assertEquals(
+            schema.getQueryDefinitions().get(0).getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("id", 1)
+                .put(
+                    "name",
+                    EzyMapBuilder.mapBuilder()
+                        .put("value", "hello")
+                        .toMap()
+                )
+                .put(
+                    "age",
+                    EzyMapBuilder.mapBuilder()
+                        .put("value", 33)
+                        .put("level", 2025)
+                        .toMap()
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void parseQueryNormalWithArgsSpecialCase() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            "{me(id:   1, name: {'va\\\'lue' : \"he\\\"llo\"}, age: {value: $variable  , level:  $level   }){}}",
+            EzyMapBuilder.mapBuilder()
+                .put("variable", 33)
+                .put("level", 2025)
+                .toMap()
+        );
+
+        // then
+        Asserts.assertEquals(
+            schema.getQueryDefinitions().get(0).getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("id", 1)
+                .put(
+                    "name",
+                    EzyMapBuilder.mapBuilder()
+                        .put("va\'lue", "he\"llo")
+                        .toMap()
+                )
+                .put(
+                    "age",
+                    EzyMapBuilder.mapBuilder()
+                        .put("value", 33)
+                        .put("level", 2025)
+                        .toMap()
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void parseQueryInvalidArgumentTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: world){}}",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument2Test() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: world}",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument3Test() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: $world",
+                Collections.singletonMap("hello", "world")
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument3xTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        StringBuilder argumentsBuilder = new StringBuilder();
+        String query = "{me(hello: $";
+        int queryLength = query.length();
+
+        // when
+        Integer i = MethodInvoker.create()
+            .object(instance)
+            .method("extractQueryArguments")
+            .param(StringBuilder.class, argumentsBuilder)
+            .param(String.class, query)
+            .param(int.class, 0)
+            .param(int.class, queryLength)
+            .param(Map.class, Collections.singletonMap("hello", "world"))
+            .invoke(Integer.class);
+
+        // then
+        Asserts.assertEquals(i, queryLength + 1);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument4Test() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: '\"world)",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument5Test() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: 'world)",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryInvalidArgument6Test() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "{me(hello: \"world)",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
     }
 }

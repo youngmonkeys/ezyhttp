@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.graphql.data;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.io.EzySingletonOutputTransformer;
+import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -35,6 +36,13 @@ public class GraphQLField {
         return fieldByName.get(fieldName);
     }
 
+    /**
+     * Get argument value by name.
+     *
+     * @param argumentName the argument name.
+     * @return the argument value.
+     * @param <T> the value type.
+     */
     @SuppressWarnings("unchecked")
     public <T> T getArgumentValue(
         String argumentName
@@ -44,6 +52,14 @@ public class GraphQLField {
             : null;
     }
 
+    /**
+     * Get argument value by name and transforms it into the desired type.
+     *
+     * @param argumentName the argument name.
+     * @param type the argument type class.
+     * @return the argument value.
+     * @param <T> the argument type.
+     */
     @SuppressWarnings("unchecked")
     public <T> T getArgumentValue(
         String argumentName,
@@ -53,11 +69,36 @@ public class GraphQLField {
         if (value == null) {
             return null;
         }
+        if (value instanceof String) {
+            return SingletonStringDeserializer
+                .getInstance()
+                .deserializeOrNull((String) value, type);
+        }
         return (T) EzySingletonOutputTransformer
             .getInstance()
             .transform(value, type);
     }
 
+    /**
+     * Retrieves the value of a specified argument from a nested GraphQL field path.
+     *
+     * @param argumentName the name of the argument to retrieve.
+     * @param fieldNames   the sequence of nested field names to traverse in order to
+     *                     reach the target field.
+     * @param <T>          the expected return type of the argument value.
+     * @return the value of the specified argument if found; otherwise, null.
+     *
+     * <p>
+     * How it works:
+     * <ul>
+     *   <li>Starts from the current field ({@code this}).</li>
+     *   <li>Iteratively navigates through the field names provided in {@code fieldNames}.</li>
+     *   <li>If all fields in the path exist, retrieves the argument value
+     *   from the final field.</li>
+     *   <li>Returns {@code null} if any field in the path is missing.</li>
+     * </ul>
+     * </p>
+     */
     public <T> T getFieldArgumentValue(
         String argumentName,
         String... fieldNames
@@ -74,6 +115,28 @@ public class GraphQLField {
             : null;
     }
 
+    /**
+     * Retrieves the value of a specified argument from a nested GraphQL field path
+     * and transforms it into the desired type.
+     *
+     * @param argumentName the name of the argument to retrieve.
+     * @param type         the target class type to which the argument value should be converted.
+     * @param fieldNames   the sequence of nested field names to traverse in order to reach
+     *                     the target field.
+     * @param <T>          the expected return type.
+     * @return the transformed value of the specified argument if found and convertible;
+     *         otherwise, null.
+     * <p>
+     * How it works:
+     * - Delegates to {@link #getFieldArgumentValue(String, String...)} to retrieve
+     *   the raw argument value.
+     * - If the value is non-null, uses {@code EzySingletonOutputTransformer} to transform
+     *   it into the specified type.
+     * - Returns null if the argument is not found or the value is null.
+     * </p>
+     * @throws ClassCastException if the transformation result cannot be cast
+     *         to the specified type.
+     */
     @SuppressWarnings("unchecked")
     public <T> T getFieldArgumentValue(
         String argumentName,
@@ -102,10 +165,8 @@ public class GraphQLField {
         Map<String, Object> arguments,
         List<GraphQLField> fields
     ) {
-        StringBuilder builder = new StringBuilder();
-        if (name != null) {
-            builder.append(name);
-        }
+        StringBuilder builder = new StringBuilder()
+            .append(name);
         if (arguments != null && !arguments.isEmpty()) {
             builder.append("(").append(arguments).append(")");
         }

@@ -380,6 +380,35 @@ public class SingletonStringDeserializerTest {
             .deserialize("hello", MyEnum.class), MyEnum.HELLO);
     }
 
+    @Test
+    public void deserializeOrNullTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            SingletonStringDeserializer.getInstance()
+                .deserializeOrNull("1", int.class),
+            1
+        );
+        Asserts.assertNull(
+            SingletonStringDeserializer.getInstance()
+                .deserializeOrNull("1", void.class)
+        );
+        Asserts.assertNull(
+            SingletonStringDeserializer.getInstance()
+                .deserializeOrNull(null, void.class)
+        );
+        Asserts.assertNull(
+            SingletonStringDeserializer.getInstance()
+                .deserializeOrNull("hello", Long.class)
+        );
+        Asserts.assertEquals(
+            SingletonStringDeserializer.getInstance()
+                .deserializeOrNull("WORLD", MyEnum.class),
+            MyEnum.WORLD
+        );
+    }
+
     public enum MyEnum {
         HELLO, WORLD
     }

@@ -1,5 +1,11 @@
 package com.tvd12.ezyhttp.core.codec;
 
+import com.tvd12.ezyfox.collect.Lists;
+import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.io.EzyDataConverter;
+import com.tvd12.ezyfox.io.EzyDates;
+import com.tvd12.ezyfox.io.EzyStrings;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -7,21 +13,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.tvd12.ezyfox.collect.Lists;
-import com.tvd12.ezyfox.collect.Sets;
-import com.tvd12.ezyfox.io.EzyDataConverter;
-import com.tvd12.ezyfox.io.EzyDates;
-import com.tvd12.ezyfox.io.EzyStrings;
+import java.util.*;
 
 public class DefaultStringDeserializer implements StringDeserializer {
 
@@ -49,7 +41,10 @@ public class DefaultStringDeserializer implements StringDeserializer {
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T> T deserialize(String value, Class<T> outType) throws IOException {
+    public <T> T deserialize(
+        String value,
+        Class<T> outType
+    ) throws IOException {
         StringMapper mapper = mappers.get(outType);
         if (mapper == null) {
             if (value == null) {
@@ -68,6 +63,29 @@ public class DefaultStringDeserializer implements StringDeserializer {
                 e
             );
         }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public <T> T deserializeOrNull(
+        String value,
+        Class<T> outType
+    ) {
+        StringMapper mapper = mappers.get(outType);
+        if (mapper == null) {
+            if (value == null) {
+                return null;
+            }
+            if (outType.isEnum()) {
+                return stringToEnum(value, outType);
+            }
+        } else {
+            try {
+                return (T) mapper.apply(value);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

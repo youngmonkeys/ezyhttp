@@ -246,10 +246,11 @@ public final class GraphQLSchemaParser {
         int quoteCount = 0;
         int quotesCount = 0;
         for (; i < queryLength; ++i) {
+            char prevCh = query.charAt(i - 1);
             char ch = query.charAt(i);
-            if (ch == '\'') {
+            if (prevCh != '\\' && ch == '\'') {
                 quoteCount = quoteCount == 0 ? 1 : 0;
-            } else if (ch == '"') {
+            } else if (prevCh != '\\' && ch == '"') {
                 quotesCount = quotesCount == 0 ? 1 : 0;
             } else if (ch == ')' && quoteCount == 0 && quotesCount == 0) {
                 break;
@@ -260,7 +261,7 @@ public final class GraphQLSchemaParser {
                     if (ch == ' ') {
                         continue;
                     }
-                    if (ch != ',' && ch != ')') {
+                    if (ch != ',' && ch != ')' && ch != '}') {
                         varNameBuilder.append(ch);
                     } else {
                         --i;
