@@ -10,7 +10,7 @@
 
     <artifactId>ezyhttp-server-tomcat</artifactId>
     <name>ezyhttp-server-tomcat</name>
-    <url>https://youngmonkeys.org/project/ezy-http/</url>
+    <url>https://youngmonkeys.org/projects/ezyhttp</url>
 
     <dependencies>
         <dependency>

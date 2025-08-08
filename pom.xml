@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>ezyhttp</name>
-    <url>https://youngmonkeys.org/project/ezy-http/</url>
+    <url>https://youngmonkeys.org/projects/ezyhttp</url>
     <description>
         Support for HTTP interaction
     </description>

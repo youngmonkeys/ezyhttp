@@ -10,7 +10,7 @@
 
     <artifactId>ezyhttp-core</artifactId>
     <name>ezyhttp-core</name>
-    <url>https://youngmonkeys.org/project/ezy-http/</url>
+    <url>https://youngmonkeys.org/projects/ezyhttp</url>
 
     <dependencies>
         <dependency>
