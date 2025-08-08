@@ -25,6 +25,7 @@ public class RequestURIManagerTest {
         sut.addApiURI(HttpMethod.PUT, "c1");
         sut.addPaymentURI(HttpMethod.DELETE, "d");
         sut.addManagementURI(HttpMethod.DELETE, "e");
+        sut.addAuthenticatableURI(HttpMethod.POST, "f");
 
         // when
         // then
@@ -57,5 +58,9 @@ public class RequestURIManagerTest {
         Asserts.assertFalse(sut.isManagementURI(HttpMethod.PATCH, "I don't know"));
         Asserts.assertEquals(sut.getManagementURIs(HttpMethod.DELETE), Collections.singletonList("e"), false);
         Asserts.assertEmpty(sut.getManagementURIs(HttpMethod.PATCH));
+
+        Assert.assertTrue(sut.isAuthenticatableURI(HttpMethod.POST, "f"));
+        Asserts.assertFalse(sut.isAuthenticatableURI(HttpMethod.POST, "I don't know"));
+        Asserts.assertFalse(sut.isAuthenticatableURI(HttpMethod.PATCH, "I don't know"));
     }
 }

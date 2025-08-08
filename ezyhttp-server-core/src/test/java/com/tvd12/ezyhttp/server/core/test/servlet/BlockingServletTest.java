@@ -175,6 +175,7 @@ public class BlockingServletTest {
         RequestURIMeta uriMeta = RequestURIMeta.builder()
             .management(false)
             .authenticated(true)
+            .authenticatable(true)
             .api(true)
             .build();
         requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, uriMeta), requestHandler);
@@ -196,6 +197,9 @@ public class BlockingServletTest {
         RequestURIManager requestURIManager = requestHandlerManager.getRequestURIManager();
         Asserts.assertTrue(requestURIManager.isAuthenticatedURI(HttpMethod.GET, "/get"));
         Asserts.assertTrue(requestURIManager.isAuthenticatedURI(HttpMethod.GET, "/get/"));
+        Asserts.assertTrue(requestURIManager.isAuthenticatableURI(HttpMethod.GET, "/get"));
+        Asserts.assertTrue(requestURIManager.isAuthenticatableURI(HttpMethod.GET, "/get/"));
+        Asserts.assertFalse(requestURIManager.isAuthenticatableURI(HttpMethod.GET, "/get/ha"));
         verify(request, times(1)).getMethod();
         verify(request, times(1)).getRequestURI();
 

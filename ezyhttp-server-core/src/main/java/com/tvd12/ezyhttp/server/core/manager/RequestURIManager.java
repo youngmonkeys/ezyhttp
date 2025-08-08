@@ -67,14 +67,19 @@ public class RequestURIManager implements EzyDestroyable {
             .add(uri);
     }
 
+    public boolean isAuthenticatedURI(HttpMethod method, String uri) {
+        Set<String> uris = authenticatedURIs.get(method);
+        return uris != null && uris.contains(uri);
+    }
+
     public void addAuthenticatableURI(HttpMethod method, String uri) {
         this.authenticatableURIs
             .computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet())
             .add(uri);
     }
 
-    public boolean isAuthenticatedURI(HttpMethod method, String uri) {
-        Set<String> uris = authenticatedURIs.get(method);
+    public boolean isAuthenticatableURI(HttpMethod method, String uri) {
+        Set<String> uris = authenticatableURIs.get(method);
         return uris != null && uris.contains(uri);
     }
 
