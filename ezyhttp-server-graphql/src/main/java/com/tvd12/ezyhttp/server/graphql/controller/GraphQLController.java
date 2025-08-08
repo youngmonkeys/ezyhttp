@@ -9,9 +9,9 @@ import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.handler.AuthenticatedController;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
-import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
@@ -22,10 +22,12 @@ import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
-import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
 import static java.util.Collections.singletonMap;
 
 @Api
@@ -37,6 +39,7 @@ public class GraphQLController
     private final boolean authenticated;
     private final ObjectMapper objectMapper;
     private final GraphQLSchemaParser schemaParser;
+    private final GraphQLDataFilter dataFilter;
     private final GraphQLDataFetcherManager dataFetcherManager;
     private final GraphQLInterceptorManager interceptorManager;
 
@@ -44,6 +47,7 @@ public class GraphQLController
         this.authenticated = builder.authenticated;
         this.objectMapper = builder.objectMapper;
         this.schemaParser = builder.schemaParser;
+        this.dataFilter = builder.dataFilter;
         this.dataFetcherManager = builder.dataFetcherManager;
         this.interceptorManager = builder.interceptorManager;
     }
@@ -52,13 +56,12 @@ public class GraphQLController
      * Follow by this suggestion: <a href="https://graphql.org/learn/serving-over-http/">https://graphql.org/learn/serving-over-http/</a>.
      * Example:
      * <code>
-     * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{id+name+friends{name}}}&amp;variables={"id" : 1}'
+     * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{myVariable: $someValue}{id+name+friends{name}}}&amp;variables={"id" : 1}'
      * </code>
      *
      * @param query     GraphQL query
      * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</code>
      * @return the result
-     * @throws Exception when have any error
      */
     @SuppressWarnings("unchecked")
     @DoGet("/graphql")
@@ -66,7 +69,7 @@ public class GraphQLController
         RequestArguments arguments,
         @RequestParam("query") String query,
         @RequestParam("variables") String variables
-    ) throws Exception {
+    ) {
         Map<String, Object> variableMap = Collections.emptyMap();
         if (isNotBlank(variables)) {
             try {
@@ -91,20 +94,19 @@ public class GraphQLController
      * curl --location --request POST 'http://localhost:8083/graphql' \
      *     --header 'Content-Type: application/json' \
      *     --data-raw '{
-     *         "query": "{me{id+name+friends{name}}}",
+     *         "query": "{me(id: $id){id+name+friends{name}}}",
      *         "variables": {"id" : 1}
      *      }'
      * </pre>
      *
      * @param request the request body
      * @return the result
-     * @throws Exception when have any error
      */
     @DoPost("/graphql")
     public Object doPost(
         RequestArguments arguments,
         @RequestBody GraphQLRequest request
-    ) throws Exception {
+    ) {
         return fetch(
             arguments,
             request.getQuery(),
@@ -117,7 +119,7 @@ public class GraphQLController
         RequestArguments arguments,
         String query,
         Map<String, Object> variables
-    ) throws Exception {
+    ) {
         GraphQLSchema schema = schemaParser.parseQuery(query, variables);
         List<GraphQLQueryDefinition> queryDefinitions = schema
             .getQueryDefinitions();
@@ -162,8 +164,7 @@ public class GraphQLController
             try {
                 Object currentResponse = mapToResponse(
                     data,
-                    queryDefinition,
-                    query
+                    queryDefinition
                 );
                 answer.put(queryName, currentResponse);
             } catch (GraphQLObjectMapperException e) {
@@ -186,8 +187,7 @@ public class GraphQLController
     @SuppressWarnings({"rawtypes"})
     private Map mapToResponse(
         Object data,
-        GraphQLQueryDefinition queryDefinition,
-        String query
+        GraphQLQueryDefinition queryDefinition
     ) {
         Map dataMap;
         try {
@@ -197,68 +197,15 @@ public class GraphQLController
                 singletonMap("response", "invalid")
             );
         }
-        return filterDataMap(dataMap, queryDefinition, query);
+        return filterDataMap(dataMap, queryDefinition);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("rawtypes")
     private Map filterDataMap(
         Map dataMap,
-        GraphQLField queryDefinition,
-        String query
+        GraphQLField queryDefinition
     ) {
-        Map answer = new HashMap<>();
-        Map parentMap = null;
-        Stack<GraphQLField> stack = new Stack<>();
-        stack.add(queryDefinition);
-        while (!stack.isEmpty()) {
-            GraphQLField parent = stack.pop();
-            parentMap = parentMap == null
-                ? answer
-                : (Map) parentMap.get(parent.getName());
-
-            for (GraphQLField field : parent.getFields()) {
-                String fieldName = field.getName();
-                if (fieldName.equals(ALL_FIELDS)) {
-                    parentMap.putAll(dataMap);
-                    continue;
-                }
-                Object value = dataMap.get(fieldName);
-                if (value == null) {
-                    continue;
-                }
-                if (field.getFields().isEmpty()) {
-                    parentMap.put(fieldName, value);
-                    continue;
-                }
-                if (value instanceof Map) {
-                    Object newItem = new HashMap<>();
-                    parentMap.put(fieldName, newItem);
-                    stack.push(field);
-                } else if (value instanceof List) {
-                    parentMap.put(
-                        fieldName,
-                        filterDataList((List) value, field, query)
-                    );
-                } else {
-                    throw new GraphQLInvalidSchemeException(
-                        "invalid schema: " + query + " at: " + fieldName
-                    );
-                }
-            }
-        }
-        return answer;
-    }
-
-    @SuppressWarnings({"rawtypes"})
-    private List<Map> filterDataList(
-        List<Map> dataList,
-        GraphQLField queryDefinition, String query
-    ) {
-        List<Map> answer = new LinkedList<>();
-        for (Map map : dataList) {
-            answer.add(filterDataMap(map, queryDefinition, query));
-        }
-        return answer;
+        return dataFilter.filter(dataMap, queryDefinition);
     }
 
     public static Builder builder() {
@@ -269,6 +216,7 @@ public class GraphQLController
         private boolean authenticated;
         private ObjectMapper objectMapper;
         private GraphQLSchemaParser schemaParser;
+        private GraphQLDataFilter dataFilter;
         private GraphQLDataFetcherManager dataFetcherManager;
         private GraphQLInterceptorManager interceptorManager;
 
@@ -284,6 +232,11 @@ public class GraphQLController
 
         public Builder schemaParser(GraphQLSchemaParser schemaParser) {
             this.schemaParser = schemaParser;
+            return this;
+        }
+
+        public Builder dataFilter(GraphQLDataFilter dataFilter) {
+            this.dataFilter = dataFilter;
             return this;
         }
 

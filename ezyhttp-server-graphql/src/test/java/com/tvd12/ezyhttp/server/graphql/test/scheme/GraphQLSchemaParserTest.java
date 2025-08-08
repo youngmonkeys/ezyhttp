@@ -24,13 +24,10 @@ public class GraphQLSchemaParserTest {
 
         // when
         GraphQLSchema schema = parser.parseQuery(query, Collections.emptyMap());
-        Throwable e = Asserts.assertThrows(() ->
-            System.out.println(schema.getQueryDefinitions().get(0).getName())
-        );
+        System.out.println(schema.getQueryDefinitions().get(0).getName());
 
         // then
         Asserts.assertEquals(schema.getQueryDefinitions().size(), 1);
-        Asserts.assertEquals(IllegalArgumentException.class, e.getClass());
     }
 
     @Test

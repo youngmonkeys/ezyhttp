@@ -3,17 +3,17 @@ package com.tvd12.ezyhttp.server.graphql.test.datafetcher;
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLAbstractDataFetcher;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 
 @EzySingleton
-@SuppressWarnings("rawtypes")
 public class GraphQLNoNameDataFetcher
     extends GraphQLAbstractDataFetcher {
 
     @Override
     public Object getData(
         RequestArguments arguments,
-        Object parameter
+        GraphQLQueryDefinition query
     ) {
-        return "Foo " + parameter;
+        return "Foo " + query;
     }
 }

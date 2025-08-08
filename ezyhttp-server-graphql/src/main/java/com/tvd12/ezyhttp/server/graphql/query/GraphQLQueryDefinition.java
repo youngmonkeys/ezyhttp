@@ -8,13 +8,6 @@ public class GraphQLQueryDefinition extends GraphQLField {
         super(builder);
     }
 
-    public String getName() {
-        if (this.name == null) {
-            throw new IllegalArgumentException("Must provide queryName!");
-        }
-        return this.name;
-    }
-
     public static Builder builder() {
         return new Builder();
     }

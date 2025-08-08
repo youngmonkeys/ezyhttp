@@ -19,7 +19,7 @@ import java.util.Set;
 public class GraphQLConfigurationTest {
 
     @Test
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("unchecked")
     public void test() throws NoSuchFieldException, IllegalAccessException {
         // given
         EzyBeanContextBuilder builder = new EzySimpleBeanContext.Builder();

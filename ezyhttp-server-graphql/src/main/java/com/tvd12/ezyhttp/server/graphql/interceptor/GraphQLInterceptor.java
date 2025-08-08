@@ -11,7 +11,7 @@ public interface GraphQLInterceptor {
         String queryGroup,
         String queryName,
         GraphQLQueryDefinition queryDefinition,
-        GraphQLDataFetcher<?, ?> dataFetcher
+        GraphQLDataFetcher dataFetcher
     ) {
         return true;
     }
@@ -22,7 +22,7 @@ public interface GraphQLInterceptor {
         String queryName,
         GraphQLQueryDefinition queryDefinition,
         Object responseData,
-        GraphQLDataFetcher<?, ?> dataFetcher
+        GraphQLDataFetcher dataFetcher
     ) {}
 
     default int getPriority() {

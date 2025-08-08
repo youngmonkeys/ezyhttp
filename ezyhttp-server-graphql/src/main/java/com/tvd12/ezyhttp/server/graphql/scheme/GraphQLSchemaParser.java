@@ -23,7 +23,6 @@ public final class GraphQLSchemaParser {
         Map<String, Object> variables
     ) {
         String query = standardize(queryToParse);
-        System.out.println(query);
 
         Stack<GraphQLField.Builder> stack = new Stack<>();
         GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
@@ -53,9 +52,15 @@ public final class GraphQLSchemaParser {
 
             if (ch == '(') {
                 GraphQLField.Builder childBuilder = stack.peek();
-                String arguments = "{" +
-                    extractQueryArguments(query, i, queryLength, variables) +
-                    '}';
+                StringBuilder argumentsBuilder = new StringBuilder();
+                i = extractQueryArguments(
+                    argumentsBuilder,
+                    query,
+                    i,
+                    queryLength,
+                    variables
+                );
+                String arguments = "{" + argumentsBuilder + "}";
                 try {
                     childBuilder.arguments(
                         objectMapper.readValue(
@@ -70,7 +75,6 @@ public final class GraphQLSchemaParser {
                         e
                     );
                 }
-                i += arguments.length() - 1;
                 continue;
             }
 
@@ -78,7 +82,6 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     continue;
                 }
-                System.out.println(stack);
                 if (stack.size() == 1) {
                     GraphQLField.Builder item = stack.pop();
                     if (nameLength > 0) {
@@ -177,7 +180,9 @@ public final class GraphQLSchemaParser {
         for (int i = 0; i < queryLength; ++i) {
             char ch = query.charAt(i);
             if (ch == '(') {
-                StringBuilder arguments = extractQueryArguments(
+                StringBuilder argumentsBuilder = new StringBuilder();
+                i = extractQueryArguments(
+                    argumentsBuilder,
                     query,
                     i,
                     queryLength,
@@ -185,9 +190,8 @@ public final class GraphQLSchemaParser {
                 );
                 answer
                     .append('(')
-                    .append(arguments)
+                    .append(argumentsBuilder)
                     .append(')');
-                i += arguments.length() + 1;
                 continue;
             }
             if (ch == '{' || ch == '}') {
@@ -207,7 +211,7 @@ public final class GraphQLSchemaParser {
     private StringBuilder backwardStandardize(String query) {
         int queryLength = query.length();
         StringBuilder answer = new StringBuilder();
-        for (int i = queryLength- 1; i >= 0; --i) {
+        for (int i = queryLength - 1; i >= 0; --i) {
             char ch = query.charAt(i);
             if (ch == '{' || ch == '}') {
                 answer.insert(0, ch);
@@ -231,23 +235,23 @@ public final class GraphQLSchemaParser {
         return s;
     }
 
-    private StringBuilder extractQueryArguments(
+    private int extractQueryArguments(
+        StringBuilder argumentsBuilder,
         String query,
         int start,
         int queryLength,
         Map<String, Object> variables
     ) {
+        int i = start + 1;
         int quoteCount = 0;
         int quotesCount = 0;
-        StringBuilder builder = new StringBuilder();
-        for (int i = start + 1; i < queryLength; ++i) {
+        for (; i < queryLength; ++i) {
             char ch = query.charAt(i);
             if (ch == '\'') {
                 quoteCount = quoteCount == 0 ? 1 : 0;
             } else if (ch == '"') {
                 quotesCount = quotesCount == 0 ? 1 : 0;
             } else if (ch == ')' && quoteCount == 0 && quotesCount == 0) {
-                ++i;
                 break;
             } else if (variables != null && ch == '$') {
                 StringBuilder varNameBuilder = new StringBuilder();
@@ -265,20 +269,14 @@ public final class GraphQLSchemaParser {
                 }
                 String varName = varNameBuilder.toString();
                 Object value = variables.get(varName);
-                if (value != null) {
-                    if (value instanceof String) {
-                        builder
-                            .append("\"")
-                            .append(value)
-                            .append("\"");
-                    } else {
-                        builder.append(value);
-                    }
+                if (value instanceof String) {
+                    value = "\"" + value + "\"";
                 }
+                argumentsBuilder.append(value);
                 continue;
             }
-            builder.append(ch);
+            argumentsBuilder.append(ch);
         }
-        return builder;
+        return i;
     }
 }
