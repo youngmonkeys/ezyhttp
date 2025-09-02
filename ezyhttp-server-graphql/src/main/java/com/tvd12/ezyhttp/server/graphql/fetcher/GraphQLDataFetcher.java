@@ -8,6 +8,8 @@ import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataSchema;
 
 import java.util.List;
 
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryAnnotations.getQLQueryName;
+
 public interface GraphQLDataFetcher {
 
     Object getData(
@@ -17,7 +19,9 @@ public interface GraphQLDataFetcher {
 
     default String getQueryName() {
         if (getClass().isAnnotationPresent(GraphQLQuery.class)) {
-            return getClass().getAnnotation(GraphQLQuery.class).name();
+            return getQLQueryName(
+                getClass().getAnnotation(GraphQLQuery.class)
+            );
         }
         throw new EzyNotImplementedException("you must implement " +
             getClass().getName() +

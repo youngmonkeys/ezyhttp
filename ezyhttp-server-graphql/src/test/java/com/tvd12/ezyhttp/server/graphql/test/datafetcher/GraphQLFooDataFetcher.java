@@ -9,7 +9,7 @@ import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 
 
 @EzySingleton
-@GraphQLQuery(name = "foo")
+@GraphQLQuery("foo")
 public class GraphQLFooDataFetcher implements GraphQLDataFetcher {
 
     @Override
