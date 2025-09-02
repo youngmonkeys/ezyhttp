@@ -4,6 +4,12 @@ public final class GraphQLConstants {
 
     public static final String ALL_FIELDS = "*";
 
+    public static final String ARGUMENT_NAME_GRAPHQL_QUERY_NAME =
+        "graphQLQueryName";
+
+    public static final String ARGUMENT_NAME_GRAPHQL_QUERY_GROUP_NAME =
+        "graphQLQueryGroupName";
+
     public static final String DEFAULT_QL_GROUP_NAME = "default";
 
     public static final String PREFIX_QUERY = "query";

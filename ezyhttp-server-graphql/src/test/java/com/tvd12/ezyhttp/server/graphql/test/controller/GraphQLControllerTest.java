@@ -100,6 +100,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(6)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -171,6 +176,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(3)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -246,6 +256,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(6)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -331,6 +346,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(3)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -407,6 +427,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(6)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -476,6 +501,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(6)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 
@@ -536,6 +566,11 @@ public class GraphQLControllerTest {
             any(GraphQLDataFetcher.class)
         );
         verifyNoMoreInteractions(interceptor);
+
+        verify(arguments, times(3)).setArgument(
+            any(Object.class),
+            any(Object.class)
+        );
         verifyNoMoreInteractions(arguments);
     }
 

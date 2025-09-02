@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ARGUMENT_NAME_GRAPHQL_QUERY_GROUP_NAME;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ARGUMENT_NAME_GRAPHQL_QUERY_NAME;
 import static java.util.Collections.singletonMap;
 
 @Api
@@ -140,6 +142,18 @@ public class GraphQLController
                 .getRequestInterceptors();
             String queryGroup = dataFetcherManager.getGroupNameByQueryName(
                 queryName
+            );
+            arguments.setArgument(
+                ARGUMENT_NAME_GRAPHQL_QUERY_NAME,
+                queryName
+            );
+            arguments.setArgument(
+                ARGUMENT_NAME_GRAPHQL_QUERY_GROUP_NAME,
+                queryGroup
+            );
+            arguments.setArgument(
+                GraphQLDataFetcherManager.class,
+                dataFetcherManager
             );
             for (GraphQLInterceptor interceptor : interceptors) {
                 boolean ok = interceptor.preHandle(
