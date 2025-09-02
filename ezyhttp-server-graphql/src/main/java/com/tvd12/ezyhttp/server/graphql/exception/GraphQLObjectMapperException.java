@@ -9,20 +9,6 @@ public class GraphQLObjectMapperException extends IllegalArgumentException {
     private final Object errors;
 
     public GraphQLObjectMapperException(
-        Object errors
-    ) {
-        this(errors, errors.toString());
-    }
-
-    public GraphQLObjectMapperException(
-        Object errors,
-        String message
-    ) {
-        super(message);
-        this.errors = errors;
-    }
-
-    public GraphQLObjectMapperException(
         Object errors,
         Throwable cause
     ) {

@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.graphql.scheme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static java.util.Collections.singletonMap;
 
 @AllArgsConstructor
 public final class GraphQLSchemaParser {
@@ -70,8 +70,10 @@ public final class GraphQLSchemaParser {
                     );
                 } catch (Exception e) {
                     throw new GraphQLObjectMapperException(
-                        singletonMap("arguments", "invalid"),
-                        "invalid arguments json: " + arguments,
+                        EzyMapBuilder.mapBuilder()
+                            .put("arguments", "invalid")
+                            .put("message", e.getMessage())
+                            .toMap(),
                         e
                     );
                 }

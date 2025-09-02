@@ -3,6 +3,8 @@ package com.tvd12.ezyhttp.server.graphql.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.server.core.annotation.*;
@@ -12,7 +14,6 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
-import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
 import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptor;
@@ -81,7 +82,7 @@ public class GraphQLController
                     Map.class
                 );
             } catch (Exception e) {
-                throw new GraphQLObjectMapperException(
+                throw new HttpBadRequestException(
                     singletonMap("variables", "invalid"),
                     e
                 );
@@ -118,7 +119,7 @@ public class GraphQLController
         );
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked", "MethodLength"})
+    @SuppressWarnings("MethodLength")
     private Object fetch(
         RequestArguments arguments,
         String query,
@@ -127,15 +128,14 @@ public class GraphQLController
         GraphQLSchema schema = schemaParser.parseQuery(query, variables);
         List<GraphQLQueryDefinition> queryDefinitions = schema
             .getQueryDefinitions();
-        Map answer = new HashMap<>();
-
+        Map<String, Object> answer = new HashMap<>();
         for (GraphQLQueryDefinition queryDefinition : queryDefinitions) {
             String queryName = queryDefinition.getName();
             GraphQLDataFetcher dataFetcher = dataFetcherManager
                 .getDataFetcher(queryName);
             if (dataFetcher == null) {
                 throw new HttpNotFoundException(
-                    "not found data fetcher with queryName: " + queryName
+                    singletonMap("dataFetcher", "notFound")
                 );
             }
             List<GraphQLInterceptor> interceptors = interceptorManager
@@ -177,15 +177,11 @@ public class GraphQLController
                 arguments,
                 queryDefinition
             );
-            try {
-                Object currentResponse = mapToResponse(
-                    data,
-                    queryDefinition
-                );
-                answer.put(queryName, currentResponse);
-            } catch (GraphQLObjectMapperException e) {
-                answer.put(queryName, data);
-            }
+            Object currentResponse = mapToResponse(
+                data,
+                queryDefinition
+            );
+            answer.put(queryName, currentResponse);
             for (GraphQLInterceptor interceptor : interceptors) {
                 interceptor.postHandle(
                     arguments,
@@ -209,8 +205,9 @@ public class GraphQLController
         try {
             dataMap = objectMapper.convertValue(data, Map.class);
         } catch (Exception e) {
-            throw new GraphQLObjectMapperException(
-                singletonMap("response", "invalid")
+            throw new HttpInternalServerErrorException(
+                singletonMap("response", "invalid"),
+                e
             );
         }
         return filterDataMap(dataMap, queryDefinition);

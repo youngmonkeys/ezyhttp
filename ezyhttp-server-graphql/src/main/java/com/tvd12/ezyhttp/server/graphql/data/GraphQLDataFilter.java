@@ -1,12 +1,12 @@
 package com.tvd12.ezyhttp.server.graphql.data;
 
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
 
 import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
-import static java.util.Collections.singletonMap;
 
 public class GraphQLDataFilter {
 
@@ -58,8 +58,10 @@ public class GraphQLDataFilter {
                     );
                 } else {
                     throw new GraphQLInvalidSchemeException(
-                        singletonMap("schema", "invalid"),
-                        "invalid schema at field: " + fieldName
+                        EzyMapBuilder.mapBuilder()
+                            .put("schema", "invalid")
+                            .put("field", fieldName)
+                            .toMap()
                     );
                 }
             }
