@@ -5,16 +5,23 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.*;
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryGroupExtractors.extractQueryGroup;
 
 public class GraphQLDataFetcherManager {
 
     private final Map<String, GraphQLDataFetcher> dataFetchers;
+    private final Set<String> authenticatedQueryNames;
+    private final Set<String> managementQueryNames;
+    private final Set<String> paymentQueryNames;
     private final Map<String, String> groupNameByQueryName;
     private final Map<String, Set<String>> queryNamesByGroupName;
 
     protected GraphQLDataFetcherManager(Builder builder) {
         this.dataFetchers = builder.dataFetchers;
+        this.authenticatedQueryNames = builder.authenticatedQueryNames;
+        this.managementQueryNames = builder.managementQueryNames;
+        this.paymentQueryNames = builder.paymentQueryNames;
         this.groupNameByQueryName = builder.groupNameByQueryName;
         this.queryNamesByGroupName = builder.queryNamesByGroupName;
     }
@@ -48,6 +55,18 @@ public class GraphQLDataFetcherManager {
         return result;
     }
 
+    public boolean isAuthenticatedQuery(String queryName) {
+        return authenticatedQueryNames.contains(queryName);
+    }
+
+    public boolean isManagementQuery(String queryName) {
+        return managementQueryNames.contains(queryName);
+    }
+
+    public boolean isPaymentQuery(String queryName) {
+        return paymentQueryNames.contains(queryName);
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -55,6 +74,12 @@ public class GraphQLDataFetcherManager {
     public static class Builder implements EzyBuilder<GraphQLDataFetcherManager> {
         private final Map<String, GraphQLDataFetcher> dataFetchers =
             new HashMap<>();
+        private final Set<String> authenticatedQueryNames =
+            new HashSet<>();
+        private final Set<String> managementQueryNames =
+            new HashSet<>();
+        private final Set<String> paymentQueryNames =
+            new HashSet<>();
         private final Map<String, String> groupNameByQueryName =
             new HashMap<>();
         private final Map<String, Set<String>> queryNamesByGroupName =
@@ -69,6 +94,15 @@ public class GraphQLDataFetcherManager {
             GraphQLDataFetcher fetcher
         ) {
             this.dataFetchers.put(queryName, fetcher);
+            if (isAuthenticatedFetcher(fetcher)) {
+                this.authenticatedQueryNames.add(queryName);
+            }
+            if (isManagementFetcher(fetcher)) {
+                this.managementQueryNames.add(queryName);
+            }
+            if (isPaymentFetcher(fetcher)) {
+                this.paymentQueryNames.add(queryName);
+            }
             String groupName = extractQueryGroup(queryName);
             this.groupNameByQueryName.put(queryName, groupName);
             this.queryNamesByGroupName.computeIfAbsent(

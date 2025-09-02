@@ -1,6 +1,10 @@
 package com.tvd12.ezyhttp.server.graphql.test.fetcher;
 
+import com.tvd12.ezyfox.annotation.EzyManagement;
+import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
+import com.tvd12.ezyhttp.server.core.handler.*;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
@@ -51,8 +55,51 @@ public class GraphQLDataFetcherManagerTest {
                 .toMap(),
             false
         );
+
+        Asserts.assertTrue(
+            instance.isAuthenticatedQuery("core1.fetcher1")
+        );
+        Asserts.assertTrue(
+            instance.isManagementQuery("core1.fetcher1")
+        );
+        Asserts.assertTrue(
+            instance.isPaymentQuery("core1.fetcher1")
+        );
+
+        Asserts.assertTrue(
+            instance.isAuthenticatedQuery("core1.fetcher11")
+        );
+        Asserts.assertTrue(
+            instance.isManagementQuery("core1.fetcher11")
+        );
+        Asserts.assertTrue(
+            instance.isPaymentQuery("core1.fetcher11")
+        );
+
+        Asserts.assertFalse(
+            instance.isAuthenticatedQuery("core2.fetcher2")
+        );
+        Asserts.assertTrue(
+            instance.isManagementQuery("core2.fetcher2")
+        );
+        Asserts.assertFalse(
+            instance.isPaymentQuery("core2.fetcher2")
+        );
+
+        Asserts.assertFalse(
+            instance.isAuthenticatedQuery("core2.fetcher22")
+        );
+        Asserts.assertFalse(
+            instance.isManagementQuery("core2.fetcher22")
+        );
+        Asserts.assertFalse(
+            instance.isPaymentQuery("core2.fetcher22")
+        );
     }
 
+    @Authenticated
+    @EzyManagement
+    @EzyPayment
     private static class Fetcher1 implements GraphQLDataFetcher {
 
         @Override
@@ -69,7 +116,11 @@ public class GraphQLDataFetcherManagerTest {
         }
     }
 
-    private static class Fetcher11 implements GraphQLDataFetcher {
+    private static class Fetcher11 implements
+        GraphQLDataFetcher,
+        AuthenticatedController,
+        ManagementController,
+        PaymentController {
 
         @Override
         public String getData(
@@ -83,9 +134,23 @@ public class GraphQLDataFetcherManagerTest {
         public String getQueryName() {
             return "core1.fetcher11";
         }
+
+        @Override
+        public boolean isAuthenticated() {
+            return true;
+        }
+
+        @Override
+        public boolean isPayment() {
+            return true;
+        }
     }
 
-    private static class Fetcher2 implements GraphQLDataFetcher {
+    private static class Fetcher2 implements
+        GraphQLDataFetcher,
+        AuthenticatedController,
+        ManageableController,
+        PaymentController {
 
         @Override
         public String getData(
@@ -99,9 +164,26 @@ public class GraphQLDataFetcherManagerTest {
         public String getQueryName() {
             return "core2.fetcher2";
         }
+
+        @Override
+        public boolean isAuthenticated() {
+            return false;
+        }
+
+        @Override
+        public boolean isManagement() {
+            return true;
+        }
+
+        @Override
+        public boolean isPayment() {
+            return false;
+        }
     }
 
-    private static class Fetcher22 implements GraphQLDataFetcher {
+    private static class Fetcher22 implements
+        GraphQLDataFetcher,
+        ManageableController {
 
         @Override
         public String getData(
@@ -114,6 +196,11 @@ public class GraphQLDataFetcherManagerTest {
         @Override
         public String getQueryName() {
             return "core2.fetcher22";
+        }
+
+        @Override
+        public boolean isManagement() {
+            return false;
         }
     }
 }

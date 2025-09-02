@@ -2,7 +2,6 @@ package com.tvd12.ezyhttp.server.graphql.fetcher;
 
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import com.tvd12.ezyhttp.server.graphql.annotation.GraphQLQuery;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataSchema;
 
@@ -18,10 +17,9 @@ public interface GraphQLDataFetcher {
     );
 
     default String getQueryName() {
-        if (getClass().isAnnotationPresent(GraphQLQuery.class)) {
-            return getQLQueryName(
-                getClass().getAnnotation(GraphQLQuery.class)
-            );
+        String queryName = getQLQueryName(getClass());
+        if (queryName != null) {
+            return queryName;
         }
         throw new EzyNotImplementedException("you must implement " +
             getClass().getName() +

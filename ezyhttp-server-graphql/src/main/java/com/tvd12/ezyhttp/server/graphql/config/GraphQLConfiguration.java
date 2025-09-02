@@ -64,6 +64,7 @@ public class GraphQLConfiguration implements
             .dataFetcherManager(dataFetcherManager)
             .interceptorManager(interceptorManager)
             .build();
+        singletonFactory.addSingleton(dataFetcherManager);
         singletonFactory.addSingleton(controller);
     }
 }
