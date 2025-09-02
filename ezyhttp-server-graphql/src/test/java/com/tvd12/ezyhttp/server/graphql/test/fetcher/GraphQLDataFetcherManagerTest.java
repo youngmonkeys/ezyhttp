@@ -4,7 +4,10 @@ import com.tvd12.ezyfox.annotation.EzyManagement;
 import com.tvd12.ezyfox.annotation.EzyPayment;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
-import com.tvd12.ezyhttp.server.core.handler.*;
+import com.tvd12.ezyhttp.server.core.handler.AuthenticatedController;
+import com.tvd12.ezyhttp.server.core.handler.ManageableController;
+import com.tvd12.ezyhttp.server.core.handler.ManagementController;
+import com.tvd12.ezyhttp.server.core.handler.PaymentController;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
@@ -41,8 +44,8 @@ public class GraphQLDataFetcherManagerTest {
         Asserts.assertEquals(
             queryNameByGroupName,
             EzyMapBuilder.mapBuilder()
-                .put("core1", new ArrayList<>(Sets.newHashSet("core1.fetcher1", "core1.fetcher11")))
-                .put("core2", new ArrayList<>(Sets.newHashSet("core2.fetcher2", "core2.fetcher22")))
+                .put("core1", new ArrayList<>(Sets.newHashSet("core1_fetcher1", "core1_fetcher11")))
+                .put("core2", new ArrayList<>(Sets.newHashSet("core2_fetcher2", "core2_fetcher22")))
                 .toMap(),
             false
         );
@@ -50,50 +53,50 @@ public class GraphQLDataFetcherManagerTest {
         Asserts.assertEquals(
             sortedQueryNameByGroupName,
             EzyMapBuilder.mapBuilder()
-                .put("core1", Arrays.asList("core1.fetcher1", "core1.fetcher11"))
-                .put("core2", Arrays.asList("core2.fetcher2", "core2.fetcher22"))
+                .put("core1", Arrays.asList("core1_fetcher1", "core1_fetcher11"))
+                .put("core2", Arrays.asList("core2_fetcher2", "core2_fetcher22"))
                 .toMap(),
             false
         );
 
         Asserts.assertTrue(
-            instance.isAuthenticatedQuery("core1.fetcher1")
+            instance.isAuthenticatedQuery("core1_fetcher1")
         );
         Asserts.assertTrue(
-            instance.isManagementQuery("core1.fetcher1")
+            instance.isManagementQuery("core1_fetcher1")
         );
         Asserts.assertTrue(
-            instance.isPaymentQuery("core1.fetcher1")
+            instance.isPaymentQuery("core1_fetcher1")
         );
 
         Asserts.assertTrue(
-            instance.isAuthenticatedQuery("core1.fetcher11")
+            instance.isAuthenticatedQuery("core1_fetcher11")
         );
         Asserts.assertTrue(
-            instance.isManagementQuery("core1.fetcher11")
+            instance.isManagementQuery("core1_fetcher11")
         );
         Asserts.assertTrue(
-            instance.isPaymentQuery("core1.fetcher11")
+            instance.isPaymentQuery("core1_fetcher11")
         );
 
         Asserts.assertFalse(
-            instance.isAuthenticatedQuery("core2.fetcher2")
+            instance.isAuthenticatedQuery("core2_fetcher2")
         );
         Asserts.assertTrue(
-            instance.isManagementQuery("core2.fetcher2")
+            instance.isManagementQuery("core2_fetcher2")
         );
         Asserts.assertFalse(
-            instance.isPaymentQuery("core2.fetcher2")
+            instance.isPaymentQuery("core2_fetcher2")
         );
 
         Asserts.assertFalse(
-            instance.isAuthenticatedQuery("core2.fetcher22")
+            instance.isAuthenticatedQuery("core2_fetcher22")
         );
         Asserts.assertFalse(
-            instance.isManagementQuery("core2.fetcher22")
+            instance.isManagementQuery("core2_fetcher22")
         );
         Asserts.assertFalse(
-            instance.isPaymentQuery("core2.fetcher22")
+            instance.isPaymentQuery("core2_fetcher22")
         );
     }
 
@@ -112,7 +115,12 @@ public class GraphQLDataFetcherManagerTest {
 
         @Override
         public String getQueryName() {
-            return "core1.fetcher1";
+            return "core1_fetcher1";
+        }
+
+        @Override
+        public String getQueryGroupName() {
+            return "core1";
         }
     }
 
@@ -132,7 +140,12 @@ public class GraphQLDataFetcherManagerTest {
 
         @Override
         public String getQueryName() {
-            return "core1.fetcher11";
+            return "core1_fetcher11";
+        }
+
+        @Override
+        public String getQueryGroupName() {
+            return "core1";
         }
 
         @Override
@@ -162,7 +175,12 @@ public class GraphQLDataFetcherManagerTest {
 
         @Override
         public String getQueryName() {
-            return "core2.fetcher2";
+            return "core2_fetcher2";
+        }
+
+        @Override
+        public String getQueryGroupName() {
+            return "core2";
         }
 
         @Override
@@ -195,7 +213,12 @@ public class GraphQLDataFetcherManagerTest {
 
         @Override
         public String getQueryName() {
-            return "core2.fetcher22";
+            return "core2_fetcher22";
+        }
+
+        @Override
+        public String getQueryGroupName() {
+            return "core2";
         }
 
         @Override

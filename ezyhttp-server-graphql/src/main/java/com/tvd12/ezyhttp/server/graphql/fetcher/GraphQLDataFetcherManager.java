@@ -5,8 +5,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.*;
-import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryGroupExtractors.extractQueryGroup;
 
 public class GraphQLDataFetcherManager {
 
@@ -103,7 +104,10 @@ public class GraphQLDataFetcherManager {
             if (isPaymentFetcher(fetcher)) {
                 this.paymentQueryNames.add(queryName);
             }
-            String groupName = extractQueryGroup(queryName);
+            String groupName = fetcher.getQueryGroupName();
+            if (isBlank(groupName)) {
+                groupName = DEFAULT_QL_GROUP_NAME;
+            }
             this.groupNameByQueryName.put(queryName, groupName);
             this.queryNamesByGroupName.computeIfAbsent(
                 groupName,

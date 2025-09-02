@@ -32,4 +32,19 @@ public final class GraphQLQueryAnnotations {
         }
         return null;
     }
+
+    public static String getQLQueryGroupName(
+        Class<?> dataFetcherClazz
+    ) {
+        String groupName = null;
+        if (isAnnotationPresentIncludeSuper(
+            dataFetcherClazz,
+            GraphQLQuery.class
+        )) {
+            groupName = dataFetcherClazz
+                .getAnnotation(GraphQLQuery.class)
+                .group();
+        }
+        return groupName;
+    }
 }

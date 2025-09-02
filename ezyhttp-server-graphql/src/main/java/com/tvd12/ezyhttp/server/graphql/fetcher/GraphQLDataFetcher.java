@@ -7,6 +7,7 @@ import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataSchema;
 
 import java.util.List;
 
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryAnnotations.getQLQueryGroupName;
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryAnnotations.getQLQueryName;
 
 public interface GraphQLDataFetcher {
@@ -25,6 +26,10 @@ public interface GraphQLDataFetcher {
             getClass().getName() +
             ".getQueryName() method or annotated the class with @GraphQLQuery"
         );
+    }
+
+    default String getQueryGroupName() {
+        return getQLQueryGroupName(getClass());
     }
 
     default List<GraphQLDataSchema> getQueryScheme() {

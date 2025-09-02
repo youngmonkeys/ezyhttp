@@ -22,4 +22,11 @@ public @interface GraphQLQuery {
      * @return name of query.
      */
     String name() default "";
+
+    /**
+     * Query group name.
+     *
+     * @return name of query group.
+     */
+    String group() default "";
 }
