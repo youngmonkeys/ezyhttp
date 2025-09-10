@@ -50,6 +50,8 @@ public class ThymeleafViewContextTest {
         // then
         Asserts.assertNotNull(viewContext);
         Asserts.assertNotNull(viewContext.getMessageResolver());
+        Asserts.assertNotNull(viewContext.getTemplateEngine());
+        Asserts.assertNotNull(viewContext.getContentTemplateEngine());
     }
 
     @Test
@@ -200,6 +202,28 @@ public class ThymeleafViewContextTest {
         // then
         Asserts.assertEquals(actual, "Hello World");
         verify(messageProvider, times(1)).provide();
+    }
+
+    @Test
+    public void renderHtmlTest() {
+        // given
+        TemplateResolver resolver = TemplateResolver.builder()
+            .build();
+
+        ViewContext viewContext = new ThymeleafViewContextBuilder()
+            .templateResolver(resolver)
+            .viewDialects(Collections.singletonList(new VewHelloDialect()))
+            .build();
+
+        View view = View.builder()
+            .template("Hello World")
+            .build();
+
+        // when
+        viewContext.renderHtml(view);
+
+        // then
+        Asserts.assertNotNull(viewContext);
     }
 
     private static class VewHelloDialect

@@ -11,12 +11,28 @@ import java.util.stream.Collectors;
 
 public interface ViewContext {
 
+    default void render(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        View view
+    ) throws IOException {
+        render(null, request, response, view);
+    }
+
     void render(
         ServletContext servletContext,
         HttpServletRequest request,
         HttpServletResponse response,
         View view
     ) throws IOException;
+
+    default String renderHtml(View view) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    default String renderHtml(Object context, View view) {
+        return renderHtml(view);
+    }
 
     String resolveMessage(
         Locale locale,
@@ -41,5 +57,13 @@ public interface ViewContext {
 
     default I18nMessageResolver getMessageResolver() {
         throw new UnsupportedOperationException("not implemented");
+    }
+
+    default <T> T getTemplateEngine() {
+        return null;
+    }
+
+    default <T> T getContentTemplateEngine() {
+        return null;
     }
 }

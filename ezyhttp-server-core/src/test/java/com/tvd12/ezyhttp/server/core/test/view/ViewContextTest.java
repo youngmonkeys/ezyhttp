@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.mockito.Mockito.mock;
+
 public class ViewContextTest {
 
     @Test
-    public void test() {
+    public void test() throws Exception {
         // given
         ViewContext sut = new ViewContext() {
             @Override
@@ -45,7 +47,24 @@ public class ViewContextTest {
             Locale.US,
             keys
         );
-        Throwable e = Asserts.assertThrows(sut::getMessageResolver);
+        sut.render(
+            mock(HttpServletRequest.class),
+            mock(HttpServletResponse.class),
+            View.builder()
+                .template("test")
+                .build()
+        );
+        Throwable e1 = Asserts.assertThrows(sut::getMessageResolver);
+        Throwable e2 = Asserts.assertThrows(() ->
+            sut.renderHtml(
+                new Object(),
+                View.builder()
+                    .template("test")
+                    .build()
+            )
+        );
+        Object templateEngine = sut.getTemplateEngine();
+        Object contentTemplateEngine = sut.getContentTemplateEngine();
 
         // then
         Asserts.assertEquals(
@@ -55,6 +74,48 @@ public class ViewContextTest {
                 .put("world", "WORLD")
                 .build()
         );
-        Asserts.assertEqualsType(e, UnsupportedOperationException.class);
+        Asserts.assertEqualsType(e1, UnsupportedOperationException.class);
+        Asserts.assertEqualsType(e2, UnsupportedOperationException.class);
+        Asserts.assertNull(templateEngine);
+        Asserts.assertNull(contentTemplateEngine);
+    }
+
+    @Test
+    public void renderHtmlTest() {
+        // given
+        ViewContext sut = new ViewContext() {
+            @Override
+            public void render(
+                ServletContext servletContext,
+                HttpServletRequest request,
+                HttpServletResponse response,
+                View view
+            ) {}
+
+            @Override
+            public String renderHtml(View view) {
+                return  null;
+            }
+
+            @Override
+            public String resolveMessage(
+                Locale locale,
+                String key,
+                Object... parameters
+            ) {
+                return key.toUpperCase();
+            }
+        };
+
+        // when
+        String actual = sut.renderHtml(
+            new Object(),
+            View.builder()
+                .template("test")
+                .build()
+        );
+
+        // then
+        Asserts.assertNull(actual);
     }
 }

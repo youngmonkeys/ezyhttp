@@ -8,6 +8,7 @@ import org.thymeleaf.context.IContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ public class ThymeleafViewContext implements ViewContext {
 
     private final TemplateResolver metadata;
     private final TemplateEngine templateEngine;
+    private final TemplateEngine contentTemplateEngine;
     private final List<ViewDialect> viewDialects;
     private final List<ViewDecorator> viewDecorators;
     private final List<MessageProvider> messageProviders;
@@ -40,6 +42,7 @@ public class ThymeleafViewContext implements ViewContext {
         this.absentMessageResolver = absentMessageResolver;
         this.messageResolver = createMessageResolver();
         this.templateEngine = createTemplateEngine();
+        this.contentTemplateEngine = createContentTemplateEngine();
     }
 
     @Override
@@ -57,6 +60,23 @@ public class ThymeleafViewContext implements ViewContext {
             view.getVariables()
         );
         templateEngine.process(view.getTemplate(), context, response.getWriter());
+    }
+
+    @Override
+    public String renderHtml(View view) {
+        IContext context = new Context(
+            view.getLocale(),
+            view.getVariables()
+        );
+        return renderHtml(context, view);
+    }
+
+    @Override
+    public String renderHtml(Object context, View view) {
+        return contentTemplateEngine.process(
+            view.getTemplate(),
+            (IContext) context
+        );
     }
 
     @Override
@@ -111,8 +131,37 @@ public class ThymeleafViewContext implements ViewContext {
         return templateEngine;
     }
 
+    private TemplateEngine createContentTemplateEngine() {
+        StringTemplateResolver resolver = new StringTemplateResolver();
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setCacheable(false);
+
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(resolver);
+        templateEngine.setMessageResolver(messageResolver);
+        templateEngine.addDialect(new LayoutDialect());
+        for (ViewDialect dialect : viewDialects) {
+            if (dialect instanceof IDialect) {
+                templateEngine.addDialect((IDialect) dialect);
+            }
+        }
+        return templateEngine;
+    }
+
     @Override
     public ThymeleafMessageResolver getMessageResolver() {
         return messageResolver;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public TemplateEngine getTemplateEngine() {
+        return templateEngine;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public TemplateEngine getContentTemplateEngine() {
+        return contentTemplateEngine;
     }
 }
