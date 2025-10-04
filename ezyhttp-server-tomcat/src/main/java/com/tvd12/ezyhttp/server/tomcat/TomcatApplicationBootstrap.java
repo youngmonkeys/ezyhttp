@@ -54,6 +54,9 @@ public class TomcatApplicationBootstrap
     @EzyProperty("server.context.path")
     protected String contextPath;
 
+    @EzyProperty("server.max_request_body_size")
+    protected String maxRequestBodySize = "2MB";
+
     @EzyProperty("server.multipart.location")
     protected String multipartLocation =
         System.getProperty("java.io.tmpdir");
@@ -114,34 +117,35 @@ public class TomcatApplicationBootstrap
         }
     }
 
+    @SuppressWarnings("MethodLength")
     protected Tomcat newTomcat(
         String host,
         int port,
         boolean normalServer
     ) throws Exception {
-        final Tomcat answer = new Tomcat();
+        Tomcat answer = new Tomcat();
         answer.setHostname(host);
         answer.setPort(port);
-        final String actualContextPath = new File(
+        String actualContextPath = new File(
             contextPath != null
                 ? contextPath
                 : System.getProperty("java.io.tmpdir")
         ).getAbsolutePath();
-        final Context context = answer.addContext(
+        Context context = answer.addContext(
             "",
             actualContextPath
         );
         context.setSessionTimeout(idleTimeout);
-        final Wrapper wrapper = answer.addServlet(
+        Wrapper wrapper = answer.addServlet(
             "",
             "Servlet",
             new TomcatBlockingServlet()
         );
         wrapper.setAsyncSupported(true);
-        final String actualMultipartLocation = multipartLocation != null
+        String actualMultipartLocation = multipartLocation != null
             ? multipartLocation
             : "tmp";
-        final Path multipartPath = actualMultipartLocation.startsWith("/")
+        Path multipartPath = actualMultipartLocation.startsWith("/")
             ? Paths.get(actualMultipartLocation)
             : Paths.get(actualContextPath, actualMultipartLocation);
         if (!Files.exists(multipartPath)) {
@@ -160,7 +164,7 @@ public class TomcatApplicationBootstrap
         if (corsEnable) {
             addCorsFilter(context);
         }
-        final Connector connector = answer.getConnector();
+        Connector connector = answer.getConnector();
         connector.setProperty(
             "minSpareThreads",
             String.valueOf(normalServer ? minThreads : 1)
@@ -168,6 +172,14 @@ public class TomcatApplicationBootstrap
         connector.setProperty("maxThreads", String.valueOf(maxThreads));
         connector.setProperty("connectionTimeout", String.valueOf(idleTimeout));
         connector.setProperty("keepAliveTimeout", String.valueOf(idleTimeout));
+        connector.setProperty(
+            "maxPostSize",
+            String.valueOf(FileSizes.toByteSize(maxRequestBodySize))
+        );
+        connector.setProperty(
+            "maxSwallowSize",
+            String.valueOf(FileSizes.toByteSize(maxRequestBodySize))
+        );
         if (compressionEnable) {
             connector.setProperty("compression", "on");
             connector.setProperty(
@@ -187,7 +199,7 @@ public class TomcatApplicationBootstrap
     }
 
     protected void addCorsFilter(Context context) {
-        final FilterDef filterDef = new FilterDef();
+        FilterDef filterDef = new FilterDef();
         filterDef.setFilterName("cross-origin");
         filterDef.setFilterClass(CorsFilter.class.getName());
         filterDef.addInitParameter(
@@ -200,7 +212,7 @@ public class TomcatApplicationBootstrap
         );
         context.addFilterDef(filterDef);
 
-        final FilterMap filterMap = new FilterMap();
+        FilterMap filterMap = new FilterMap();
         filterMap.setFilterName("cross-origin");
         filterMap.addURLPattern("/*");
         context.addFilterMap(filterMap);
@@ -208,7 +220,7 @@ public class TomcatApplicationBootstrap
 
     protected void startTomcat(Tomcat tomcatToStart) throws Exception {
         tomcatToStart.start();
-        final Server server = tomcatToStart.getServer();
+        Server server = tomcatToStart.getServer();
         startTomcatThreadFactory.newThread(server::await).start();
     }
 

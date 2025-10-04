@@ -1,15 +1,13 @@
 package com.tvd12.ezyhttp.server.jetty;
 
-import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
-import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.MultipartConfigElement;
-
+import com.tvd12.ezyfox.annotation.EzyProperty;
+import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyStoppable;
+import com.tvd12.ezyhttp.core.util.FileSizes;
+import com.tvd12.ezyhttp.server.core.ApplicationEntry;
+import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -17,15 +15,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
-import com.tvd12.ezyfox.annotation.EzyProperty;
-import com.tvd12.ezyfox.util.EzyLoggable;
-import com.tvd12.ezyfox.util.EzyStoppable;
-import com.tvd12.ezyhttp.core.util.FileSizes;
-import com.tvd12.ezyhttp.server.core.ApplicationEntry;
-import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import javax.servlet.DispatcherType;
+import javax.servlet.MultipartConfigElement;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Setter;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 @Setter
 @ApplicationBootstrap
@@ -47,6 +44,9 @@ public class JettyApplicationBootstrap
 
     @EzyProperty("server.idle_timeout")
     protected int idleTimeout = 150 * 1000;
+
+    @EzyProperty("server.max_request_body_size")
+    protected String maxRequestBodySize = "2MB";
 
     @EzyProperty("server.multipart.location")
     protected String multipartLocation =
@@ -120,7 +120,11 @@ public class JettyApplicationBootstrap
         server.start();
         logger.info("http server started on: {}:{}", host, port);
         if (managementEnable) {
-            logger.info("management started on: {}:{}", managementHost, managementPort);
+            logger.info(
+                "management started on: {}:{}",
+                managementHost,
+                managementPort
+            );
         }
     }
 
@@ -146,14 +150,20 @@ public class JettyApplicationBootstrap
 
     protected ServletContextHandler newServletHandler() {
         ServletContextHandler servletHandler = new ServletContextHandler();
-        servletHandler.addServlet(JettyBlockingServlet.class, "/*")
+        servletHandler
+            .addServlet(JettyBlockingServlet.class, "/*")
             .getRegistration()
-            .setMultipartConfig(new MultipartConfigElement(
-                multipartLocation,
-                FileSizes.toByteSize(multipartMaxFileSize),
-                (int) FileSizes.toByteSize(multipartMaxRequestSize),
-                (int) FileSizes.toByteSize(multipartFileSizeThreshold)
-            ));
+            .setMultipartConfig(
+                new MultipartConfigElement(
+                    multipartLocation,
+                    FileSizes.toByteSize(multipartMaxFileSize),
+                    (int) FileSizes.toByteSize(multipartMaxRequestSize),
+                    (int) FileSizes.toByteSize(multipartFileSizeThreshold)
+                )
+            );
+        servletHandler.setMaxFormContentSize(
+            (int) FileSizes.toByteSize(maxRequestBodySize)
+        );
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
             addFilter(servletHandler, newCrossOriginFilter());
@@ -164,7 +174,9 @@ public class JettyApplicationBootstrap
     protected GzipHandler newGzipHandler() {
         GzipHandler gzipHandler = new GzipHandler();
         if (isNotEmpty(compressionMinSize)) {
-            gzipHandler.setMinGzipSize((int) FileSizes.toByteSize(compressionMinSize));
+            gzipHandler.setMinGzipSize(
+                (int) FileSizes.toByteSize(compressionMinSize)
+            );
         }
         if (compressionIncludedMethods != null) {
             gzipHandler.setIncludedMethods(compressionIncludedMethods);
@@ -181,8 +193,15 @@ public class JettyApplicationBootstrap
         return gzipHandler;
     }
 
-    protected void addFilter(ServletContextHandler servletHandler, FilterHolder filter) {
-        servletHandler.addFilter(filter, "/*", EnumSet.of(DispatcherType.REQUEST));
+    protected void addFilter(
+        ServletContextHandler servletHandler,
+        FilterHolder filter
+    ) {
+        servletHandler.addFilter(
+            filter,
+            "/*",
+            EnumSet.of(DispatcherType.REQUEST)
+        );
     }
 
     protected FilterHolder newCrossOriginFilter() {
