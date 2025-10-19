@@ -44,7 +44,7 @@ public class ControllerProxy {
     }
 
     protected String getRequestURI() {
-        return ControllerAnnotations.getURI(clazz.getClazz());
+        return ControllerAnnotations.getURI(instance);
     }
 
     protected List<RequestHandlerMethod> fetchRequestHandlerMethods() {

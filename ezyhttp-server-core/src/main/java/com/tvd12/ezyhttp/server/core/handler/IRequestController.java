@@ -1,3 +1,10 @@
 package com.tvd12.ezyhttp.server.core.handler;
 
-public interface IRequestController { }
+import static com.tvd12.ezyhttp.core.constant.Constants.DEFAULT_URI;
+
+public interface IRequestController {
+
+    default String getDefaultUri() {
+        return DEFAULT_URI;
+    }
+}

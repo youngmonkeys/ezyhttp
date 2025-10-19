@@ -1,19 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
-
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.EzyPropertiesMap;
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
@@ -24,19 +10,20 @@ import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.ApplicationContextBuilder;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
+import com.tvd12.ezyhttp.server.core.test.controller.NoAnnotationController;
 import com.tvd12.ezyhttp.server.core.test.event.EventService;
 import com.tvd12.ezyhttp.server.core.test.event.SourceService;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
 import com.tvd12.ezyhttp.server.core.test.service.UserService0;
-import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
-import com.tvd12.ezyhttp.server.core.view.MessageProvider;
-import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
-import com.tvd12.ezyhttp.server.core.view.ViewContext;
-import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
-import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
-import com.tvd12.ezyhttp.server.core.view.ViewDialect;
+import com.tvd12.ezyhttp.server.core.view.*;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.MethodInvoker;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
+
+import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 public class ApplicationContextBuilderTest {
 
@@ -138,6 +125,10 @@ public class ApplicationContextBuilderTest {
         Asserts.assertNotNull(internalSingleton1);
         Asserts.assertNotNull(internalSingleton2);
         Asserts.assertNotNull(internalSingleton3);
+
+        NoAnnotationController noAnnotationController = beanContext
+            .getSingleton(NoAnnotationController.class);
+        Asserts.assertNotNull(noAnnotationController);
 
         ComponentManager componentManager = ComponentManager.getInstance();
         Asserts.assertEquals(componentManager.getAsyncDefaultTimeout(), 10000);

@@ -242,7 +242,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         allPackageToScans.addAll(getPackagesToScanFromProviders(reflection));
         reflection = EzyPackages.scanPackages(allPackageToScans);
         Set controllerClasses = reflection.getAnnotatedClasses(Controller.class);
-        Set interceptorClases = reflection.getAnnotatedClasses(Interceptor.class);
+        Set interceptorClasses = reflection.getAnnotatedClasses(Interceptor.class);
         Set exceptionHandlerClasses = reflection.getAnnotatedClasses(ExceptionHandler.class);
         Set bodyConverterClasses = reflection.getAnnotatedClasses(BodyConvert.class);
         Set stringConverterClasses = reflection.getAnnotatedClasses(StringConvert.class);
@@ -257,7 +257,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
             .addSingletonClasses(componentClasses)
             .addSingletonClasses(serviceClasses)
             .addSingletonClasses(controllerClasses)
-            .addSingletonClasses(interceptorClases)
+            .addSingletonClasses(interceptorClasses)
             .addSingletonClasses(exceptionHandlerClasses)
             .addSingletonClasses(bodyConverterClasses)
             .addSingletonClasses(stringConverterClasses)
@@ -302,7 +302,8 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     }
 
     protected EzyBeanContextBuilder newBeanContextBuilder() {
-        EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder()
+        EzyBeanContextBuilder beanContextBuilder = EzyBeanContext.builder();
+        beanContextBuilder
             .addProperties(properties)
             .addSingletons(singletonByName)
             .addSingletonsByKey(singletonByKey);
