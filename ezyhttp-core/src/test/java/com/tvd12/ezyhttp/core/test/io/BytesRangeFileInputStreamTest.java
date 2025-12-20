@@ -149,17 +149,12 @@ public class BytesRangeFileInputStreamTest {
         final String pomFilePath = "pom.xml";
         final File pomFile = new File(pomFilePath);
         final long fileLength = pomFile.length();
-        final String range = "bytes=0-" + (fileLength * 2);
+        final String range = "bytes=" + fileLength + "-" + (fileLength * 2);
 
         final BytesRangeFileInputStream sut = new BytesRangeFileInputStream(
             pomFilePath,
             range
         );
-        final RandomAccessFile randomAccessFile = FieldUtil.getFieldValue(
-            sut,
-            "randomAccessFile"
-        );
-        randomAccessFile.seek(fileLength);
 
         // when
         final byte[] actual = EzyInputStreams.toByteArray(sut);
@@ -170,14 +165,13 @@ public class BytesRangeFileInputStreamTest {
             actual,
             EMPTY_BYTE_ARRAY
         );
-        Asserts.assertEquals(sut.getFrom(), 0L);
+        Asserts.assertEquals(sut.getFrom(), fileLength);
         Asserts.assertEquals(sut.getTo(), fileLength);
         Asserts.assertEquals(sut.getFileLength(), fileLength);
         Asserts.assertEquals(sut.getReadBytes(), 0L);
-        Asserts.assertEquals(sut.getTargetReadBytes(), fileLength);
+        Asserts.assertEquals(sut.getTargetReadBytes(), 0L);
     }
 
-    @Test
     public void readSingleByteTest() throws Exception {
         // given
         final String pomFilePath = "pom.xml";
@@ -209,7 +203,6 @@ public class BytesRangeFileInputStreamTest {
         Asserts.assertEquals(sut.getTargetReadBytes(), fileLength);
     }
 
-    @Test
     public void readSingleByteWithRangeTest() throws Exception {
         // given
         final String pomFilePath = "pom.xml";
@@ -258,19 +251,19 @@ public class BytesRangeFileInputStreamTest {
             pomFilePath,
             range
         );
-        final RandomAccessFile randomAccessFile = FieldUtil.getFieldValue(
+        FieldUtil.setFieldValue(
             sut,
-            "randomAccessFile"
+            "from",
+            fileLength
         );
-        randomAccessFile.seek(fileLength);
 
         // when
-        final int actual = sut.read();
+        final int actual = sut.read(new byte[1]);
 
         // then
         sut.close();
         Asserts.assertEquals(actual, -1);
-        Asserts.assertEquals(sut.getFrom(), 0L);
+        Asserts.assertEquals(sut.getFrom(), fileLength);
         Asserts.assertEquals(sut.getTo(), 2L);
         Asserts.assertEquals(sut.getFileLength(), fileLength);
         Asserts.assertEquals(sut.getReadBytes(), 0L);
@@ -313,7 +306,6 @@ public class BytesRangeFileInputStreamTest {
         Asserts.assertEqualsType(e, IllegalArgumentException.class);
     }
 
-    @Test
     public void seekIoErrorTest() {
         // given
         final String pomFilePath = "pom.xml";

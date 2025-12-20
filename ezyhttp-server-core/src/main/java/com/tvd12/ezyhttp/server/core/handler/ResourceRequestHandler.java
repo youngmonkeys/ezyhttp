@@ -1,15 +1,5 @@
 package com.tvd12.ezyhttp.server.core.handler;
 
-import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
-import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletResponse;
-
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.exception.EzyFileNotFoundException;
 import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
@@ -21,8 +11,16 @@ import com.tvd12.ezyhttp.core.resources.ActualContentTypeDetector;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-
 import lombok.AllArgsConstructor;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 
 @AllArgsConstructor
 public class ResourceRequestHandler implements RequestHandler {
@@ -132,25 +130,33 @@ public class ResourceRequestHandler implements RequestHandler {
                 throw new FileNotFoundException(resourcePath + " file not found");
             }
         } else {
-            final BytesRangeFileInputStream is = new BytesRangeFileInputStream(
-                resourcePath,
-                range
-            );
-            servletResponse.setHeader(
-                Headers.ACCEPT_RANGES,
-                "bytes"
-            );
-            servletResponse.setHeader(
-                Headers.CONTENT_RANGE,
-                is.getBytesContentRangeString()
-            );
-            servletResponse.setHeader(
-                Headers.CONTENT_LENGTH,
-                String.valueOf(is.getTargetReadBytes())
-            );
-            statusCode = StatusCodes.PARTIAL_CONTENT;
-            servletResponse.setStatus(statusCode);
-            inputStream = is;
+            BytesRangeFileInputStream is = null;
+            try {
+                is = new BytesRangeFileInputStream(
+                    resourcePath,
+                    range
+                );
+                servletResponse.setHeader(
+                    Headers.ACCEPT_RANGES,
+                    "bytes"
+                );
+                servletResponse.setHeader(
+                    Headers.CONTENT_RANGE,
+                    is.getBytesContentRangeString()
+                );
+                servletResponse.setHeader(
+                    Headers.CONTENT_LENGTH,
+                    String.valueOf(is.getTargetReadBytes())
+                );
+                statusCode = StatusCodes.PARTIAL_CONTENT;
+                servletResponse.setStatus(statusCode);
+                inputStream = is;
+            } catch (Exception e) {
+                if (is != null) {
+                    is.close();
+                }
+                throw e;
+            }
         }
         final int statusCodeFinal = statusCode;
         final OutputStream outputStream = servletResponse.getOutputStream();
