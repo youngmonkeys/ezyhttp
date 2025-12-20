@@ -75,19 +75,15 @@ public class BytesRangeFileInputStream extends InputStream {
         if (readBytes >= targetReadBytes) {
             return -1;
         }
-
         long remaining = targetReadBytes - readBytes;
         int actualLength = (int) Math.min(b.length, remaining);
-
         ByteBuffer dst = ByteBuffer.wrap(b, 0, actualLength);
-
         long position = from + readBytes;
-        int n = fileChannel.read(dst, position);
-
-        if (n > 0) {
-            readBytes += n;
+        int rb = fileChannel.read(dst, position);
+        if (rb > 0) {
+            readBytes += rb;
         }
-        return n;
+        return rb;
     }
 
     @Override
