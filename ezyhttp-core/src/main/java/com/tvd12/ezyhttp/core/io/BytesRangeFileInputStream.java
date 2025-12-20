@@ -49,7 +49,6 @@ public class BytesRangeFileInputStream extends InputStream {
         long rangeTo
     ) throws Exception {
         from = rangeFrom;
-
         final AnywayFileLoader fileLoader = AnywayFileLoader.getDefault();
         final File file = fileLoader.load(filePath);
         if (file == null) {
