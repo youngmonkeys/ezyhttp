@@ -379,4 +379,102 @@ public class ResourceRequestHandlerTest {
         verify(response, times(1))
             .setContentType(ContentTypes.APPLICATION_WASM);
     }
+
+    @Test
+    public void handleAsyncWithRangeExceptionWhenServletResponseSetHeaderTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        doThrow(new RuntimeException("test"))
+            .when(response)
+            .setHeader(Headers.ACCEPT_RANGES, "bytes");
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        String range = "bytes=0-" + new File(resourcePath).length();
+        when(arguments.getHeader("Range")).thenReturn(range);
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.handle(arguments));
+
+        // then
+        Asserts.assertEqualsType(e, RuntimeException.class);
+        Asserts.assertTrue(sut.isAsync());
+        Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
+        Asserts.assertEquals("/index.html", sut.getRequestURI());
+        Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getResponseContentType());
+        Thread.sleep(300);
+        downloadManager.stop();
+        verify(arguments, times(1)).getAsyncContext();
+        verify(asyncContext, times(1)).getResponse();
+        verify(asyncContext, times(1)).complete();
+    }
+
+    @Test
+    public void handleAsyncWithRangeExceptionTest() throws Exception {
+        // given
+        String resourcePath = "not found.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        doThrow(new RuntimeException("test"))
+            .when(response)
+            .setHeader(Headers.ACCEPT_RANGES, "bytes");
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        String range = "bytes=0-" + new File(resourcePath).length();
+        when(arguments.getHeader("Range")).thenReturn(range);
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.handle(arguments));
+
+        // then
+        Asserts.assertEqualsType(e, HttpNotFoundException.class);
+        Asserts.assertTrue(sut.isAsync());
+        Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
+        Asserts.assertEquals("/index.html", sut.getRequestURI());
+        Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getResponseContentType());
+        Thread.sleep(300);
+        downloadManager.stop();
+        verify(arguments, times(1)).getAsyncContext();
+        verify(asyncContext, times(1)).getResponse();
+        verify(asyncContext, times(1)).complete();
+    }
 }

@@ -1,10 +1,9 @@
 package com.tvd12.ezyhttp.core.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 
 import com.tvd12.ezyhttp.core.data.BytesRange;
 
@@ -22,7 +21,8 @@ public class BytesRangeFileInputStream extends InputStream {
     private long readBytes;
     @Getter
     private final long targetReadBytes;
-    private final RandomAccessFile randomAccessFile;
+
+    private final FileChannel fileChannel;
 
     public static final int MAX_CHUNK_LENGTH = 2 * 1024 * 1024;
 
@@ -50,61 +50,60 @@ public class BytesRangeFileInputStream extends InputStream {
         long rangeTo
     ) throws Exception {
         from = rangeFrom;
+
         final AnywayFileLoader fileLoader = AnywayFileLoader.getDefault();
         final File file = fileLoader.load(filePath);
         if (file == null) {
             throw new FileNotFoundException(filePath + " not found");
         }
+
         fileLength = file.length();
         long actualTo = rangeTo == 0
             ? from + MAX_CHUNK_LENGTH
             : rangeTo + 1;
+
         if (actualTo > fileLength) {
             actualTo = fileLength;
         }
+
         to = actualTo;
         targetReadBytes = actualTo - from;
-        randomAccessFile = new RandomAccessFile(
-            file,
-            "r"
+
+        fileChannel = FileChannel.open(
+            file.toPath(),
+            StandardOpenOption.READ
         );
-        try {
-            randomAccessFile.seek(from);
-        } catch (Exception e) {
-            randomAccessFile.close();
-            throw e;
-        }
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public int read(byte[] b) throws IOException {
         if (readBytes >= targetReadBytes) {
             return -1;
         }
-        final int length = (int) (to - (from + readBytes));
-        final int actualLength = Math.min(b.length, length);
-        final int rb = randomAccessFile.read(b, 0, actualLength);
-        if (rb > 0) {
-            readBytes += rb;
+
+        long remaining = targetReadBytes - readBytes;
+        int actualLength = (int) Math.min(b.length, remaining);
+
+        ByteBuffer dst = ByteBuffer.wrap(b, 0, actualLength);
+
+        long position = from + readBytes;
+        int n = fileChannel.read(dst, position);
+
+        if (n > 0) {
+            readBytes += n;
         }
-        return rb;
+        return n;
     }
 
     @Override
     public int read() throws IOException {
-        if (readBytes >= targetReadBytes) {
-            return -1;
-        }
-        final int b = randomAccessFile.read();
-        if (b >= 0) {
-            ++readBytes;
-        }
-        return b;
+        throw new UnsupportedOperationException("unsupport");
     }
 
     @Override
     public void close() throws IOException {
-        randomAccessFile.close();
+        fileChannel.close();
     }
 
     public String getBytesContentRangeString() {
