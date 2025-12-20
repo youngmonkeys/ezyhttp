@@ -21,7 +21,6 @@ public class BytesRangeFileInputStream extends InputStream {
     private long readBytes;
     @Getter
     private final long targetReadBytes;
-
     private final FileChannel fileChannel;
 
     public static final int MAX_CHUNK_LENGTH = 2 * 1024 * 1024;
