@@ -56,19 +56,15 @@ public class BytesRangeFileInputStream extends InputStream {
         if (file == null) {
             throw new FileNotFoundException(filePath + " not found");
         }
-
         fileLength = file.length();
         long actualTo = rangeTo == 0
             ? from + MAX_CHUNK_LENGTH
             : rangeTo + 1;
-
         if (actualTo > fileLength) {
             actualTo = fileLength;
         }
-
         to = actualTo;
         targetReadBytes = actualTo - from;
-
         fileChannel = FileChannel.open(
             file.toPath(),
             StandardOpenOption.READ
