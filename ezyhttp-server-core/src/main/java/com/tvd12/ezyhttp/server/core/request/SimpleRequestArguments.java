@@ -60,7 +60,7 @@ public class SimpleRequestArguments implements RequestArguments {
     public <T> T getArgument(Object key) {
         Object argument = arguments != null ? arguments.get(key) : null;
         if (argument == null && debug) {
-            LOGGER.error("there is no value for argment: {}", key);
+            LOGGER.error("there is no value for argument: {}", key);
         }
         return (T) argument;
     }
