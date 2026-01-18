@@ -14,7 +14,8 @@ public class ThymeleafViewContextBuilder extends ViewContextBuilder {
             viewDialects,
             viewDecorators,
             messageProviders,
-            absentMessageResolver
+            absentMessageResolver,
+            templateInputStreamLoaders
         );
     }
 }
