@@ -17,6 +17,7 @@
  *
  * =============================================================================
  */
+
 package com.tvd12.ezyhttp.server.thymeleaf;
 
 import com.tvd12.ezyhttp.server.core.view.ViewTemplateInputStreamLoader;
@@ -33,16 +34,17 @@ import static com.tvd12.ezyhttp.server.thymeleaf.ThymeleafTemplateResourceUtils.
 
 /**
  * <p>
- *   Implementation of {@link ITemplateResource} representing a resource accessible by a {@link ClassLoader}
- *   (i.e. living at the <em>class path</em>).
+ *   Implementation of {@link ITemplateResource} representing a resource accessible
+ *   by a {@link ClassLoader} (i.e. living at the <em>class path</em>).
  * </p>
  * <p>
- *   Objects of this class are usually created by {@link org.thymeleaf.templateresolver.ClassLoaderTemplateResolver}.
+ *   Objects of this class are usually created by
+ *   {@link org.thymeleaf.templateresolver.ClassLoaderTemplateResolver}.
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
  * @since 3.0.0
- * 
+ *
  */
 public final class ThymeleafClassLoaderTemplateResource implements ITemplateResource {
 

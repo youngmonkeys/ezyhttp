@@ -17,6 +17,7 @@
  *
  * =============================================================================
  */
+
 package com.tvd12.ezyhttp.server.thymeleaf;
 
 import com.tvd12.ezyhttp.server.core.view.ViewTemplateInputStreamLoader;
@@ -33,15 +34,17 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- *   Implementation of {@link ITemplateResolver} that extends {@link AbstractConfigurableTemplateResolver}
- *   and creates {@link ClassLoaderTemplateResource} instances for template resources.
+ *   Implementation of {@link ITemplateResolver} that extends
+ *   {@link AbstractConfigurableTemplateResolver} and creates
+ *   {@link ClassLoaderTemplateResource} instances for template resources.
  * </p>
  * <p>
- *   Note a class with this name existed since 1.0, but it was completely rewritten in Thymeleaf 3.0.
+ *   Note a class with this name existed since 1.0, but it was completely
+ *   rewritten in Thymeleaf 3.0.
  * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
- * 
+ *
  * @since 3.0.0
  *
  */
