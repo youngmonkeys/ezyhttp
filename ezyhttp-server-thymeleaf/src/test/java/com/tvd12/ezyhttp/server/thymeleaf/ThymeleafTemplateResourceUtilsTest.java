@@ -89,6 +89,30 @@ public class ThymeleafTemplateResourceUtilsTest {
         Asserts.assertEquals("foo/bar", result);
     }
 
+     @Test
+    public void cleanPathContainsNoBack1Text() {
+        // given
+        String path = "foo//bar/aa";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.cleanPath(path);
+
+        // then
+        Asserts.assertEquals("foo/bar/aa", result);
+    }
+
+    @Test
+    public void cleanPathContainsNoBack2Text() {
+        // given
+        String path = "foo//bar/.a";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.cleanPath(path);
+
+        // then
+        Asserts.assertEquals("foo/bar/.a", result);
+    }
+
     @Test
     public void computeRelativeLocationWithSeparator() {
         // given
@@ -155,6 +179,18 @@ public class ThymeleafTemplateResourceUtilsTest {
     }
 
     @Test
+    public void computeBaseNameWithSlashAndDotAfterName() {
+        // given
+        String path = "templates/home.page.html";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.computeBaseName(path);
+
+        // then
+        Asserts.assertEquals("home.page", result);
+    }
+
+    @Test
     public void computeBaseNameWithoutSlash() {
         // given
         String path = "archive.tar.gz";
@@ -164,5 +200,17 @@ public class ThymeleafTemplateResourceUtilsTest {
 
         // then
         Asserts.assertEquals("archive.tar", result);
+    }
+
+    @Test
+    public void computeBaseNamDotPost1Test() {
+        // given
+        String path = "a/b";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.computeBaseName(path);
+
+        // then
+        Asserts.assertEquals("b", result);
     }
 }
