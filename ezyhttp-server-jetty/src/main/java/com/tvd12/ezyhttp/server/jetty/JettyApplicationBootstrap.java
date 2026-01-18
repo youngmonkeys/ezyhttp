@@ -37,10 +37,10 @@ public class JettyApplicationBootstrap
     protected String host = "0.0.0.0";
 
     @EzyProperty("server.max_threads")
-    protected int maxThreads = 256;
+    protected int maxThreads = 16;
 
     @EzyProperty("server.min_threads")
-    protected int minThreads = 16;
+    protected int minThreads = 4;
 
     @EzyProperty("server.idle_timeout")
     protected int idleTimeout = 150 * 1000;

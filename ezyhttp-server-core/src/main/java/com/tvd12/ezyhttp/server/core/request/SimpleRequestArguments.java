@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 @SuppressWarnings("unchecked")
 public class SimpleRequestArguments implements RequestArguments {
 
@@ -242,18 +245,46 @@ public class SimpleRequestArguments implements RequestArguments {
         return cookieMap != null ? cookieMap.get(name) : null;
     }
 
+    @Override
+    public String getRequestValue(String name) {
+        String value = (String) request.getAttribute(name);
+        if (isBlank(value)) {
+            value = getPathVariable(name);
+        }
+        if (isBlank(value)) {
+            value = getHeader(name);
+        }
+        if (isBlank(value)) {
+            value = getParameter(name);
+        }
+        if (isBlank(value)) {
+            value = getCookieValue(name);
+        }
+        if (isBlank(value)) {
+            value = getArgument(name);
+        }
+        return value;
+    }
+
     public void setRedirectionAttributesFromCookie() {
-        Cookie cookie = getCookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME);
+        Cookie cookie = getCookie(CoreConstants
+            .COOKIE_REDIRECT_ATTRIBUTES_NAME);
         if (cookie == null) {
             return;
         }
         try {
             String value = EzyBase64.decodeUtf(cookie.getValue());
-            this.redirectionAttributes = objectMapper.readValue(value, Map.class);
+            this.redirectionAttributes = objectMapper.readValue(
+                value,
+                Map.class
+            );
         } catch (Exception e) {
             // do nothing
         }
-        Cookie newCookie = new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "");
+        Cookie newCookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            EMPTY_STRING
+        );
         newCookie.setMaxAge(0);
         response.addCookie(newCookie);
     }
@@ -267,9 +298,14 @@ public class SimpleRequestArguments implements RequestArguments {
     }
 
     @Override
-    public <T> T getRedirectionAttribute(String name, Class<T> outType) {
+    public <T> T getRedirectionAttribute(
+        String name,
+        Class<T> outType
+    ) {
         Object value = getRedirectionAttribute(name);
-        return value != null ? objectMapper.convertValue(value, outType) : null;
+        return value != null
+            ? objectMapper.convertValue(value, outType)
+            : null;
     }
 
     @Override

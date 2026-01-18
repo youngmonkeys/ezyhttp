@@ -62,7 +62,29 @@ public class HttpServletRequestsTest extends BaseTest {
         verify(request, times(1)).getAttribute("1");
         verify(request, times(1)).getHeader("2");
         verify(request, times(1)).getParameter("3");
-        verify(request, times(8)).getCookies();
+        verify(request, times(4)).getCookies();
+    }
+
+    @Test
+    public void getRequestValueTestWithoutCookie() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        // when
+        when(request.getCookies()).thenReturn(new Cookie[]{
+            new Cookie("1", ""), new Cookie("2", "b"), new Cookie("3", "c")
+        });
+
+        // then
+        Asserts.assertNull(HttpServletRequests.getRequestValue(request, "1", false));
+        Asserts.assertNull(HttpServletRequests.getRequestValue(request, "2", false));
+        Asserts.assertNull(HttpServletRequests.getRequestValue(request, "3", false));
+        Asserts.assertNull(HttpServletRequests.getRequestValue(request, "unknown", false));
+
+        verify(request, times(1)).getAttribute("1");
+        verify(request, times(1)).getHeader("2");
+        verify(request, times(1)).getParameter("3");
+        verify(request, times(0)).getCookies();
     }
 
     @Test
@@ -88,6 +110,37 @@ public class HttpServletRequestsTest extends BaseTest {
         verify(request, times(1)).getParameter("3");
         verify(request, times(1)).getParameter("A");
         verify(request, times(1)).getParameter("a");
-        verify(request, times(3)).getCookies();
+        verify(request, times(4)).getCookies();
+    }
+
+    @Test
+    public void getRequestValueAnywayNoCheckCookieTest() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        // when
+        when(request.getAttribute("1")).thenReturn("a");
+        when(request.getHeader("2")).thenReturn("b");
+        when(request.getParameter("3")).thenReturn("c");
+        when(request.getParameter("a")).thenReturn("d");
+        when(request.getParameter("a")).thenReturn("d");
+        when(request.getCookies()).thenReturn(new Cookie[]{
+            new Cookie("e", "e1"), new Cookie("f", "f1"), new Cookie("g", "g1")
+        });
+
+        // then
+        Asserts.assertEquals(HttpServletRequests.getRequestValueAnyway(request, "1", false), "a");
+        Asserts.assertEquals(HttpServletRequests.getRequestValueAnyway(request, "2", false), "b");
+        Asserts.assertEquals(HttpServletRequests.getRequestValueAnyway(request, "3", false), "c");
+        Asserts.assertEquals(HttpServletRequests.getRequestValueAnyway(request, "A", false), "d");
+        Asserts.assertNull(HttpServletRequests.getRequestValueAnyway(request, "unknown", false));
+        Asserts.assertNull(HttpServletRequests.getRequestValueAnyway(request, "e", false));
+
+        verify(request, times(1)).getAttribute("1");
+        verify(request, times(1)).getHeader("2");
+        verify(request, times(1)).getParameter("3");
+        verify(request, times(1)).getParameter("A");
+        verify(request, times(1)).getParameter("a");
+        verify(request, times(0)).getCookies();
     }
 }

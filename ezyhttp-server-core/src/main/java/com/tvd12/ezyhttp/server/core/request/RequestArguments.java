@@ -1,15 +1,17 @@
 package com.tvd12.ezyhttp.server.core.request;
 
-import java.util.Map;
+import com.tvd12.ezyfox.util.EzyReleasable;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.data.BodyData;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
-import com.tvd12.ezyfox.util.EzyReleasable;
-import com.tvd12.ezyhttp.core.constant.HttpMethod;
-import com.tvd12.ezyhttp.core.data.BodyData;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 public interface RequestArguments extends BodyData, EzyReleasable {
 
@@ -75,6 +77,26 @@ public interface RequestArguments extends BodyData, EzyReleasable {
     default String getCookieValue(String name, String defaultValue) {
         String answer = getCookieValue(name);
         return answer != null ? answer : defaultValue;
+    }
+
+    String getRequestValue(String name);
+
+    default String getRequestValueAnyway(
+        String argumentName
+    ) {
+        String value = getRequestValue(argumentName);
+        String argumentNameLowerCase = EMPTY_STRING;
+        if (isBlank(value)) {
+            argumentNameLowerCase = argumentName.toLowerCase();
+            value = getRequestValue(argumentNameLowerCase);
+        }
+        if (isBlank(value)) {
+            String argumentNameFirstUpperCase =
+                argumentNameLowerCase.substring(0, 1).toUpperCase() +
+                argumentNameLowerCase.substring(1);
+            value = getRequestValue(argumentNameFirstUpperCase);
+        }
+        return value;
     }
 
     Map<String, Object> getRedirectionAttributes();

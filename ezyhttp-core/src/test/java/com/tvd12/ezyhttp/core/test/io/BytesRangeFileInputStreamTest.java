@@ -9,7 +9,6 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 
 public class BytesRangeFileInputStreamTest {
@@ -322,5 +321,31 @@ public class BytesRangeFileInputStreamTest {
 
         // then
         Asserts.assertEqualsType(e, IOException.class);
+    }
+
+    @Test
+    public void readTest() throws Exception {
+        // given
+        final String pomFilePath = "pom.xml";
+        final File pomFile = new File(pomFilePath);
+        final long fileLength = pomFile.length();
+        final String range = "bytes=0-1";
+
+        final BytesRangeFileInputStream sut = new BytesRangeFileInputStream(
+            pomFilePath,
+            range
+        );
+        FieldUtil.setFieldValue(
+            sut,
+            "from",
+            fileLength
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.read());
+
+        // then
+        sut.close();
+        Asserts.assertEqualsType(e, UnsupportedOperationException.class);
     }
 }
