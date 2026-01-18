@@ -3,8 +3,6 @@ package com.tvd12.ezyhttp.server.thymeleaf;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import com.tvd12.ezyhttp.server.thymeleaf.ThymeleafTemplateResourceUtils;
-
 public class ThymeleafTemplateResourceUtilsTest {
 
     @Test
@@ -13,16 +11,19 @@ public class ThymeleafTemplateResourceUtilsTest {
         String nullPath = null;
         String emptyPath = "";
         String simplePath = "templates\\home.html";
+        String plainPath = "a/b/c";
 
         // when
         String nullResult = ThymeleafTemplateResourceUtils.cleanPath(nullPath);
         String emptyResult = ThymeleafTemplateResourceUtils.cleanPath(emptyPath);
         String simpleResult = ThymeleafTemplateResourceUtils.cleanPath(simplePath);
+        String plainResult = ThymeleafTemplateResourceUtils.cleanPath(plainPath);
 
         // then
         Asserts.assertNull(nullResult);
         Asserts.assertEquals("", emptyResult);
         Asserts.assertEquals("templates/home.html", simpleResult);
+        Asserts.assertEquals("a/b/c", plainResult);
     }
 
     @Test
@@ -38,6 +39,18 @@ public class ThymeleafTemplateResourceUtilsTest {
     }
 
     @Test
+    public void cleanPathSimpleWithoutDotOrDoubleSlash() {
+        // given
+        String path = "foo/bar";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.cleanPath(path);
+
+        // then
+        Asserts.assertEquals("foo/bar", result);
+    }
+
+    @Test
     public void cleanPathRootBasedWithParentSegments() {
         // given
         String path = "/a/b/../c";
@@ -50,6 +63,30 @@ public class ThymeleafTemplateResourceUtilsTest {
         // then
         Asserts.assertEquals("/a/c", result);
         Asserts.assertEquals("/../a", resultWithParents);
+    }
+
+    @Test
+    public void cleanPathWithUnixPathContainsDoubleSplash() {
+        // given
+        String path = "foo//bar";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.cleanPath(path);
+
+        // then
+        Asserts.assertEquals("foo/bar", result);
+    }
+
+    @Test
+    public void cleanPathContainsNoBackText() {
+        // given
+        String path = "foo//bar/.";
+
+        // when
+        String result = ThymeleafTemplateResourceUtils.cleanPath(path);
+
+        // then
+        Asserts.assertEquals("foo/bar", result);
     }
 
     @Test

@@ -46,7 +46,8 @@ final class ThymeleafTemplateResourceUtils {
         // Some shortcuts, just in case this is empty or simply has no '.' or '..'
         // (and no double-/ we should simplify)
         if (unixPath.isEmpty()
-            || (!unixPath.contains("/.") && !unixPath.contains("//"))) {
+            || (!unixPath.contains("/.") && !unixPath.contains("//"))
+        ) {
             return unixPath;
         }
         // We make sure path starts with '/' in order to simplify the algorithm
