@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.*;
 
+@SuppressWarnings("MethodCount")
 public interface RequestArguments extends BodyData, EzyReleasable {
 
     HttpMethod getMethod();
@@ -79,7 +79,20 @@ public interface RequestArguments extends BodyData, EzyReleasable {
         return answer != null ? answer : defaultValue;
     }
 
-    String getRequestValue(String name);
+    String getRequestValue(String argumentName);
+
+    default String getRequestValueAnyway(
+        String... argumentNames
+    ) {
+        String value = null;
+        for (String argumentName : argumentNames) {
+            value = getRequestValueAnyway(argumentName);
+            if (isNotBlank(value)) {
+                break;
+            }
+        }
+        return value;
+    }
 
     default String getRequestValueAnyway(
         String argumentName

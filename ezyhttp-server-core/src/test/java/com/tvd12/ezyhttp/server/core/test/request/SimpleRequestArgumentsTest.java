@@ -402,6 +402,49 @@ public class SimpleRequestArgumentsTest {
     }
 
     @Test
+    public void getRequestValueAnywayCaseInAttribute2Test() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getAttribute("hello")).thenReturn("world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+
+        // when
+        String actual = sut.getRequestValueAnyway("worlD", "hello");
+
+        // then
+        Asserts.assertEquals(actual, "world");
+
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInAttributeEmtpyTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getAttribute("hello")).thenReturn("world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+
+        // when
+        String actual = sut.getRequestValueAnyway();
+
+        // then
+        Asserts.assertNull(actual);
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
     public void getRequestValueAnywayCaseInPathVariableTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
