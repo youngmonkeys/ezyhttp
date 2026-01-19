@@ -31,8 +31,28 @@ public class ResourceRequestHandler implements RequestHandler {
     private final EzyInputStreamLoader inputStreamLoader;
     private final ResourceDownloadManager downloadManager;
     private final int defaultTimeout;
+    private final EzyResultCallback<Boolean> callback;
     private final ActualContentTypeDetector actualContentTypeDetector =
         ActualContentTypeDetector.getInstance();
+
+    public ResourceRequestHandler(
+        String resourcePath,
+        String resourceURI,
+        String resourceExtension,
+        EzyInputStreamLoader inputStreamLoader,
+        ResourceDownloadManager downloadManager,
+        int defaultTimeout
+    ) {
+        this(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            inputStreamLoader,
+            downloadManager,
+            defaultTimeout,
+            null
+        );
+    }
 
     public ResourceRequestHandler(
         String resourcePath,
@@ -170,6 +190,9 @@ public class ResourceRequestHandler implements RequestHandler {
                         processWithLogException(inputStream::close);
                         servletResponse.setStatus(statusCodeFinal);
                         asyncContext.complete();
+                        if (callback != null) {
+                            callback.onResponse(response);
+                        }
                     }
 
                     @Override
@@ -177,6 +200,9 @@ public class ResourceRequestHandler implements RequestHandler {
                         processWithLogException(inputStream::close);
                         servletResponse.setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
                         asyncContext.complete();
+                        if (callback != null) {
+                            callback.onException(e);
+                        }
                     }
                 }
             );
