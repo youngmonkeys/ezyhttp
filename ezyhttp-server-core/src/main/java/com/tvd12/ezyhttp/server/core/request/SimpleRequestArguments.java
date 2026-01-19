@@ -18,10 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -247,10 +244,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getRequestValue(String argumentName) {
-        String value = (String) request.getAttribute(argumentName);
-        if (isBlank(value)) {
-            value = getPathVariable(argumentName);
-        }
+        String value = getCookieValue(argumentName);
         if (isBlank(value)) {
             value = getHeader(argumentName);
         }
@@ -258,7 +252,13 @@ public class SimpleRequestArguments implements RequestArguments {
             value = getParameter(argumentName);
         }
         if (isBlank(value)) {
-            value = getCookieValue(argumentName);
+            value = getPathVariable(argumentName);
+        }
+        if (isBlank(value)) {
+            value = Objects.toString(
+                request.getAttribute(argumentName),
+                null
+            );
         }
         if (isBlank(value)) {
             value = getArgument(argumentName);

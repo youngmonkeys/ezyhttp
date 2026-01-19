@@ -461,7 +461,7 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals(actual1, "world");
         Asserts.assertEquals(actual2, null);
 
-        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(0)).getAttribute("hello");
         verify(request, times(1)).getAttribute("worlD");
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
@@ -487,7 +487,7 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals(actual1, "world");
         Asserts.assertEquals(actual2, null);
 
-        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(0)).getAttribute("hello");
         verify(request, times(1)).getAttribute("worlD");
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
@@ -513,7 +513,7 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals(actual1, "world");
         Asserts.assertEquals(actual2, null);
 
-        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(0)).getAttribute("hello");
         verify(request, times(1)).getAttribute("worlD");
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
@@ -539,7 +539,7 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertEquals(actual1, "world");
         Asserts.assertEquals(actual2, null);
 
-        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(0)).getAttribute("hello");
         verify(request, times(1)).getAttribute("worlD");
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
