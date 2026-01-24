@@ -105,6 +105,9 @@ public final class ThymeleafClassLoaderTemplateResource implements ITemplateReso
         if (inputStream == null) {
             for (ViewTemplateInputStreamLoader loader : templateInputStreamLoaders) {
                 inputStream = loader.load(template, path);
+                if (inputStream != null) {
+                    break;
+                }
             }
         }
         if (inputStream == null) {

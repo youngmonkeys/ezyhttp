@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.mockito.Mockito.mock;
@@ -96,6 +97,38 @@ public class ThymeleafClassLoaderTemplateResourceTest {
                 "templates/custom.html",
                 null,
                 Collections.singletonList(loader)
+            );
+
+        // when
+        Reader reader = sut.reader();
+        String content = readAll(reader);
+
+        // then
+        Asserts.assertEquals("Hello Loader", content);
+    }
+
+    @Test
+    public void readerWith2InputStreamLoader() throws Exception {
+        // given
+        ViewTemplateInputStreamLoader loader1 = mock(ViewTemplateInputStreamLoader.class);
+        ViewTemplateInputStreamLoader loader2 = mock(ViewTemplateInputStreamLoader.class);
+        when(
+            loader2.load(
+                "custom",
+                "templates/custom.html"
+            )
+        ).thenReturn(
+            new ByteArrayInputStream(
+                "Hello Loader".getBytes(StandardCharsets.UTF_8)
+            )
+        );
+
+        ThymeleafClassLoaderTemplateResource sut =
+            new ThymeleafClassLoaderTemplateResource(
+                "custom",
+                "templates/custom.html",
+                null,
+                Arrays.asList(loader1, loader2)
             );
 
         // when
