@@ -1,10 +1,10 @@
 package com.tvd12.ezyhttp.server.core.view;
 
+import com.tvd12.ezyfox.builder.EzyBuilder;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import com.tvd12.ezyfox.builder.EzyBuilder;
 
 public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
 
@@ -13,11 +13,13 @@ public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
     protected final List<ViewDialect> viewDialects;
     protected final List<ViewDecorator> viewDecorators;
     protected final List<MessageProvider> messageProviders;
+    protected final List<ViewTemplateInputStreamLoader> templateInputStreamLoaders;
 
     public ViewContextBuilder() {
         this.viewDialects = new ArrayList<>();
         this.viewDecorators = new ArrayList<>();
         this.messageProviders = new ArrayList<>();
+        this.templateInputStreamLoaders = new ArrayList<>();
     }
 
     public ViewContextBuilder templateResolver(TemplateResolver templateResolver) {
@@ -45,6 +47,13 @@ public abstract class ViewContextBuilder implements EzyBuilder<ViewContext> {
         if (absentMessageResolver != null) {
             this.absentMessageResolver = absentMessageResolver;
         }
+        return this;
+    }
+
+    public ViewContextBuilder templateInputStreamLoaders(
+        List<ViewTemplateInputStreamLoader> templateInputStreamLoaders
+    ) {
+        this.templateInputStreamLoaders.addAll(templateInputStreamLoaders);
         return this;
     }
 }

@@ -18,11 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 @SuppressWarnings("unchecked")
 public class SimpleRequestArguments implements RequestArguments {
@@ -242,18 +242,49 @@ public class SimpleRequestArguments implements RequestArguments {
         return cookieMap != null ? cookieMap.get(name) : null;
     }
 
+    @Override
+    public String getRequestValue(String argumentName) {
+        String value = getCookieValue(argumentName);
+        if (isBlank(value)) {
+            value = getHeader(argumentName);
+        }
+        if (isBlank(value)) {
+            value = getParameter(argumentName);
+        }
+        if (isBlank(value)) {
+            value = getPathVariable(argumentName);
+        }
+        if (isBlank(value)) {
+            value = Objects.toString(
+                request.getAttribute(argumentName),
+                null
+            );
+        }
+        if (isBlank(value)) {
+            value = getArgument(argumentName);
+        }
+        return value;
+    }
+
     public void setRedirectionAttributesFromCookie() {
-        Cookie cookie = getCookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME);
+        Cookie cookie = getCookie(CoreConstants
+            .COOKIE_REDIRECT_ATTRIBUTES_NAME);
         if (cookie == null) {
             return;
         }
         try {
             String value = EzyBase64.decodeUtf(cookie.getValue());
-            this.redirectionAttributes = objectMapper.readValue(value, Map.class);
+            this.redirectionAttributes = objectMapper.readValue(
+                value,
+                Map.class
+            );
         } catch (Exception e) {
             // do nothing
         }
-        Cookie newCookie = new Cookie(CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME, "");
+        Cookie newCookie = new Cookie(
+            CoreConstants.COOKIE_REDIRECT_ATTRIBUTES_NAME,
+            EMPTY_STRING
+        );
         newCookie.setMaxAge(0);
         response.addCookie(newCookie);
     }
@@ -267,9 +298,14 @@ public class SimpleRequestArguments implements RequestArguments {
     }
 
     @Override
-    public <T> T getRedirectionAttribute(String name, Class<T> outType) {
+    public <T> T getRedirectionAttribute(
+        String name,
+        Class<T> outType
+    ) {
         Object value = getRedirectionAttribute(name);
-        return value != null ? objectMapper.convertValue(value, outType) : null;
+        return value != null
+            ? objectMapper.convertValue(value, outType)
+            : null;
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import javax.servlet.ServletContext;
@@ -27,19 +26,22 @@ public class ThymeleafViewContext implements ViewContext {
     private final List<MessageProvider> messageProviders;
     private final ThymeleafMessageResolver messageResolver;
     private final AbsentMessageResolver absentMessageResolver;
+    private final List<ViewTemplateInputStreamLoader> templateInputStreamLoaders;
 
     public ThymeleafViewContext(
         TemplateResolver metadata,
         List<ViewDialect> viewDialects,
         List<ViewDecorator> viewDecorators,
         List<MessageProvider> messageProviders,
-        AbsentMessageResolver absentMessageResolver
+        AbsentMessageResolver absentMessageResolver,
+        List<ViewTemplateInputStreamLoader> templateInputStreamLoaders
     ) {
         this.metadata = metadata;
         this.viewDialects = viewDialects;
         this.viewDecorators = viewDecorators;
         this.messageProviders = messageProviders;
         this.absentMessageResolver = absentMessageResolver;
+        this.templateInputStreamLoaders = templateInputStreamLoaders;
         this.messageResolver = createMessageResolver();
         this.templateEngine = createTemplateEngine();
         this.contentTemplateEngine = createContentTemplateEngine();
@@ -109,8 +111,8 @@ public class ThymeleafViewContext implements ViewContext {
     }
 
     private TemplateEngine createTemplateEngine() {
-        ClassLoaderTemplateResolver templateResolver =
-            new ClassLoaderTemplateResolver();
+        ThymeleafClassLoaderTemplateResolver templateResolver =
+            new ThymeleafClassLoaderTemplateResolver(templateInputStreamLoaders);
         TemplateMode templateMode = TemplateMode.valueOf(metadata.getTemplateMode());
         templateResolver.setTemplateMode(templateMode);
         templateResolver.setPrefix(metadata.getPrefix());

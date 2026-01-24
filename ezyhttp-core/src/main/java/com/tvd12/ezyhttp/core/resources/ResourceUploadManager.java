@@ -33,7 +33,7 @@ public class ResourceUploadManager
     public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
     public static final long UNLIMITED_UPLOAD_SIZE = -1;
     public static final int DEFAULT_THREAD_POOL_SIZE =
-        Runtime.getRuntime().availableProcessors() * 2;
+        Runtime.getRuntime().availableProcessors();
 
     public ResourceUploadManager() {
         this(
@@ -45,7 +45,9 @@ public class ResourceUploadManager
 
     public ResourceUploadManager(
         int capacity,
-        int threadPoolSize, int bufferSize) {
+        int threadPoolSize,
+        int bufferSize
+    ) {
         this.capacity = capacity;
         this.threadPoolSize = threadPoolSize;
         this.bufferSize = bufferSize;

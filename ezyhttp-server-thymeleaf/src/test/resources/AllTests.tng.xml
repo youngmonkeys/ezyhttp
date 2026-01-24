@@ -3,7 +3,8 @@
 <suite name="AllTests">
     <test name="All">
         <packages>
-            <package name="com.tvd12.ezyhttp.server.thymeleaf.test"></package>
+            <package name="com.tvd12.ezyhttp.server.thymeleaf" />
+            <package name="com.tvd12.ezyhttp.server.thymeleaf.test" />
         </packages>
     </test>
 </suite>

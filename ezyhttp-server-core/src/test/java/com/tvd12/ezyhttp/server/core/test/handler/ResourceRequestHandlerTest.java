@@ -69,6 +69,61 @@ public class ResourceRequestHandlerTest {
         verify(asyncContext, times(1)).complete();
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void handleAsyncWitCallbackTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        EzyInputStreamLoader inputStreamLoader = mock(EzyInputStreamLoader.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStreamLoader.load(resourcePath)).thenReturn(inputStream);
+        EzyResultCallback<Boolean> callback = mock(EzyResultCallback.class);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            inputStreamLoader,
+            downloadManager,
+            0,
+            callback
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        Asserts.assertTrue(sut.isAsync());
+        Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
+        Asserts.assertEquals("/index.html", sut.getRequestURI());
+        Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getResponseContentType());
+        Thread.sleep(300);
+        downloadManager.stop();
+        verify(arguments, times(1)).getAsyncContext();
+        verify(response, times(1)).getOutputStream();
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(asyncContext, times(1)).getResponse();
+        verify(asyncContext, times(1)).complete();
+        verify(inputStreamLoader, times(1)).load(resourcePath);
+        verify(inputStream, times(1)).close();
+        verify(callback, times(1)).onResponse(true);
+    }
+
     @Test
     public void handleAsyncWithRangeTest() throws Exception {
         // given
@@ -297,6 +352,74 @@ public class ResourceRequestHandlerTest {
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
         verify(asyncContext, times(1)).getResponse();
         verify(asyncContext, times(1)).complete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void handleWithDrainExceptionWitCallbackTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        EzyInputStreamLoader inputStreamLoader = mock(EzyInputStreamLoader.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStream.read(any())).thenReturn(1);
+        when(inputStreamLoader.load(resourcePath)).thenReturn(inputStream);
+        EzyResultCallback<Boolean> callback = mock(EzyResultCallback.class);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            inputStreamLoader,
+            downloadManager,
+            0,
+            callback
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        doThrow(IOException.class).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
+
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        Asserts.assertEquals(HttpMethod.GET, sut.getMethod());
+        Asserts.assertEquals("/index.html", sut.getRequestURI());
+        Asserts.assertEquals(ContentTypes.TEXT_HTML_UTF8, sut.getResponseContentType());
+        Thread.sleep(300);
+        downloadManager.stop();
+        verify(arguments, times(1)).getAsyncContext();
+        verify(response, times(1)).getOutputStream();
+        verify(arguments, times(1)).getHeader("Range");
+        verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+        verify(response, times(1)).setContentType("text/html; charset=utf-8");
+        verify(asyncContext, times(1)).getResponse();
+        verify(asyncContext, times(1)).complete();
+        verify(inputStreamLoader, times(1)).load(resourcePath);
+        verify(inputStream, times(1)).read(any());
+        verify(inputStream, times(1)).close();
+        verify(callback, times(1)).onException(any(IOException.class));
+
+        verifyNoMoreInteractions(
+            arguments,
+            response,
+            asyncContext,
+            inputStreamLoader,
+            inputStream,
+            callback
+        );
     }
 
     @SuppressWarnings("unchecked")

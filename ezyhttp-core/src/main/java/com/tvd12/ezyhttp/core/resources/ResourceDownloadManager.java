@@ -39,7 +39,7 @@ public class ResourceDownloadManager
     public static final int DEFAULT_BUFFER_SIZE = 1024;
     public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
     public static final int DEFAULT_THREAD_POOL_SIZE =
-        Runtime.getRuntime().availableProcessors() * 2;
+        Runtime.getRuntime().availableProcessors();
 
     public ResourceDownloadManager() {
         this(

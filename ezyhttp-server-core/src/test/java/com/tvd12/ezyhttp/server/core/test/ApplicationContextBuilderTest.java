@@ -292,6 +292,15 @@ public class ApplicationContextBuilderTest {
         when(beanContext.getSingleton(AbsentMessageResolver.class)).thenReturn(absentMessageResolver);
         when(viewContextBuilder.absentMessageResolver(absentMessageResolver)).thenReturn(viewContextBuilder);
 
+        ViewTemplateInputStreamLoader viewTemplateInputStreamLoader =
+            mock(ViewTemplateInputStreamLoader.class);
+        List<ViewTemplateInputStreamLoader> viewTemplateInputStreamLoaders =
+            Collections.singletonList(viewTemplateInputStreamLoader);
+        when(beanContext.getSingletonsOf(ViewTemplateInputStreamLoader.class))
+            .thenReturn(viewTemplateInputStreamLoaders);
+        when(viewContextBuilder.templateInputStreamLoaders(viewTemplateInputStreamLoaders))
+            .thenReturn(viewContextBuilder);
+
         ApplicationContextBuilder sut = new ApplicationContextBuilder();
 
         // when
@@ -311,11 +320,14 @@ public class ApplicationContextBuilderTest {
         verify(beanContext, times(1)).getSingletonsOf(ViewDecorator.class);
         verify(beanContext, times(1)).getSingleton(AbsentMessageResolver.class);
         verify(beanContext, times(1)).getSingletonsOf(MessageProvider.class);
+        verify(beanContext, times(1)).getSingletonsOf(ViewTemplateInputStreamLoader.class);
         verify(viewContextBuilder, times(1)).templateResolver(templateResolver);
         verify(viewContextBuilder, times(1)).viewDialects(viewDialects);
         verify(viewContextBuilder, times(1)).viewDecorators(viewDecorators);
         verify(viewContextBuilder, times(1)).messageProviders(messageProviders);
         verify(viewContextBuilder, times(1)).absentMessageResolver(absentMessageResolver);
+        verify(viewContextBuilder, times(1))
+            .templateInputStreamLoaders(viewTemplateInputStreamLoaders);
         verify(viewContextBuilder, times(1)).build();
         verify(singletonFactory, times(1)).addSingleton(viewContext);
     }

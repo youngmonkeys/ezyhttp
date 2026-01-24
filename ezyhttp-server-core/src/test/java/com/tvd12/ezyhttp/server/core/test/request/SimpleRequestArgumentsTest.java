@@ -1,23 +1,5 @@
 package com.tvd12.ezyhttp.server.core.test.request;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.testng.annotations.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
@@ -26,6 +8,19 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.constant.CoreConstants;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.Test;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Mockito.*;
 
 public class SimpleRequestArgumentsTest {
 
@@ -377,5 +372,229 @@ public class SimpleRequestArgumentsTest {
         Asserts.assertNull(actualAttributes);
         Asserts.assertNull(sut.getRedirectionAttribute("hello"));
         Asserts.assertNull(sut.getRedirectionAttribute("hello", Map.class));
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInAttributeTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getAttribute("hello")).thenReturn("world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInAttribute2Test() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getAttribute("hello")).thenReturn("world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+
+        // when
+        String actual = sut.getRequestValueAnyway("worlD", "hello");
+
+        // then
+        Asserts.assertEquals(actual, "world");
+
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInAttributeEmtpyTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getAttribute("hello")).thenReturn("world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+
+        // when
+        String actual = sut.getRequestValueAnyway();
+
+        // then
+        Asserts.assertNull(actual);
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInPathVariableTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/{hello}");
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(0)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInHeaderTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+        sut.setHeader("hello", "world");
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(0)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInParameterTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+        sut.setParameter("hello", new String[] {"world"});
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(0)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInCookieTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+        sut.setCookies(new Cookie[] {new Cookie("hello", "world")});
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(0)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInArgumentTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+        sut.setArgument("hello", "world");
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("worlD");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(1)).getAttribute("worlD");
+        verify(request, times(1)).getAttribute("world");
+        verify(request, times(1)).getAttribute("World");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void getRequestValueAnywayCaseInArgument2Test() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/hello/world");
+        sut.setRequest(request);
+        sut.setUriTemplate("/hello/hello");
+        sut.setArgument("hello", "world");
+
+        // when
+        String actual1 = sut.getRequestValueAnyway("hello");
+        String actual2 = sut.getRequestValueAnyway("w");
+
+        // then
+        Asserts.assertEquals(actual1, "world");
+        Asserts.assertEquals(actual2, null);
+
+        verify(request, times(1)).getAttribute("hello");
+        verify(request, times(2)).getAttribute("w");
+        verify(request, times(1)).getAttribute("W");
+        verify(request, times(1)).getRequestURI();
+        verifyNoMoreInteractions(request);
     }
 }

@@ -54,13 +54,7 @@ import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolvers;
 import com.tvd12.ezyhttp.server.core.util.InterceptorAnnotations;
 import com.tvd12.ezyhttp.server.core.util.ServiceAnnotations;
-import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
-import com.tvd12.ezyhttp.server.core.view.MessageProvider;
-import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
-import com.tvd12.ezyhttp.server.core.view.ViewContext;
-import com.tvd12.ezyhttp.server.core.view.ViewContextBuilder;
-import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
-import com.tvd12.ezyhttp.server.core.view.ViewDialect;
+import com.tvd12.ezyhttp.server.core.view.*;
 
 @SuppressWarnings({"rawtypes", "unchecked", "MethodCount"})
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
@@ -408,6 +402,9 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
                     .viewDecorators(beanContext.getSingletonsOf(ViewDecorator.class))
                     .messageProviders(beanContext.getSingletonsOf(MessageProvider.class))
                     .absentMessageResolver(beanContext.getSingleton(AbsentMessageResolver.class))
+                    .templateInputStreamLoaders(
+                        beanContext.getSingletonsOf(ViewTemplateInputStreamLoader.class)
+                    )
                     .build();
             }
         }

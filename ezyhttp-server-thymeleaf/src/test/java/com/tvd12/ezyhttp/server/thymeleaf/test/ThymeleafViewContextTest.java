@@ -17,7 +17,9 @@ import org.unbescape.html.HtmlEscape;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -143,6 +145,53 @@ public class ThymeleafViewContextTest {
 
         // then
         Asserts.assertNotNull(viewContext);
+    }
+
+
+    @Test
+    public void renderWithoutTemplateTest() throws Exception {
+        // given
+        TemplateResolver resolver = TemplateResolver.builder()
+            .build();
+        ViewTemplateInputStreamLoader loader = mock(ViewTemplateInputStreamLoader.class);
+        when(
+            loader.load(
+                "posts/details",
+                "templates/posts/details.html"
+            )
+        ).thenReturn(
+            new ByteArrayInputStream("Hello World".getBytes(StandardCharsets.UTF_8))
+        );
+        ViewContext viewContext = new ThymeleafViewContextBuilder()
+            .templateResolver(resolver)
+            .templateInputStreamLoaders(
+                Collections.singletonList(loader)
+            )
+            .build();
+
+        ServletContext servletContext = mock(ServletContext.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        PrintWriter writer = mock(PrintWriter.class);
+        when(response.getWriter()).thenReturn(writer);
+
+        View view = View.builder()
+            .template("posts/details")
+            .build();
+
+        // when
+        viewContext.render(servletContext, request, response, view);
+
+        // then
+        Asserts.assertNotNull(viewContext);
+        Asserts.assertNotNull(viewContext.getMessageResolver());
+        Asserts.assertNotNull(viewContext.getTemplateEngine());
+        Asserts.assertNotNull(viewContext.getContentTemplateEngine());
+        verify(loader, times(1)).load(
+            "posts/details",
+            "templates/posts/details.html"
+        );
     }
 
     @Test
@@ -271,9 +320,12 @@ public class ThymeleafViewContextTest {
 
 
         protected void doProcess(
-            final ITemplateContext context, final IProcessableElementTag tag,
-            final AttributeName attributeName, final String attributeValue,
-            final IElementTagStructureHandler structureHandler) {
+            final ITemplateContext context,
+            final IProcessableElementTag tag,
+            final AttributeName attributeName,
+            final String attributeValue,
+            final IElementTagStructureHandler structureHandler
+        ) {
 
             structureHandler.setBody(
                 "Hello, " + HtmlEscape.escapeHtml5(attributeValue) + "!", false);
