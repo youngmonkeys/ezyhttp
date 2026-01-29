@@ -7,8 +7,9 @@ import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
@@ -24,7 +25,7 @@ public final class GraphQLSchemaParser {
     ) {
         String query = standardize(queryToParse);
 
-        Stack<GraphQLField.Builder> stack = new Stack<>();
+        Deque<GraphQLField.Builder> stack = new ArrayDeque<>();
         GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 
         int queryLength = query.length();
@@ -36,7 +37,7 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     continue;
                 }
 
@@ -46,7 +47,7 @@ public final class GraphQLSchemaParser {
                     nameLength = 0;
                 }
                 GraphQLField.Builder childBuilder = GraphQLField.builder();
-                stack.add(childBuilder);
+                stack.push(childBuilder);
                 continue;
             }
 
@@ -119,7 +120,7 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     nameLength = 0;
                     continue;
                 }
@@ -134,7 +135,7 @@ public final class GraphQLSchemaParser {
 
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     continue;
                 }
 
@@ -150,7 +151,7 @@ public final class GraphQLSchemaParser {
                 parentBuilder.addField(childBuilder.build());
 
                 GraphQLField.Builder newChildBuilder = GraphQLField.builder();
-                stack.add(newChildBuilder);
+                stack.push(newChildBuilder);
             } else {
                 nameBuffer[nameLength++] = ch;
             }
