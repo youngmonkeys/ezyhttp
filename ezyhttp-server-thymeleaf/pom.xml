@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.tvd12</groupId>
         <artifactId>ezyhttp</artifactId>
-        <version>1.4.7</version>
+        <version>1.4.8</version>
     </parent>
     <artifactId>ezyhttp-server-thymeleaf</artifactId>
     <name>ezyhttp-server-thymeleaf</name>

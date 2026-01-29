@@ -17,8 +17,8 @@ public class GraphQLDataFilter {
     ) {
         Map answer = new HashMap<>();
         Map parentMap = null;
-        Stack<StackEntry> stack = new Stack<>();
-        stack.add(new StackEntry(queryDefinition, data));
+        Deque<StackEntry> stack = new ArrayDeque<>();
+        stack.push(new StackEntry(queryDefinition, data));
         while (!stack.isEmpty()) {
             StackEntry entry = stack.pop();
             String parentName = entry.field.getName();

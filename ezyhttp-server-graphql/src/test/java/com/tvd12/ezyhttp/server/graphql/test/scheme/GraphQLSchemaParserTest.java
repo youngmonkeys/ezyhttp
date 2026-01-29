@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.graphql.test.scheme;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
@@ -12,8 +13,12 @@ import com.tvd12.test.reflect.MethodInvoker;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Map;
 
 public class GraphQLSchemaParserTest {
@@ -500,5 +505,81 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+    }
+
+    @Test
+    public void parseQueryNoChildBeforeArgumentsTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(
+                "(id: 1)",
+                Collections.emptyMap()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        GraphQLObjectMapperException exception = (GraphQLObjectMapperException) e;
+        Asserts.assertEquals(
+            exception.getErrors(),
+            EzyMapBuilder.mapBuilder()
+                .put("arguments", "invalid")
+                .put("message", "there is no child")
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void requireParentBuilderWithEmptyStackTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Deque<GraphQLField.Builder> stack = new ArrayDeque<>();
+
+        // when
+        final Method method;
+        try {
+            method = GraphQLSchemaParser.class.getDeclaredMethod(
+                "peekFieldStackItemOrThrow",
+                Deque.class,
+                String.class
+            );
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalStateException(
+                "method requireParentBuilder should exist",
+                ex
+            );
+        }
+        method.setAccessible(true);
+        Throwable e = Asserts.assertThrows(() -> {
+            try {
+                method.invoke(
+                    instance,
+                    stack,
+                    "there is no parent case curly brace close"
+                );
+            } catch (InvocationTargetException ex) {
+                throw ex.getCause();
+            }
+        });
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        GraphQLObjectMapperException exception = (GraphQLObjectMapperException) e;
+        Asserts.assertEquals(
+            exception.getErrors(),
+            EzyMapBuilder.mapBuilder()
+                .put("arguments", "invalid")
+                .put("message", "there is no parent case curly brace close")
+                .toMap(),
+            false
+        );
     }
 }

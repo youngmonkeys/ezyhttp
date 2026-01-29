@@ -7,8 +7,9 @@ import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
@@ -24,7 +25,7 @@ public final class GraphQLSchemaParser {
     ) {
         String query = standardize(queryToParse);
 
-        Stack<GraphQLField.Builder> stack = new Stack<>();
+        Deque<GraphQLField.Builder> stack = new ArrayDeque<>();
         GraphQLSchema.Builder schemaBuilder = GraphQLSchema.builder();
 
         int queryLength = query.length();
@@ -36,7 +37,7 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     continue;
                 }
 
@@ -46,12 +47,15 @@ public final class GraphQLSchemaParser {
                     nameLength = 0;
                 }
                 GraphQLField.Builder childBuilder = GraphQLField.builder();
-                stack.add(childBuilder);
+                stack.push(childBuilder);
                 continue;
             }
 
             if (ch == '(') {
-                GraphQLField.Builder childBuilder = stack.peek();
+                GraphQLField.Builder childBuilder = peekFieldStackItemOrThrow(
+                    stack,
+                    "there is no child"
+                );
                 StringBuilder argumentsBuilder = new StringBuilder();
                 i = extractQueryArguments(
                     argumentsBuilder,
@@ -106,7 +110,10 @@ public final class GraphQLSchemaParser {
                     nameLength = 0;
                 }
 
-                GraphQLField.Builder parentBuilder = stack.peek();
+                GraphQLField.Builder parentBuilder = peekFieldStackItemOrThrow(
+                    stack,
+                    "there is no parent case curly brace close"
+                );
                 parentBuilder.addField(childBuilder.build());
 
                 if (stack.size() == 1) {
@@ -119,7 +126,7 @@ public final class GraphQLSchemaParser {
                 if (stack.isEmpty()) {
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     nameLength = 0;
                     continue;
                 }
@@ -134,7 +141,7 @@ public final class GraphQLSchemaParser {
 
                     GraphQLQueryDefinition.Builder queryBuilder =
                         GraphQLQueryDefinition.builder();
-                    stack.add(queryBuilder);
+                    stack.push(queryBuilder);
                     continue;
                 }
 
@@ -146,11 +153,14 @@ public final class GraphQLSchemaParser {
                     nameLength = 0;
                 }
 
-                GraphQLField.Builder parentBuilder = stack.peek();
+                GraphQLField.Builder parentBuilder = peekFieldStackItemOrThrow(
+                    stack,
+                    "there is no parent case space"
+                );
                 parentBuilder.addField(childBuilder.build());
 
                 GraphQLField.Builder newChildBuilder = GraphQLField.builder();
-                stack.add(newChildBuilder);
+                stack.push(newChildBuilder);
             } else {
                 nameBuffer[nameLength++] = ch;
             }
@@ -281,5 +291,21 @@ public final class GraphQLSchemaParser {
             argumentsBuilder.append(ch);
         }
         return i;
+    }
+
+    private GraphQLField.Builder peekFieldStackItemOrThrow(
+        Deque<GraphQLField.Builder> stack,
+        String message
+    ) {
+        GraphQLField.Builder parentBuilder = stack.peek();
+        if (parentBuilder == null) {
+            throw new GraphQLObjectMapperException(
+                EzyMapBuilder.mapBuilder()
+                    .put("arguments", "invalid")
+                    .put("message", message)
+                    .toMap()
+            );
+        }
+        return parentBuilder;
     }
 }
