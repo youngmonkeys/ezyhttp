@@ -244,12 +244,12 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getRequestValue(String argumentName) {
-        String value = getCookieValue(argumentName);
+        String value = getParameter(argumentName);
         if (isBlank(value)) {
             value = getHeader(argumentName);
         }
         if (isBlank(value)) {
-            value = getParameter(argumentName);
+            value = getCookieValue(argumentName);
         }
         if (isBlank(value)) {
             value = getPathVariable(argumentName);

@@ -2,7 +2,6 @@ package com.tvd12.ezyhttp.server.core.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Objects;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
@@ -38,15 +37,15 @@ public final class HttpServletRequests {
         String name,
         boolean checkCookie
     ) {
-        String value = Objects.toString(
-            request.getAttribute(name),
-            null
-        );
+        String value = request.getParameter(name);
         if (isBlank(value)) {
             value = request.getHeader(name);
         }
         if (isBlank(value)) {
-            value = request.getParameter(name);
+            value = Objects.toString(
+                request.getAttribute(name),
+                null
+            );
         }
         if (isBlank(value) && checkCookie) {
             Cookie[] cookies = request.getCookies();
