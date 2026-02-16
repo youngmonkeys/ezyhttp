@@ -53,13 +53,14 @@ public class SimpleRequestArguments implements RequestArguments {
     @Getter
     protected Map<String, Object> redirectionAttributes;
 
+    public static final boolean DEBUG = false;
     private static final Logger LOGGER =
         LoggerFactory.getLogger(SimpleRequestArguments.class);
 
     @Override
     public <T> T getArgument(Object key) {
         Object argument = arguments != null ? arguments.get(key) : null;
-        if (argument == null && debug) {
+        if (argument == null && debug && DEBUG) {
             LOGGER.error("there is no value for argument: {}", key);
         }
         return (T) argument;
