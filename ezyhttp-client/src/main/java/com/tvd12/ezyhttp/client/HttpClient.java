@@ -17,13 +17,35 @@ import com.tvd12.ezyhttp.client.request.UploadRequest;
 import com.tvd12.ezyhttp.core.codec.BodyDeserializer;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
-import com.tvd12.ezyhttp.core.constant.*;
+import com.tvd12.ezyhttp.core.constant.ContentEncoding;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.core.constant.Headers;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
-import com.tvd12.ezyhttp.core.exception.*;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpConflictException;
+import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
+import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
+import com.tvd12.ezyhttp.core.exception.HttpMethodNotAllowedException;
+import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
+import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.exception.HttpPaymentRequiredException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestException;
+import com.tvd12.ezyhttp.core.exception.HttpRequestTimeoutException;
+import com.tvd12.ezyhttp.core.exception.HttpTooManyRequestsException;
+import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
+import com.tvd12.ezyhttp.core.exception.HttpUnsupportedMediaTypeException;
 import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -676,6 +698,9 @@ public class HttpClient extends EzyLoggable {
         String contentEncoding,
         InputStream inputStream
     ) throws IOException {
+        if (inputStream == null) {
+            return null;
+        }
         ContentEncoding contentEncodingEnum = ContentEncoding
             .ofValue(contentEncoding);
         if (contentEncodingEnum == ContentEncoding.GZIP) {
