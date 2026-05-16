@@ -5,15 +5,25 @@ import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.I18nMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.core.view.MessageReader;
+import com.tvd12.properties.file.util.PropertiesUtil;
 import lombok.Getter;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.messageresolver.IMessageResolver;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 import static com.tvd12.ezyhttp.core.constant.Constants.EMPTY_STRING;
 import static com.tvd12.ezyhttp.core.util.Locales.getLocaleFromLanguage;
+import static com.tvd12.properties.file.util.PropertiesUtil.toProperties;
 
 public class ThymeleafMessageResolver implements
     I18nMessageResolver,
@@ -175,7 +185,11 @@ public class ThymeleafMessageResolver implements
         return key;
     }
 
-    private String formatMessage(Locale locale, String message, Object[] parameters) {
+    private String formatMessage(
+        Locale locale,
+        String message,
+        Object[] parameters
+    ) {
         if (!isFormatCandidate(message)) {
             return message;
         }
@@ -195,6 +209,83 @@ public class ThymeleafMessageResolver implements
             }
         }
         return false;
+    }
+
+    @Override
+    public Set<String> getMessageLanguages() {
+        return messagesByLanguage
+            .keySet()
+            .stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Locale> getMessageLocales() {
+        return new HashSet<>(messagesByLocale.keySet());
+    }
+
+    @Override
+    public Properties getDefaultMessages() {
+        return toProperties(defaultMessages);
+    }
+
+    @Override
+    public Map<Locale, Properties> getMessagesByLocale() {
+        return newHashMapNewValues(
+            messagesByLocale,
+            PropertiesUtil::toProperties
+        );
+    }
+
+    @Override
+    public Properties getMessagesByLocale(
+        Locale locale
+    ) {
+        Properties answer = messagesByLocale.get(locale);
+        return answer != null
+            ? toProperties(answer)
+            : new Properties();
+    }
+
+    @Override
+    public Map<String, Properties> getMessagesByLanguage() {
+        return newHashMapNewValues(
+            messagesByLanguage,
+            PropertiesUtil::toProperties
+        );
+    }
+
+    @Override
+    public Properties getMessagesByLanguage(
+        String language
+    ) {
+        Properties answer = messagesByLanguage.get(language);
+        return answer != null
+            ? toProperties(answer)
+            : new Properties();
+    }
+
+    @Override
+    public Set<String> getKeysOfMessageContainsKeyword(
+        String keyword
+    ) {
+        Set<String> answer = new HashSet<>();
+        for (Map.Entry<Object, Object> e : defaultMessages.entrySet()) {
+            String message = String.valueOf(e.getValue());
+            if (message.contains(keyword)) {
+                answer.add(String.valueOf(e.getKey()));
+            }
+        }
+        for (Properties props : messagesByLanguage.values()) {
+            for (Map.Entry<Object, Object> e : props.entrySet()) {
+                String message = String.valueOf(e.getValue());
+                if (message.contains(keyword)) {
+                    answer.add(String.valueOf(e.getKey()));
+                }
+            }
+        }
+        return answer;
     }
 
     public static Builder builder() {

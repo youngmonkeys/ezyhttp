@@ -1,21 +1,24 @@
 package com.tvd12.ezyhttp.server.thymeleaf.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Properties;
-
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
-import org.testng.annotations.Test;
-import org.thymeleaf.context.ITemplateContext;
-
 import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
 import com.tvd12.ezyhttp.server.thymeleaf.ThymeleafMessageResolver;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.reflect.MethodUtil;
+import org.testng.annotations.Test;
+import org.thymeleaf.context.ITemplateContext;
+
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+
+import static com.tvd12.ezyfox.io.EzySets.newHashSet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ThymeleafMessageResolverTest {
 
@@ -43,6 +46,9 @@ public class ThymeleafMessageResolverTest {
         String greetMessage = sut.resolveMessage(context, origin, "greet.message", new Object[]{"Monkey"});
         String unkown = sut.resolveMessage(context, origin, "unknown", new Object[0]);
         String foo = sut.resolveMessage(context, origin, "foo", new Object[0]);
+        Properties defaultMessages = FieldUtil.getFieldValue(sut, "defaultMessages");
+        Map<Locale, Properties> messagesByLocale = FieldUtil.getFieldValue(sut, "messagesByLocale");
+        Map<String, Properties> messagesByLanguage = FieldUtil.getFieldValue(sut, "messagesByLanguage");
 
         // then
         Asserts.assertEquals("DEFAULT", sut.getName());
@@ -52,6 +58,70 @@ public class ThymeleafMessageResolverTest {
         Asserts.assertEquals("Great Monkey!", greetMessage, false);
         Asserts.assertNull(unkown);
         Asserts.assertEquals("Bar", foo);
+        Asserts.assertEquals(
+            defaultMessages,
+            sut.getDefaultMessages()
+        );
+        Asserts.assertEquals(
+            messagesByLocale,
+            sut.getMessagesByLocale()
+        );
+        Asserts.assertEquals(
+            messagesByLanguage,
+            sut.getMessagesByLanguage()
+        );
+        Asserts.assertEquals(
+            sut.getMessagesByLocale(new Locale("en")),
+            messagesByLocale.get(new Locale("en"))
+        );
+        Asserts.assertEquals(
+            sut.getMessagesByLocale(Locale.CANADA),
+            new Properties()
+        );
+        Asserts.assertEquals(
+            sut.getMessagesByLanguage("en"),
+            messagesByLanguage.get("en")
+        );
+        Asserts.assertEquals(
+            sut.getMessagesByLanguage("ca"),
+            new Properties()
+        );
+        Asserts.assertEquals(
+            sut.getKeysOfMessageContainsKeyword("Wel"),
+            Sets.newHashSet("home.welcome")
+        );
+        Asserts.assertEquals(
+            sut.getKeysOfMessageContainsKeyword("Hel"),
+            Sets.newHashSet("ex.hello")
+        );
+        Asserts.assertEquals(
+            sut.getKeysOfMessageContainsKeyword("KKKK"),
+            Sets.newHashSet()
+        );
+        Asserts.assertEquals(
+            sut.getMessageLanguages(),
+            Sets.newHashSet(
+                "",
+                "vi",
+                "en_us",
+                "en",
+                "fr-fr"
+            )
+        );
+        Asserts.assertEquals(
+            newHashSet(
+                sut.getMessageLocales(),
+                Locale::getLanguage
+            ),
+            newHashSet(
+                Sets.newHashSet(
+                    new Locale("vi"),
+                    new Locale("en"),
+                    new Locale("fr")
+                ),
+                Locale::getLanguage
+            )
+        );
     }
 
     @Test
