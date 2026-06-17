@@ -25,6 +25,7 @@ public class GraphQLDataFetcherManager {
     private final Set<String> paymentQueryNames;
     private final Map<String, String> groupNameByQueryName;
     private final Map<String, Set<String>> queryNamesByGroupName;
+    private final GraphQLDataFetcherProvider dataFetcherProvider;
 
     protected GraphQLDataFetcherManager(Builder builder) {
         this.dataFetchers = builder.dataFetchers;
@@ -33,6 +34,7 @@ public class GraphQLDataFetcherManager {
         this.paymentQueryNames = builder.paymentQueryNames;
         this.groupNameByQueryName = builder.groupNameByQueryName;
         this.queryNamesByGroupName = builder.queryNamesByGroupName;
+        this.dataFetcherProvider = builder.dataFetcherProvider;
     }
 
     public void addDataFetcher(
@@ -65,7 +67,12 @@ public class GraphQLDataFetcherManager {
     }
 
     public GraphQLDataFetcher getDataFetcher(String queryName) {
-        return dataFetchers.get(queryName);
+        GraphQLDataFetcher fetcher = dataFetchers
+            .get(queryName);
+        if (fetcher == null && dataFetcherProvider != null) {
+            fetcher = dataFetcherProvider.provide(queryName);
+        }
+        return fetcher;
     }
     
     public Map<String, List<String>> getQueryNameByGroupName() {
@@ -118,6 +125,7 @@ public class GraphQLDataFetcherManager {
             new ConcurrentHashMap<>();
         private final Map<String, Set<String>> queryNamesByGroupName =
             new ConcurrentHashMap<>();
+        private GraphQLDataFetcherProvider dataFetcherProvider;
 
         public Builder addDataFetcher(GraphQLDataFetcher fetcher) {
             return addDataFetcher(fetcher.getQueryName(), fetcher);
@@ -146,6 +154,13 @@ public class GraphQLDataFetcherManager {
                 groupName,
                 k -> ConcurrentHashMap.newKeySet()
             ).add(queryName);
+            return this;
+        }
+
+        public Builder dataFetcherProvider(
+            GraphQLDataFetcherProvider dataFetcherProvider
+        ) {
+            this.dataFetcherProvider = dataFetcherProvider;
             return this;
         }
 

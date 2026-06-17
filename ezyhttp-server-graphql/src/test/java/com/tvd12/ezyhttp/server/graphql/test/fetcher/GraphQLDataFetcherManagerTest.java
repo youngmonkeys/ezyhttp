@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
 
@@ -71,6 +72,71 @@ public class GraphQLDataFetcherManagerTest {
             instance.getGroupNameByQueryName(noGroupFetcher.getQueryName()),
             DEFAULT_QL_GROUP_NAME
         );
+    }
+
+    @Test
+    public void getDataFetcherTest() {
+        // given
+        Fetcher1 fetcher1 = new Fetcher1();
+        Fetcher2 fetcher2 = new Fetcher2();
+        GraphQLDataFetcherManager instance = GraphQLDataFetcherManager
+            .builder()
+            .addDataFetcher(fetcher1)
+            .addDataFetcher(fetcher2)
+            .build();
+
+        // when
+        GraphQLDataFetcher actualFetcher1 = instance.getDataFetcher(
+            fetcher1.getQueryName()
+        );
+        GraphQLDataFetcher actualFetcher2 = instance.getDataFetcher(
+            fetcher2.getQueryName()
+        );
+        GraphQLDataFetcher unknownFetcher = instance.getDataFetcher(
+            "unknown"
+        );
+
+        // then
+        Asserts.assertEquals(actualFetcher1, fetcher1);
+        Asserts.assertEquals(actualFetcher2, fetcher2);
+        Asserts.assertNull(unknownFetcher);
+    }
+
+    @Test
+    public void getDataFetcherWithProviderTest() {
+        // given
+        Fetcher1 fetcher1 = new Fetcher1();
+        Fetcher2 fetcher2 = new Fetcher2();
+        AtomicInteger provideCount = new AtomicInteger();
+        GraphQLDataFetcherManager instance = GraphQLDataFetcherManager
+            .builder()
+            .addDataFetcher(fetcher1)
+            .dataFetcherProvider(queryName -> {
+                provideCount.incrementAndGet();
+                return fetcher2.getQueryName().equals(queryName)
+                    ? fetcher2
+                    : null;
+            })
+            .build();
+
+        // when
+        GraphQLDataFetcher existingFetcher = instance.getDataFetcher(
+            fetcher1.getQueryName()
+        );
+        int provideCountAfterExistingFetcher = provideCount.get();
+        GraphQLDataFetcher providedFetcher = instance.getDataFetcher(
+            fetcher2.getQueryName()
+        );
+        GraphQLDataFetcher unknownFetcher = instance.getDataFetcher(
+            "unknown"
+        );
+
+        // then
+        Asserts.assertEquals(existingFetcher, fetcher1);
+        Asserts.assertEquals(provideCountAfterExistingFetcher, 0);
+        Asserts.assertEquals(providedFetcher, fetcher2);
+        Asserts.assertNull(unknownFetcher);
+        Asserts.assertEquals(provideCount.get(), 2);
     }
 
     private void assertFetcherManager(GraphQLDataFetcherManager instance) {
