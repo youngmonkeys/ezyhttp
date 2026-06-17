@@ -15,8 +15,7 @@ public class GraphQLDataFetcherTest {
 
         // when
         // then
-        Asserts.assertNull(instance.getQueryScheme());
-        Asserts.assertNull(instance.getResponseScheme());
+        Asserts.assertNull(instance.getSchema());
     }
 
     private static class ExGraphQLDataFetcher
