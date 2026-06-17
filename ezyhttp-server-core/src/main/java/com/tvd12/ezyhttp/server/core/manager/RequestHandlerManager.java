@@ -1,13 +1,5 @@
 package com.tvd12.ezyhttp.server.core.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
@@ -16,9 +8,16 @@ import com.tvd12.ezyhttp.core.net.URITree;
 import com.tvd12.ezyhttp.server.core.exception.DuplicateURIMappingHandlerException;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable {
 
@@ -70,10 +69,11 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     }
 
     public void addHandler(RequestURI uri, RequestHandler handler) {
-        RequestHandler old = this.handlers.put(uri, handler);
+        RequestHandler old = this.handlers.get(uri);
         if (old != null && !allowOverrideURI) {
             throw new DuplicateURIMappingHandlerException(uri, old, handler);
         }
+        this.handlers.put(uri, handler);
         this.handledURIs.add(uri.getUri());
         this.logger.info("add mapping uri: {}", uri);
         this.handlerListByURI
