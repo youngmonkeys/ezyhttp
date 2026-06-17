@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable {
 
@@ -118,7 +119,15 @@ public class RequestHandlerManager extends EzyLoggable implements EzyDestroyable
     }
 
     public Map<RequestURI, List<RequestHandler>> getHandlerListByURI() {
-        return Collections.unmodifiableMap(handlerListByURI);
+        return handlerListByURI
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    it -> Collections.unmodifiableList(it.getValue())
+                )
+            );
     }
 
     @Override
