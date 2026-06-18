@@ -3,9 +3,7 @@ package com.tvd12.ezyhttp.server.graphql.fetcher;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
-import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataSchema;
-
-import java.util.List;
+import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLDataFetcherSchema;
 
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryAnnotations.getQLQueryGroupName;
 import static com.tvd12.ezyhttp.server.graphql.util.GraphQLQueryAnnotations.getQLQueryName;
@@ -32,11 +30,7 @@ public interface GraphQLDataFetcher {
         return getQLQueryGroupName(getClass());
     }
 
-    default List<GraphQLDataSchema> getQueryScheme() {
-        return null;
-    }
-
-    default GraphQLDataSchema getResponseScheme() {
+    default GraphQLDataFetcherSchema getSchema() {
         return null;
     }
 }

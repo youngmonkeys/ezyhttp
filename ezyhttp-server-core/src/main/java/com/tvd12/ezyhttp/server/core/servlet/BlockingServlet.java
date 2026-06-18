@@ -18,7 +18,11 @@ import com.tvd12.ezyhttp.server.core.handler.RequestResponseWatcher;
 import com.tvd12.ezyhttp.server.core.handler.UncaughtExceptionHandler;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
-import com.tvd12.ezyhttp.server.core.manager.*;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
+import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
+import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
+import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
+import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
@@ -29,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -38,7 +41,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class BlockingServlet extends HttpServlet {
@@ -64,7 +71,7 @@ public class BlockingServlet extends HttpServlet {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         this.componentManager = ComponentManager.getInstance();
         this.debug = componentManager.isDebug();
         this.managementPort = componentManager.getManagementPort();

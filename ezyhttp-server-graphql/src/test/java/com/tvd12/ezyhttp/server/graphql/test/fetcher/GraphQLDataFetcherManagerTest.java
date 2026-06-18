@@ -2,7 +2,6 @@ package com.tvd12.ezyhttp.server.graphql.test.fetcher;
 
 import com.tvd12.ezyfox.annotation.EzyManagement;
 import com.tvd12.ezyfox.annotation.EzyPayment;
-import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
 import com.tvd12.ezyhttp.server.core.handler.AuthenticatedController;
 import com.tvd12.ezyhttp.server.core.handler.ManageableController;
@@ -20,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
 
 public class GraphQLDataFetcherManagerTest {
 
@@ -33,29 +35,136 @@ public class GraphQLDataFetcherManagerTest {
             .addDataFetcher(new Fetcher22())
             .build();
 
+        // then
+        assertFetcherManager(instance);
+    }
+
+    @Test
+    public void addDataFetcherTest() {
+        // given
+        Fetcher1 fetcher1 = new Fetcher1();
+        Fetcher11 fetcher11 = new Fetcher11();
+        Fetcher2 fetcher2 = new Fetcher2();
+        Fetcher22 fetcher22 = new Fetcher22();
+        NoGroupFetcher noGroupFetcher = new NoGroupFetcher();
+        GraphQLDataFetcherManager instance = GraphQLDataFetcherManager
+            .builder()
+            .build();
+
         // when
+        instance.addDataFetcher(fetcher1.getQueryName(), fetcher1);
+        instance.addDataFetcher(fetcher11.getQueryName(), fetcher11);
+        instance.addDataFetcher(fetcher2.getQueryName(), fetcher2);
+        instance.addDataFetcher(fetcher22.getQueryName(), fetcher22);
+        instance.addDataFetcher(noGroupFetcher.getQueryName(), noGroupFetcher);
+
+        // then
+        assertFetcherManager(instance);
+        Asserts.assertEquals(
+            instance.getDataFetcher(fetcher1.getQueryName()),
+            fetcher1
+        );
+        Asserts.assertEquals(
+            instance.getDataFetcher(noGroupFetcher.getQueryName()),
+            noGroupFetcher
+        );
+        Asserts.assertEquals(
+            instance.getGroupNameByQueryName(noGroupFetcher.getQueryName()),
+            DEFAULT_QL_GROUP_NAME
+        );
+    }
+
+    @Test
+    public void getDataFetcherTest() {
+        // given
+        Fetcher1 fetcher1 = new Fetcher1();
+        Fetcher2 fetcher2 = new Fetcher2();
+        GraphQLDataFetcherManager instance = GraphQLDataFetcherManager
+            .builder()
+            .addDataFetcher(fetcher1)
+            .addDataFetcher(fetcher2)
+            .build();
+
+        // when
+        GraphQLDataFetcher actualFetcher1 = instance.getDataFetcher(
+            fetcher1.getQueryName()
+        );
+        GraphQLDataFetcher actualFetcher2 = instance.getDataFetcher(
+            fetcher2.getQueryName()
+        );
+        GraphQLDataFetcher unknownFetcher = instance.getDataFetcher(
+            "unknown"
+        );
+
+        // then
+        Asserts.assertEquals(actualFetcher1, fetcher1);
+        Asserts.assertEquals(actualFetcher2, fetcher2);
+        Asserts.assertNull(unknownFetcher);
+    }
+
+    @Test
+    public void getDataFetcherWithProviderTest() {
+        // given
+        Fetcher1 fetcher1 = new Fetcher1();
+        Fetcher2 fetcher2 = new Fetcher2();
+        AtomicInteger provideCount = new AtomicInteger();
+        GraphQLDataFetcherManager instance = GraphQLDataFetcherManager
+            .builder()
+            .addDataFetcher(fetcher1)
+            .dataFetcherProvider(queryName -> {
+                provideCount.incrementAndGet();
+                return fetcher2.getQueryName().equals(queryName)
+                    ? fetcher2
+                    : null;
+            })
+            .build();
+
+        // when
+        GraphQLDataFetcher existingFetcher = instance.getDataFetcher(
+            fetcher1.getQueryName()
+        );
+        int provideCountAfterExistingFetcher = provideCount.get();
+        GraphQLDataFetcher providedFetcher = instance.getDataFetcher(
+            fetcher2.getQueryName()
+        );
+        GraphQLDataFetcher unknownFetcher = instance.getDataFetcher(
+            "unknown"
+        );
+
+        // then
+        Asserts.assertEquals(existingFetcher, fetcher1);
+        Asserts.assertEquals(provideCountAfterExistingFetcher, 0);
+        Asserts.assertEquals(providedFetcher, fetcher2);
+        Asserts.assertNull(unknownFetcher);
+        Asserts.assertEquals(provideCount.get(), 2);
+    }
+
+    private void assertFetcherManager(GraphQLDataFetcherManager instance) {
         Map<String, List<String>> queryNameByGroupName = instance
             .getQueryNameByGroupName();
 
         Map<String, List<String>> sortedQueryNameByGroupName = instance
             .getSortedQueryNameByGroupName();
 
-        // then
         Asserts.assertEquals(
-            queryNameByGroupName,
-            EzyMapBuilder.mapBuilder()
-                .put("core1", new ArrayList<>(Sets.newHashSet("core1_fetcher1", "core1_fetcher11")))
-                .put("core2", new ArrayList<>(Sets.newHashSet("core2_fetcher2", "core2_fetcher22")))
-                .toMap(),
+            queryNameByGroupName.get("core1"),
+            new ArrayList<>(Sets.newHashSet("core1_fetcher1", "core1_fetcher11")),
+            false
+        );
+        Asserts.assertEquals(
+            queryNameByGroupName.get("core2"),
+            new ArrayList<>(Sets.newHashSet("core2_fetcher2", "core2_fetcher22")),
             false
         );
 
         Asserts.assertEquals(
-            sortedQueryNameByGroupName,
-            EzyMapBuilder.mapBuilder()
-                .put("core1", Arrays.asList("core1_fetcher1", "core1_fetcher11"))
-                .put("core2", Arrays.asList("core2_fetcher2", "core2_fetcher22"))
-                .toMap(),
+            sortedQueryNameByGroupName.get("core1"),
+            Arrays.asList("core1_fetcher1", "core1_fetcher11"),
+            false
+        );
+        Asserts.assertEquals(
+            sortedQueryNameByGroupName.get("core2"),
+            Arrays.asList("core2_fetcher2", "core2_fetcher22"),
             false
         );
 
@@ -224,6 +333,27 @@ public class GraphQLDataFetcherManagerTest {
         @Override
         public boolean isManagement() {
             return false;
+        }
+    }
+
+    private static class NoGroupFetcher implements GraphQLDataFetcher {
+
+        @Override
+        public String getData(
+            RequestArguments arguments,
+            GraphQLQueryDefinition query
+        ) {
+            return null;
+        }
+
+        @Override
+        public String getQueryName() {
+            return "no_group_fetcher";
+        }
+
+        @Override
+        public String getQueryGroupName() {
+            return "";
         }
     }
 }

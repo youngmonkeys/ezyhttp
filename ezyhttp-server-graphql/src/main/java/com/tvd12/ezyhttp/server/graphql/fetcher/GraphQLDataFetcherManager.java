@@ -2,12 +2,20 @@ package com.tvd12.ezyhttp.server.graphql.fetcher;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.DEFAULT_QL_GROUP_NAME;
-import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.*;
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.isAuthenticatedFetcher;
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.isManagementFetcher;
+import static com.tvd12.ezyhttp.server.graphql.util.GraphQLDataFetcherClasses.isPaymentFetcher;
 
 public class GraphQLDataFetcherManager {
 
@@ -17,6 +25,7 @@ public class GraphQLDataFetcherManager {
     private final Set<String> paymentQueryNames;
     private final Map<String, String> groupNameByQueryName;
     private final Map<String, Set<String>> queryNamesByGroupName;
+    private final GraphQLDataFetcherProvider dataFetcherProvider;
 
     protected GraphQLDataFetcherManager(Builder builder) {
         this.dataFetchers = builder.dataFetchers;
@@ -25,6 +34,32 @@ public class GraphQLDataFetcherManager {
         this.paymentQueryNames = builder.paymentQueryNames;
         this.groupNameByQueryName = builder.groupNameByQueryName;
         this.queryNamesByGroupName = builder.queryNamesByGroupName;
+        this.dataFetcherProvider = builder.dataFetcherProvider;
+    }
+
+    public void addDataFetcher(
+        String queryName,
+        GraphQLDataFetcher fetcher
+    ) {
+        this.dataFetchers.put(queryName, fetcher);
+        if (isAuthenticatedFetcher(fetcher)) {
+            this.authenticatedQueryNames.add(queryName);
+        }
+        if (isManagementFetcher(fetcher)) {
+            this.managementQueryNames.add(queryName);
+        }
+        if (isPaymentFetcher(fetcher)) {
+            this.paymentQueryNames.add(queryName);
+        }
+        String groupName = fetcher.getQueryGroupName();
+        if (isBlank(groupName)) {
+            groupName = DEFAULT_QL_GROUP_NAME;
+        }
+        this.groupNameByQueryName.put(queryName, groupName);
+        this.queryNamesByGroupName.computeIfAbsent(
+            groupName,
+            k -> ConcurrentHashMap.newKeySet()
+        ).add(queryName);
     }
 
     public String getGroupNameByQueryName(String queryName) {
@@ -32,7 +67,12 @@ public class GraphQLDataFetcherManager {
     }
 
     public GraphQLDataFetcher getDataFetcher(String queryName) {
-        return dataFetchers.get(queryName);
+        GraphQLDataFetcher fetcher = dataFetchers
+            .get(queryName);
+        if (fetcher == null && dataFetcherProvider != null) {
+            fetcher = dataFetcherProvider.provide(queryName);
+        }
+        return fetcher;
     }
     
     public Map<String, List<String>> getQueryNameByGroupName() {
@@ -74,17 +114,18 @@ public class GraphQLDataFetcherManager {
 
     public static class Builder implements EzyBuilder<GraphQLDataFetcherManager> {
         private final Map<String, GraphQLDataFetcher> dataFetchers =
-            new HashMap<>();
+            new ConcurrentHashMap<>();
         private final Set<String> authenticatedQueryNames =
-            new HashSet<>();
+            ConcurrentHashMap.newKeySet();
         private final Set<String> managementQueryNames =
-            new HashSet<>();
+            ConcurrentHashMap.newKeySet();
         private final Set<String> paymentQueryNames =
-            new HashSet<>();
+            ConcurrentHashMap.newKeySet();
         private final Map<String, String> groupNameByQueryName =
-            new HashMap<>();
+            new ConcurrentHashMap<>();
         private final Map<String, Set<String>> queryNamesByGroupName =
-            new HashMap<>();
+            new ConcurrentHashMap<>();
+        private GraphQLDataFetcherProvider dataFetcherProvider;
 
         public Builder addDataFetcher(GraphQLDataFetcher fetcher) {
             return addDataFetcher(fetcher.getQueryName(), fetcher);
@@ -111,8 +152,15 @@ public class GraphQLDataFetcherManager {
             this.groupNameByQueryName.put(queryName, groupName);
             this.queryNamesByGroupName.computeIfAbsent(
                 groupName,
-                k -> new HashSet<>()
+                k -> ConcurrentHashMap.newKeySet()
             ).add(queryName);
+            return this;
+        }
+
+        public Builder dataFetcherProvider(
+            GraphQLDataFetcherProvider dataFetcherProvider
+        ) {
+            this.dataFetcherProvider = dataFetcherProvider;
             return this;
         }
 
