@@ -4,7 +4,13 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import lombok.AllArgsConstructor;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FIELDS;
 
@@ -39,6 +45,9 @@ public class GraphQLDataFilter {
 
             for (GraphQLField field : entry.field.getFields()) {
                 String fieldName = field.getName();
+                if (entry.data == null) {
+                    continue;
+                }
                 Object value = entry.data.get(fieldName);
                 if (value == null) {
                     continue;
