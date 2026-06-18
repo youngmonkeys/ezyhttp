@@ -10,6 +10,7 @@ import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherManager;
+import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcherProvider;
 import com.tvd12.ezyhttp.server.graphql.interceptor.GraphQLInterceptorManager;
 import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
@@ -52,7 +53,10 @@ public class GraphQLConfiguration implements
         for (GraphQLDataFetcher dataFetcher : dataFetchers) {
             dataFetcherManagerBuilder.addDataFetcher(dataFetcher);
         }
+        GraphQLDataFetcherProvider dataFetcherProvider = singletonFactory
+            .getSingletonCast(GraphQLDataFetcherProvider.class);
         GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder
+            .dataFetcherProvider(dataFetcherProvider)
             .build();
         GraphQLInterceptorManager interceptorManager =
             new GraphQLInterceptorManager(singletonFactory);
