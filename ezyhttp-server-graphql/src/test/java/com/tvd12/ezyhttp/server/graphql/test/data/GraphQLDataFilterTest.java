@@ -68,6 +68,25 @@ public class GraphQLDataFilterTest {
     }
 
     @Test
+    public void filterWithAllFieldsAndNullDataTest() {
+        // given
+        GraphQLField queryDefinition = GraphQLField.builder()
+            .name("user")
+            .addField(
+                GraphQLField.builder()
+                    .name(ALL_FIELDS)
+                    .build()
+            )
+            .build();
+
+        // when
+        Map result = instance.filter(null, queryDefinition);
+
+        // then
+        Asserts.assertEquals(result, Collections.emptyMap(), false);
+    }
+
+    @Test
     public void filterWithAllFieldsAndNestedOverrideTest() {
         // given
         GraphQLField queryDefinition = GraphQLField.builder()

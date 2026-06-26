@@ -85,6 +85,30 @@ public class GraphQLFieldTest {
     }
 
     @Test
+    public void toStringWithMultipleFieldsTest() {
+        // given
+        GraphQLField field = GraphQLField.builder()
+            .name("user")
+            .addField(
+                GraphQLField.builder()
+                    .name("name")
+                    .build()
+            )
+            .addField(
+                GraphQLField.builder()
+                    .name("email")
+                    .build()
+            )
+            .build();
+
+        // when
+        String result = field.toString();
+
+        // then
+        Asserts.assertEquals(result, "user, [name, [], email, []]");
+    }
+
+    @Test
     public void getNestedFieldArgumentValueTest() {
         // given
         GraphQLField field = GraphQLField.builder()
@@ -121,6 +145,40 @@ public class GraphQLFieldTest {
 
         // then
         Asserts.assertEquals(value, "1");
+        Asserts.assertEquals(typedValue, 1L);
+    }
+
+    @Test
+    public void getNestedFieldArgumentValueWithNonStringValueTest() {
+        // given
+        GraphQLField field = GraphQLField.builder()
+            .name("user")
+            .addField(
+                GraphQLField.builder()
+                    .name("bank")
+                    .addField(
+                        GraphQLField.builder()
+                            .name("branch")
+                            .arguments(
+                                EzyMapBuilder.mapBuilder()
+                                    .put("id", 1)
+                                    .toMap()
+                            )
+                            .build()
+                    )
+                    .build()
+            )
+            .build();
+
+        // when
+        Long typedValue = field.getFieldArgumentValue(
+            "id",
+            Long.class,
+            "bank",
+            "branch"
+        );
+
+        // then
         Asserts.assertEquals(typedValue, 1L);
     }
 }

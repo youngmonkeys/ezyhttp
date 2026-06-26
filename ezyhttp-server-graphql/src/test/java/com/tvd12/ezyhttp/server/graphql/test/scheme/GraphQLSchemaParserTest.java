@@ -459,6 +459,313 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void replaceVariablePlaceholdersWithNullArgumentsTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+
+        // when
+        method.invoke(
+            instance,
+            null,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertTrue(true);
+    }
+
+    @Test
+    public void replaceVariablePlaceholdersWithNullVariablesTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put("id", 1)
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            null
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put("id", 1)
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void replaceVariablePlaceholdersWithListValueTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put(
+                "ids",
+                Arrays.<Object>asList(
+                    EzyMapBuilder.mapBuilder()
+                        .put("__ezyhttp_graphql_variable__", "id")
+                        .toMap()
+                )
+            )
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put("ids", Collections.singletonList(1))
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void replaceVariablePlaceholdersWithNestedListValueTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put(
+                "filters",
+                Arrays.<Object>asList(
+                    EzyMapBuilder.mapBuilder()
+                        .put(
+                            "names",
+                            Arrays.<Object>asList(
+                                EzyMapBuilder.mapBuilder()
+                                    .put("__ezyhttp_graphql_variable__", "name")
+                                    .toMap()
+                            )
+                        )
+                        .toMap()
+                )
+            )
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            Collections.singletonMap("name", "Dzung")
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "filters",
+                    Collections.singletonList(
+                        EzyMapBuilder.mapBuilder()
+                            .put(
+                                "names",
+                                Collections.singletonList("Dzung")
+                            )
+                            .toMap()
+                    )
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void replaceVariablePlaceholdersShouldPushMapItemInListTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put(
+                "filters",
+                Arrays.<Object>asList(
+                    EzyMapBuilder.mapBuilder()
+                        .put(
+                            "name",
+                            EzyMapBuilder.mapBuilder()
+                                .put("__ezyhttp_graphql_variable__", "name")
+                                .toMap()
+                        )
+                        .toMap()
+                )
+            )
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            Collections.singletonMap("name", "Dzung")
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "filters",
+                    Collections.singletonList(
+                        EzyMapBuilder.mapBuilder()
+                            .put("name", "Dzung")
+                            .toMap()
+                    )
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void replaceVariablePlaceholdersShouldPushListItemInListTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put(
+                "groups",
+                Arrays.<Object>asList(
+                    Arrays.<Object>asList(
+                        EzyMapBuilder.mapBuilder()
+                            .put("__ezyhttp_graphql_variable__", "id")
+                            .toMap()
+                    )
+                )
+            )
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "groups",
+                    Collections.singletonList(
+                        Collections.singletonList(1)
+                    )
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void getVariableValueWithStringVariableNameTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "getVariableValue",
+            Object.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> placeholder = EzyMapBuilder.mapBuilder()
+            .put("__ezyhttp_graphql_variable__", "id")
+            .toMap();
+
+        // when
+        Object result = method.invoke(
+            instance,
+            placeholder,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertEquals(result, 1);
+    }
+
+    @Test
+    public void getVariableValueWithNonStringVariableNameTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "getVariableValue",
+            Object.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> placeholder = EzyMapBuilder.mapBuilder()
+            .put("__ezyhttp_graphql_variable__", 1)
+            .toMap();
+
+        // when
+        Object result = method.invoke(
+            instance,
+            placeholder,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertNull(result);
+    }
+
+    @Test
     public void parseQuerySubmitWorkReportWithOperationVariables() {
         // given
         GraphQLSchemaParser instance = new GraphQLSchemaParser(
@@ -763,5 +1070,400 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEquals(result, 0);
+    }
+
+    @Test
+    public void findOperationSelectionStartFromLengthTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+        String query = "query";
+
+        // when
+        Object result = method.invoke(
+            instance,
+            query,
+            query.length()
+        );
+
+        // then
+        Asserts.assertEquals(result, -1);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldUseStartIndexTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "{ignored} query {slug}",
+            10
+        );
+
+        // then
+        Asserts.assertEquals(result, 16);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldIgnoreBracesInSingleQuotesTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: '{ignored}'){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, 23);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldIgnoreBracesInDoubleQuotesTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: \"{ignored}\"){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, 23);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldIgnoreEscapedSingleQuoteTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: 'it\\'s {ignored}'){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, 29);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldIgnoreEscapedDoubleQuoteTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: \"he\\\"llo {ignored}\"){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, 31);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldReturnMinusOneInOpenSingleQuoteTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: '{ignored}){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, -1);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldReturnMinusOneInOpenDoubleQuoteTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(arg: \"{ignored}){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, -1);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldIgnoreBracesInParenthesesTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(input: {id: 1}){slug}",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, 21);
+    }
+
+    @Test
+    public void findOperationSelectionStartShouldReturnMinusOneWhenBracesOnlyInParenthesesTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query(input: {id: 1})",
+            5
+        );
+
+        // then
+        Asserts.assertEquals(result, -1);
+    }
+
+    @Test
+    public void removeQueryPrefixWithExactPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query"
+        );
+
+        // then
+        Asserts.assertEquals(result, "");
+    }
+
+    @Test
+    public void removeQueryPrefixWithNonNameCharAfterPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query{slug}"
+        );
+
+        // then
+        Asserts.assertEquals(result, "{slug}");
+    }
+
+    @Test
+    public void removeQueryPrefixWithOperationNameAndSelectionStartTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query FindSlug($id: ID){slug}"
+        );
+
+        // then
+        Asserts.assertEquals(result, "{slug}");
+    }
+
+    @Test
+    public void removeQueryPrefixWithoutSelectionStartAfterPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query FindSlug"
+        );
+
+        // then
+        Asserts.assertEquals(result, " FindSlug");
+    }
+
+    @Test
+    public void removeQueryPrefixWithLetterAfterPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "queryName{slug}"
+        );
+
+        // then
+        Asserts.assertEquals(result, "queryName{slug}");
+    }
+
+    @Test
+    public void removeQueryPrefixWithDigitAfterPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query1{slug}"
+        );
+
+        // then
+        Asserts.assertEquals(result, "query1{slug}");
+    }
+
+    @Test
+    public void removeQueryPrefixWithUnderscoreAfterPrefixTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "removeQueryPrefix",
+            String.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "query_name{slug}"
+        );
+
+        // then
+        Asserts.assertEquals(result, "query_name{slug}");
     }
 }
