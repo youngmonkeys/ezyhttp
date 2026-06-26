@@ -24,51 +24,7 @@ public class GraphQLDataFilter {
         Map answer = new HashMap<>();
         Deque<StackEntry> stack = new ArrayDeque<>();
         stack.push(new StackEntry(queryDefinition, data, answer));
-        while (!stack.isEmpty()) {
-            StackEntry entry = stack.pop();
-
-            GraphQLField allField = entry.field.getField(ALL_FIELDS);
-            if (allField != null && entry.data != null) {
-                Set<Map.Entry> entries = entry.data.entrySet();
-                for (Map.Entry e : entries) {
-                    Object v = e.getValue();
-                    if (v != null) {
-                        entry.output.put(e.getKey(), v);
-                    }
-                }
-            }
-
-            for (GraphQLField field : entry.field.getFields()) {
-                String fieldName = field.getName();
-                if (entry.data == null) {
-                    continue;
-                }
-                Object value = entry.data.get(fieldName);
-                if (value == null) {
-                    continue;
-                }
-                if (field.getFields().isEmpty()) {
-                    entry.output.put(fieldName, value);
-                    continue;
-                }
-                if (value instanceof Map) {
-                    Map newItem = new HashMap<>();
-                    entry.output.put(fieldName, newItem);
-                    stack.push(new StackEntry(field, (Map) value, newItem));
-                } else if (value instanceof List) {
-                    List<Map> newList = new LinkedList<>();
-                    entry.output.put(fieldName, newList);
-                    pushListItems(stack, (List) value, field, newList);
-                } else {
-                    throw new GraphQLInvalidSchemeException(
-                        EzyMapBuilder.mapBuilder()
-                            .put("schema", "invalid")
-                            .put("field", fieldName)
-                            .toMap()
-                    );
-                }
-            }
-        }
+        filterStack(stack);
         return answer;
     }
 
@@ -80,6 +36,12 @@ public class GraphQLDataFilter {
         List<Map> answer = new LinkedList<>();
         Deque<StackEntry> stack = new ArrayDeque<>();
         pushListItems(stack, dataList, queryDefinition, answer);
+        filterStack(stack);
+        return answer;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void filterStack(Deque<StackEntry> stack) {
         while (!stack.isEmpty()) {
             StackEntry entry = stack.pop();
 
@@ -125,7 +87,6 @@ public class GraphQLDataFilter {
                 }
             }
         }
-        return answer;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
