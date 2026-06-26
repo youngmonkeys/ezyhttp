@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.graphql.test.data;
 
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
@@ -172,6 +173,43 @@ public class GraphQLDataFilterTest {
                     .put("name", "Bar")
                     .toMap()
             ),
+            false
+        );
+    }
+
+    @Test
+    public void filterListFieldWithNonMapItemTest() {
+        // given
+        GraphQLField queryDefinition = GraphQLField.builder()
+            .name("user")
+            .addField(
+                GraphQLField.builder()
+                    .name("tags")
+                    .addField(
+                        GraphQLField.builder()
+                            .name("name")
+                            .build()
+                    )
+                    .build()
+            )
+            .build();
+        Map data = mapBuilder()
+            .put("tags", Arrays.asList("java", "graphql"))
+            .toMap();
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.filter(data, queryDefinition)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLInvalidSchemeException.class);
+        Asserts.assertEquals(
+            ((GraphQLInvalidSchemeException) e).getErrors(),
+            mapBuilder()
+                .put("schema", "invalid")
+                .put("field", "tags")
+                .toMap(),
             false
         );
     }

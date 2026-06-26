@@ -35,7 +35,13 @@ public class GraphQLDataFilter {
     ) {
         List<Map> answer = new LinkedList<>();
         Deque<StackEntry> stack = new ArrayDeque<>();
-        pushListItems(stack, dataList, queryDefinition, answer);
+        pushListItems(
+            stack,
+            dataList,
+            queryDefinition,
+            answer,
+            queryDefinition.getName()
+        );
         filterStack(stack);
         return answer;
     }
@@ -76,14 +82,15 @@ public class GraphQLDataFilter {
                 } else if (value instanceof List) {
                     List<Map> newList = new LinkedList<>();
                     entry.output.put(fieldName, newList);
-                    pushListItems(stack, (List) value, field, newList);
-                } else {
-                    throw new GraphQLInvalidSchemeException(
-                        EzyMapBuilder.mapBuilder()
-                            .put("schema", "invalid")
-                            .put("field", fieldName)
-                            .toMap()
+                    pushListItems(
+                        stack,
+                        (List) value,
+                        field,
+                        newList,
+                        fieldName
                     );
+                } else {
+                    throw newInvalidSchemeException(fieldName);
                 }
             }
         }
@@ -92,16 +99,32 @@ public class GraphQLDataFilter {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void pushListItems(
         Deque<StackEntry> stack,
-        List<Map> dataList,
+        List dataList,
         GraphQLField queryDefinition,
-        List<Map> answer
+        List<Map> answer,
+        String fieldName
     ) {
         int size = dataList.size();
         for (int i = size - 1; i >= 0; --i) {
+            Object data = dataList.get(i);
+            if (!(data instanceof Map)) {
+                throw newInvalidSchemeException(fieldName);
+            }
             Map item = new HashMap<>();
             answer.add(0, item);
-            stack.push(new StackEntry(queryDefinition, dataList.get(i), item));
+            stack.push(new StackEntry(queryDefinition, (Map) data, item));
         }
+    }
+
+    private GraphQLInvalidSchemeException newInvalidSchemeException(
+        String fieldName
+    ) {
+        return new GraphQLInvalidSchemeException(
+            EzyMapBuilder.mapBuilder()
+                .put("schema", "invalid")
+                .put("field", fieldName)
+                .toMap()
+        );
     }
 
     @AllArgsConstructor
