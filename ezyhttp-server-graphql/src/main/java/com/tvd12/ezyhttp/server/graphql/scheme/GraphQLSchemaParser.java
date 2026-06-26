@@ -213,6 +213,9 @@ public final class GraphQLSchemaParser {
             if (ch == '{' || ch == '}') {
                 answer.append(ch);
             } else if (ch == '+' || ch == ',' || ch == ' ' || ch == '\t' || ch == '\n') {
+                if (answer.length() == 0) {
+                    continue;
+                }
                 char lastChar = answer.charAt(answer.length() - 1);
                 if ((lastChar != ' ') && (lastChar != '{')) {
                     answer.append(' ');
@@ -232,6 +235,9 @@ public final class GraphQLSchemaParser {
             if (ch == '{' || ch == '}') {
                 answer.insert(0, ch);
             } else if (ch == ' ') { // ',' '\t' '\n' '+' have been removed in forward pass
+                if (answer.length() == 0) {
+                    continue;
+                }
                 char firstChar = answer.charAt(0);
                 if ((firstChar != '{') && (firstChar != '}')) {
                     answer.insert(0, ' ');
@@ -265,7 +271,7 @@ public final class GraphQLSchemaParser {
         int quotesCount = 0;
         int length = s.length();
         for (int i = start; i < length; ++i) {
-            char prevCh = s.charAt(i - 1);
+            char prevCh = i > 0 ? s.charAt(i - 1) : 0;
             char ch = s.charAt(i);
             if (prevCh != '\\' && ch == '\'') {
                 quoteCount = quoteCount == 0 ? 1 : 0;

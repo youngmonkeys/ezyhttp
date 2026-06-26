@@ -92,6 +92,42 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void standardizeQueryWithLeadingSeparatorTest() {
+        // given
+        GraphQLSchemaParser parser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = parser.parseQuery(
+            ",{slug}",
+            Collections.emptyMap()
+        );
+
+        // then
+        Asserts.assertEquals(schema.getQueryDefinitions().size(), 1);
+        Asserts.assertEquals(schema.getQueryDefinitions().get(0).getName(), "slug");
+    }
+
+    @Test
+    public void standardizeQueryWithTrailingSeparatorTest() {
+        // given
+        GraphQLSchemaParser parser = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = parser.parseQuery(
+            "{slug},",
+            Collections.emptyMap()
+        );
+
+        // then
+        Asserts.assertEquals(schema.getQueryDefinitions().size(), 1);
+        Asserts.assertEquals(schema.getQueryDefinitions().get(0).getName(), "slug");
+    }
+
+    @Test
     public void testStandardize4() {
         // given
         GraphQLSchemaParser parser = new GraphQLSchemaParser(
@@ -703,5 +739,29 @@ public class GraphQLSchemaParserTest {
                 .toMap(),
             false
         );
+    }
+
+    @Test
+    public void findOperationSelectionStartFromZeroTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new ObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "findOperationSelectionStart",
+            String.class,
+            int.class
+        );
+        method.setAccessible(true);
+
+        // when
+        Object result = method.invoke(
+            instance,
+            "{slug}",
+            0
+        );
+
+        // then
+        Asserts.assertEquals(result, 0);
     }
 }
