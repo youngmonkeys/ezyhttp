@@ -105,7 +105,7 @@ public class GraphQLField {
     ) {
         GraphQLField field = this;
         for (String fieldName : fieldNames) {
-            field = fieldByName.get(fieldName);
+            field = field.getField(fieldName);
             if (field == null) {
                 break;
             }
@@ -148,6 +148,11 @@ public class GraphQLField {
         );
         if (value == null) {
             return null;
+        }
+        if (value instanceof String) {
+            return SingletonStringDeserializer
+                .getInstance()
+                .deserializeOrNull((String) value, type);
         }
         return (T) EzySingletonOutputTransformer
             .getInstance()

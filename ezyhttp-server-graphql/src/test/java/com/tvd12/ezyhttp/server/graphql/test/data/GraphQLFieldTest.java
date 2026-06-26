@@ -83,4 +83,44 @@ public class GraphQLFieldTest {
             .arguments(Collections.emptyMap())
         );
     }
+
+    @Test
+    public void getNestedFieldArgumentValueTest() {
+        // given
+        GraphQLField field = GraphQLField.builder()
+            .name("user")
+            .addField(
+                GraphQLField.builder()
+                    .name("bank")
+                    .addField(
+                        GraphQLField.builder()
+                            .name("branch")
+                            .arguments(
+                                EzyMapBuilder.mapBuilder()
+                                    .put("id", "1")
+                                    .toMap()
+                            )
+                            .build()
+                    )
+                    .build()
+            )
+            .build();
+
+        // when
+        String value = field.getFieldArgumentValue(
+            "id",
+            "bank",
+            "branch"
+        );
+        Long typedValue = field.getFieldArgumentValue(
+            "id",
+            Long.class,
+            "bank",
+            "branch"
+        );
+
+        // then
+        Asserts.assertEquals(value, "1");
+        Asserts.assertEquals(typedValue, 1L);
+    }
 }
