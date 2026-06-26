@@ -17,10 +17,10 @@ import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 @AllArgsConstructor
 public final class GraphQLSchemaParser {
 
+    private final ObjectMapper objectMapper;
+
     private static final String VARIABLE_PLACEHOLDER_FIELD =
         "__ezyhttp_graphql_variable__";
-
-    private final ObjectMapper objectMapper;
 
     @SuppressWarnings({"unchecked", "MethodLength"})
     public GraphQLSchema parseQuery(
@@ -245,10 +245,43 @@ public final class GraphQLSchemaParser {
 
     private String removeQueryPrefix(String s) {
         String prefix = "query";
-        if (s.startsWith(prefix)) {
-            return s.substring(prefix.length());
+        if (s.startsWith(prefix)
+            && (s.length() == prefix.length()
+            || !isGraphQLNameChar(s.charAt(prefix.length())))) {
+            int selectionStart = findOperationSelectionStart(
+                s,
+                prefix.length()
+            );
+            return selectionStart >= 0
+                ? s.substring(selectionStart)
+                : s.substring(prefix.length());
         }
         return s;
+    }
+
+    private int findOperationSelectionStart(String s, int start) {
+        int parenthesesCount = 0;
+        int quoteCount = 0;
+        int quotesCount = 0;
+        int length = s.length();
+        for (int i = start; i < length; ++i) {
+            char prevCh = s.charAt(i - 1);
+            char ch = s.charAt(i);
+            if (prevCh != '\\' && ch == '\'') {
+                quoteCount = quoteCount == 0 ? 1 : 0;
+            } else if (prevCh != '\\' && ch == '"') {
+                quotesCount = quotesCount == 0 ? 1 : 0;
+            } else if (quoteCount == 0 && quotesCount == 0) {
+                if (ch == '(') {
+                    ++parenthesesCount;
+                } else if (ch == ')') {
+                    --parenthesesCount;
+                } else if (ch == '{' && parenthesesCount == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     private int extractQueryArguments(

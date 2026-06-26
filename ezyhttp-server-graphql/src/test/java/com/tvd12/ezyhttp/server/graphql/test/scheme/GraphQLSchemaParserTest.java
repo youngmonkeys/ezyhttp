@@ -423,6 +423,73 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void parseQuerySubmitWorkReportWithOperationVariables() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        String contentJson = "{\"items\":[{\"title\":\"Done\"}]}";
+        String scheduleJson = "[{\"time\":\"09:00\",\"task\":\"Daily\"}]";
+        String query =
+            "query($reportType: String, $reportDate: String, " +
+                "$employeeName: String, $username: String, " +
+                "$email: String, $department: String, " +
+                "$contentJson: String, $scheduleJson: String) {\n" +
+                "    submit_work_report(" +
+                "reportType: $reportType, " +
+                "reportDate: $reportDate, " +
+                "employeeName: $employeeName, " +
+                "username: $username, " +
+                "email: $email, " +
+                "department: $department, " +
+                "contentJson: $contentJson, " +
+                "scheduleJson: $scheduleJson" +
+                ") {\n" +
+                "        success postId slug message\n" +
+                "    }\n" +
+                "}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            EzyMapBuilder.mapBuilder()
+                .put("reportType", "daily")
+                .put("reportDate", "2026-06-26")
+                .put("employeeName", "Dzung")
+                .put("username", "dzung@example.com")
+                .put("email", "dzung@example.com")
+                .put("department", "")
+                .put("contentJson", contentJson)
+                .put("scheduleJson", scheduleJson)
+                .toMap()
+        );
+
+        // then
+        GraphQLField queryDefinition = schema.getQueryDefinitions().get(0);
+        Asserts.assertEquals(schema.getQueryDefinitions().size(), 1);
+        Asserts.assertEquals(queryDefinition.getName(), "submit_work_report");
+        Asserts.assertEquals(
+            queryDefinition.getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("reportType", "daily")
+                .put("reportDate", "2026-06-26")
+                .put("employeeName", "Dzung")
+                .put("username", "dzung@example.com")
+                .put("email", "dzung@example.com")
+                .put("department", "")
+                .put("contentJson", contentJson)
+                .put("scheduleJson", scheduleJson)
+                .toMap(),
+            false
+        );
+        Asserts.assertEquals(queryDefinition.getFields().size(), 4);
+        Asserts.assertEquals(queryDefinition.getFields().get(0).getName(), "success");
+        Asserts.assertEquals(queryDefinition.getFields().get(1).getName(), "postId");
+        Asserts.assertEquals(queryDefinition.getFields().get(2).getName(), "slug");
+        Asserts.assertEquals(queryDefinition.getFields().get(3).getName(), "message");
+    }
+
+    @Test
     public void parseQueryInvalidArgumentTest() {
         // given
         GraphQLSchemaParser instance = new GraphQLSchemaParser(
