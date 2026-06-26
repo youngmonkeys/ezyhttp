@@ -253,7 +253,8 @@ public final class GraphQLSchemaParser {
         String prefix = "query";
         if (s.startsWith(prefix)
             && (s.length() == prefix.length()
-            || !isGraphQLNameChar(s.charAt(prefix.length())))) {
+            || !isGraphQLNameChar(s.charAt(prefix.length())))
+        ) {
             int selectionStart = findOperationSelectionStart(
                 s,
                 prefix.length()
@@ -355,7 +356,7 @@ public final class GraphQLSchemaParser {
                         stack.push(value);
                     }
                 }
-            } else if (item instanceof List) {
+            } else {
                 List<Object> list = (List<Object>) item;
                 int size = list.size();
                 for (int i = 0; i < size; ++i) {

@@ -712,6 +712,45 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void replaceVariablePlaceholdersWithScalarListValueTest() throws Exception {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+        Method method = GraphQLSchemaParser.class.getDeclaredMethod(
+            "replaceVariablePlaceholders",
+            Map.class,
+            Map.class
+        );
+        method.setAccessible(true);
+        Map<String, Object> arguments = EzyMapBuilder.mapBuilder()
+            .put(
+                "tags",
+                Arrays.<Object>asList("java", 1, null)
+            )
+            .toMap();
+
+        // when
+        method.invoke(
+            instance,
+            arguments,
+            Collections.singletonMap("id", 1)
+        );
+
+        // then
+        Asserts.assertEquals(
+            arguments,
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "tags",
+                    Arrays.<Object>asList("java", 1, null)
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
     public void getVariableValueWithStringVariableNameTest() throws Exception {
         // given
         GraphQLSchemaParser instance = new GraphQLSchemaParser(
