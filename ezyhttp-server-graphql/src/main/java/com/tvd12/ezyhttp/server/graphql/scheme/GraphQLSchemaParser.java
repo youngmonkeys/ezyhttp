@@ -9,12 +9,16 @@ import lombok.AllArgsConstructor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @AllArgsConstructor
 public final class GraphQLSchemaParser {
+
+    private static final String VARIABLE_PLACEHOLDER_FIELD =
+        "__ezyhttp_graphql_variable__";
 
     private final ObjectMapper objectMapper;
 
@@ -66,12 +70,12 @@ public final class GraphQLSchemaParser {
                 );
                 String arguments = "{" + argumentsBuilder + "}";
                 try {
-                    childBuilder.arguments(
-                        objectMapper.readValue(
-                            arguments,
-                            Map.class
-                        )
+                    Map<String, Object> argumentMap = objectMapper.readValue(
+                        arguments,
+                        Map.class
                     );
+                    replaceVariablePlaceholders(argumentMap, variables);
+                    childBuilder.arguments(argumentMap);
                 } catch (Exception e) {
                     throw new GraphQLObjectMapperException(
                         EzyMapBuilder.mapBuilder()
@@ -270,27 +274,86 @@ public final class GraphQLSchemaParser {
                 StringBuilder varNameBuilder = new StringBuilder();
                 for (++i; i < queryLength; ++i) {
                     ch = query.charAt(i);
-                    if (ch == ' ') {
-                        continue;
-                    }
-                    if (ch != ',' && ch != ')' && ch != '}') {
+                    if (isGraphQLNameChar(ch)) {
                         varNameBuilder.append(ch);
                     } else {
                         --i;
                         break;
                     }
                 }
-                String varName = varNameBuilder.toString();
-                Object value = variables.get(varName);
-                if (value instanceof String) {
-                    value = "\"" + value + "\"";
-                }
-                argumentsBuilder.append(value);
+                argumentsBuilder
+                    .append("{\"")
+                    .append(VARIABLE_PLACEHOLDER_FIELD)
+                    .append("\":\"")
+                    .append(varNameBuilder)
+                    .append("\"}");
                 continue;
             }
             argumentsBuilder.append(ch);
         }
         return i;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void replaceVariablePlaceholders(
+        Map<String, Object> arguments,
+        Map<String, Object> variables
+    ) {
+        if (arguments == null || variables == null) {
+            return;
+        }
+        Deque<Object> stack = new ArrayDeque<>();
+        stack.push(arguments);
+        while (!stack.isEmpty()) {
+            Object item = stack.pop();
+            if (item instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) item;
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    Object value = entry.getValue();
+                    if (isVariablePlaceholder(value)) {
+                        entry.setValue(getVariableValue(value, variables));
+                    } else if (value instanceof Map || value instanceof List) {
+                        stack.push(value);
+                    }
+                }
+            } else if (item instanceof List) {
+                List<Object> list = (List<Object>) item;
+                int size = list.size();
+                for (int i = 0; i < size; ++i) {
+                    Object value = list.get(i);
+                    if (isVariablePlaceholder(value)) {
+                        list.set(i, getVariableValue(value, variables));
+                    } else if (value instanceof Map || value instanceof List) {
+                        stack.push(value);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isVariablePlaceholder(Object value) {
+        return value instanceof Map
+            && ((Map<?, ?>) value).size() == 1
+            && ((Map<?, ?>) value).containsKey(VARIABLE_PLACEHOLDER_FIELD);
+    }
+
+    private Object getVariableValue(
+        Object placeholder,
+        Map<String, Object> variables
+    ) {
+        Object variableName = ((Map<?, ?>) placeholder).get(
+            VARIABLE_PLACEHOLDER_FIELD
+        );
+        return variableName instanceof String
+            ? variables.get(variableName)
+            : null;
+    }
+
+    private boolean isGraphQLNameChar(char ch) {
+        return (ch >= 'A' && ch <= 'Z')
+            || (ch >= 'a' && ch <= 'z')
+            || (ch >= '0' && ch <= '9')
+            || ch == '_';
     }
 
     private GraphQLField.Builder peekFieldStackItemOrThrow(

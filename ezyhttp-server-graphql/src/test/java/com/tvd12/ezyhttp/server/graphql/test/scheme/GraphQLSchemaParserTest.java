@@ -368,6 +368,61 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void parseQueryWithStringVariableSpecialChars() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            "{me(name: $name){}}",
+            Collections.singletonMap("name", "he\"l\\lo\nworld")
+        );
+
+        // then
+        Asserts.assertEquals(
+            schema.getQueryDefinitions().get(0).getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("name", "he\"l\\lo\nworld")
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
+    public void parseQueryWithVariablesInListAndNestedObject() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(
+            new GraphQLObjectMapperFactory().newObjectMapper()
+        );
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            "{me(ids: [$id], filter: {name: $name}){}}",
+            EzyMapBuilder.mapBuilder()
+                .put("id", 1)
+                .put("name", "Dzung")
+                .toMap()
+        );
+
+        // then
+        Asserts.assertEquals(
+            schema.getQueryDefinitions().get(0).getArguments(),
+            EzyMapBuilder.mapBuilder()
+                .put("ids", Collections.singletonList(1))
+                .put(
+                    "filter",
+                    EzyMapBuilder.mapBuilder()
+                        .put("name", "Dzung")
+                        .toMap()
+                )
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
     public void parseQueryInvalidArgumentTest() {
         // given
         GraphQLSchemaParser instance = new GraphQLSchemaParser(
