@@ -5,8 +5,10 @@ import com.tvd12.ezyfox.io.EzySingletonOutputTransformer;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import lombok.Getter;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +105,7 @@ public class GraphQLField {
     ) {
         GraphQLField field = this;
         for (String fieldName : fieldNames) {
-            field = fieldByName.get(fieldName);
+            field = field.getField(fieldName);
             if (field == null) {
                 break;
             }
@@ -147,6 +149,11 @@ public class GraphQLField {
         if (value == null) {
             return null;
         }
+        if (value instanceof String) {
+            return SingletonStringDeserializer
+                .getInstance()
+                .deserializeOrNull((String) value, type);
+        }
         return (T) EzySingletonOutputTransformer
             .getInstance()
             .transform(value, type);
@@ -162,15 +169,48 @@ public class GraphQLField {
         Map<String, Object> arguments,
         List<GraphQLField> fields
     ) {
-        StringBuilder builder = new StringBuilder()
-            .append(name);
+        StringBuilder builder = new StringBuilder();
+        Deque<ToStringTask> stack = new ArrayDeque<>();
+        stack.push(new ToStringTask(name, arguments, fields));
+        while (!stack.isEmpty()) {
+            ToStringTask task = stack.pop();
+            if (task.text != null) {
+                builder.append(task.text);
+                continue;
+            }
+            appendFieldStart(builder, task.name, task.arguments);
+            List<GraphQLField> taskFields = task.fields;
+            if (taskFields == null) {
+                continue;
+            }
+            builder.append(", [");
+            stack.push(new ToStringTask("]"));
+            for (int i = taskFields.size() - 1; i >= 0; --i) {
+                GraphQLField field = taskFields.get(i);
+                stack.push(
+                    new ToStringTask(
+                        field.name,
+                        field.arguments,
+                        field.fields
+                    )
+                );
+                if (i > 0) {
+                    stack.push(new ToStringTask(", "));
+                }
+            }
+        }
+        return builder.toString();
+    }
+
+    private static void appendFieldStart(
+        StringBuilder builder,
+        String name,
+        Map<String, Object> arguments
+    ) {
+        builder.append(name);
         if (arguments != null && !arguments.isEmpty()) {
             builder.append("(").append(arguments).append(")");
         }
-        if (fields != null) {
-            builder.append(", ").append(fields);
-        }
-        return builder.toString();
     }
 
     @Override
@@ -224,6 +264,31 @@ public class GraphQLField {
         @Override
         public String toString() {
             return GraphQLField.toString(name, arguments, fields);
+        }
+    }
+
+    private static class ToStringTask {
+        private final String text;
+        private final String name;
+        private final Map<String, Object> arguments;
+        private final List<GraphQLField> fields;
+
+        ToStringTask(String text) {
+            this.text = text;
+            this.name = null;
+            this.arguments = null;
+            this.fields = null;
+        }
+
+        ToStringTask(
+            String name,
+            Map<String, Object> arguments,
+            List<GraphQLField> fields
+        ) {
+            this.text = null;
+            this.name = name;
+            this.arguments = arguments;
+            this.fields = fields;
         }
     }
 }

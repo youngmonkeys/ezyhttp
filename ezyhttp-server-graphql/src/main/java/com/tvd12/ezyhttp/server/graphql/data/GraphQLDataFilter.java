@@ -22,23 +22,42 @@ public class GraphQLDataFilter {
         GraphQLField queryDefinition
     ) {
         Map answer = new HashMap<>();
-        Map parentMap = null;
         Deque<StackEntry> stack = new ArrayDeque<>();
-        stack.push(new StackEntry(queryDefinition, data));
+        stack.push(new StackEntry(queryDefinition, data, answer));
+        filterStack(stack);
+        return answer;
+    }
+
+    @SuppressWarnings({"rawtypes"})
+    public List<Map> filterList(
+        List<Map> dataList,
+        GraphQLField queryDefinition
+    ) {
+        List<Map> answer = new LinkedList<>();
+        Deque<StackEntry> stack = new ArrayDeque<>();
+        pushListItems(
+            stack,
+            dataList,
+            queryDefinition,
+            answer,
+            queryDefinition.getName()
+        );
+        filterStack(stack);
+        return answer;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void filterStack(Deque<StackEntry> stack) {
         while (!stack.isEmpty()) {
             StackEntry entry = stack.pop();
-            String parentName = entry.field.getName();
-            parentMap = parentMap == null
-                ? answer
-                : (Map) parentMap.get(parentName);
 
             GraphQLField allField = entry.field.getField(ALL_FIELDS);
-            if (allField != null) {
+            if (allField != null && entry.data != null) {
                 Set<Map.Entry> entries = entry.data.entrySet();
                 for (Map.Entry e : entries) {
                     Object v = e.getValue();
                     if (v != null) {
-                        parentMap.put(e.getKey(), v);
+                        entry.output.put(e.getKey(), v);
                     }
                 }
             }
@@ -53,41 +72,59 @@ public class GraphQLDataFilter {
                     continue;
                 }
                 if (field.getFields().isEmpty()) {
-                    parentMap.put(fieldName, value);
+                    entry.output.put(fieldName, value);
                     continue;
                 }
                 if (value instanceof Map) {
-                    Object newItem = new HashMap<>();
-                    parentMap.put(fieldName, newItem);
-                    stack.push(new StackEntry(field, (Map) value));
+                    Map newItem = new HashMap<>();
+                    entry.output.put(fieldName, newItem);
+                    stack.push(new StackEntry(field, (Map) value, newItem));
                 } else if (value instanceof List) {
-                    parentMap.put(
-                        fieldName,
-                        filterList((List) value, field)
+                    List<Map> newList = new LinkedList<>();
+                    entry.output.put(fieldName, newList);
+                    pushListItems(
+                        stack,
+                        (List) value,
+                        field,
+                        newList,
+                        fieldName
                     );
                 } else {
-                    throw new GraphQLInvalidSchemeException(
-                        EzyMapBuilder.mapBuilder()
-                            .put("schema", "invalid")
-                            .put("field", fieldName)
-                            .toMap()
-                    );
+                    throw newInvalidSchemeException(fieldName);
                 }
             }
         }
-        return answer;
     }
 
-    @SuppressWarnings({"rawtypes"})
-    public List<Map> filterList(
-        List<Map> dataList,
-        GraphQLField queryDefinition
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void pushListItems(
+        Deque<StackEntry> stack,
+        List dataList,
+        GraphQLField queryDefinition,
+        List<Map> answer,
+        String fieldName
     ) {
-        List<Map> answer = new LinkedList<>();
-        for (Map map : dataList) {
-            answer.add(filter(map, queryDefinition));
+        int size = dataList.size();
+        for (int i = size - 1; i >= 0; --i) {
+            Object data = dataList.get(i);
+            if (!(data instanceof Map)) {
+                throw newInvalidSchemeException(fieldName);
+            }
+            Map item = new HashMap<>();
+            answer.add(0, item);
+            stack.push(new StackEntry(queryDefinition, (Map) data, item));
         }
-        return answer;
+    }
+
+    private GraphQLInvalidSchemeException newInvalidSchemeException(
+        String fieldName
+    ) {
+        return new GraphQLInvalidSchemeException(
+            EzyMapBuilder.mapBuilder()
+                .put("schema", "invalid")
+                .put("field", fieldName)
+                .toMap()
+        );
     }
 
     @AllArgsConstructor
@@ -95,5 +132,6 @@ public class GraphQLDataFilter {
     private static class StackEntry {
         private GraphQLField field;
         private Map data;
+        private Map output;
     }
 }
