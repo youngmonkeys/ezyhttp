@@ -2,10 +2,8 @@ package com.tvd12.ezyhttp.server.graphql.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import com.tvd12.ezyfox.util.EzyMapBuilder;
-import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
-import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
+import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLFetcherException;
 import com.tvd12.ezyhttp.server.core.annotation.*;
@@ -37,6 +35,7 @@ import static java.util.Collections.singletonMap;
 @Api
 @Authenticatable
 public class GraphQLController
+    extends EzyLoggable
     implements IRequestController, AuthenticatedController {
 
     @Getter
@@ -83,8 +82,12 @@ public class GraphQLController
                     Map.class
                 );
             } catch (Exception e) {
-                throw new HttpBadRequestException(
-                    singletonMap("variables", "invalid"),
+                throw new GraphQLObjectMapperException(
+                    Collections.singletonList(
+                        GraphQLError.builder()
+                            .message("invalid variables: " + e.getMessage())
+                            .build()
+                    ),
                     e
                 );
             }
@@ -169,13 +172,13 @@ public class GraphQLController
                     dataFetcher
                 );
                 if (!ok) {
-                    throw new HttpNotAcceptableException(
-                        EzyMapBuilder.mapBuilder()
-                            .put("controller", "GraphQL")
-                            .put("queryGroup", queryGroup)
-                            .put("queryName", queryName)
-                            .toMap()
-                    );
+                    throw GraphQLFetcherException.builder()
+                        .error(
+                            GraphQLError.builder()
+                                .message("interceptor rejected query: " + queryName)
+                                .build()
+                        )
+                        .build();
                 }
             }
             Object data = dataFetcher.getData(
@@ -210,10 +213,23 @@ public class GraphQLController
         try {
             dataMap = objectMapper.convertValue(data, Map.class);
         } catch (Exception e) {
-            throw new HttpInternalServerErrorException(
-                singletonMap("response", "invalid"),
+            String queryName = queryDefinition.getName();
+            logger.error(
+                "failed to convert response for query: {}, data: {}",
+                queryName,
+                data,
                 e
             );
+            throw GraphQLFetcherException.builder()
+                .error(
+                    GraphQLError.builder()
+                        .message(
+                            "internal error: failed to convert " +
+                                "response for query: " + queryName
+                        )
+                        .build()
+                )
+                .build();
         }
         return filterDataMap(dataMap, queryDefinition);
     }

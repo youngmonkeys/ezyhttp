@@ -2,13 +2,12 @@ package com.tvd12.ezyhttp.server.graphql.test.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
-import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
-import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLFetcherException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLRequest;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.fetcher.GraphQLDataFetcher;
@@ -23,6 +22,7 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
@@ -82,7 +82,7 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertFalse(controller.isAuthenticated());
         Asserts.assertEquals(meResult.toString(), "{data={me={bank={id=100}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}}");
-        Asserts.assertEqualsType(e, HttpInternalServerErrorException.class);
+        Asserts.assertEqualsType(e, GraphQLFetcherException.class);
 
         verify(interceptorManager, times(2)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);
@@ -240,7 +240,7 @@ public class GraphQLControllerTest {
         // then
         Asserts.assertFalse(controller.isAuthenticated());
         Asserts.assertEquals(meResult.toString(), "{data={me={bank={id=100}, name=Dzung, friends=[{name=Foo, id=1}, {name=Bar, id=1}]}}}");
-        Asserts.assertEqualsType(e, HttpInternalServerErrorException.class);
+        Asserts.assertEqualsType(e, GraphQLFetcherException.class);
 
         verify(interceptorManager, times(2)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);
@@ -341,7 +341,10 @@ public class GraphQLControllerTest {
         Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
 
         // then
-        Asserts.assertEqualsType(e, HttpNotAcceptableException.class);
+        Asserts.assertEqualsType(e, GraphQLFetcherException.class);
+        GraphQLFetcherException ex = (GraphQLFetcherException) e;
+        Asserts.assertNull(ex.getData());
+        Asserts.assertEquals(ex.getErrors().get(0).getMessage(), "interceptor rejected query: hero");
 
         verify(interceptorManager, times(1)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);
@@ -414,7 +417,7 @@ public class GraphQLControllerTest {
         );
 
         // then
-        Asserts.assertEqualsType(e, HttpInternalServerErrorException.class);
+        Asserts.assertEqualsType(e, GraphQLFetcherException.class);
 
         verify(interceptorManager, times(1)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);
@@ -609,6 +612,9 @@ public class GraphQLControllerTest {
         Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, "abc"));
 
         // then
-        Asserts.assertEqualsType(e, HttpBadRequestException.class);
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertTrue(errors.get(0).getMessage().startsWith("invalid variables:"));
     }
 }
