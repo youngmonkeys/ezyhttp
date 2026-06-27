@@ -7,6 +7,7 @@ import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.test.assertion.Asserts;
@@ -1494,5 +1495,209 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEquals(result, "query_name{slug}");
+    }
+
+    @Test
+    public void parseQueryWithOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}} query GetHero{hero{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryWithOperationNameSelectSecondTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}} query GetHero{hero{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetHero",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "hero");
+    }
+
+    @Test
+    public void parseQueryWithUnknownOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}}";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(query, "GetUnknown", Collections.emptyMap())
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetUnknown");
+    }
+
+    @Test
+    public void parseQueryWithNullOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}}";
+
+        // when — null operationName falls back to normal parsing
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            null,
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryOperationNameSuffixOfAnotherShouldNotMatchTest() {
+        // given — "GetMe" appears as suffix inside "SomeGetMe"; should skip it
+        // and match the standalone "GetMe"
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query SomeGetMe{me{name}} query GetMe{user{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then — matched the second operation, not the one ending in "GetMe"
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "user");
+    }
+
+    @Test
+    public void parseQueryOperationNameAtStartOfStringTest() {
+        // given — no "query" keyword prefix; nameIdx == 0
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "GetMe{me{name}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryOperationNamePrefixOfAnotherShouldNotMatchTest() {
+        // given — "GetMe" is a prefix of "GetMeFull"; validSuffix check must reject it
+        // and match the standalone "GetMe" that comes after
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMeFull{me{name}} query GetMe{user{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then — matched the standalone "GetMe", not "GetMeFull"
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "user");
+    }
+
+    @Test
+    public void parseQueryOperationNameWithCharsBetweenNameAndBraceTest() {
+        // given — "(id: 1)" sits between operation name and '{'; braceStart++ runs
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe(id: 1){me{name}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryOperationNameWithUnclosedBracesTest() {
+        // given — unclosed braces: for loop exhausts without depth reaching 0
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(query, "GetMe", Collections.emptyMap())
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetMe");
+    }
+
+    @Test
+    public void parseQueryOperationNameAtEndWithoutSelectionSetTest() {
+        // given — "GetMe" at end of string: afterName >= length → validSuffix=true
+        // but braceStart loop finds no '{' → returns null → unknown operation
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetOther{other{id}} query GetMe";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(query, "GetMe", Collections.emptyMap())
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetMe");
+    }
+
+    @Test
+    public void parseQueryWithOperationNameAndNullQueryTest() {
+        // given — null query with operationName; standardizeKeepOperationNames returns ""
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(null, "GetMe", Collections.emptyMap())
+        );
+
+        // then — "GetMe" not found in empty string
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetMe");
     }
 }

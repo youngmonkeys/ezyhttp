@@ -10,6 +10,7 @@ import java.util.Map;
 @Setter
 public class GraphQLRequest {
     private String query;
+    private String operationName;
     private Map<String, Object> variables;
 
     public Map<String, Object> getVariables() {

@@ -76,7 +76,7 @@ public class GraphQLControllerTest {
         // when
         Object meResult = controller.doPost(arguments, meRequest);
         Throwable e = Asserts.assertThrows(() ->
-            controller.doGet(arguments, heroQuery, null)
+            controller.doGet(arguments, heroQuery, null, null)
         );
 
         // then
@@ -234,7 +234,7 @@ public class GraphQLControllerTest {
         // when
         Object meResult = controller.doPost(arguments, meRequest);
         Throwable e = Asserts.assertThrows(() ->
-            controller.doGet(arguments, heroQuery, null)
+            controller.doGet(arguments, heroQuery, null, null)
         );
 
         // then
@@ -290,7 +290,7 @@ public class GraphQLControllerTest {
         String heroQuery = "{hero}";
 
         // when
-        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null, null));
 
         // then
         Asserts.assertEqualsType(e, GraphQLFetcherException.class);
@@ -338,7 +338,7 @@ public class GraphQLControllerTest {
         String heroQuery = "{hero}";
 
         // when
-        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null, null));
 
         // then
         Asserts.assertEqualsType(e, GraphQLFetcherException.class);
@@ -413,7 +413,7 @@ public class GraphQLControllerTest {
 
         // when
         Throwable e = Asserts.assertThrows(() ->
-            controller.doGet(arguments, welcomeQuery, variablesString)
+            controller.doGet(arguments, welcomeQuery, null, variablesString)
         );
 
         // then
@@ -478,8 +478,8 @@ public class GraphQLControllerTest {
         String fooQuery = "{foo{value(value:$value){*}}}";
 
         // when
-        Object fooResult1 = controller.doGet(arguments, fooQuery, "{\"value\": \"Bar\"}");
-        Object fooResult2 = controller.doGet(arguments, fooQuery, null);
+        Object fooResult1 = controller.doGet(arguments, fooQuery, null, "{\"value\": \"Bar\"}");
+        Object fooResult2 = controller.doGet(arguments, fooQuery, null, null);
 
         // then
         Asserts.assertEquals(fooResult1.toString(), "{data={foo={value={bar=Bar}}}}");
@@ -609,7 +609,7 @@ public class GraphQLControllerTest {
         String heroQuery = "{hero}";
 
         // when
-        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, "abc"));
+        Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null, "abc"));
 
         // then
         Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
