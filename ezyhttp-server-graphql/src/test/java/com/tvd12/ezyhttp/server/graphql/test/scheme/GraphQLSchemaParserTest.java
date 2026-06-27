@@ -1632,6 +1632,42 @@ public class GraphQLSchemaParserTest {
     }
 
     @Test
+    public void parseQueryOperationNameWithCharsBetweenNameAndBraceTest() {
+        // given — "(id: 1)" sits between operation name and '{'; braceStart++ runs
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe(id: 1){me{name}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryOperationNameWithUnclosedBracesTest() {
+        // given — unclosed braces: for loop exhausts without depth reaching 0
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(query, "GetMe", Collections.emptyMap())
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetMe");
+    }
+
+    @Test
     public void parseQueryOperationNameAtEndWithoutSelectionSetTest() {
         // given — "GetMe" at end of string: afterName >= length → validSuffix=true
         // but braceStart loop finds no '{' → returns null → unknown operation
