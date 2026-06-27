@@ -100,8 +100,6 @@ public final class GraphQLSchemaParser {
                     );
                     replaceVariablePlaceholders(argumentMap, variables);
                     childBuilder.arguments(argumentMap);
-                } catch (GraphQLObjectMapperException e) {
-                    throw e;
                 } catch (Exception e) {
                     throw new GraphQLObjectMapperException(
                         Collections.singletonList(
