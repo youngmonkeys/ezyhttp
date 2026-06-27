@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
 @AllArgsConstructor
 public final class GraphQLSchemaParser {
@@ -22,6 +23,28 @@ public final class GraphQLSchemaParser {
 
     private static final String VARIABLE_PLACEHOLDER_FIELD =
         "__ezyhttp_graphql_variable__";
+
+    public GraphQLSchema parseQuery(
+        String queryToParse,
+        String operationName,
+        Map<String, Object> variables
+    ) {
+        if (!isNotBlank(operationName)) {
+            return parseQuery(queryToParse, variables);
+        }
+        String standardized = standardizeKeepOperationNames(queryToParse);
+        String selectionSet = extractNamedOperation(standardized, operationName);
+        if (selectionSet == null) {
+            throw new GraphQLObjectMapperException(
+                Collections.singletonList(
+                    GraphQLError.builder()
+                        .message("unknown operation named: " + operationName)
+                        .build()
+                )
+            );
+        }
+        return parseQuery(selectionSet, variables);
+    }
 
     @SuppressWarnings({"unchecked", "MethodLength"})
     public GraphQLSchema parseQuery(
@@ -176,6 +199,42 @@ public final class GraphQLSchemaParser {
         return schemaBuilder.build();
     }
 
+    private String extractNamedOperation(
+        String standardizedQuery,
+        String operationName
+    ) {
+        int nameIdx = standardizedQuery.indexOf(operationName);
+        while (nameIdx >= 0) {
+            boolean validPrefix = nameIdx == 0
+                || !isGraphQLNameChar(standardizedQuery.charAt(nameIdx - 1));
+            int afterName = nameIdx + operationName.length();
+            boolean validSuffix = afterName >= standardizedQuery.length()
+                || !isGraphQLNameChar(standardizedQuery.charAt(afterName));
+            if (validPrefix && validSuffix) {
+                int braceStart = afterName;
+                while (braceStart < standardizedQuery.length()
+                    && standardizedQuery.charAt(braceStart) != '{') {
+                    braceStart++;
+                }
+                if (braceStart < standardizedQuery.length()) {
+                    int depth = 0;
+                    for (int i = braceStart; i < standardizedQuery.length(); i++) {
+                        char c = standardizedQuery.charAt(i);
+                        if (c == '{') {
+                            depth++;
+                        } else if (c == '}') {
+                            if (--depth == 0) {
+                                return standardizedQuery.substring(braceStart, i + 1);
+                            }
+                        }
+                    }
+                }
+            }
+            nameIdx = standardizedQuery.indexOf(operationName, nameIdx + 1);
+        }
+        return null;
+    }
+
     /**
      * Remove redundant '\t', '\n', '+', ',', ' ' in query.
      *
@@ -186,12 +245,20 @@ public final class GraphQLSchemaParser {
         if (query == null) {
             return EMPTY_STRING;
         }
-        String trimedQuery = query.trim();
-        StringBuilder forwardStandard = forwardStandardize(trimedQuery);
+        String trimmedQuery = query.trim();
+        StringBuilder forwardStandard = forwardStandardize(trimmedQuery);
         StringBuilder backwardStandard = backwardStandardize(
             forwardStandard.toString()
         );
         return removeQueryPrefix(backwardStandard.toString());
+    }
+
+    private String standardizeKeepOperationNames(String query) {
+        if (query == null) {
+            return EMPTY_STRING;
+        }
+        StringBuilder forwardStandard = forwardStandardize(query.trim());
+        return backwardStandardize(forwardStandard.toString()).toString();
     }
 
     private StringBuilder forwardStandardize(String query) {

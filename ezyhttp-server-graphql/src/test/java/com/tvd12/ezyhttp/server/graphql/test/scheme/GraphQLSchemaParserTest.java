@@ -7,6 +7,7 @@ import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
+import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchema;
 import com.tvd12.ezyhttp.server.graphql.scheme.GraphQLSchemaParser;
 import com.tvd12.test.assertion.Asserts;
@@ -1494,5 +1495,80 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEquals(result, "query_name{slug}");
+    }
+
+    @Test
+    public void parseQueryWithOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}} query GetHero{hero{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetMe",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
+    }
+
+    @Test
+    public void parseQueryWithOperationNameSelectSecondTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}} query GetHero{hero{id}}";
+
+        // when
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            "GetHero",
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "hero");
+    }
+
+    @Test
+    public void parseQueryWithUnknownOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}}";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.parseQuery(query, "GetUnknown", Collections.emptyMap())
+        );
+
+        // then
+        Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertEquals(errors.get(0).getMessage(), "unknown operation named: GetUnknown");
+    }
+
+    @Test
+    public void parseQueryWithNullOperationNameTest() {
+        // given
+        GraphQLSchemaParser instance = new GraphQLSchemaParser(new ObjectMapper());
+        String query = "query GetMe{me{name}}";
+
+        // when — null operationName falls back to normal parsing
+        GraphQLSchema schema = instance.parseQuery(
+            query,
+            null,
+            Collections.emptyMap()
+        );
+
+        // then
+        List<GraphQLQueryDefinition> definitions = schema.getQueryDefinitions();
+        Asserts.assertEquals(definitions.size(), 1);
+        Asserts.assertEquals(definitions.get(0).getName(), "me");
     }
 }

@@ -62,9 +62,11 @@ public class GraphQLController
      * curl --location -g --request GET 'http://localhost:8083/graphql?query={me{myVariable: $someValue}{id+name+friends{name}}}&amp;variables={"id" : 1}'
      * </code>
      *
-     * @param arguments the request arguments
-     * @param query     GraphQL query
-     * @param variables a JSON-encoded string like <code>{ "myVariable": "someValue", ... }</code>
+     * @param arguments     the request arguments
+     * @param query         GraphQL query
+     * @param operationName optional operation name for named operations
+     * @param variables     a JSON-encoded string like
+     *                      <code>{ "myVariable": "someValue", ... }</code>
      * @return the result
      */
     @SuppressWarnings("unchecked")
@@ -72,6 +74,7 @@ public class GraphQLController
     public Object doGet(
         RequestArguments arguments,
         @RequestParam("query") String query,
+        @RequestParam("operationName") String operationName,
         @RequestParam("variables") String variables
     ) {
         Map<String, Object> variableMap = Collections.emptyMap();
@@ -92,7 +95,7 @@ public class GraphQLController
                 );
             }
         }
-        return fetch(arguments, query, variableMap);
+        return fetch(arguments, query, operationName, variableMap);
     }
 
     /**
@@ -119,6 +122,7 @@ public class GraphQLController
         return fetch(
             arguments,
             request.getQuery(),
+            request.getOperationName(),
             request.getVariables()
         );
     }
@@ -127,9 +131,11 @@ public class GraphQLController
     private Object fetch(
         RequestArguments arguments,
         String query,
+        String operationName,
         Map<String, Object> variables
     ) {
-        GraphQLSchema schema = schemaParser.parseQuery(query, variables);
+        GraphQLSchema schema = schemaParser
+            .parseQuery(query, operationName, variables);
         List<GraphQLQueryDefinition> queryDefinitions = schema
             .getQueryDefinitions();
         Map<String, Object> answer = new HashMap<>();
