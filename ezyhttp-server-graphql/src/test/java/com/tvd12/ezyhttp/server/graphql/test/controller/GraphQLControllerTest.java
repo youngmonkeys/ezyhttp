@@ -5,7 +5,7 @@ import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
-import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLFetcherException;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.graphql.controller.GraphQLController;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
@@ -293,7 +293,10 @@ public class GraphQLControllerTest {
         Throwable e = Asserts.assertThrows(() -> controller.doGet(arguments, heroQuery, null));
 
         // then
-        Asserts.assertEquals(HttpNotFoundException.class.toString(), e.getClass().toString());
+        Asserts.assertEqualsType(e, GraphQLFetcherException.class);
+        GraphQLFetcherException ex = (GraphQLFetcherException) e;
+        Asserts.assertNull(ex.getData());
+        Asserts.assertEquals(ex.getErrors().get(0).getMessage(), "dataFetcher not found: hero");
     }
 
     @Test

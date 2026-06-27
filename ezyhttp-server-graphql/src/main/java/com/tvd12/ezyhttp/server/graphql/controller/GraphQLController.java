@@ -6,7 +6,8 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpInternalServerErrorException;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
-import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
+import com.tvd12.ezyhttp.server.graphql.exception.GraphQLFetcherException;
 import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.handler.AuthenticatedController;
 import com.tvd12.ezyhttp.server.core.handler.IRequestController;
@@ -134,9 +135,13 @@ public class GraphQLController
             GraphQLDataFetcher dataFetcher = dataFetcherManager
                 .getDataFetcher(queryName);
             if (dataFetcher == null) {
-                throw new HttpNotFoundException(
-                    singletonMap("dataFetcher", "notFound")
-                );
+                throw GraphQLFetcherException.builder()
+                    .error(
+                        GraphQLError.builder()
+                            .message("dataFetcher not found: " + queryName)
+                            .build()
+                    )
+                    .build();
             }
             List<GraphQLInterceptor> interceptors = interceptorManager
                 .getRequestInterceptors();
