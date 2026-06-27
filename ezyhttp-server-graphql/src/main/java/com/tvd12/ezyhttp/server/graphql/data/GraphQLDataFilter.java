@@ -16,7 +16,7 @@ import static com.tvd12.ezyhttp.server.graphql.constants.GraphQLConstants.ALL_FI
 
 public class GraphQLDataFilter {
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("rawtypes")
     public Map filter(
         Map data,
         GraphQLField queryDefinition
@@ -28,7 +28,7 @@ public class GraphQLDataFilter {
         return answer;
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings("rawtypes")
     public List<Map> filterList(
         List<Map> dataList,
         GraphQLField queryDefinition
@@ -96,7 +96,7 @@ public class GraphQLDataFilter {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("rawtypes")
     private void pushListItems(
         Deque<StackEntry> stack,
         List dataList,
