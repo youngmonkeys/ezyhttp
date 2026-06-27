@@ -81,7 +81,7 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertFalse(controller.isAuthenticated());
-        Asserts.assertEquals(meResult.toString(), "{me={bank={id=100}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}");
+        Asserts.assertEquals(meResult.toString(), "{data={me={bank={id=100}, name=Dzung, friends=[{name=Foo}, {name=Bar}]}}}");
         Asserts.assertEqualsType(e, HttpInternalServerErrorException.class);
 
         verify(interceptorManager, times(2)).getRequestInterceptors();
@@ -158,7 +158,7 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertFalse(controller.isAuthenticated());
-        Asserts.assertEquals(meResult.toString(), "{me={bank={id=100}, nickName=Hello, name=Dzung, id=1, friends=[{id=1, name=Foo}, {id=1, name=Bar}]}}");
+        Asserts.assertEquals(meResult.toString(), "{data={me={bank={id=100}, nickName=Hello, name=Dzung, id=1, friends=[{id=1, name=Foo}, {id=1, name=Bar}]}}}");
 
         verify(interceptorManager, times(1)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);
@@ -239,7 +239,7 @@ public class GraphQLControllerTest {
 
         // then
         Asserts.assertFalse(controller.isAuthenticated());
-        Asserts.assertEquals(meResult.toString(), "{me={bank={id=100}, name=Dzung, friends=[{name=Foo, id=1}, {name=Bar, id=1}]}}");
+        Asserts.assertEquals(meResult.toString(), "{data={me={bank={id=100}, name=Dzung, friends=[{name=Foo, id=1}, {name=Bar, id=1}]}}}");
         Asserts.assertEqualsType(e, HttpInternalServerErrorException.class);
 
         verify(interceptorManager, times(2)).getRequestInterceptors();
@@ -476,8 +476,8 @@ public class GraphQLControllerTest {
         Object fooResult2 = controller.doGet(arguments, fooQuery, null);
 
         // then
-        Asserts.assertEquals(fooResult1.toString(), "{foo={value={bar=Bar}}}");
-        Asserts.assertEquals(fooResult2.toString(), "{foo={value={}}}");
+        Asserts.assertEquals(fooResult1.toString(), "{data={foo={value={bar=Bar}}}}");
+        Asserts.assertEquals(fooResult2.toString(), "{data={foo={value={}}}}");
 
         verify(interceptorManager, times(2)).getRequestInterceptors();
         verifyNoMoreInteractions(interceptorManager);

@@ -193,7 +193,7 @@ public class GraphQLController
                 );
             }
         }
-        return answer;
+        return singletonMap("data", answer);
     }
 
     @SuppressWarnings({"rawtypes"})

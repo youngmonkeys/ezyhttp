@@ -7,6 +7,8 @@ import com.tvd12.ezyhttp.server.graphql.exception.GraphQLFetcherException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 
+import java.util.Collections;
+
 @ExceptionHandler
 public class GraphQLExceptionHandler extends EzyLoggable {
 
@@ -19,12 +21,12 @@ public class GraphQLExceptionHandler extends EzyLoggable {
     @TryCatch(GraphQLInvalidSchemeException.class)
     public Object handle(GraphQLInvalidSchemeException e) {
         logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
-        return e.getErrors();
+        return Collections.singletonMap("errors", e.getErrors());
     }
 
     @TryCatch(GraphQLObjectMapperException.class)
     public Object handle(GraphQLObjectMapperException e) {
         logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
-        return e.getErrors();
+        return Collections.singletonMap("errors", e.getErrors());
     }
 }

@@ -10,6 +10,7 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class GraphQLExceptionHandlerTest {
         // then
         Asserts.assertEquals(
             actual,
-            errors
+            Collections.singletonMap("errors", errors)
         );
     }
 
@@ -79,7 +80,7 @@ public class GraphQLExceptionHandlerTest {
         // then
         Asserts.assertEquals(
             actual,
-            errors
+            Collections.singletonMap("errors", errors)
         );
     }
 }
