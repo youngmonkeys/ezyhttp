@@ -1,10 +1,10 @@
 package com.tvd12.ezyhttp.server.graphql.data;
 
-import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -120,10 +120,11 @@ public class GraphQLDataFilter {
         String fieldName
     ) {
         return new GraphQLInvalidSchemeException(
-            EzyMapBuilder.mapBuilder()
-                .put("schema", "invalid")
-                .put("field", fieldName)
-                .toMap()
+            Collections.singletonList(
+                GraphQLError.builder()
+                    .message("invalid schema for field: " + fieldName)
+                    .build()
+            )
         );
     }
 

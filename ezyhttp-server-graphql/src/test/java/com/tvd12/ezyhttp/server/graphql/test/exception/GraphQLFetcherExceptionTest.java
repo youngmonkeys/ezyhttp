@@ -158,6 +158,7 @@ public class GraphQLFetcherExceptionTest {
         Asserts.assertEquals(
             instance.toDataMap(),
             EzyMapBuilder.mapBuilder()
+                .put("data", null)
                 .put("errors", Arrays.asList(error1, error2))
                 .toMap(),
             false

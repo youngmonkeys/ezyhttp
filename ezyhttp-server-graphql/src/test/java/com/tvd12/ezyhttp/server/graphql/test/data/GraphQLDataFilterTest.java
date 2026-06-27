@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.graphql.test.data;
 
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLDataFilter;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLInvalidSchemeException;
 import com.tvd12.test.assertion.Asserts;
@@ -9,6 +10,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.util.EzyMapBuilder.mapBuilder;
@@ -223,13 +225,8 @@ public class GraphQLDataFilterTest {
 
         // then
         Asserts.assertEqualsType(e, GraphQLInvalidSchemeException.class);
-        Asserts.assertEquals(
-            ((GraphQLInvalidSchemeException) e).getErrors(),
-            mapBuilder()
-                .put("schema", "invalid")
-                .put("field", "tags")
-                .toMap(),
-            false
-        );
+        List<GraphQLError> errors = ((GraphQLInvalidSchemeException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertEquals(errors.get(0).getMessage(), "invalid schema for field: tags");
     }
 }

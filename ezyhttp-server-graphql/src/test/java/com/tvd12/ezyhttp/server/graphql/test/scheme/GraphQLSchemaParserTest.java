@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.graphql.test.scheme;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.json.GraphQLObjectMapperFactory;
@@ -19,6 +20,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 
 public class GraphQLSchemaParserTest {
@@ -1028,15 +1030,9 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
-        GraphQLObjectMapperException exception = (GraphQLObjectMapperException) e;
-        Asserts.assertEquals(
-            exception.getErrors(),
-            EzyMapBuilder.mapBuilder()
-                .put("arguments", "invalid")
-                .put("message", "there is no child")
-                .toMap(),
-            false
-        );
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertEquals(errors.get(0).getMessage(), "there is no child");
     }
 
     @Test
@@ -1076,15 +1072,9 @@ public class GraphQLSchemaParserTest {
 
         // then
         Asserts.assertEqualsType(e, GraphQLObjectMapperException.class);
-        GraphQLObjectMapperException exception = (GraphQLObjectMapperException) e;
-        Asserts.assertEquals(
-            exception.getErrors(),
-            EzyMapBuilder.mapBuilder()
-                .put("arguments", "invalid")
-                .put("message", "there is no parent case curly brace close")
-                .toMap(),
-            false
-        );
+        List<GraphQLError> errors = ((GraphQLObjectMapperException) e).getErrors();
+        Asserts.assertEquals(errors.size(), 1);
+        Asserts.assertEquals(errors.get(0).getMessage(), "there is no parent case curly brace close");
     }
 
     @Test

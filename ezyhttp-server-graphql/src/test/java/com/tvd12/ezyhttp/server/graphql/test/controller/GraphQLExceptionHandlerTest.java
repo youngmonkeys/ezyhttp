@@ -44,6 +44,30 @@ public class GraphQLExceptionHandlerTest {
     }
 
     @Test
+    public void handleGraphQLFetcherExceptionWithNullDataTest() {
+        // given
+        List<GraphQLError> errors = new ArrayList<>();
+        GraphQLFetcherException exception = GraphQLFetcherException.builder()
+            .errors(errors)
+            .build();
+
+        GraphQLExceptionHandler instance = new GraphQLExceptionHandler();
+
+        // when
+        Object actual = instance.handle(exception);
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            EzyMapBuilder.mapBuilder()
+                .put("data", null)
+                .put("errors", errors)
+                .toMap(),
+            false
+        );
+    }
+
+    @Test
     public void handleGraphQLInvalidSchemeExceptionTest() {
         // given
         List<GraphQLError> errors = new ArrayList<>();

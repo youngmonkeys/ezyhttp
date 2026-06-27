@@ -23,9 +23,7 @@ public class GraphQLFetcherException extends RuntimeException {
 
     public Map<String, Object> toDataMap() {
         Map<String, Object> answer = new HashMap<>();
-        if (data != null) {
-            answer.put("data", data);
-        }
+        answer.put("data", data);
         answer.put("errors", errors);
         return answer;
     }

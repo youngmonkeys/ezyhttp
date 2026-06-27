@@ -1,13 +1,14 @@
 package com.tvd12.ezyhttp.server.graphql.scheme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyhttp.server.graphql.data.GraphQLError;
 import com.tvd12.ezyhttp.server.graphql.data.GraphQLField;
 import com.tvd12.ezyhttp.server.graphql.exception.GraphQLObjectMapperException;
 import com.tvd12.ezyhttp.server.graphql.query.GraphQLQueryDefinition;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -76,12 +77,15 @@ public final class GraphQLSchemaParser {
                     );
                     replaceVariablePlaceholders(argumentMap, variables);
                     childBuilder.arguments(argumentMap);
+                } catch (GraphQLObjectMapperException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new GraphQLObjectMapperException(
-                        EzyMapBuilder.mapBuilder()
-                            .put("arguments", "invalid")
-                            .put("message", e.getMessage())
-                            .toMap(),
+                        Collections.singletonList(
+                            GraphQLError.builder()
+                                .message("invalid arguments: " + e.getMessage())
+                                .build()
+                        ),
                         e
                     );
                 }
@@ -403,10 +407,11 @@ public final class GraphQLSchemaParser {
         GraphQLField.Builder parentBuilder = stack.peek();
         if (parentBuilder == null) {
             throw new GraphQLObjectMapperException(
-                EzyMapBuilder.mapBuilder()
-                    .put("arguments", "invalid")
-                    .put("message", message)
-                    .toMap()
+                Collections.singletonList(
+                    GraphQLError.builder()
+                        .message(message)
+                        .build()
+                )
             );
         }
         return parentBuilder;
