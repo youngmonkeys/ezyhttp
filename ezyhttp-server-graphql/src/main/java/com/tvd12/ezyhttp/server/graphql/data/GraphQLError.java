@@ -1,11 +1,13 @@
 package com.tvd12.ezyhttp.server.graphql.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 import java.util.*;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GraphQLError {
 
     private final String message;

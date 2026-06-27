@@ -10,7 +10,6 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,11 @@ public class GraphQLExceptionHandlerTest {
         // then
         Asserts.assertEquals(
             actual,
-            Collections.singletonMap("errors", errors)
+            EzyMapBuilder.mapBuilder()
+                .put("data", null)
+                .put("errors", errors)
+                .toMap(),
+            false
         );
     }
 
@@ -104,7 +107,11 @@ public class GraphQLExceptionHandlerTest {
         // then
         Asserts.assertEquals(
             actual,
-            Collections.singletonMap("errors", errors)
+            EzyMapBuilder.mapBuilder()
+                .put("data", null)
+                .put("errors", errors)
+                .toMap(),
+            false
         );
     }
 }
