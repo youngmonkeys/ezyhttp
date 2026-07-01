@@ -3,6 +3,8 @@ package com.tvd12.ezyhttp.server.core.asm;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.tvd12.reflections.ReflectionUtils.toClass;
+
 import com.tvd12.ezyfox.asm.EzyFunction;
 import com.tvd12.ezyfox.asm.EzyFunction.EzyBody;
 import com.tvd12.ezyfox.asm.EzyInstruction;
@@ -67,7 +69,7 @@ public class ExceptionHandlerImplementer
         implClass.addMethod(CtNewMethod.make(setExceptionHandlerMethodContent, implClass));
         implClass.addMethod(CtNewMethod.make(handleExceptionMethodContent, implClass));
         implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
-        Class answerClass = implClass.toClass();
+        Class answerClass = toClass(implClass, getSuperClass());
         implClass.detach();
         AsmUncaughtExceptionHandler handler = (AsmUncaughtExceptionHandler)
             answerClass.newInstance();
@@ -173,7 +175,8 @@ public class ExceptionHandlerImplementer
     }
 
     protected String getImplClassName() {
-        return exceptionHandler.getClassSimpleName()
+        return getSuperClass().getPackage().getName()
+            + "." + exceptionHandler.getClassSimpleName()
             + "$" + handlerMethod.getName() + "$ExceptionHandler$AutoImpl$"
             + COUNT.incrementAndGet();
     }
