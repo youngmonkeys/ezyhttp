@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.asm;
 
 import static com.tvd12.ezyfox.io.EzyStrings.quote;
+import static com.tvd12.reflections.ReflectionUtils.toClass;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -104,7 +105,7 @@ public class RequestHandlerImplementer
         implClass.addMethod(CtNewMethod.make(getRequestURIMethodContent, implClass));
         implClass.addMethod(CtNewMethod.make(getResponseContentTypeMethodContent, implClass));
         implClass.addMethod(CtNewMethod.make(isAsyncMethodContent, implClass));
-        Class answerClass = implClass.toClass();
+        Class answerClass = toClass(implClass, getSuperClass());
         implClass.detach();
         RequestHandler handler = (RequestHandler) answerClass.newInstance();
         handler.setHandlerMethod(handlerMethod.getMethod().getMethod());
@@ -418,7 +419,8 @@ public class RequestHandlerImplementer
     }
 
     protected String getImplClassName() {
-        return controller.getControllerName()
+        return getSuperClass().getPackage().getName()
+            + "." + controller.getControllerName()
             + "$" + handlerMethod.getName() + "$Handler$AutoImpl$" + COUNT.incrementAndGet();
     }
 
