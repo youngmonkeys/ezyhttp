@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -25,7 +26,7 @@ public class GraphQLDataFetcherManager {
     private final Set<String> paymentQueryNames;
     private final Map<String, String> groupNameByQueryName;
     private final Map<String, Set<String>> queryNamesByGroupName;
-    private final GraphQLDataFetcherProvider dataFetcherProvider;
+    private final List<GraphQLDataFetcherProvider> dataFetcherProviders;
 
     protected GraphQLDataFetcherManager(Builder builder) {
         this.dataFetchers = builder.dataFetchers;
@@ -34,7 +35,7 @@ public class GraphQLDataFetcherManager {
         this.paymentQueryNames = builder.paymentQueryNames;
         this.groupNameByQueryName = builder.groupNameByQueryName;
         this.queryNamesByGroupName = builder.queryNamesByGroupName;
-        this.dataFetcherProvider = builder.dataFetcherProvider;
+        this.dataFetcherProviders = builder.dataFetcherProviders;
     }
 
     public void addDataFetcher(
@@ -69,8 +70,14 @@ public class GraphQLDataFetcherManager {
     public GraphQLDataFetcher getDataFetcher(String queryName) {
         GraphQLDataFetcher fetcher = dataFetchers
             .get(queryName);
-        if (fetcher == null && dataFetcherProvider != null) {
-            fetcher = dataFetcherProvider.provide(queryName);
+        if (fetcher == null) {
+            for (GraphQLDataFetcherProvider dataFetcherProvider
+                : dataFetcherProviders) {
+                fetcher = dataFetcherProvider.provide(queryName);
+                if (fetcher != null) {
+                    break;
+                }
+            }
         }
         return fetcher;
     }
@@ -125,7 +132,8 @@ public class GraphQLDataFetcherManager {
             new ConcurrentHashMap<>();
         private final Map<String, Set<String>> queryNamesByGroupName =
             new ConcurrentHashMap<>();
-        private GraphQLDataFetcherProvider dataFetcherProvider;
+        private final List<GraphQLDataFetcherProvider> dataFetcherProviders =
+            new CopyOnWriteArrayList<>();
 
         public Builder addDataFetcher(GraphQLDataFetcher fetcher) {
             return addDataFetcher(fetcher.getQueryName(), fetcher);
@@ -160,7 +168,7 @@ public class GraphQLDataFetcherManager {
         public Builder dataFetcherProvider(
             GraphQLDataFetcherProvider dataFetcherProvider
         ) {
-            this.dataFetcherProvider = dataFetcherProvider;
+            this.dataFetcherProviders.add(dataFetcherProvider);
             return this;
         }
 
