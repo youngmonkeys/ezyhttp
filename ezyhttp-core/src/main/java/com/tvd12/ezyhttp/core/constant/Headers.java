@@ -8,6 +8,7 @@ public final class Headers {
     public static final String CONTENT_RANGE = "Content-Range";
     public static final String CONTENT_LENGTH = "Content-Length";
     public static final String CONTENT_TYPE = "Content-Type";
+    public static final String USER_AGENT = "User-Agent";
 
     private Headers() {}
 }

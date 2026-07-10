@@ -53,10 +53,10 @@ public class GraphQLConfiguration implements
         for (GraphQLDataFetcher dataFetcher : dataFetchers) {
             dataFetcherManagerBuilder.addDataFetcher(dataFetcher);
         }
-        GraphQLDataFetcherProvider dataFetcherProvider = singletonFactory
-            .getSingletonCast(GraphQLDataFetcherProvider.class);
+        List<GraphQLDataFetcherProvider> dataFetcherProviders = singletonFactory
+            .getSingletonsOf(GraphQLDataFetcherProvider.class);
         GraphQLDataFetcherManager dataFetcherManager = dataFetcherManagerBuilder
-            .dataFetcherProvider(dataFetcherProvider)
+            .dataFetcherProviders(dataFetcherProviders)
             .build();
         GraphQLInterceptorManager interceptorManager =
             new GraphQLInterceptorManager(singletonFactory);

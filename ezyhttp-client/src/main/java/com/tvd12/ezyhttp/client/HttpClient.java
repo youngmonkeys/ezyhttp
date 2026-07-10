@@ -65,6 +65,7 @@ import static com.tvd12.ezyfox.util.EzyFileUtil.getFileExtension;
 import static com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken.ALWAYS_RUN;
 import static com.tvd12.ezyhttp.core.constant.Headers.ACCEPT_ENCODING;
 import static com.tvd12.ezyhttp.core.constant.Headers.CONTENT_ENCODING;
+import static com.tvd12.ezyhttp.core.constant.Headers.USER_AGENT;
 
 @SuppressWarnings("MethodCount")
 public class HttpClient extends EzyLoggable {
@@ -72,13 +73,32 @@ public class HttpClient extends EzyLoggable {
     protected final int defaultReadTimeout;
     protected final int defaultConnectTimeout;
     protected final DataConverters dataConverters;
+    protected final String defaultUserAgent;
 
     public static final int NO_TIMEOUT = -1;
+    private static final String AUTO_USER_AGENT = autoUserAgent();
+    private static final String FALLBACK_VERSION = "1.5.8";
 
     protected HttpClient(Builder builder) {
         this.defaultReadTimeout = builder.readTimeout;
         this.defaultConnectTimeout = builder.connectTimeout;
         this.dataConverters = builder.dataConverters;
+        this.defaultUserAgent = builder.userAgent != null
+            ? builder.userAgent
+            : AUTO_USER_AGENT;
+    }
+
+    private static String autoUserAgent() {
+        String version;
+        try {
+            Package pkg = HttpClient.class.getPackage();
+            version = pkg != null
+                ? pkg.getImplementationVersion()
+                : null;
+        } catch (Throwable e) {
+            version = FALLBACK_VERSION;
+        }
+        return "EzyHttp-Client/" + version;
     }
 
     public <T> T call(Request request) throws Exception {
@@ -148,6 +168,9 @@ public class HttpClient extends EzyLoggable {
                     ACCEPT_ENCODING,
                     ContentEncoding.GZIP.getValue()
                 );
+            }
+            if (connection.getRequestProperty(USER_AGENT) == null) {
+                connection.setRequestProperty(USER_AGENT, defaultUserAgent);
             }
             Object requestBody = null;
             if (method != HttpMethod.GET && entity != null) {
@@ -722,12 +745,22 @@ public class HttpClient extends EzyLoggable {
         if (inputStream != null) {
             try {
                 int contentLength = connection.getContentLength();
-                responseBody = deserializeResponseBody(null, contentLength, inputStream, null);
+                responseBody = deserializeResponseBody(
+                    null,
+                    contentLength,
+                    inputStream,
+                    null
+                );
             } finally {
                 inputStream.close();
             }
         }
-        logger.debug("download error: {} - {} - {}", fileURL, responseCode, responseBody);
+        logger.debug(
+            "download error: {} - {} - {}",
+            fileURL,
+            responseCode,
+            responseBody
+        );
         return translateErrorCode(responseCode, responseBody);
     }
 
@@ -842,7 +875,8 @@ public class HttpClient extends EzyLoggable {
                     ? EzyFileUtil.getFileName(filePath)
                     : "unknown";
             }
-            writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"")
+            writer
+                .append("Content-Disposition: form-data; name=\"file\"; filename=\"")
                 .append(fileName)
                 .append("\"\r\n");
             writer.append("Content-Type: application/octet-stream\r\n\r\n");
@@ -869,10 +903,18 @@ public class HttpClient extends EzyLoggable {
                     inputStream.close();
                 }
             }
-            writer.append("\r\n").append("--").append(boundary).append("--").append("\r\n");
+            writer
+                .append("\r\n")
+                .append("--")
+                .append(boundary)
+                .append("--")
+                .append("\r\n");
             writer.flush();
             writer.close();
-            return processConnectionResponse(connection, request.getResponseTypes());
+            return processConnectionResponse(
+                connection,
+                request.getResponseTypes()
+            );
         } finally {
             connection.disconnect();
         }
@@ -896,13 +938,29 @@ public class HttpClient extends EzyLoggable {
         int readTimeout,
         MultiValueMap requestHeaders
     ) {
-        connection.setConnectTimeout(connectTimeout > 0 ? connectTimeout : defaultConnectTimeout);
-        connection.setReadTimeout(readTimeout > 0 ? readTimeout : defaultReadTimeout);
+        connection.setConnectTimeout(
+            connectTimeout > 0
+                ? connectTimeout
+                : defaultConnectTimeout
+        );
+        connection.setReadTimeout(
+            readTimeout > 0
+                ? readTimeout
+                : defaultReadTimeout
+        );
         if (requestHeaders != null) {
             Map<String, String> encodedHeaders = requestHeaders.toMap();
-            for (Entry<String, String> requestHeader : encodedHeaders.entrySet()) {
-                connection.setRequestProperty(requestHeader.getKey(), requestHeader.getValue());
+            for (Entry<String, String> requestHeader
+                : encodedHeaders.entrySet()
+            ) {
+                connection.setRequestProperty(
+                    requestHeader.getKey(),
+                    requestHeader.getValue()
+                );
             }
+        }
+        if (connection.getRequestProperty(USER_AGENT) == null) {
+            connection.setRequestProperty(USER_AGENT, defaultUserAgent);
         }
     }
 
@@ -914,6 +972,7 @@ public class HttpClient extends EzyLoggable {
 
         protected int readTimeout;
         protected int connectTimeout;
+        protected String userAgent;
         protected ObjectMapper objectMapper;
         protected Object stringConverter;
         protected DataConverters dataConverters;
@@ -934,6 +993,11 @@ public class HttpClient extends EzyLoggable {
 
         public Builder connectTimeout(int connectTimeout) {
             this.connectTimeout = connectTimeout;
+            return this;
+        }
+
+        public Builder userAgent(String userAgent) {
+            this.userAgent = userAgent;
             return this;
         }
 

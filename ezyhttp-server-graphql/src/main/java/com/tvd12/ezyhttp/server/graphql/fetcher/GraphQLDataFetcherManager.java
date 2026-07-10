@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.server.graphql.fetcher;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -169,6 +170,13 @@ public class GraphQLDataFetcherManager {
             GraphQLDataFetcherProvider dataFetcherProvider
         ) {
             this.dataFetcherProviders.add(dataFetcherProvider);
+            return this;
+        }
+
+        public Builder dataFetcherProviders(
+            Collection<GraphQLDataFetcherProvider> dataFetcherProviders
+        ) {
+            this.dataFetcherProviders.addAll(dataFetcherProviders);
             return this;
         }
 
