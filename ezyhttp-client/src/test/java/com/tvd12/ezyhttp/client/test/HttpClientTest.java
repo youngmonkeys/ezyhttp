@@ -16,7 +16,9 @@ import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.codec.TextBodyConverter;
 import com.tvd12.ezyhttp.core.constant.ContentEncoding;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
+import com.tvd12.ezyhttp.core.constant.Headers;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
@@ -29,15 +31,19 @@ import lombok.NoArgsConstructor;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.sun.net.httpserver.HttpServer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.mockito.Mockito.*;
 
@@ -811,6 +817,231 @@ public class HttpClientTest {
 
         // then
         Asserts.assertEquals(actual, fileName);
+    }
+
+    @Test
+    public void requestSetsDefaultUserAgentWhenAbsentTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .build();
+        String expectedUserAgent = FieldUtil.getFieldValue(sut, "defaultUserAgent");
+
+        AtomicReference<String> capturedUserAgent = new AtomicReference<>();
+        HttpServer server = startCaptureHeaderServer(capturedUserAgent);
+        try {
+            GetRequest request = new GetRequest()
+                .setURL("http://127.0.0.1:" + server.getAddress().getPort() + "/")
+                .setResponseType(String.class);
+
+            // when
+            sut.call(request);
+
+            // then
+            Asserts.assertEquals(capturedUserAgent.get(), expectedUserAgent);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    public void requestKeepsExistingUserAgentTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .build();
+        String customUserAgent = "Custom-Agent/" + RandomUtil.randomShortAlphabetString();
+
+        AtomicReference<String> capturedUserAgent = new AtomicReference<>();
+        HttpServer server = startCaptureHeaderServer(capturedUserAgent);
+        try {
+            GetRequest request = new GetRequest()
+                .setURL("http://127.0.0.1:" + server.getAddress().getPort() + "/")
+                .setEntity(
+                    RequestEntity.builder()
+                        .header(Headers.USER_AGENT, customUserAgent)
+                        .build()
+                )
+                .setResponseType(String.class);
+
+            // when
+            sut.call(request);
+
+            // then
+            Asserts.assertEquals(capturedUserAgent.get(), customUserAgent);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    private HttpServer startCaptureHeaderServer(
+        AtomicReference<String> capturedUserAgent
+    ) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/", exchange -> {
+            capturedUserAgent.set(
+                exchange.getRequestHeaders().getFirst(Headers.USER_AGENT)
+            );
+            exchange.sendResponseHeaders(StatusCodes.OK, 0);
+            exchange.close();
+        });
+        server.start();
+        return server;
+    }
+
+    @Test
+    public void decorateConnectionSetsDefaultUserAgentWhenAbsentTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .build();
+        String expectedUserAgent = FieldUtil.getFieldValue(sut, "defaultUserAgent");
+
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        when(connection.getRequestProperty(Headers.USER_AGENT)).thenReturn(null);
+
+        // when
+        MethodInvoker.create()
+            .object(sut)
+            .method("decorateConnection")
+            .param(HttpURLConnection.class, connection)
+            .param(int.class, 1000)
+            .param(int.class, 1000)
+            .param(MultiValueMap.class, null)
+            .invoke();
+
+        // then
+        verify(connection, times(1))
+            .setRequestProperty(Headers.USER_AGENT, expectedUserAgent);
+    }
+
+    @Test
+    public void decorateConnectionKeepsExistingUserAgentTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder()
+            .build();
+
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        when(connection.getRequestProperty(Headers.USER_AGENT))
+            .thenReturn("Custom-Agent/1.0");
+
+        // when
+        MethodInvoker.create()
+            .object(sut)
+            .method("decorateConnection")
+            .param(HttpURLConnection.class, connection)
+            .param(int.class, 1000)
+            .param(int.class, 1000)
+            .param(MultiValueMap.class, null)
+            .invoke();
+
+        // then
+        verify(connection, never())
+            .setRequestProperty(eq(Headers.USER_AGENT), anyString());
+    }
+
+    @Test
+    public void builderCustomUserAgentTest() {
+        // given
+        String customUserAgent = "MyApp/" + RandomUtil.randomShortAlphabetString();
+
+        // when
+        HttpClient sut = HttpClient.builder()
+            .userAgent(customUserAgent)
+            .build();
+
+        // then
+        Asserts.assertEquals(
+            FieldUtil.getFieldValue(sut, "defaultUserAgent"),
+            customUserAgent
+        );
+    }
+
+    @Test
+    public void builderDefaultUserAgentTest() {
+        // when
+        HttpClient sut = HttpClient.builder()
+            .build();
+
+        // then
+        String actual = FieldUtil.getFieldValue(sut, "defaultUserAgent");
+        Asserts.assertTrue(actual.startsWith("EzyHttp-Client/"));
+        Asserts.assertFalse(actual.endsWith("/null"));
+    }
+
+    @Test
+    public void autoUserAgentWithNullPackageTest() {
+        // given
+        String fallbackVersion = FieldUtil.getStaticFieldValue(
+            HttpClient.class,
+            "FALLBACK_VERSION"
+        );
+
+        // when
+        String actual = MethodInvoker.create()
+            .staticClass(HttpClient.class)
+            .method("autoUserAgent")
+            .param(Package.class, null)
+            .call();
+
+        // then
+        Asserts.assertEquals(actual, "EzyHttp-Client/" + fallbackVersion);
+    }
+
+    @Test
+    public void autoUserAgentWithNullImplementationVersionTest() {
+        // given
+        String fallbackVersion = FieldUtil.getStaticFieldValue(
+            HttpClient.class,
+            "FALLBACK_VERSION"
+        );
+        Package pkg = mock(Package.class);
+        when(pkg.getImplementationVersion()).thenReturn(null);
+
+        // when
+        String actual = MethodInvoker.create()
+            .staticClass(HttpClient.class)
+            .method("autoUserAgent")
+            .param(Package.class, pkg)
+            .call();
+
+        // then
+        Asserts.assertEquals(actual, "EzyHttp-Client/" + fallbackVersion);
+    }
+
+    @Test
+    public void autoUserAgentWithImplementationVersionTest() {
+        // given
+        Package pkg = mock(Package.class);
+        when(pkg.getImplementationVersion()).thenReturn("9.9.9");
+
+        // when
+        String actual = MethodInvoker.create()
+            .staticClass(HttpClient.class)
+            .method("autoUserAgent")
+            .param(Package.class, pkg)
+            .call();
+
+        // then
+        Asserts.assertEquals(actual, "EzyHttp-Client/9.9.9");
+    }
+
+    @Test
+    public void autoUserAgentWhenGetImplementationVersionThrowsTest() {
+        // given
+        String fallbackVersion = FieldUtil.getStaticFieldValue(
+            HttpClient.class,
+            "FALLBACK_VERSION"
+        );
+        Package pkg = mock(Package.class);
+        when(pkg.getImplementationVersion()).thenThrow(new RuntimeException("boom"));
+
+        // when
+        String actual = MethodInvoker.create()
+            .staticClass(HttpClient.class)
+            .method("autoUserAgent")
+            .param(Package.class, pkg)
+            .call();
+
+        // then
+        Asserts.assertEquals(actual, "EzyHttp-Client/" + fallbackVersion);
     }
 
     @BeforeTest

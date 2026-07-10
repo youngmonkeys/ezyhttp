@@ -76,7 +76,6 @@ public class HttpClient extends EzyLoggable {
     protected final String defaultUserAgent;
 
     public static final int NO_TIMEOUT = -1;
-    private static final String AUTO_USER_AGENT = autoUserAgent();
     private static final String FALLBACK_VERSION = "1.5.8";
 
     protected HttpClient(Builder builder) {
@@ -85,20 +84,20 @@ public class HttpClient extends EzyLoggable {
         this.dataConverters = builder.dataConverters;
         this.defaultUserAgent = builder.userAgent != null
             ? builder.userAgent
-            : AUTO_USER_AGENT;
+            : autoUserAgent(HttpClient.class.getPackage());
     }
 
-    private static String autoUserAgent() {
+    private static String autoUserAgent(Package pkg) {
         String version;
         try {
-            Package pkg = HttpClient.class.getPackage();
             version = pkg != null
                 ? pkg.getImplementationVersion()
                 : null;
         } catch (Throwable e) {
-            version = FALLBACK_VERSION;
+            version = null;
         }
-        return "EzyHttp-Client/" + version;
+        return "EzyHttp-Client/" +
+            (version != null ? version : FALLBACK_VERSION);
     }
 
     public <T> T call(Request request) throws Exception {
