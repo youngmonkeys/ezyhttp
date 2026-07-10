@@ -974,6 +974,24 @@ public class HttpClientProxyTest extends BaseTest {
     }
 
     @Test
+    public void builderUserAgentTest() {
+        // given
+        String customUserAgent = "MyApp/" + RandomUtil.randomShortAlphabetString();
+
+        // when
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .userAgent(customUserAgent)
+            .build();
+
+        // then
+        HttpClient client = FieldUtil.getFieldValue(sut, "client");
+        Asserts.assertEquals(
+            FieldUtil.getFieldValue(client, "defaultUserAgent"),
+            customUserAgent
+        );
+    }
+
+    @Test
     public void uploadFileTest() throws Exception {
         // given
         HttpClientProxy sut = HttpClientProxy.builder()

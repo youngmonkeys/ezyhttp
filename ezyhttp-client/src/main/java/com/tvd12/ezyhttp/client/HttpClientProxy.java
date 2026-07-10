@@ -502,6 +502,11 @@ public class HttpClientProxy
             return this;
         }
 
+        public Builder userAgent(String userAgent) {
+            clientBuilder.userAgent(userAgent);
+            return this;
+        }
+
         public Builder setStringConverter(Object converter) {
             clientBuilder.setStringConverter(converter);
             return this;
