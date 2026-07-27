@@ -1,6 +1,13 @@
 package com.tvd12.ezyhttp.server.thymeleaf;
 
-import com.tvd12.ezyhttp.server.core.view.*;
+import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
+import com.tvd12.ezyhttp.server.core.view.MessageProvider;
+import com.tvd12.ezyhttp.server.core.view.TemplateResolver;
+import com.tvd12.ezyhttp.server.core.view.View;
+import com.tvd12.ezyhttp.server.core.view.ViewContext;
+import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
+import com.tvd12.ezyhttp.server.core.view.ViewDialect;
+import com.tvd12.ezyhttp.server.core.view.ViewTemplateInputStreamLoader;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -55,7 +62,7 @@ public class ThymeleafViewContext implements ViewContext {
         View view
     ) throws IOException {
         for (ViewDecorator viewDecorator : viewDecorators) {
-            viewDecorator.decorate(request, view);
+            viewDecorator.decorate(request, response, view);
         }
         IContext context = new Context(
             view.getLocale(),

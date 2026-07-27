@@ -85,7 +85,7 @@ public class ThymeleafViewContextTest {
 
         // then
         Asserts.assertNotNull(viewContext);
-        verify(viewDecorator, times(1)).decorate(request, view);
+        verify(viewDecorator, times(1)).decorate(request, response, view);
     }
 
     @Test
