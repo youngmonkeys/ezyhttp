@@ -9,7 +9,7 @@
         <version>1.0.8</version>
     </parent>
     <artifactId>ezyhttp</artifactId>
-    <version>1.5.9</version>
+    <version>1.6.0</version>
     <packaging>pom</packaging>
 
     <name>ezyhttp</name>
@@ -98,7 +98,6 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <violationSeverity>warning</violationSeverity>
                     <configLocation>checkstyle.xml</configLocation>

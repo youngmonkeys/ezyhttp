@@ -1,6 +1,11 @@
 package com.tvd12.ezyhttp.core.resources;
 
-import com.tvd12.ezyfox.concurrent.*;
+import com.tvd12.ezyfox.concurrent.EzyCallableFutureTask;
+import com.tvd12.ezyfox.concurrent.EzyExecutors;
+import com.tvd12.ezyfox.concurrent.EzyFuture;
+import com.tvd12.ezyfox.concurrent.EzyFutureConcurrentHashMap;
+import com.tvd12.ezyfox.concurrent.EzyFutureMap;
+import com.tvd12.ezyfox.concurrent.EzyFutureTask;
 import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.util.EzyDestroyable;
 import com.tvd12.ezyfox.util.EzyLoggable;
@@ -178,6 +183,7 @@ public class ResourceUploadManager
         drainAsync(from, to, UNLIMITED_UPLOAD_SIZE, callback);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void stop() {
         this.active = false;
@@ -192,7 +198,7 @@ public class ResourceUploadManager
         this.stop();
     }
 
-    private static class Entry {
+    protected static class Entry {
         private final InputStream inputStream;
         private final OutputStream outputStream;
         private final long maxUploadSize;
