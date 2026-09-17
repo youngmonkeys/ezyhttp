@@ -88,7 +88,11 @@ public class TestBlockingServlet extends HttpServlet {
                         throw new IllegalStateException("can not create directory");
                     }
                 }
-                Part filePart = req.getPart("file");
+                String fieldName = req.getParameter("fieldName");
+                if (fieldName == null) {
+                    fieldName = "file";
+                }
+                Part filePart = req.getPart(fieldName);
                 if (filePart != null && filePart.getSize() > 0) {
                     String fileName = filePart.getSubmittedFileName();
                     File file = new File(uploadDir, fileName);

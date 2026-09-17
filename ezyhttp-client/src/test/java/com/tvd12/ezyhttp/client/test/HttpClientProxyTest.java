@@ -1109,6 +1109,56 @@ public class HttpClientProxyTest extends BaseTest {
     }
 
     @Test
+    public void callUploadFileWithFieldNameTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload?fieldName=photo")
+            .setFilePath("pom.xml")
+            .setFieldName("photo");
+
+        // when
+        Object result = sut.callUpload(request);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            Collections.singletonMap("ok", true),
+            false
+        );
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
+    public void callUploadFileWithMismatchedFieldNameTest() throws Exception {
+        // given
+        HttpClientProxy sut = HttpClientProxy.builder()
+            .requestQueueCapacity(1)
+            .threadPoolSize(1)
+            .build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://localhost:18081/upload")
+            .setFilePath("pom.xml")
+            .setFieldName("photo");
+
+        // when
+        Object result = sut.callUpload(request);
+
+        // then
+        Asserts.assertEquals(
+            result,
+            Collections.singletonMap("ok", false),
+            false
+        );
+        sut.close();
+        sut.stop();
+    }
+
+    @Test
     public void callUploadFileWithInputStreamTest() throws Exception {
         // given
         HttpClientProxy sut = HttpClientProxy.builder()

@@ -875,7 +875,9 @@ public class HttpClient extends EzyLoggable {
                     : "unknown";
             }
             writer
-                .append("Content-Disposition: form-data; name=\"file\"; filename=\"")
+                .append("Content-Disposition: form-data; name=\"")
+                .append(request.getFieldName())
+                .append("\"; filename=\"")
                 .append(fileName)
                 .append("\"\r\n");
             writer.append("Content-Type: application/octet-stream\r\n\r\n");

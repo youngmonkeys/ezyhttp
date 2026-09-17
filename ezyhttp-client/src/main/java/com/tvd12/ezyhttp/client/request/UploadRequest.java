@@ -16,6 +16,7 @@ public class UploadRequest {
 
     protected String url;
     protected HttpMethod method;
+    protected String fieldName;
     protected String fileName;
     protected String filePath;
     protected InputStream inputStream;
@@ -26,6 +27,7 @@ public class UploadRequest {
 
     public UploadRequest() {
         this.method = HttpMethod.POST;
+        this.fieldName = "file";
         this.responseTypes = new HashMap<>();
     }
 
@@ -50,6 +52,13 @@ public class UploadRequest {
 
     public UploadRequest setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
+        return this;
+    }
+
+    public UploadRequest setFieldName(String fieldName) {
+        if (fieldName != null) {
+            this.fieldName = fieldName;
+        }
         return this;
     }
 

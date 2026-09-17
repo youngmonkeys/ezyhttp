@@ -36,4 +36,26 @@ public class UploadRequestTest {
         Asserts.assertEquals(actual.getConnectTimeout(), 2);
         Asserts.assertEquals(actual.getHeaders(), headers);
     }
+
+    @Test
+    public void defaultFieldNameTest() {
+        // given
+        // when
+        UploadRequest actual = new UploadRequest();
+
+        // then
+        Asserts.assertEquals(actual.getFieldName(), "file");
+    }
+
+    @Test
+    public void setFieldNameTest() {
+        // given
+        // when
+        UploadRequest actual = new UploadRequest()
+            .setFieldName(null)
+            .setFieldName("photo");
+
+        // then
+        Asserts.assertEquals(actual.getFieldName(), "photo");
+    }
 }
