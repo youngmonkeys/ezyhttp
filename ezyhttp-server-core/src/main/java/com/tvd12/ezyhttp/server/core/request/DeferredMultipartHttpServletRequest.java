@@ -79,7 +79,11 @@ public class DeferredMultipartHttpServletRequest
         if (contentAccessible) {
             return super.getParameterMap();
         }
-        return Collections.unmodifiableMap(queryParameters);
+        Map<String, String[]> answer = new LinkedHashMap<>();
+        for (Entry<String, String[]> e : queryParameters.entrySet()) {
+            answer.put(e.getKey(), e.getValue().clone());
+        }
+        return Collections.unmodifiableMap(answer);
     }
 
     @Override
