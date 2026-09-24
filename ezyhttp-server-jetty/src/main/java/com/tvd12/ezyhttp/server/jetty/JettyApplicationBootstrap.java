@@ -9,6 +9,7 @@ import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -48,12 +49,21 @@ public class JettyApplicationBootstrap
     @EzyProperty("server.max_request_body_size")
     protected String maxRequestBodySize = "2MB";
 
+    @EzyProperty("server.max_request_header_size")
+    protected String maxRequestHeaderSize = "32KB";
+
+    @EzyProperty("server.max_request_parameter_count")
+    protected int maxRequestParameterCount = Integer.getInteger(
+        ContextHandler.MAX_FORM_KEYS_KEY,
+        ContextHandler.DEFAULT_MAX_FORM_KEYS
+    );
+
     @EzyProperty("server.multipart.location")
     protected String multipartLocation =
         System.getProperty("java.io.tmpdir");
 
     @EzyProperty("server.multipart.file_size_threshold")
-    protected String multipartFileSizeThreshold = "1MB";
+    protected String multipartFileSizeThreshold = "256KB";
 
     @EzyProperty("server.multipart.max_file_size")
     protected String multipartMaxFileSize = "5MB";
@@ -110,7 +120,9 @@ public class JettyApplicationBootstrap
         server = new Server(threadPool);
         List<Connector> connectors = createConnectors();
         server.setConnectors(connectors.toArray(new Connector[0]));
-        Handler servletHandler = newServletHandler();
+        Handler servletHandler = newRequestBodySizeLimitHandler(
+            newServletHandler()
+        );
         if (compressionEnable) {
             GzipHandler gzipHandler = newGzipHandler();
             gzipHandler.setHandler(servletHandler);
@@ -129,7 +141,7 @@ public class JettyApplicationBootstrap
     }
 
     private List<Connector> createConnectors() {
-        HttpConfiguration httpConfig = new HttpConfiguration();
+        HttpConfiguration httpConfig = newHttpConfiguration();
         httpConfig.addCustomizer(new ForwardedRequestCustomizer());
         ServerConnector connector = new ServerConnector(
             server,
@@ -140,12 +152,23 @@ public class JettyApplicationBootstrap
         List<Connector> connectors = new ArrayList<>();
         connectors.add(connector);
         if (managementEnable) {
-            ServerConnector managementConnector = new ServerConnector(server);
+            ServerConnector managementConnector = new ServerConnector(
+                server,
+                new HttpConnectionFactory(newHttpConfiguration())
+            );
             managementConnector.setHost(managementHost);
             managementConnector.setPort(managementPort);
             connectors.add(managementConnector);
         }
         return connectors;
+    }
+
+    protected HttpConfiguration newHttpConfiguration() {
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setRequestHeaderSize(
+            (int) FileSizes.toByteSize(maxRequestHeaderSize)
+        );
+        return httpConfig;
     }
 
     protected ServletContextHandler newServletHandler() {
@@ -164,11 +187,22 @@ public class JettyApplicationBootstrap
         servletHandler.setMaxFormContentSize(
             (int) FileSizes.toByteSize(maxRequestBodySize)
         );
+        servletHandler.setMaxFormKeys(maxRequestParameterCount);
         logger.info("cors.enable = {}", corsEnable);
         if (corsEnable) {
             addFilter(servletHandler, newCrossOriginFilter());
         }
         return servletHandler;
+    }
+
+    protected Handler newRequestBodySizeLimitHandler(Handler handler) {
+        RequestBodySizeLimitHandler sizeLimitHandler =
+            new RequestBodySizeLimitHandler(
+                FileSizes.toByteSize(maxRequestBodySize),
+                FileSizes.toByteSize(multipartMaxRequestSize)
+            );
+        sizeLimitHandler.setHandler(handler);
+        return sizeLimitHandler;
     }
 
     protected GzipHandler newGzipHandler() {

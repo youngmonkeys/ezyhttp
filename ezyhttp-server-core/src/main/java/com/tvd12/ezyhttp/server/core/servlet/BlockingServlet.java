@@ -23,6 +23,7 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
+import com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
@@ -47,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import static com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest.isMultipartRequest;
 
 public class BlockingServlet extends HttpServlet {
     private static final long serialVersionUID = -3874017929628817672L;
@@ -129,6 +132,9 @@ public class BlockingServlet extends HttpServlet {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws IOException {
+        if (isMultipartRequest(request)) {
+            request = new DeferredMultipartHttpServletRequest(request);
+        }
         try {
             watchRequest(method, request);
             handleRequest(method, request, response);
@@ -205,6 +211,9 @@ public class BlockingServlet extends HttpServlet {
         try {
             acceptableRequest = preHandleRequest(arguments, requestHandler);
             if (acceptableRequest) {
+                if (request instanceof DeferredMultipartHttpServletRequest) {
+                    ((DeferredMultipartHttpServletRequest) request).allowContentAccess();
+                }
                 if (requestHandler.isAsync()) {
                     syncResponse = false;
                     AsyncContext asyncContext = request.startAsync(request, response);
