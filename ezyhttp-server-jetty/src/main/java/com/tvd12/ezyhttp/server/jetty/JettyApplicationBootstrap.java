@@ -50,7 +50,7 @@ public class JettyApplicationBootstrap
     protected String maxRequestBodySize = "2MB";
 
     @EzyProperty("server.max_request_header_size")
-    protected String maxRequestHeaderSize = "8KB";
+    protected String maxRequestHeaderSize = "32KB";
 
     @EzyProperty("server.max_request_parameter_count")
     protected int maxRequestParameterCount = Integer.getInteger(
@@ -63,7 +63,7 @@ public class JettyApplicationBootstrap
         System.getProperty("java.io.tmpdir");
 
     @EzyProperty("server.multipart.file_size_threshold")
-    protected String multipartFileSizeThreshold = "1MB";
+    protected String multipartFileSizeThreshold = "256KB";
 
     @EzyProperty("server.multipart.max_file_size")
     protected String multipartMaxFileSize = "5MB";

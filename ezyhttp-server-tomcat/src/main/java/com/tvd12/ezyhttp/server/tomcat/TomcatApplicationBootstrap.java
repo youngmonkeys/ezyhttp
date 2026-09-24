@@ -58,7 +58,7 @@ public class TomcatApplicationBootstrap
     protected String maxRequestBodySize = "2MB";
 
     @EzyProperty("server.max_request_header_size")
-    protected String maxRequestHeaderSize = "8KB";
+    protected String maxRequestHeaderSize = "32KB";
 
     @EzyProperty("server.max_request_header_count")
     protected int maxRequestHeaderCount = 100;
@@ -74,7 +74,7 @@ public class TomcatApplicationBootstrap
         System.getProperty("java.io.tmpdir");
 
     @EzyProperty("server.multipart.file_size_threshold")
-    protected String multipartFileSizeThreshold = "1MB";
+    protected String multipartFileSizeThreshold = "256KB";
 
     @EzyProperty("server.multipart.max_file_size")
     protected String multipartMaxFileSize = "5MB";
