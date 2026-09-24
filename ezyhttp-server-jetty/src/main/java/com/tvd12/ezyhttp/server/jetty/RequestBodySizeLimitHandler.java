@@ -65,6 +65,7 @@ public class RequestBodySizeLimitHandler extends HandlerWrapper {
 
         private final long limit;
         private long read;
+        private HttpInput.Content countedContent;
 
         LimitInterceptor(long limit) {
             this.limit = limit;
@@ -72,7 +73,8 @@ public class RequestBodySizeLimitHandler extends HandlerWrapper {
 
         @Override
         public HttpInput.Content readFrom(HttpInput.Content content) {
-            if (content.hasContent()) {
+            if (content != countedContent && content.hasContent()) {
+                countedContent = content;
                 read += content.remaining();
                 if (read > limit) {
                     throw new HttpRequestException(

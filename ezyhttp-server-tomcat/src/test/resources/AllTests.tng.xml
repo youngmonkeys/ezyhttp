@@ -4,6 +4,7 @@
     <test name="All">
         <packages>
             <package name="com.tvd12.ezyhttp.server.tomcat.test" />
+            <package name="com.tvd12.ezyhttp.server.tomcat.test.limit" />
         </packages>
     </test>
 </suite>
