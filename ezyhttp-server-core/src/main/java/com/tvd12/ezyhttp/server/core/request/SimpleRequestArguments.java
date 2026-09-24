@@ -77,9 +77,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(int index) {
-        if (parameterList == null || parameterList.size() <= index) {
-            loadDeferredParametersIfNeed();
-        }
+        loadDeferredParametersIfNeed();
         if (parameterList == null) {
             return null;
         }
@@ -91,24 +89,20 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(String name) {
-        String value = parameterMap != null
-            ? parameterMap.get(name)
-            : null;
-        if (value == null && loadDeferredParametersIfNeed()) {
-            value = parameterMap != null
-                ? parameterMap.get(name)
-                : null;
+        loadDeferredParametersIfNeed();
+        if (parameterMap == null) {
+            return null;
         }
-        return value;
+        return parameterMap.get(name);
     }
 
-    protected boolean loadDeferredParametersIfNeed() {
+    protected void loadDeferredParametersIfNeed() {
         if (deferredParametersLoaded
             || !(request instanceof DeferredMultipartHttpServletRequest)
             || !((DeferredMultipartHttpServletRequest) request)
             .isContentAccessible()
         ) {
-            return false;
+            return;
         }
         deferredParametersLoaded = true;
         if (parameterList != null) {
@@ -122,7 +116,6 @@ public class SimpleRequestArguments implements RequestArguments {
             String paramName = paramNames.nextElement();
             setParameter(paramName, request.getParameterValues(paramName));
         }
-        return true;
     }
 
     @Override
