@@ -146,6 +146,7 @@ public class RequestBodySizeLimitFilter implements Filter {
             return value;
         }
 
+        @SuppressWarnings("NullableProblems")
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             int count = inputStream.read(b, off, len);
