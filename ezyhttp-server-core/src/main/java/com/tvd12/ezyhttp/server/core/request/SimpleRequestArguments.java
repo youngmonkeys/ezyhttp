@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "MethodCount"})
 public class SimpleRequestArguments implements RequestArguments {
 
     @Setter
@@ -46,6 +46,7 @@ public class SimpleRequestArguments implements RequestArguments {
     protected Map<String, String> headerMap;
     protected List<String> parameterList;
     protected Map<String, String> parameterMap;
+    protected boolean deferredParametersLoaded;
     protected Map<String, String> pathVariableMap;
     protected List<Entry<String, String>> pathVariableList;
     protected Cookie[] cookies;
@@ -76,6 +77,9 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(int index) {
+        if (parameterList == null || parameterList.size() <= index) {
+            loadDeferredParametersIfNeed();
+        }
         if (parameterList == null) {
             return null;
         }
@@ -87,10 +91,38 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(String name) {
-        if (parameterMap == null) {
-            return null;
+        String value = parameterMap != null
+            ? parameterMap.get(name)
+            : null;
+        if (value == null && loadDeferredParametersIfNeed()) {
+            value = parameterMap != null
+                ? parameterMap.get(name)
+                : null;
         }
-        return parameterMap.get(name);
+        return value;
+    }
+
+    protected boolean loadDeferredParametersIfNeed() {
+        if (deferredParametersLoaded
+            || !(request instanceof DeferredMultipartHttpServletRequest)
+            || !((DeferredMultipartHttpServletRequest) request)
+            .isContentAccessible()
+        ) {
+            return false;
+        }
+        deferredParametersLoaded = true;
+        if (parameterList != null) {
+            parameterList.clear();
+        }
+        if (parameterMap != null) {
+            parameterMap.clear();
+        }
+        Enumeration<String> paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            setParameter(paramName, request.getParameterValues(paramName));
+        }
+        return true;
     }
 
     @Override
@@ -100,6 +132,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public Map<String, String> getParameters() {
+        loadDeferredParametersIfNeed();
         return parameterMap;
     }
 
@@ -321,6 +354,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public void release() {
+        this.deferredParametersLoaded = false;
         if (arguments != null) {
             arguments.clear();
         }

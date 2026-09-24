@@ -57,6 +57,18 @@ public class TomcatApplicationBootstrap
     @EzyProperty("server.max_request_body_size")
     protected String maxRequestBodySize = "2MB";
 
+    @EzyProperty("server.max_request_header_size")
+    protected String maxRequestHeaderSize = "8KB";
+
+    @EzyProperty("server.max_request_header_count")
+    protected int maxRequestHeaderCount = 100;
+
+    @EzyProperty("server.max_request_parameter_count")
+    protected int maxRequestParameterCount = 1000;
+
+    @EzyProperty("server.max_cookie_count")
+    protected int maxCookieCount = 200;
+
     @EzyProperty("server.multipart.location")
     protected String multipartLocation =
         System.getProperty("java.io.tmpdir");
@@ -164,6 +176,7 @@ public class TomcatApplicationBootstrap
         if (corsEnable) {
             addCorsFilter(context);
         }
+        addRequestBodySizeLimitFilter(context);
         Connector connector = answer.getConnector();
         connector.setProperty(
             "minSpareThreads",
@@ -180,6 +193,16 @@ public class TomcatApplicationBootstrap
             "maxSwallowSize",
             String.valueOf(FileSizes.toByteSize(maxRequestBodySize))
         );
+        connector.setProperty(
+            "maxHttpHeaderSize",
+            String.valueOf(FileSizes.toByteSize(maxRequestHeaderSize))
+        );
+        connector.setProperty(
+            "maxHeaderCount",
+            String.valueOf(maxRequestHeaderCount)
+        );
+        connector.setMaxParameterCount(maxRequestParameterCount);
+        connector.setMaxCookieCount(maxCookieCount);
         if (compressionEnable) {
             connector.setProperty("compression", "on");
             connector.setProperty(
@@ -214,6 +237,23 @@ public class TomcatApplicationBootstrap
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName("cross-origin");
+        filterMap.addURLPattern("/*");
+        context.addFilterMap(filterMap);
+    }
+
+    protected void addRequestBodySizeLimitFilter(Context context) {
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterName("request-body-size-limit");
+        filterDef.setFilter(
+            new RequestBodySizeLimitFilter(
+                FileSizes.toByteSize(maxRequestBodySize),
+                FileSizes.toByteSize(multipartMaxRequestSize)
+            )
+        );
+        context.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("request-body-size-limit");
         filterMap.addURLPattern("/*");
         context.addFilterMap(filterMap);
     }

@@ -23,6 +23,7 @@ import com.tvd12.ezyhttp.server.core.manager.ExceptionHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.InterceptorManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestHandlerManager;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
+import com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
@@ -44,9 +45,13 @@ import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import static com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest.isMultipartRequest;
 
 public class BlockingServlet extends HttpServlet {
     private static final long serialVersionUID = -3874017929628817672L;
@@ -129,6 +134,9 @@ public class BlockingServlet extends HttpServlet {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws IOException {
+        if (isMultipartRequest(request)) {
+            request = new DeferredMultipartHttpServletRequest(request);
+        }
         try {
             watchRequest(method, request);
             handleRequest(method, request, response);
@@ -205,6 +213,9 @@ public class BlockingServlet extends HttpServlet {
         try {
             acceptableRequest = preHandleRequest(arguments, requestHandler);
             if (acceptableRequest) {
+                if (request instanceof DeferredMultipartHttpServletRequest) {
+                    ((DeferredMultipartHttpServletRequest) request).allowContentAccess();
+                }
                 if (requestHandler.isAsync()) {
                     syncResponse = false;
                     AsyncContext asyncContext = request.startAsync(request, response);
@@ -321,12 +332,20 @@ public class BlockingServlet extends HttpServlet {
         Exception e
     ) {
         UncaughtExceptionHandler handler = getUncaughtExceptionHandler(e.getClass());
+        Exception handledException = e;
+        if (handler == null) {
+            HttpRequestException requestException = findHttpRequestException(e);
+            if (requestException != null) {
+                handledException = requestException;
+                handler = getUncaughtExceptionHandler(HttpRequestException.class);
+            }
+        }
         HttpServletRequest request = arguments.getRequest();
         HttpServletResponse response = arguments.getResponse();
         Exception exception = e;
         if (handler != null) {
             try {
-                Object result = handler.handleException(arguments, e);
+                Object result = handler.handleException(arguments, handledException);
                 if (result != null) {
                     String responseContentType = handler.getResponseContentType();
                     if (responseContentType != null) {
@@ -350,6 +369,18 @@ public class BlockingServlet extends HttpServlet {
                 exception
             );
         }
+    }
+
+    private static HttpRequestException findHttpRequestException(Throwable e) {
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+        Throwable current = e.getCause();
+        while (current != null && visited.add(current)) {
+            if (current instanceof HttpRequestException) {
+                return (HttpRequestException) current;
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     protected UncaughtExceptionHandler getUncaughtExceptionHandler(Class<?> exceptionClass) {
