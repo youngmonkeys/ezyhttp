@@ -211,11 +211,17 @@ public class BlockingServlet extends HttpServlet {
             return;
         }
         if (!isAcceptableContentType(request, requestHandler)) {
-            if (!handleError(method, request, response,
-                HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE)) {
+            boolean handled = handleError(
+                method,
+                request,
+                response,
+                HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE
+            );
+            if (!handled) {
                 responseString(
                     response,
-                    "content type " + request.getContentType() + " not supported"
+                    "content type " + request.getContentType() +
+                        " not supported"
                 );
             }
             return;
