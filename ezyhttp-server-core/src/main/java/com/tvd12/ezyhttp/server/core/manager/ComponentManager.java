@@ -26,6 +26,8 @@ public final class ComponentManager implements EzyDestroyable {
     @Setter
     private boolean exposeManagementURIs;
     @Setter
+    private boolean requireMultipartAccept;
+    @Setter
     private int asyncDefaultTimeout;
     @Setter
     private ViewContext viewContext;
@@ -68,6 +70,7 @@ public final class ComponentManager implements EzyDestroyable {
     public void destroy() {
         this.viewContext = null;
         this.exposeManagementURIs = false;
+        this.requireMultipartAccept = false;
         this.unhandledErrorHandler = null;
         this.dataConverters.destroy();
         this.controllerManager.destroy();

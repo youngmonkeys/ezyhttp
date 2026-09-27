@@ -1,11 +1,13 @@
 package com.tvd12.ezyhttp.server.core.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyCollections;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
@@ -46,8 +48,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest.isMultipartRequest;
 
@@ -57,6 +61,7 @@ public class BlockingServlet extends HttpServlet {
     private boolean debug;
     private int managementPort;
     private boolean exposeManagementURIs;
+    private boolean requireMultipartAccept;
     private int asyncDefaultTimeout;
     protected ViewContext viewContext;
     protected ObjectMapper objectMapper;
@@ -79,6 +84,7 @@ public class BlockingServlet extends HttpServlet {
         this.debug = componentManager.isDebug();
         this.managementPort = componentManager.getManagementPort();
         this.exposeManagementURIs = componentManager.isExposeManagementURIs();
+        this.requireMultipartAccept = componentManager.isRequireMultipartAccept();
         this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
         this.viewContext = componentManager.getViewContext();
         this.objectMapper = componentManager.getObjectMapper();
@@ -204,6 +210,22 @@ public class BlockingServlet extends HttpServlet {
             }
             return;
         }
+        if (!isAcceptableContentType(request, requestHandler)) {
+            boolean handled = handleError(
+                method,
+                request,
+                response,
+                HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE
+            );
+            if (!handled) {
+                responseString(
+                    response,
+                    "content type " + request.getContentType() +
+                        " not supported"
+                );
+            }
+            return;
+        }
         boolean acceptableRequest = false;
         boolean syncResponse = true;
         String uriTemplate = requestHandler.getRequestURI();
@@ -247,6 +269,26 @@ public class BlockingServlet extends HttpServlet {
                 arguments.release();
             }
         }
+    }
+
+    protected boolean isAcceptableContentType(
+        HttpServletRequest request,
+        RequestHandler requestHandler
+    ) {
+        Set<String> accept = requestHandler.getAccept();
+        if (EzyCollections.isEmpty(accept)) {
+            return !requireMultipartAccept
+                || !(request instanceof DeferredMultipartHttpServletRequest);
+        }
+        String contentType = ContentTypes
+            .getContentType(request.getContentType());
+        if (contentType == null) {
+            return false;
+        }
+        String trimmedContentType = contentType.trim();
+        return accept.contains(
+            trimmedContentType.toLowerCase(Locale.ROOT)
+        );
     }
 
     protected AsyncListener newAsyncListener(

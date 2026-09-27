@@ -78,7 +78,10 @@ public class ThymeleafMessageResolver implements
                 .computeIfAbsent(language, k -> new Properties())
                 .putAll(messages);
             answer
-                .computeIfAbsent(language.toLowerCase(), k -> new Properties())
+                .computeIfAbsent(
+                    language.toLowerCase(Locale.ROOT),
+                    k -> new Properties()
+                )
                 .putAll(messages);
         }
     }

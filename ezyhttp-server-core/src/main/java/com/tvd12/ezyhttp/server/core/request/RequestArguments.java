@@ -8,6 +8,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
@@ -100,12 +101,14 @@ public interface RequestArguments extends BodyData, EzyReleasable {
         String value = getRequestValue(argumentName);
         String argumentNameLowerCase = EMPTY_STRING;
         if (isBlank(value)) {
-            argumentNameLowerCase = argumentName.toLowerCase();
+            argumentNameLowerCase = argumentName
+                .toLowerCase(Locale.ROOT);
             value = getRequestValue(argumentNameLowerCase);
         }
         if (isBlank(value)) {
             String argumentNameFirstUpperCase =
-                argumentNameLowerCase.substring(0, 1).toUpperCase() +
+                argumentNameLowerCase.substring(0, 1)
+                    .toUpperCase(Locale.ROOT) +
                 argumentNameLowerCase.substring(1);
             value = getRequestValue(argumentNameFirstUpperCase);
         }
@@ -123,7 +126,11 @@ public interface RequestArguments extends BodyData, EzyReleasable {
         return value != null ? value : defaultValue;
     }
 
-    default <T> T getRedirectionAttribute(String name, Class<T> outType, T defaultValue) {
+    default <T> T getRedirectionAttribute(
+        String name,
+        Class<T> outType,
+        T defaultValue
+    ) {
         T value = getRedirectionAttribute(name, outType);
         return value != null ? value : defaultValue;
     }

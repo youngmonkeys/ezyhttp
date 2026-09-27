@@ -5,6 +5,7 @@ import static com.tvd12.ezyfox.util.EzyFileUtil.getFileName;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -37,7 +38,10 @@ public class MessageReader {
                 .computeIfAbsent(file.language, k -> new Properties())
                 .putAll(properties);
             answer
-                .computeIfAbsent(file.language.toLowerCase(), k -> new Properties())
+                .computeIfAbsent(
+                    file.language.toLowerCase(Locale.ROOT),
+                    k -> new Properties()
+                )
                 .putAll(properties);
         }
         return answer;

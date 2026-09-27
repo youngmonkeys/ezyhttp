@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class WebManagementController implements ManagementController {
 
-    private final FeatureURIManager futureURIManager;
+    private final FeatureURIManager featureURIManager;
     private final RequestHandlerManager requestHandlerManager;
 
     @EzyFeature(DEFAULT_FEATURE_NAME)
@@ -43,12 +43,12 @@ public class WebManagementController implements ManagementController {
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/features")
     public Map<String, Map<String, List<HttpMethod>>> featuresGet() {
-        return futureURIManager.getURIsByFeatureMap();
+        return featureURIManager.getURIsByFeatureMap();
     }
 
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/feature-names")
     public List<String> featureNamesGet() {
-        return futureURIManager.getFeatures();
+        return featureURIManager.getFeatures();
     }
 }

@@ -359,6 +359,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         componentManager.setViewContext(buildViewContext(beanContext));
         componentManager.setServerPort(getServerPort(beanContext));
         componentManager.setExposeManagementURIs(isExposeManagementURIs(beanContext));
+        componentManager.setRequireMultipartAccept(isRequireMultipartAccept(beanContext));
         componentManager.setManagementPort(getManagementPort(beanContext));
         componentManager.setAsyncDefaultTimeout(getAsyncDefaultTimeout(beanContext));
         componentManager.setUnhandledErrorHandler(uncaughtErrorHandlers);
@@ -371,6 +372,10 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
 
     private boolean isExposeManagementURIs(EzyBeanContext beanContext) {
         return beanContext.getProperty(MANAGEMENT_URIS_EXPOSE, boolean.class, false);
+    }
+
+    private boolean isRequireMultipartAccept(EzyBeanContext beanContext) {
+        return beanContext.getProperty(SERVER_MULTIPART_REQUIRE_ACCEPT, boolean.class, false);
     }
 
     private int getManagementPort(EzyBeanContext beanContext) {

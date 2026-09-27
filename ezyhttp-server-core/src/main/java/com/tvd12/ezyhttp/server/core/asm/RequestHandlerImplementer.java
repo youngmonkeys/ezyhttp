@@ -109,6 +109,7 @@ public class RequestHandlerImplementer
         implClass.detach();
         RequestHandler handler = (RequestHandler) answerClass.newInstance();
         handler.setHandlerMethod(handlerMethod.getMethod().getMethod());
+        handler.setAccept(handlerMethod.getAccept());
         setRepoComponent(handler);
         return handler;
     }

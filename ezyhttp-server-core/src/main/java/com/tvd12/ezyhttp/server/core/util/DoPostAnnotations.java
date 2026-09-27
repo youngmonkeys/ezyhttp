@@ -5,6 +5,11 @@ import com.tvd12.ezyhttp.core.constant.Constants;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
 
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public final class DoPostAnnotations {
 
     private DoPostAnnotations() {}
@@ -26,5 +31,13 @@ public final class DoPostAnnotations {
             responseType = ContentTypes.APPLICATION_JSON;
         }
         return responseType;
+    }
+
+    public static Set<String> getAccept(DoPost annotation) {
+        return Stream
+            .of(annotation.accept())
+            .filter(EzyStrings::isNotBlank)
+            .map(it -> it.trim().toLowerCase(Locale.ROOT))
+            .collect(Collectors.toSet());
     }
 }

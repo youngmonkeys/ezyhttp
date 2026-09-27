@@ -19,4 +19,16 @@ public class HealthCheckControllerTest {
         // then
         Asserts.assertEquals(actual, ResponseEntity.ok());
     }
+
+    @Test
+    public void managementHealthCheck() {
+        // given
+        HealthCheckController sut = new HealthCheckController();
+
+        // when
+        ResponseEntity actual = sut.managementHealthCheck();
+
+        // then
+        Asserts.assertEquals(actual, ResponseEntity.noContent());
+    }
 }

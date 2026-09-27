@@ -1,11 +1,13 @@
 package com.tvd12.ezyhttp.core.util;
 
+import java.util.Locale;
+
 public final class FileSizes {
 
     private FileSizes() {}
 
     public static long toByteSize(String value) {
-        String lowercase = value.toLowerCase();
+        String lowercase = value.toLowerCase(Locale.ROOT);
         if (value.length() > 2) {
             if (lowercase.endsWith("kb")) {
                 return subSizeStringToLong(value, 2) * 1024;
