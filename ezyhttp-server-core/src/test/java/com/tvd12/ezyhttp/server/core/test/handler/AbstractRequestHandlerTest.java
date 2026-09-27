@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.servlet.AsyncContext;
 
@@ -50,6 +52,31 @@ public class AbstractRequestHandlerTest {
         // then
         Asserts.assertEquals(response, actual);
         Asserts.assertNull(sut.getHandlerMethod());
+    }
+
+    @Test
+    public void getAcceptDefaultTest() {
+        // given
+        ExRequestHandler sut = new ExRequestHandler();
+
+        // when
+        Set<String> actual = sut.getAccept();
+
+        // then
+        Asserts.assertNull(actual);
+    }
+
+    @Test
+    public void setAcceptTest() {
+        // given
+        ExRequestHandler sut = new ExRequestHandler();
+        Set<String> accept = Collections.singleton(ContentTypes.MULTIPART_FORM_DATA);
+
+        // when
+        sut.setAccept(accept);
+
+        // then
+        Asserts.assertEquals(sut.getAccept(), accept);
     }
 
     @Test
