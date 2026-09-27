@@ -93,7 +93,7 @@ public class DefaultStringDeserializer implements StringDeserializer {
         try {
             return (T) Enum.valueOf((Class) outType, value);
         } catch (IllegalArgumentException e) {
-            return (T) Enum.valueOf((Class) outType, value.toUpperCase());
+            return (T) Enum.valueOf((Class) outType, value.toUpperCase(Locale.ROOT));
         }
     }
 

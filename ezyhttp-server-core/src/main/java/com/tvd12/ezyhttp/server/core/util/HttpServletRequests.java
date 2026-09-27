@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.core.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
@@ -98,7 +99,7 @@ public final class HttpServletRequests {
         String value = getRequestValue(request, name, checkCookie);
         String argumentNameLowerCase = EMPTY_STRING;
         if (isBlank(value)) {
-            argumentNameLowerCase = name.toLowerCase();
+            argumentNameLowerCase = name.toLowerCase(Locale.ROOT);
             value = getRequestValue(
                 request,
                 argumentNameLowerCase,
@@ -107,7 +108,7 @@ public final class HttpServletRequests {
         }
         if (isBlank(value)) {
             String argumentNameFirstUpperCase =
-                argumentNameLowerCase.substring(0, 1).toUpperCase() +
+                argumentNameLowerCase.substring(0, 1).toUpperCase(Locale.ROOT) +
                 argumentNameLowerCase.substring(1);
             value = getRequestValue(
                 request,

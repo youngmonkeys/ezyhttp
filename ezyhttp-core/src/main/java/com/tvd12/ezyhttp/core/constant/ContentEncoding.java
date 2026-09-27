@@ -3,6 +3,7 @@ package com.tvd12.ezyhttp.core.constant;
 import com.tvd12.ezyfox.util.EzyEnums;
 import lombok.Getter;
 
+import java.util.Locale;
 import java.util.Map;
 
 @Getter
@@ -14,10 +15,16 @@ public enum ContentEncoding {
     private final String value;
 
     private static final Map<String, ContentEncoding> VALUE_BY_MIME_TYPE =
-        EzyEnums.enumMap(ContentEncoding.class, it -> it.mimeType);
+        EzyEnums.enumMap(
+            ContentEncoding.class,
+            it -> it.mimeType
+        );
 
     private static final Map<String, ContentEncoding> VALUE_BY_VALUE_LOWERCASE =
-        EzyEnums.enumMap(ContentEncoding.class, it -> it.value.toLowerCase());
+        EzyEnums.enumMap(
+            ContentEncoding.class,
+            it -> it.value.toLowerCase(Locale.ROOT)
+        );
 
     ContentEncoding(String mimeType, String value) {
         this.mimeType = mimeType;
@@ -28,7 +35,8 @@ public enum ContentEncoding {
         if (value == null) {
             return null;
         }
-        return VALUE_BY_VALUE_LOWERCASE.get(value.toLowerCase());
+        return VALUE_BY_VALUE_LOWERCASE
+            .get(value.toLowerCase(Locale.ROOT));
     }
     
     public static ContentEncoding ofMimeType(String mimeType) {
