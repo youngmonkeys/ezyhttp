@@ -1,6 +1,8 @@
 package com.tvd12.ezyhttp.server.management.data;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
@@ -17,6 +19,7 @@ public class ApiInformation {
     private final boolean authenticated;
     private final boolean resource;
     private final String resourcePath;
+    private final Set<String> accept;
     private final List<JavaMethod> handlers;
 
     public ApiInformation(
@@ -29,8 +32,21 @@ public class ApiInformation {
         this.authenticated = requestUri.isAuthenticated();
         this.resource = requestUri.isResource();
         this.resourcePath = requestUri.getResourceFullPath();
+        this.accept = fetchAccept(handlerMethods);
         this.handlers = handlerMethods.stream()
             .map(it -> new JavaMethod(it.getHandlerMethod()))
             .collect(Collectors.toList());
+    }
+
+    private static Set<String> fetchAccept(
+        List<RequestHandler> handlerMethods
+    ) {
+        if (handlerMethods.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<String> answer = handlerMethods
+            .get(handlerMethods.size() - 1)
+            .getAccept();
+        return answer != null ? answer : Collections.emptySet();
     }
 }
