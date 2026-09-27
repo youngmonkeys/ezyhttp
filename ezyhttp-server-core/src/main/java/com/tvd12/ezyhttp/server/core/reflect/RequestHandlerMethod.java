@@ -29,18 +29,21 @@ public class RequestHandlerMethod extends HandlerMethod {
     protected final String requestURI;
     protected final String responseType;
     protected final HttpMethod httpMethod;
+    protected final Set<String> accept;
 
     private RequestHandlerMethod(
         String rootURI,
         String requestURI,
         HttpMethod httpMethod,
         String responseType,
+        Set<String> accept,
         EzyMethod method
     ) {
         super(method);
         this.rootURI = rootURI;
         this.httpMethod = httpMethod;
         this.responseType = responseType;
+        this.accept = accept;
         this.requestURI = normalizePath(rootURI + requestURI);
     }
 
@@ -50,6 +53,7 @@ public class RequestHandlerMethod extends HandlerMethod {
         this.requestURI = fetchRequestURI(rootURI);
         this.httpMethod = fetchHttpMethod();
         this.responseType = fetchResponseType();
+        this.accept = fetchAccept();
     }
 
     protected String fetchRequestURI(String rootURI) {
@@ -107,6 +111,23 @@ public class RequestHandlerMethod extends HandlerMethod {
         return DoDeleteAnnotations.getResponseType(doDelete);
     }
 
+    protected Set<String> fetchAccept() {
+        DoGet doGet = method.getAnnotation(DoGet.class);
+        if (doGet != null) {
+            return DoGetAnnotations.getAccept(doGet);
+        }
+        DoPost doPost = method.getAnnotation(DoPost.class);
+        if (doPost != null) {
+            return DoPostAnnotations.getAccept(doPost);
+        }
+        DoPut doPut = method.getAnnotation(DoPut.class);
+        if (doPut != null) {
+            return DoPutAnnotations.getAccept(doPut);
+        }
+        DoDelete doDelete = method.getAnnotation(DoDelete.class);
+        return DoDeleteAnnotations.getAccept(doDelete);
+    }
+
     public List<RequestHandlerMethod> duplicatedToOtherRequestHandlerMethods() {
         return newArrayList(
             fetchOtherRequestURIs(),
@@ -115,6 +136,7 @@ public class RequestHandlerMethod extends HandlerMethod {
                 it,
                 httpMethod,
                 responseType,
+                accept,
                 method
             )
         );

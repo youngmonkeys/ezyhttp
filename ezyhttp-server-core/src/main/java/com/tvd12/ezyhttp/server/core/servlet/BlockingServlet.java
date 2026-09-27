@@ -1,11 +1,13 @@
 package com.tvd12.ezyhttp.server.core.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyCollections;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyhttp.core.codec.BodySerializer;
 import com.tvd12.ezyhttp.core.codec.DataConverters;
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import static com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest.isMultipartRequest;
 
@@ -204,6 +207,16 @@ public class BlockingServlet extends HttpServlet {
             }
             return;
         }
+        if (!isAcceptableContentType(request, requestHandler)) {
+            if (!handleError(method, request, response,
+                HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE)) {
+                responseString(
+                    response,
+                    "content type " + request.getContentType() + " not supported"
+                );
+            }
+            return;
+        }
         boolean acceptableRequest = false;
         boolean syncResponse = true;
         String uriTemplate = requestHandler.getRequestURI();
@@ -247,6 +260,20 @@ public class BlockingServlet extends HttpServlet {
                 arguments.release();
             }
         }
+    }
+
+    protected boolean isAcceptableContentType(
+        HttpServletRequest request,
+        RequestHandler requestHandler
+    ) {
+        Set<String> accept = requestHandler.getAccept();
+        if (EzyCollections.isEmpty(accept)) {
+            return true;
+        }
+        String contentType = ContentTypes
+            .getContentType(request.getContentType());
+        return contentType != null
+            && accept.contains(contentType.trim());
     }
 
     protected AsyncListener newAsyncListener(

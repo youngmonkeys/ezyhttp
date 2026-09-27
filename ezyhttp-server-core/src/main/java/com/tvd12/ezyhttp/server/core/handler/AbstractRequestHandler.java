@@ -2,6 +2,8 @@ package com.tvd12.ezyhttp.server.core.handler;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.servlet.AsyncContext;
 
@@ -28,6 +30,9 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     @Setter
     @Getter
     protected Method handlerMethod;
+    @Setter
+    @Getter
+    protected Set<String> accept;
     protected final DataConverters dataConverters;
     protected final ComponentManager componentManager;
 
