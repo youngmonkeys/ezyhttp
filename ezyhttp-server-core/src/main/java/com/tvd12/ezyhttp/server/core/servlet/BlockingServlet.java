@@ -280,10 +280,9 @@ public class BlockingServlet extends HttpServlet {
             return false;
         }
         String trimmedContentType = contentType.trim();
-        return accept.contains(trimmedContentType)
-            || accept
-                .contains(trimmedContentType
-                .toLowerCase(Locale.ROOT));
+        return accept.contains(
+            trimmedContentType.toLowerCase(Locale.ROOT)
+        );
     }
 
     protected AsyncListener newAsyncListener(
