@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -60,6 +61,7 @@ public class BlockingServlet extends HttpServlet {
     private boolean debug;
     private int managementPort;
     private boolean exposeManagementURIs;
+    private boolean strictMultipart;
     private int asyncDefaultTimeout;
     protected ViewContext viewContext;
     protected ObjectMapper objectMapper;
@@ -82,6 +84,7 @@ public class BlockingServlet extends HttpServlet {
         this.debug = componentManager.isDebug();
         this.managementPort = componentManager.getManagementPort();
         this.exposeManagementURIs = componentManager.isExposeManagementURIs();
+        this.strictMultipart = componentManager.isStrictMultipart();
         this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
         this.viewContext = componentManager.getViewContext();
         this.objectMapper = componentManager.getObjectMapper();
@@ -268,12 +271,19 @@ public class BlockingServlet extends HttpServlet {
     ) {
         Set<String> accept = requestHandler.getAccept();
         if (EzyCollections.isEmpty(accept)) {
-            return true;
+            return !strictMultipart
+                || !(request instanceof DeferredMultipartHttpServletRequest);
         }
         String contentType = ContentTypes
             .getContentType(request.getContentType());
-        return contentType != null
-            && accept.contains(contentType.trim());
+        if (contentType == null) {
+            return false;
+        }
+        String trimmedContentType = contentType.trim();
+        return accept.contains(trimmedContentType)
+            || accept
+                .contains(trimmedContentType
+                .toLowerCase(Locale.ROOT));
     }
 
     protected AsyncListener newAsyncListener(

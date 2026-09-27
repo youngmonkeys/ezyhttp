@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -240,6 +241,11 @@ public class BlockingServletMultipartTest {
         @Override
         public String getResponseContentType() {
             return null;
+        }
+
+        @Override
+        public Set<String> getAccept() {
+            return Collections.singleton(ContentTypes.MULTIPART_FORM_DATA);
         }
     }
 }

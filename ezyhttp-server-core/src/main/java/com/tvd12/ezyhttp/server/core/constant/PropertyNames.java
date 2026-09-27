@@ -6,6 +6,7 @@ public final class PropertyNames {
     public static final String DEBUG = "server.debug";
     public static final String ALLOW_OVERRIDE_URI = "server.allow_override_uri";
     public static final String SERVER_PORT = "server.port";
+    public static final String SERVER_MULTIPART_STRICT = "server.multipart.strict";
     public static final String MANAGEMENT_ENABLE = "management.enable";
     public static final String MANAGEMENT_PORT = "management.port";
     public static final String MANAGEMENT_URIS_EXPOSE = "management.uris_expose";

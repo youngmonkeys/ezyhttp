@@ -1,5 +1,6 @@
 package com.tvd12.ezyhttp.server.tomcat.test.limit;
 
+import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.server.core.annotation.Controller;
 import com.tvd12.ezyhttp.server.core.annotation.DoGet;
 import com.tvd12.ezyhttp.server.core.annotation.DoPost;
@@ -21,7 +22,7 @@ public class LimitController {
         return "json:" + body.getWho().length();
     }
 
-    @DoPost("/upload")
+    @DoPost(value = "/upload", accept = ContentTypes.MULTIPART_FORM_DATA)
     public String upload(
         RequestArguments arguments,
         @RequestParam("folder") String folder,
