@@ -1,9 +1,12 @@
 package com.tvd12.ezyhttp.server.core.test.servlet;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
+import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.interceptor.RequestInterceptor;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
@@ -325,6 +328,70 @@ public class BlockingServletMultipartTest {
 
         verify(response, times(1)).setStatus(StatusCodes.UNSUPPORTED_MEDIA_TYPE);
         verify(interceptor, never()).preHandle(any(), any());
+        Asserts.assertFalse(handler.called);
+        verifyBodyNeverRead(container);
+
+        componentManager.destroy();
+    }
+
+    @Test
+    public void unsupportedContentTypeHandledByUnhandledErrorHandlerTest() throws Exception {
+        ComponentManager componentManager = ComponentManager.getInstance();
+        componentManager.setServerPort(PORT);
+
+        HttpServletResponse response = newResponse();
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        UnhandledErrorHandler unhandledErrorHandler = mock(UnhandledErrorHandler.class);
+        ResponseEntity responseEntity = ResponseEntity.create(
+            StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+            Collections.singletonMap("error", "unsupported")
+        );
+        when(
+            unhandledErrorHandler.handleError(
+                eq(HttpMethod.POST),
+                any(),
+                eq(response),
+                eq(StatusCodes.UNSUPPORTED_MEDIA_TYPE),
+                any()
+            )
+        ).thenReturn(responseEntity);
+        componentManager.setUnhandledErrorHandler(
+            Collections.singletonList(unhandledErrorHandler)
+        );
+
+        BlockingServlet sut = new BlockingServlet();
+        sut.init();
+
+        Map<String, String[]> fullForm = new LinkedHashMap<>();
+        fullForm.put("folder", new String[] {"avatars"});
+        HttpServletRequest container = newUploadContainer(
+            HttpMethod.POST,
+            "folder=avatars",
+            fullForm
+        );
+
+        UploadRequestHandler handler = new UploadRequestHandler(ContentTypes.APPLICATION_JSON);
+        componentManager.getRequestHandlerManager().addHandler(
+            new RequestURI(HttpMethod.POST, UPLOAD_URI, false),
+            handler
+        );
+
+        sut.service(container, response);
+
+        verify(unhandledErrorHandler, times(1)).handleError(
+            eq(HttpMethod.POST),
+            any(),
+            eq(response),
+            eq(StatusCodes.UNSUPPORTED_MEDIA_TYPE),
+            any()
+        );
+        verify(response, times(1)).setStatus(StatusCodes.UNSUPPORTED_MEDIA_TYPE);
+        verify(response.getOutputStream(), never()).write(
+            EzyStrings.getUtfBytes(
+                "content type multipart/form-data; boundary=----abc not supported"
+            )
+        );
         Asserts.assertFalse(handler.called);
         verifyBodyNeverRead(container);
 
