@@ -113,6 +113,6 @@ public class MetricsController implements ManagementController {
     @EzyFeature(DEFAULT_FEATURE_NAME)
     @DoGet("/management/response-per-second")
     public long responsePerSecondGet() {
-        return SystemMonitor.getInstance().getRequestPerSecond();
+        return SystemMonitor.getInstance().getResponsePerSecond();
     }
 }
