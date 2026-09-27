@@ -61,7 +61,7 @@ public class BlockingServlet extends HttpServlet {
     private boolean debug;
     private int managementPort;
     private boolean exposeManagementURIs;
-    private boolean strictMultipart;
+    private boolean requireMultipartAccept;
     private int asyncDefaultTimeout;
     protected ViewContext viewContext;
     protected ObjectMapper objectMapper;
@@ -84,7 +84,7 @@ public class BlockingServlet extends HttpServlet {
         this.debug = componentManager.isDebug();
         this.managementPort = componentManager.getManagementPort();
         this.exposeManagementURIs = componentManager.isExposeManagementURIs();
-        this.strictMultipart = componentManager.isStrictMultipart();
+        this.requireMultipartAccept = componentManager.isRequireMultipartAccept();
         this.asyncDefaultTimeout = componentManager.getAsyncDefaultTimeout();
         this.viewContext = componentManager.getViewContext();
         this.objectMapper = componentManager.getObjectMapper();
@@ -271,7 +271,7 @@ public class BlockingServlet extends HttpServlet {
     ) {
         Set<String> accept = requestHandler.getAccept();
         if (EzyCollections.isEmpty(accept)) {
-            return !strictMultipart
+            return !requireMultipartAccept
                 || !(request instanceof DeferredMultipartHttpServletRequest);
         }
         String contentType = ContentTypes

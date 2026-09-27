@@ -26,7 +26,7 @@ public final class ComponentManager implements EzyDestroyable {
     @Setter
     private boolean exposeManagementURIs;
     @Setter
-    private boolean strictMultipart;
+    private boolean requireMultipartAccept;
     @Setter
     private int asyncDefaultTimeout;
     @Setter
@@ -43,7 +43,6 @@ public final class ComponentManager implements EzyDestroyable {
     private static final ComponentManager INSTANCE = new ComponentManager();
 
     private ComponentManager() {
-        this.strictMultipart = true;
         this.objectMapper = new ObjectMapperBuilder().build();
         this.dataConverters = new DataConverters(objectMapper);
         this.requestResponseWatchers = new ArrayList<>();
@@ -71,7 +70,7 @@ public final class ComponentManager implements EzyDestroyable {
     public void destroy() {
         this.viewContext = null;
         this.exposeManagementURIs = false;
-        this.strictMultipart = true;
+        this.requireMultipartAccept = false;
         this.unhandledErrorHandler = null;
         this.dataConverters.destroy();
         this.controllerManager.destroy();
