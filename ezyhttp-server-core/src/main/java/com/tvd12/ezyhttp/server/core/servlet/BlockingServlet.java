@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -541,13 +540,6 @@ public class BlockingServlet extends HttpServlet {
         arguments.setCookies(request.getCookies());
         arguments.setObjectMapper(objectMapper);
         arguments.setRedirectionAttributesFromCookie();
-
-        Enumeration<String> paramNames = request.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-            String paramName = paramNames.nextElement();
-            String[] paramValues = request.getParameterValues(paramName);
-            arguments.setParameter(paramName, paramValues);
-        }
         return arguments;
     }
 

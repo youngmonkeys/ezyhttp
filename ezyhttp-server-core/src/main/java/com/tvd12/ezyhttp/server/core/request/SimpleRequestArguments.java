@@ -47,7 +47,8 @@ public class SimpleRequestArguments implements RequestArguments {
     protected boolean headersLoaded;
     protected List<String> parameterList;
     protected Map<String, String> parameterMap;
-    protected boolean deferredParametersLoaded;
+    protected boolean parametersLoaded;
+    protected boolean parametersContentAccessible;
     protected Map<String, String> pathVariableMap;
     protected List<Entry<String, String>> pathVariableList;
     protected Cookie[] cookies;
@@ -78,11 +79,8 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(int index) {
-        loadDeferredParametersIfNeed();
-        if (parameterList == null) {
-            return null;
-        }
-        if (parameterList.size() <= index) {
+        loadParametersIfNeed();
+        if (parameterList == null || parameterList.size() <= index) {
             return null;
         }
         return parameterList.get(index);
@@ -90,33 +88,64 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getParameter(String name) {
-        loadDeferredParametersIfNeed();
-        if (parameterMap == null) {
-            return null;
-        }
-        return parameterMap.get(name);
+        return request != null
+            ? joinParameterValues(request.getParameterValues(name))
+            : null;
     }
 
-    protected void loadDeferredParametersIfNeed() {
-        if (deferredParametersLoaded
-            || !(request instanceof DeferredMultipartHttpServletRequest)
-            || !((DeferredMultipartHttpServletRequest) request)
-            .isContentAccessible()
+    @Override
+    public Map<String, String> getParameters() {
+        loadParametersIfNeed();
+        return parameterMap;
+    }
+
+    protected void loadParametersIfNeed() {
+        boolean contentAccessible = isParameterContentAccessible();
+        if (parametersLoaded
+            && parametersContentAccessible == contentAccessible
         ) {
             return;
         }
-        deferredParametersLoaded = true;
-        if (parameterList != null) {
-            parameterList.clear();
+        parametersLoaded = true;
+        parametersContentAccessible = contentAccessible;
+        parameterList = null;
+        parameterMap = null;
+        Enumeration<String> paramNames = request != null
+            ? request.getParameterNames()
+            : null;
+        if (paramNames == null) {
+            return;
         }
-        if (parameterMap != null) {
-            parameterMap.clear();
-        }
-        Enumeration<String> paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
-            setParameter(paramName, request.getParameterValues(paramName));
+            String value = joinParameterValues(
+                request.getParameterValues(paramName)
+            );
+            if (value == null) {
+                continue;
+            }
+            if (parameterList == null) {
+                parameterList = new ArrayList<>();
+                parameterMap = new HashMap<>();
+            }
+            parameterList.add(value);
+            parameterMap.put(paramName, value);
         }
+    }
+
+    protected boolean isParameterContentAccessible() {
+        return !(request instanceof DeferredMultipartHttpServletRequest)
+            || ((DeferredMultipartHttpServletRequest) request)
+            .isContentAccessible();
+    }
+
+    protected static String joinParameterValues(String[] values) {
+        if (values == null) {
+            return null;
+        }
+        return values.length == 0
+            ? ""
+            : values.length == 1 ? values[0] : String.join(",", values);
     }
 
     @Override
@@ -130,8 +159,6 @@ public class SimpleRequestArguments implements RequestArguments {
             return;
         }
         headersLoaded = true;
-        headerList = new ArrayList<>();
-        headerMap = new HashMap<>();
         Enumeration<String> headerNames = request != null
             ? request.getHeaderNames()
             : null;
@@ -141,38 +168,19 @@ public class SimpleRequestArguments implements RequestArguments {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
             String headerValue = request.getHeader(headerName);
+            if (headerList == null) {
+                headerList = new ArrayList<>();
+                headerMap = new HashMap<>();
+            }
             headerList.add(headerValue);
             headerMap.put(headerName, headerValue);
         }
     }
 
     @Override
-    public Map<String, String> getParameters() {
-        loadDeferredParametersIfNeed();
-        return parameterMap;
-    }
-
-    public void setParameter(String name, String[] values) {
-        if (values == null) {
-            return;
-        }
-        if (parameterList == null) {
-            parameterList = new ArrayList<>();
-        }
-        if (parameterMap == null) {
-            parameterMap = new HashMap<>();
-        }
-        String value = values.length == 0
-            ? ""
-            : values.length == 1 ? values[0] : String.join(",", values);
-        parameterList.add(value);
-        parameterMap.put(name, value);
-    }
-
-    @Override
     public String getHeader(int index) {
         loadHeadersIfNeed();
-        if (headerList.size() <= index) {
+        if (headerList == null || headerList.size() <= index) {
             return null;
         }
         return headerList.get(index);
@@ -354,7 +362,8 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public void release() {
-        this.deferredParametersLoaded = false;
+        this.parametersLoaded = false;
+        this.parametersContentAccessible = false;
         this.headersLoaded = false;
         if (arguments != null) {
             arguments.clear();
