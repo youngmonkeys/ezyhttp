@@ -145,7 +145,9 @@ public class SimpleRequestArguments implements RequestArguments {
         }
         return values.length == 0
             ? ""
-            : values.length == 1 ? values[0] : String.join(",", values);
+            : values.length == 1
+                ? values[0]
+                : String.join(",", values);
     }
 
     @Override

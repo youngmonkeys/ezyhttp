@@ -21,15 +21,12 @@ public class DeferredMultipartHttpServletRequest
 
     @Getter
     private volatile boolean contentAccessible;
-    private final Map<String, String[]> queryParameters;
+    private Map<String, String[]> queryParameters;
 
     public DeferredMultipartHttpServletRequest(
         HttpServletRequest request
     ) {
         super(request);
-        this.queryParameters = decodeQueryString(
-            request.getQueryString()
-        );
     }
 
     public static boolean isMultipartRequest(
@@ -53,7 +50,7 @@ public class DeferredMultipartHttpServletRequest
         if (contentAccessible) {
             return super.getParameter(name);
         }
-        String[] values = queryParameters.get(name);
+        String[] values = getQueryParameters().get(name);
         return values != null ? values[0] : null;
     }
 
@@ -62,7 +59,7 @@ public class DeferredMultipartHttpServletRequest
         if (contentAccessible) {
             return super.getParameterNames();
         }
-        return Collections.enumeration(queryParameters.keySet());
+        return Collections.enumeration(getQueryParameters().keySet());
     }
 
     @Override
@@ -70,7 +67,7 @@ public class DeferredMultipartHttpServletRequest
         if (contentAccessible) {
             return super.getParameterValues(name);
         }
-        String[] values = queryParameters.get(name);
+        String[] values = getQueryParameters().get(name);
         return values != null ? values.clone() : null;
     }
 
@@ -80,7 +77,7 @@ public class DeferredMultipartHttpServletRequest
             return super.getParameterMap();
         }
         Map<String, String[]> answer = new LinkedHashMap<>();
-        for (Entry<String, String[]> e : queryParameters.entrySet()) {
+        for (Entry<String, String[]> e : getQueryParameters().entrySet()) {
             answer.put(e.getKey(), e.getValue().clone());
         }
         return Collections.unmodifiableMap(answer);
@@ -96,6 +93,13 @@ public class DeferredMultipartHttpServletRequest
     public Part getPart(String name) throws IOException, ServletException {
         checkContentAccessible();
         return super.getPart(name);
+    }
+
+    private Map<String, String[]> getQueryParameters() {
+        if (queryParameters == null) {
+            queryParameters = decodeQueryString(getQueryString());
+        }
+        return queryParameters;
     }
 
     private void checkContentAccessible() {
