@@ -44,6 +44,7 @@ public class SimpleRequestArguments implements RequestArguments {
     protected Map<Object, Object> arguments;
     protected List<String> headerList;
     protected Map<String, String> headerMap;
+    protected boolean headersLoaded;
     protected List<String> parameterList;
     protected Map<String, String> parameterMap;
     protected boolean deferredParametersLoaded;
@@ -120,7 +121,29 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public Map<String, String> getHeaders() {
+        loadHeadersIfNeed();
         return headerMap;
+    }
+
+    protected void loadHeadersIfNeed() {
+        if (headersLoaded) {
+            return;
+        }
+        headersLoaded = true;
+        headerList = new ArrayList<>();
+        headerMap = new HashMap<>();
+        Enumeration<String> headerNames = request != null
+            ? request.getHeaderNames()
+            : null;
+        if (headerNames == null) {
+            return;
+        }
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            String headerValue = request.getHeader(headerName);
+            headerList.add(headerValue);
+            headerMap.put(headerName, headerValue);
+        }
     }
 
     @Override
@@ -148,9 +171,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getHeader(int index) {
-        if (headerList == null) {
-            return null;
-        }
+        loadHeadersIfNeed();
         if (headerList.size() <= index) {
             return null;
         }
@@ -159,21 +180,7 @@ public class SimpleRequestArguments implements RequestArguments {
 
     @Override
     public String getHeader(String name) {
-        if (headerMap == null) {
-            return null;
-        }
-        return headerMap.get(name);
-    }
-
-    public void setHeader(String name, String value) {
-        if (headerList == null) {
-            headerList = new ArrayList<>();
-        }
-        if (headerMap == null) {
-            headerMap = new HashMap<>();
-        }
-        headerList.add(value);
-        headerMap.put(name, value);
+        return request != null ? request.getHeader(name) : null;
     }
 
     @Override
@@ -348,6 +355,7 @@ public class SimpleRequestArguments implements RequestArguments {
     @Override
     public void release() {
         this.deferredParametersLoaded = false;
+        this.headersLoaded = false;
         if (arguments != null) {
             arguments.clear();
         }

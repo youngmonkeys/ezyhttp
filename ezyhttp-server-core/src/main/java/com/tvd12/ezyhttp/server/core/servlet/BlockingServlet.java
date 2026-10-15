@@ -548,13 +548,6 @@ public class BlockingServlet extends HttpServlet {
             String[] paramValues = request.getParameterValues(paramName);
             arguments.setParameter(paramName, paramValues);
         }
-
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            arguments.setHeader(headerName, headerValue);
-        }
         return arguments;
     }
 
