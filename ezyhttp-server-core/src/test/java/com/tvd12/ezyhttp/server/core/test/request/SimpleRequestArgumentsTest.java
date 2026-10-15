@@ -16,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,17 +105,27 @@ public class SimpleRequestArgumentsTest {
     public void parameterTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setParameter("hello", new String[]{"world"});
-        sut.setParameter("foo", new String[]{"bar"});
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("hello", "foo"))
+        );
+        when(request.getParameterValues("hello")).thenReturn(new String[]{"world"});
+        when(request.getParameterValues("foo")).thenReturn(new String[]{"bar"});
+        sut.setRequest(request);
 
         // when
+        String param0 = sut.getParameter(0);
+        String param1 = sut.getParameter(1);
         String paramOverSize = sut.getParameter(3);
         String paramByName = sut.getParameter("hello");
         Map<String, String> params = sut.getParameters();
 
         // then
+        Asserts.assertEquals("world", param0);
+        Asserts.assertEquals("bar", param1);
         Asserts.assertNull(paramOverSize);
         Asserts.assertEquals("world", paramByName);
+        verify(request, times(1)).getParameterNames();
 
         Map<String, String> expectedParams = EzyMapBuilder.mapBuilder()
             .put("hello", "world")
@@ -128,14 +139,23 @@ public class SimpleRequestArgumentsTest {
     public void headerTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setHeader("hello", "world");
-        sut.setHeader("foo", "bar");
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Arrays.asList("hello", "foo"))
+        );
+        when(request.getHeader("hello")).thenReturn("world");
+        when(request.getHeader("foo")).thenReturn("bar");
+        sut.setRequest(request);
 
         // when
+        String header0 = sut.getHeader(0);
+        String header1 = sut.getHeader(1);
         String headerOverSize = sut.getHeader(3);
         String headerByName = sut.getHeader("hello");
 
         // then
+        Asserts.assertEquals("world", header0);
+        Asserts.assertEquals("bar", header1);
         Asserts.assertNull(headerOverSize);
         Asserts.assertEquals("world", headerByName);
         Asserts.assertEquals(
@@ -146,6 +166,35 @@ public class SimpleRequestArgumentsTest {
                 .toMap(),
             false
         );
+        verify(request, times(1)).getHeaderNames();
+        sut.release();
+    }
+
+    @Test
+    public void headerWithoutRequestTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+
+        // when
+        // then
+        Asserts.assertNull(sut.getHeader(0));
+        Asserts.assertNull(sut.getHeader("hello"));
+        Asserts.assertNull(sut.getHeaders());
+        sut.release();
+    }
+
+    @Test
+    public void headerNamesNullTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        sut.setRequest(request);
+
+        // when
+        // then
+        Asserts.assertNull(sut.getHeader(0));
+        Asserts.assertNull(sut.getHeaders());
+        verify(request, times(1)).getHeaderNames();
         sut.release();
     }
 
@@ -244,8 +293,16 @@ public class SimpleRequestArgumentsTest {
     public void getByDefaultButNotNullTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setParameter("key", new String[]{"paramValue0"});
-        sut.setHeader("key", "headerValue0");
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("key"))
+        );
+        when(request.getHeader("key")).thenReturn("headerValue0");
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("key"))
+        );
+        when(request.getParameterValues("key")).thenReturn(new String[]{"paramValue0"});
+        sut.setRequest(request);
         sut.setCookies(new Cookie[]{new Cookie("key", "cookieValue0")});
 
         // when
@@ -260,10 +317,28 @@ public class SimpleRequestArgumentsTest {
     }
 
     @Test
-    public void setParameterEmpty() {
+    public void parameterWithoutRequestTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setParameter("key", new String[0]);
+
+        // when
+        // then
+        Asserts.assertNull(sut.getParameter(0));
+        Asserts.assertNull(sut.getParameter("hello"));
+        Asserts.assertNull(sut.getParameters());
+        sut.release();
+    }
+
+    @Test
+    public void parameterEmptyTest() {
+        // given
+        SimpleRequestArguments sut = new SimpleRequestArguments();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("key"))
+        );
+        when(request.getParameterValues("key")).thenReturn(new String[0]);
+        sut.setRequest(request);
 
         // when
         // then
@@ -273,10 +348,15 @@ public class SimpleRequestArgumentsTest {
     }
 
     @Test
-    public void setParameterMulti() {
+    public void parameterMultiTest() {
         // given
         SimpleRequestArguments sut = new SimpleRequestArguments();
-        sut.setParameter("key", new String[]{"a", "b"});
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("key"))
+        );
+        when(request.getParameterValues("key")).thenReturn(new String[]{"a", "b"});
+        sut.setRequest(request);
 
         // when
         // then
@@ -398,6 +478,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getAttribute("hello");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -423,6 +511,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getAttribute("hello");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -466,6 +562,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -475,9 +579,9 @@ public class SimpleRequestArgumentsTest {
         SimpleRequestArguments sut = new SimpleRequestArguments();
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/hello/world");
+        when(request.getHeader("hello")).thenReturn("world");
         sut.setRequest(request);
         sut.setUriTemplate("/hello/hello");
-        sut.setHeader("hello", "world");
 
         // when
         String actual1 = sut.getRequestValueAnyway("hello");
@@ -492,6 +596,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -502,8 +614,8 @@ public class SimpleRequestArgumentsTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/hello/world");
         sut.setRequest(request);
+        when(request.getParameterValues("hello")).thenReturn(new String[] {"world"});
         sut.setUriTemplate("/hello/hello");
-        sut.setParameter("hello", new String[] {"world"});
 
         // when
         String actual1 = sut.getRequestValueAnyway("hello");
@@ -518,6 +630,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(0)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -544,6 +664,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -570,6 +698,14 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(1)).getAttribute("world");
         verify(request, times(1)).getAttribute("World");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(1)).getHeader("worlD");
+        verify(request, times(1)).getHeader("world");
+        verify(request, times(1)).getHeader("World");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(1)).getParameterValues("worlD");
+        verify(request, times(1)).getParameterValues("world");
+        verify(request, times(1)).getParameterValues("World");
         verifyNoMoreInteractions(request);
     }
 
@@ -595,6 +731,12 @@ public class SimpleRequestArgumentsTest {
         verify(request, times(2)).getAttribute("w");
         verify(request, times(1)).getAttribute("W");
         verify(request, times(1)).getRequestURI();
+        verify(request, times(1)).getHeader("hello");
+        verify(request, times(2)).getHeader("w");
+        verify(request, times(1)).getHeader("W");
+        verify(request, times(1)).getParameterValues("hello");
+        verify(request, times(2)).getParameterValues("w");
+        verify(request, times(1)).getParameterValues("W");
         verifyNoMoreInteractions(request);
     }
 }

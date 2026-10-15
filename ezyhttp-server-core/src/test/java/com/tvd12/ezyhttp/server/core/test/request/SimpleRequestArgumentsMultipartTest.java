@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -129,12 +128,16 @@ public class SimpleRequestArgumentsMultipartTest {
     }
 
     @Test
-    public void normalRequestKeepsCopiedParametersWithoutReparsingTest() {
+    public void normalRequestLoadsParameterListOnceTest() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
+        when(request.getParameterNames()).thenAnswer(it ->
+            Collections.enumeration(Collections.singletonList("username"))
+        );
+        when(request.getParameterValues("username"))
+            .thenReturn(new String[] {"dung"});
         SimpleRequestArguments sut = new SimpleRequestArguments();
         sut.setRequest(request);
-        sut.setParameter("username", new String[] {"dung"});
 
         Asserts.assertEquals(sut.getParameter("username"), "dung");
         Asserts.assertEquals(sut.getParameter(0), "dung");
@@ -145,8 +148,7 @@ public class SimpleRequestArgumentsMultipartTest {
             Collections.singletonMap("username", "dung"),
             false
         );
-        verify(request, never()).getParameterNames();
-        verify(request, never()).getParameterValues(anyString());
+        verify(request, times(1)).getParameterNames();
     }
 
     @Test
@@ -166,7 +168,6 @@ public class SimpleRequestArgumentsMultipartTest {
         HttpServletRequest secondContainer = newUploadContainer(null, secondForm);
         DeferredMultipartHttpServletRequest secondRequest =
             new DeferredMultipartHttpServletRequest(secondContainer);
-        copyParameters(sut, secondRequest);
         sut.setRequest(secondRequest);
         secondRequest.allowContentAccess();
 
@@ -194,19 +195,7 @@ public class SimpleRequestArgumentsMultipartTest {
     private static SimpleRequestArguments newArguments(HttpServletRequest request) {
         SimpleRequestArguments arguments = new SimpleRequestArguments();
         arguments.setRequest(request);
-        copyParameters(arguments, request);
         return arguments;
-    }
-
-    private static void copyParameters(
-        SimpleRequestArguments arguments,
-        HttpServletRequest request
-    ) {
-        Enumeration<String> paramNames = request.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-            String paramName = paramNames.nextElement();
-            arguments.setParameter(paramName, request.getParameterValues(paramName));
-        }
     }
 
     private static void verifyUploadBodyNotParsed(HttpServletRequest container) {
