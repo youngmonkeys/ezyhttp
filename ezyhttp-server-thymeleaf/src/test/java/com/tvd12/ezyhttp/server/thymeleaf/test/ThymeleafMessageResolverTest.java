@@ -234,6 +234,115 @@ public class ThymeleafMessageResolverTest {
     }
 
     @Test
+    public void putI18nMessagesIfAbsentTest() {
+        // given
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Collections.emptyList())
+            .build();
+        String viWelcome = sut.resolveMessage(new Locale("vi"), "home.welcome", null);
+        Map<String, Map<String, String>> newMessages = EzyMapBuilder.mapBuilder()
+            .put(
+                "vi",
+                EzyMapBuilder.mapBuilder()
+                    .put("home.welcome", "market welcome")
+                    .put("foo", "Foo VI")
+                    .toMap()
+            )
+            .put(
+                "th",
+                EzyMapBuilder.mapBuilder()
+                    .put("foo", "Foo TH")
+                    .toMap()
+            )
+            .put(
+                "",
+                EzyMapBuilder.mapBuilder()
+                    .put("foo", "market foo")
+                    .put("new_key", "new value")
+                    .toMap()
+            )
+            .toMap();
+
+        // when
+        Map<String, Map<String, String>> actual = sut.putI18nMessagesIfAbsent(newMessages);
+
+        // then
+        Map<String, Map<String, String>> expected = EzyMapBuilder.mapBuilder()
+            .put("vi", Collections.singletonMap("foo", "Foo VI"))
+            .put("th", Collections.singletonMap("foo", "Foo TH"))
+            .put("", Collections.singletonMap("new_key", "new value"))
+            .toMap();
+        Asserts.assertEquals(actual, expected, false);
+        Asserts.assertEquals(
+            sut.resolveMessage(new Locale("vi"), "home.welcome", null),
+            viWelcome
+        );
+        Asserts.assertEquals(sut.resolveMessage(new Locale("vi"), "foo", null), "Foo VI");
+        Asserts.assertEquals(sut.resolveMessage(new Locale("th"), "foo", null), "Foo TH");
+        Asserts.assertEquals(sut.resolveMessage(new Locale("en"), "foo", null), "Bar");
+        Asserts.assertEquals(
+            sut.resolveMessage(new Locale("en"), "new_key", null),
+            "new value"
+        );
+        Asserts.assertEquals(sut.getMessagesByLanguage("th").getProperty("foo"), "Foo TH");
+        Asserts.assertEquals(
+            sut.getMessagesByLocale(new Locale("th")).getProperty("foo"),
+            "Foo TH"
+        );
+    }
+
+    @Test
+    public void removeI18nMessagesTest() {
+        // given
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Collections.emptyList())
+            .build();
+        String viWelcome = sut.resolveMessage(new Locale("vi"), "home.welcome", null);
+        Map<String, Map<String, String>> putMessages = sut.putI18nMessagesIfAbsent(
+            EzyMapBuilder.mapBuilder()
+                .put(
+                    "th",
+                    EzyMapBuilder.mapBuilder()
+                        .put("foo", "Foo TH")
+                        .put("greet.title", "Greet TH {0}")
+                        .toMap()
+                )
+                .toMap()
+        );
+        sut.putI18nMessages(
+            Collections.singletonMap(
+                "th",
+                Collections.singletonMap("greet.title", "Admin edited {0}")
+            )
+        );
+
+        // when
+        sut.removeI18nMessages(putMessages);
+        sut.removeI18nMessages(
+            EzyMapBuilder.mapBuilder()
+                .put("vi", Collections.singletonMap("home.welcome", "other value"))
+                .put("unknown", Collections.singletonMap("foo", "Foo"))
+                .toMap()
+        );
+
+        // then
+        Asserts.assertEquals(sut.resolveMessage(new Locale("th"), "foo", null), "Bar");
+        Asserts.assertNull(sut.getMessagesByLanguage("th").getProperty("foo"));
+        Asserts.assertNull(sut.getMessagesByLocale(new Locale("th")).getProperty("foo"));
+        Asserts.assertEquals(
+            sut.resolveMessage(new Locale("th"), "greet.title", new Object[]{"Monkey"}),
+            "Admin edited Monkey"
+        );
+        Asserts.assertEquals(
+            sut.resolveMessage(new Locale("vi"), "home.welcome", null),
+            viWelcome
+        );
+        Asserts.assertFalse(sut.getMessageLanguages().contains("unknown"));
+    }
+
+    @Test
     public void createAbsentMessageRepresentation() {
         // given
         MessageProvider messageProvider = mock(MessageProvider.class);

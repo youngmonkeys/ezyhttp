@@ -18,6 +18,18 @@ public class I18nMessageResolverTest {
         // then
         instance.putI18nMessages(Collections.emptyMap());
         Asserts.assertEqualsType(
+            Asserts.assertThrows(() ->
+                instance.putI18nMessagesIfAbsent(Collections.emptyMap())
+            ),
+            UnsupportedOperationException.class
+        );
+        Asserts.assertEqualsType(
+            Asserts.assertThrows(() ->
+                instance.removeI18nMessages(Collections.emptyMap())
+            ),
+            UnsupportedOperationException.class
+        );
+        Asserts.assertEqualsType(
             Asserts.assertThrows(instance::getMessageLanguages),
             UnsupportedOperationException.class
         );

@@ -11,6 +11,18 @@ public interface I18nMessageResolver {
         Map<String, Map<String, String>> newMessagesByLanguage
     ) {}
 
+    default Map<String, Map<String, String>> putI18nMessagesIfAbsent(
+        Map<String, Map<String, String>> newMessagesByLanguage
+    ) {
+        throw new UnsupportedOperationException();
+    }
+
+    default void removeI18nMessages(
+        Map<String, Map<String, String>> messagesByLanguage
+    ) {
+        throw new UnsupportedOperationException();
+    }
+
     default Set<String> getMessageLanguages() {
         throw new UnsupportedOperationException();
     }

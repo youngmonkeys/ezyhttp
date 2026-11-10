@@ -119,6 +119,91 @@ public class ThymeleafMessageResolver implements
     }
 
     @Override
+    public Map<String, Map<String, String>> putI18nMessagesIfAbsent(
+        Map<String, Map<String, String>> newMessagesByLanguage
+    ) {
+        Map<String, Map<String, String>> answer = new HashMap<>();
+        for (String lang : newMessagesByLanguage.keySet()) {
+            Properties languageMessages = messagesByLanguage
+                .computeIfAbsent(lang, k -> new Properties());
+            Properties localeMessages = getLocaleMessagesOrNull(
+                lang,
+                languageMessages,
+                true
+            );
+            Map<String, String> putMessages = new HashMap<>();
+            for (Map.Entry<String, String> e
+                : newMessagesByLanguage.get(lang).entrySet()
+            ) {
+                String key = e.getKey();
+                String value = e.getValue();
+                if (key == null || value == null) {
+                    continue;
+                }
+                if (languageMessages.putIfAbsent(key, value) == null) {
+                    putMessages.put(key, value);
+                    if (localeMessages != null) {
+                        localeMessages.putIfAbsent(key, value);
+                    }
+                }
+            }
+            if (!putMessages.isEmpty()) {
+                answer.put(lang, putMessages);
+            }
+        }
+        return answer;
+    }
+
+    @Override
+    public void removeI18nMessages(
+        Map<String, Map<String, String>> messagesByLanguage
+    ) {
+        for (String lang : messagesByLanguage.keySet()) {
+            Properties languageMessages = this.messagesByLanguage.get(lang);
+            if (languageMessages == null) {
+                continue;
+            }
+            Properties localeMessages = getLocaleMessagesOrNull(
+                lang,
+                languageMessages,
+                false
+            );
+            for (Map.Entry<String, String> e
+                : messagesByLanguage.get(lang).entrySet()
+            ) {
+                String key = e.getKey();
+                String value = e.getValue();
+                if (key == null || value == null) {
+                    continue;
+                }
+                languageMessages.remove(key, value);
+                if (localeMessages != null) {
+                    localeMessages.remove(key, value);
+                }
+            }
+        }
+    }
+
+    private Properties getLocaleMessagesOrNull(
+        String lang,
+        Properties languageMessages,
+        boolean createIfAbsent
+    ) {
+        if (lang.isEmpty()) {
+            return defaultMessages != languageMessages
+                ? defaultMessages
+                : null;
+        }
+        Locale locale = getLocaleFromLanguage(lang);
+        Properties localeMessages = createIfAbsent
+            ? messagesByLocale.computeIfAbsent(locale, k -> new Properties())
+            : messagesByLocale.get(locale);
+        return localeMessages != languageMessages
+            ? localeMessages
+            : null;
+    }
+
+    @Override
     public String resolveMessage(
         ITemplateContext context,
         Class<?> origin,
