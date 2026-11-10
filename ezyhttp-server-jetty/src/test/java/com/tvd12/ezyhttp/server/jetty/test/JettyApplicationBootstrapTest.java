@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.testng.annotations.Test;
 
 import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.jetty.JettyApplicationBootstrap;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
@@ -41,6 +42,7 @@ public class JettyApplicationBootstrapTest {
     public void compressionDisableTest() throws Exception {
         // given
         JettyApplicationBootstrap instance = new JettyApplicationBootstrap();
+        instance.setComponentManager(new ComponentManager());
         instance.setCompressionEnable(false);
 
         // when

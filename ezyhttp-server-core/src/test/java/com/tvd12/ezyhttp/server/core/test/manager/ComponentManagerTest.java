@@ -10,7 +10,7 @@ public class ComponentManagerTest {
     @Test
     public void test() {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setExposeManagementURIs(true);
 
         // when

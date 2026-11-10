@@ -37,9 +37,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void rejectedUploadNeverParsesBodyTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -96,9 +96,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void acceptedUploadHandlerReadsFormFieldsAndFilesTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -149,9 +149,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void normalFormInterceptorStillSeesBodyFieldsTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -193,9 +193,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void multipartWithoutAcceptAllowedByDefaultTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -227,10 +227,10 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void multipartWithoutAcceptRejectedWhenRequireAcceptTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setRequireMultipartAccept(true);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -266,10 +266,10 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void nonMultipartWithoutAcceptAllowedWhenRequireAcceptTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setRequireMultipartAccept(true);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -299,9 +299,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void multipartToNonMultipartAcceptRejectedTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -336,7 +336,7 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void unsupportedContentTypeHandledByUnhandledErrorHandlerTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         HttpServletResponse response = newResponse();
@@ -360,7 +360,7 @@ public class BlockingServletMultipartTest {
             Collections.singletonList(unhandledErrorHandler)
         );
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -400,9 +400,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void multipartContentTypeIgnoresCaseTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         Map<String, String[]> fullForm = new LinkedHashMap<>();
@@ -434,9 +434,9 @@ public class BlockingServletMultipartTest {
 
     @Test
     public void missingContentTypeRejectedWhenAcceptDeclaredTest() throws Exception {
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         HttpServletRequest request = mock(HttpServletRequest.class);

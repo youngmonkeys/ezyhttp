@@ -67,13 +67,13 @@ public class BlockingServletTest {
     @Test
     public void doGetTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
         componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -140,13 +140,13 @@ public class BlockingServletTest {
     @Test
     public void doGetSecureTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
         componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -225,11 +225,11 @@ public class BlockingServletTest {
     @Test
     public void doGetManagementTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setManagementPort(MANAGEMENT_POR);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -288,7 +288,7 @@ public class BlockingServletTest {
     @Test
     public void doGetToManagementNotAllow() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setManagementPort(MANAGEMENT_POR);
         componentManager.getRequestHandlerManager().addHandler(
@@ -296,7 +296,7 @@ public class BlockingServletTest {
             mock(RequestHandler.class)
         );
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/management";
@@ -324,7 +324,7 @@ public class BlockingServletTest {
     @Test
     public void doGetFromManagement() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setManagementPort(MANAGEMENT_POR);
         componentManager.getRequestHandlerManager().addHandler(
@@ -332,7 +332,7 @@ public class BlockingServletTest {
             mock(RequestHandler.class)
         );
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -374,7 +374,7 @@ public class BlockingServletTest {
     @Test
     public void doGetFromManagementButExpose() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setManagementPort(MANAGEMENT_POR);
         componentManager.setExposeManagementURIs(true);
@@ -383,7 +383,7 @@ public class BlockingServletTest {
             mock(RequestHandler.class)
         );
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/management";
@@ -427,10 +427,10 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get-handler-null";
@@ -464,7 +464,7 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerNullAndHasErrorHandler() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -483,7 +483,7 @@ public class BlockingServletTest {
         ).thenReturn(responseEntity);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get-handler-null";
@@ -512,10 +512,10 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerEmpty() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -553,7 +553,7 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerEmptyAndHasErrorHandler() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -573,7 +573,7 @@ public class BlockingServletTest {
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -606,7 +606,7 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerEmptyWithErrorHandlerButDataNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -624,7 +624,7 @@ public class BlockingServletTest {
         ).thenReturn(null);
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -660,7 +660,7 @@ public class BlockingServletTest {
     @Test
     public void requestHandlerEmptyAndHasErrorHandlerButException() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -680,7 +680,7 @@ public class BlockingServletTest {
         componentManager.setUnhandledErrorHandler(Collections.singletonList(unhandledErrorHandler));
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -717,10 +717,10 @@ public class BlockingServletTest {
     @Test
     public void doGetNotAcceptable() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -772,10 +772,10 @@ public class BlockingServletTest {
     @Test
     public void doGetResponseContentTypeNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -833,13 +833,13 @@ public class BlockingServletTest {
     @Test
     public void doGetResponseContentTypeNullAndPostHandleRequestError() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         int defaultAsyncTimeout = RandomUtil.randomSmallInt() + 1;
         componentManager.setAsyncDefaultTimeout(defaultAsyncTimeout);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -902,10 +902,10 @@ public class BlockingServletTest {
     @Test
     public void responseDataIsNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -949,10 +949,10 @@ public class BlockingServletTest {
     @Test
     public void getRequestDeserializeValueException() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1002,10 +1002,10 @@ public class BlockingServletTest {
     @Test
     public void getRequestHttpRequestExceptionDataNotNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1055,10 +1055,10 @@ public class BlockingServletTest {
     @Test
     public void getRequestHttpRequestExceptionDataNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1108,7 +1108,7 @@ public class BlockingServletTest {
     @Test
     public void getRequestUnknownExceptionContentTypeIsNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1116,7 +1116,7 @@ public class BlockingServletTest {
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1166,7 +1166,7 @@ public class BlockingServletTest {
     @Test
     public void getRequestUnknownExceptionResultIsNull() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1174,7 +1174,7 @@ public class BlockingServletTest {
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1222,7 +1222,7 @@ public class BlockingServletTest {
     @Test
     public void getRequestUnknownExceptionError() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
@@ -1230,7 +1230,7 @@ public class BlockingServletTest {
         exceptionHandlerManager.addUncaughtExceptionHandler(IllegalStateException.class, exceptionHandler);
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1279,14 +1279,14 @@ public class BlockingServletTest {
     @Test
     public void getRequestUnknownExceptionNoHandler() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         ExceptionHandlerManager exceptionHandlerManager = componentManager.getExceptionHandlerManager();
         exceptionHandlerManager.destroy();
 
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get";
@@ -1334,10 +1334,10 @@ public class BlockingServletTest {
     @Test
     public void doPostTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/post";
@@ -1405,10 +1405,10 @@ public class BlockingServletTest {
     @Test
     public void doPutTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/put";
@@ -1464,10 +1464,10 @@ public class BlockingServletTest {
     @Test
     public void doPutWithSpaceTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/put%20with%20space";
@@ -1523,10 +1523,10 @@ public class BlockingServletTest {
     @Test
     public void doPutWithRedirectTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/put-with-redirect-attributes";
@@ -1583,7 +1583,7 @@ public class BlockingServletTest {
     @Test
     public void doDeleteTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
         ViewContext viewContext = mock(ViewContext.class);
@@ -1591,7 +1591,7 @@ public class BlockingServletTest {
 
         ServletConfig servletConfig = mock(ServletConfig.class);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init(servletConfig);
         sut.init();
 
@@ -1646,11 +1646,11 @@ public class BlockingServletTest {
     @Test
     public void doDeleteButViewContextIsNullTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
         componentManager.setViewContext(null);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/delete";
@@ -1703,10 +1703,10 @@ public class BlockingServletTest {
     @Test
     public void doGetButResponseBodyIsNullTest() throws Exception {
         // given
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = new ComponentManager();
         componentManager.setServerPort(PORT);
 
-        BlockingServlet sut = new BlockingServlet();
+        BlockingServlet sut = new BlockingServlet(componentManager);
         sut.init();
 
         String requestURI = "/get-no-body";

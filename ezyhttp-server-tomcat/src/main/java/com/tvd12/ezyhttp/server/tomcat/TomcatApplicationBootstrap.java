@@ -1,12 +1,14 @@
 package com.tvd12.ezyhttp.server.tomcat;
 
 import com.tvd12.ezyfox.annotation.EzyProperty;
+import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyStoppable;
 import com.tvd12.ezyhttp.core.concurrent.HttpThreadFactory;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import com.tvd12.ezyhttp.server.core.ApplicationEntry;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.apache.catalina.Context;
@@ -106,6 +108,9 @@ public class TomcatApplicationBootstrap
     @EzyProperty("management.port")
     protected int managementPort = 18080;
 
+    @EzyAutoBind
+    protected ComponentManager componentManager;
+
     @Setter(AccessLevel.NONE)
     protected Tomcat tomcat;
 
@@ -151,7 +156,7 @@ public class TomcatApplicationBootstrap
         Wrapper wrapper = answer.addServlet(
             "",
             "Servlet",
-            new TomcatBlockingServlet()
+            new TomcatBlockingServlet(componentManager)
         );
         wrapper.setAsyncSupported(true);
         String actualMultipartLocation = multipartLocation != null

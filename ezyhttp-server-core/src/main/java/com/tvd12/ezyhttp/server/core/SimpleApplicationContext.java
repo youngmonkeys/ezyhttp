@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.util.EzyDestroyable;
-import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,6 +48,5 @@ public class SimpleApplicationContext implements ApplicationContext {
         for (Object component : destroyableComponents) {
             ((EzyDestroyable) component).destroy();
         }
-        ComponentManager.getInstance().destroy();
     }
 }
