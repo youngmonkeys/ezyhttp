@@ -190,9 +190,7 @@ public class ThymeleafMessageResolver implements
         boolean createIfAbsent
     ) {
         if (lang.isEmpty()) {
-            return defaultMessages != languageMessages
-                ? defaultMessages
-                : null;
+            return null;
         }
         Locale locale = getLocaleFromLanguage(lang);
         Properties localeMessages = createIfAbsent

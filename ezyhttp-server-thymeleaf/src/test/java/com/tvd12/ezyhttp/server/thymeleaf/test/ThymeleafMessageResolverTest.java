@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import org.thymeleaf.context.ITemplateContext;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -293,6 +294,44 @@ public class ThymeleafMessageResolverTest {
     }
 
     @Test
+    public void putI18nMessagesIfAbsentNullKeyOrValueAndNoPutMessagesTest() {
+        // given
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Collections.emptyList())
+            .build();
+        String viWelcome = sut.resolveMessage(new Locale("vi"), "home.welcome", null);
+        Map<String, String> viMessages = new HashMap<>();
+        viMessages.put(null, "null key");
+        viMessages.put("null_value", null);
+        viMessages.put("home.welcome", "market welcome");
+        Map<String, String> thMessages = new HashMap<>();
+        thMessages.put(null, "null key");
+        thMessages.put("null_value", null);
+        thMessages.put("foo", "Foo TH");
+        Map<String, Map<String, String>> newMessages = new HashMap<>();
+        newMessages.put("vi", viMessages);
+        newMessages.put("th", thMessages);
+
+        // when
+        Map<String, Map<String, String>> actual = sut.putI18nMessagesIfAbsent(newMessages);
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Collections.singletonMap("th", Collections.singletonMap("foo", "Foo TH")),
+            false
+        );
+        Asserts.assertEquals(
+            sut.resolveMessage(new Locale("vi"), "home.welcome", null),
+            viWelcome
+        );
+        Asserts.assertNull(sut.getMessagesByLanguage("vi").getProperty("null_value"));
+        Asserts.assertNull(sut.getMessagesByLanguage("th").getProperty("null_value"));
+        Asserts.assertEquals(sut.getMessagesByLanguage("th").getProperty("foo"), "Foo TH");
+    }
+
+    @Test
     public void removeI18nMessagesTest() {
         // given
         ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
@@ -340,6 +379,40 @@ public class ThymeleafMessageResolverTest {
             viWelcome
         );
         Asserts.assertFalse(sut.getMessageLanguages().contains("unknown"));
+    }
+
+    @Test
+    public void removeI18nMessagesNullKeyOrValueTest() {
+        // given
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Collections.emptyList())
+            .build();
+        sut.putI18nMessagesIfAbsent(
+            Collections.singletonMap(
+                "th",
+                EzyMapBuilder.mapBuilder()
+                    .put("foo", "Foo TH")
+                    .put("bar", "Bar TH")
+                    .toMap()
+            )
+        );
+        Map<String, String> thMessages = new HashMap<>();
+        thMessages.put(null, "Foo TH");
+        thMessages.put("foo", null);
+        thMessages.put("bar", "Bar TH");
+
+        // when
+        sut.removeI18nMessages(Collections.singletonMap("th", thMessages));
+
+        // then
+        Asserts.assertEquals(sut.getMessagesByLanguage("th").getProperty("foo"), "Foo TH");
+        Asserts.assertEquals(
+            sut.getMessagesByLocale(new Locale("th")).getProperty("foo"),
+            "Foo TH"
+        );
+        Asserts.assertNull(sut.getMessagesByLanguage("th").getProperty("bar"));
+        Asserts.assertNull(sut.getMessagesByLocale(new Locale("th")).getProperty("bar"));
     }
 
     @Test
