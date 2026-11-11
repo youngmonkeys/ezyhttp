@@ -3,11 +3,15 @@ package com.tvd12.ezyhttp.client.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.concurrent.DownloadCancellationToken;
+import com.tvd12.ezyhttp.client.concurrent.UploadCancellationToken;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
+import com.tvd12.ezyhttp.client.exception.UploadCancelledException;
 import com.tvd12.ezyhttp.client.request.DownloadRequest;
 import com.tvd12.ezyhttp.client.request.GetRequest;
+import com.tvd12.ezyhttp.client.request.HeadRequest;
 import com.tvd12.ezyhttp.client.request.PostRequest;
 import com.tvd12.ezyhttp.client.request.RequestEntity;
+import com.tvd12.ezyhttp.client.request.UploadRequest;
 import com.tvd12.ezyhttp.client.test.request.HelloRequest;
 import com.tvd12.ezyhttp.client.test.server.TestApplicationBootstrap;
 import com.tvd12.ezyhttp.core.annotation.BodyConvert;
@@ -17,9 +21,11 @@ import com.tvd12.ezyhttp.core.codec.TextBodyConverter;
 import com.tvd12.ezyhttp.core.constant.ContentEncoding;
 import com.tvd12.ezyhttp.core.constant.ContentTypes;
 import com.tvd12.ezyhttp.core.constant.Headers;
+import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.data.MultiValueMap;
 import com.tvd12.ezyhttp.core.exception.*;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.reflect.MethodInvoker;
@@ -33,6 +39,7 @@ import org.testng.annotations.Test;
 
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1042,6 +1049,125 @@ public class HttpClientTest {
 
         // then
         Asserts.assertEquals(actual, "EzyHttp-Client/" + fallbackVersion);
+    }
+
+    @Test
+    public void uploadRawBodyFromFileTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder().build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://127.0.0.1:18081/upload-raw")
+            .setMethod(HttpMethod.PUT)
+            .setFilePath("pom.xml")
+            .setMultipart(false);
+
+        // when
+        ResponseEntity response = sut.upload(request);
+
+        // then
+        Map<String, Object> body = response.getBody();
+        Asserts.assertEquals(response.getStatus(), StatusCodes.OK);
+        Asserts.assertEquals(body.get("method"), "PUT");
+        Asserts.assertEquals(
+            ((Number) body.get("size")).longValue(),
+            new File("pom.xml").length()
+        );
+        Asserts.assertEquals(
+            body.get("contentType"),
+            ContentTypes.APPLICATION_OCTET_STREAM
+        );
+        Asserts.assertEquals(body.get("chunked"), false);
+    }
+
+    @Test
+    public void uploadRawBodyFromInputStreamWithContentLengthTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder().build();
+        byte[] bytes = RandomUtil.randomShortByteArray();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://127.0.0.1:18081/upload-raw")
+            .setMethod(HttpMethod.PUT)
+            .setInputStream(new ByteArrayInputStream(bytes))
+            .setContentLength(bytes.length)
+            .setHeaders(
+                MultiValueMap.builder()
+                    .setValue(Headers.CONTENT_TYPE, ContentTypes.TEXT_PLAIN)
+                    .build()
+            )
+            .setMultipart(false);
+
+        // when
+        ResponseEntity response = sut.upload(request);
+
+        // then
+        Map<String, Object> body = response.getBody();
+        Asserts.assertEquals(response.getStatus(), StatusCodes.OK);
+        Asserts.assertEquals(
+            ((Number) body.get("size")).longValue(),
+            (long) bytes.length
+        );
+        Asserts.assertEquals(body.get("contentType"), ContentTypes.TEXT_PLAIN);
+        Asserts.assertEquals(body.get("chunked"), false);
+    }
+
+    @Test
+    public void uploadRawBodyFromInputStreamChunkedTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder().build();
+        byte[] bytes = new byte[20 * 1024];
+        UploadRequest request = new UploadRequest()
+            .setURL("http://127.0.0.1:18081/upload-raw")
+            .setInputStream(new ByteArrayInputStream(bytes))
+            .setMultipart(false);
+
+        // when
+        ResponseEntity response = sut.upload(request);
+
+        // then
+        Map<String, Object> body = response.getBody();
+        Asserts.assertEquals(response.getStatus(), StatusCodes.OK);
+        Asserts.assertEquals(body.get("method"), "POST");
+        Asserts.assertEquals(
+            ((Number) body.get("size")).longValue(),
+            (long) bytes.length
+        );
+        Asserts.assertEquals(body.get("chunked"), true);
+    }
+
+    @Test
+    public void uploadRawBodyCancelledTest() {
+        // given
+        HttpClient sut = HttpClient.builder().build();
+        UploadRequest request = new UploadRequest()
+            .setURL("http://127.0.0.1:18081/upload-raw")
+            .setFilePath("pom.xml")
+            .setMultipart(false);
+        UploadCancellationToken cancellationToken = new UploadCancellationToken();
+        cancellationToken.cancel();
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            sut.upload(request, cancellationToken)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, UploadCancelledException.class);
+    }
+
+    @Test
+    public void headRequestTest() throws Exception {
+        // given
+        HttpClient sut = HttpClient.builder().build();
+        HeadRequest request = new HeadRequest()
+            .setURL("http://127.0.0.1:18081/greet?who=Monkey");
+
+        // when
+        ResponseEntity response = sut.request(request);
+
+        // then
+        Asserts.assertEquals(response.getStatus(), StatusCodes.OK);
+        Asserts.assertNull(response.getBody());
+        Asserts.assertEquals(request.getMethod(), HttpMethod.HEAD);
     }
 
     @BeforeTest
