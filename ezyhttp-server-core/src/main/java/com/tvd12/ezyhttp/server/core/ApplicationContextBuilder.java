@@ -80,7 +80,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         this.propertiesSources = new HashSet<>();
         this.singletonByKey = new HashMap<>();
         this.singletonByName = new HashMap<>();
-        this.componentManager = ComponentManager.getInstance();
+        this.componentManager = new ComponentManager();
         this.objectMapper = componentManager.getObjectMapper();
         this.dataConverters = componentManager.getDataConverters();
         this.controllerManager = componentManager.getControllerManager();
@@ -422,6 +422,7 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected void addRequestHandlers(EzyBeanContext beanContext) {
         List<Object> controllerList = controllerManager.getControllers();
         RequestHandlersImplementer implementer = newRequestHandlersImplementer();
+        implementer.setDataConverters(dataConverters);
         implementer.setRequestURIDecorator(beanContext.getSingleton(RequestURIDecorator.class));
         Map<RequestURI, List<RequestHandler>> requestHandlers =
             implementer.implement(controllerList);

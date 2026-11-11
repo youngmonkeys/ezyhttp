@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.core.asm;
 
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.handler.RequestHandler;
 import com.tvd12.ezyhttp.server.core.handler.RequestURIDecorator;
@@ -15,6 +16,7 @@ import java.util.*;
 @Setter
 public class RequestHandlersImplementer extends EzyLoggable {
 
+    private DataConverters dataConverters;
     private RequestURIDecorator requestURIDecorator;
 
     public Map<RequestURI, List<RequestHandler>> implement(
@@ -68,6 +70,7 @@ public class RequestHandlersImplementer extends EzyLoggable {
         RequestHandlerMethod method
     ) {
         RequestHandlerImplementer answer = new RequestHandlerImplementer(controller, method);
+        answer.setDataConverters(dataConverters);
         answer.setRequestURIDecorator(requestURIDecorator);
         return answer;
     }

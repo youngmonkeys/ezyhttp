@@ -19,6 +19,7 @@ import com.tvd12.ezyfox.reflect.EzyClass;
 import com.tvd12.ezyfox.reflect.EzyClassTree;
 import com.tvd12.ezyfox.reflect.EzyMethod;
 import com.tvd12.ezyfox.reflect.EzyMethods;
+import com.tvd12.ezyhttp.core.codec.DataConverters;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
 import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
@@ -53,6 +54,8 @@ public class RequestHandlerImplementer
     protected final ControllerProxy controller;
     @Setter
     protected RequestURIDecorator requestURIDecorator;
+    @Setter
+    protected DataConverters dataConverters;
 
     protected static final String PARAMETER_PREFIX = "param";
     protected static final AtomicInteger COUNT = new AtomicInteger(0);
@@ -107,7 +110,9 @@ public class RequestHandlerImplementer
         implClass.addMethod(CtNewMethod.make(isAsyncMethodContent, implClass));
         Class answerClass = toClass(implClass, getSuperClass());
         implClass.detach();
-        RequestHandler handler = (RequestHandler) answerClass.newInstance();
+        AbstractRequestHandler handler =
+            (AbstractRequestHandler) answerClass.newInstance();
+        handler.setDataConverters(dataConverters);
         handler.setHandlerMethod(handlerMethod.getMethod().getMethod());
         handler.setAccept(handlerMethod.getAccept());
         setRepoComponent(handler);

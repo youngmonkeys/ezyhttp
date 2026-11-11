@@ -10,7 +10,6 @@ import com.tvd12.ezyhttp.core.exception.DeserializeHeaderException;
 import com.tvd12.ezyhttp.core.exception.DeserializeParameterException;
 import com.tvd12.ezyhttp.core.exception.DeserializePathVariableException;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
-import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,13 +29,9 @@ public abstract class AbstractRequestHandler implements RequestHandler {
     @Setter
     @Getter
     protected Set<String> accept;
-    protected final DataConverters dataConverters;
-    protected final ComponentManager componentManager;
-
-    public AbstractRequestHandler() {
-        this.componentManager = ComponentManager.getInstance();
-        this.dataConverters = componentManager.getDataConverters();
-    }
+    @Setter
+    @Getter
+    protected DataConverters dataConverters;
 
     @Override
     public final Object handle(

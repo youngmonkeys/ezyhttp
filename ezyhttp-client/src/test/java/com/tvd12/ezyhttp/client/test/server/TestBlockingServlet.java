@@ -115,6 +115,25 @@ public class TestBlockingServlet extends HttpServlet {
                 }
                 break;
             }
+            case "/upload-raw": {
+                long size = 0;
+                try (InputStream inputStream = req.getInputStream()) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        size += bytesRead;
+                    }
+                }
+                String transferEncoding = req.getHeader("Transfer-Encoding");
+                resp.setContentType(ContentTypes.APPLICATION_JSON);
+                resp.getWriter().write(
+                    "{\"method\":\"" + req.getMethod() + "\"," +
+                        "\"size\":" + size + "," +
+                        "\"contentType\":\"" + req.getContentType() + "\"," +
+                        "\"chunked\":" + "chunked".equalsIgnoreCase(transferEncoding) + "}"
+                );
+                break;
+            }
             case "/no-content-error":
                 resp.setContentLength(1);
                 resp.getOutputStream().write(new byte[]{0});

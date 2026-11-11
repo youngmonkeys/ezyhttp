@@ -18,7 +18,6 @@ import com.tvd12.ezyhttp.server.core.test.service.UserService0;
 import com.tvd12.ezyhttp.server.core.view.*;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.MethodInvoker;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.util.*;
@@ -26,11 +25,6 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 public class ApplicationContextBuilderTest {
-
-    @AfterMethod
-    public void postTest() {
-        ComponentManager.getInstance().destroy();
-    }
 
     @Test
     public void test() {
@@ -130,7 +124,8 @@ public class ApplicationContextBuilderTest {
             .getSingleton(NoAnnotationController.class);
         Asserts.assertNotNull(noAnnotationController);
 
-        ComponentManager componentManager = ComponentManager.getInstance();
+        ComponentManager componentManager = beanContext
+            .getSingleton(ComponentManager.class);
         Asserts.assertEquals(componentManager.getAsyncDefaultTimeout(), 10000);
 
         System.out.println(applicationContext);

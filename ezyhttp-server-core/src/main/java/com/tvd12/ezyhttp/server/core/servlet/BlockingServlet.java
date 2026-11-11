@@ -77,9 +77,12 @@ public class BlockingServlet extends HttpServlet {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public BlockingServlet(ComponentManager componentManager) {
+        this.componentManager = componentManager;
+    }
+
     @Override
     public void init() {
-        this.componentManager = ComponentManager.getInstance();
         this.debug = componentManager.isDebug();
         this.managementPort = componentManager.getManagementPort();
         this.exposeManagementURIs = componentManager.isExposeManagementURIs();

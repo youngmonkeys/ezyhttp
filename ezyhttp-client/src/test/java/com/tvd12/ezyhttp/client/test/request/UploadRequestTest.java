@@ -58,4 +58,28 @@ public class UploadRequestTest {
         // then
         Asserts.assertEquals(actual.getFieldName(), "photo");
     }
+
+    @Test
+    public void defaultRawBodyOptionsTest() {
+        // given
+        // when
+        UploadRequest actual = new UploadRequest();
+
+        // then
+        Asserts.assertTrue(actual.isMultipart());
+        Asserts.assertEquals(actual.getContentLength(), -1L);
+    }
+
+    @Test
+    public void setRawBodyOptionsTest() {
+        // given
+        // when
+        UploadRequest actual = new UploadRequest()
+            .setMultipart(false)
+            .setContentLength(100L);
+
+        // then
+        Asserts.assertFalse(actual.isMultipart());
+        Asserts.assertEquals(actual.getContentLength(), 100L);
+    }
 }

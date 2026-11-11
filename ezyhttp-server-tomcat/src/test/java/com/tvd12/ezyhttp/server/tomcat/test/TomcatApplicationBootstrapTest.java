@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.tomcat.test;
 
 import org.testng.annotations.Test;
 
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.tomcat.TomcatApplicationBootstrap;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.FieldUtil;
@@ -37,6 +38,7 @@ public class TomcatApplicationBootstrapTest {
     public void compressionDisableTest() throws Exception {
         // given
         TomcatApplicationBootstrap sut = new TomcatApplicationBootstrap();
+        sut.setComponentManager(new ComponentManager());
         sut.setCompressionEnable(false);
         sut.setCompressionMinSize("1MB");
 

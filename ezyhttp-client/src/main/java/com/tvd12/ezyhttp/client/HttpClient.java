@@ -77,6 +77,7 @@ public class HttpClient extends EzyLoggable {
 
     public static final int NO_TIMEOUT = -1;
     private static final String FALLBACK_VERSION = "1.5.8";
+    private static final int UPLOAD_BUFFER_SIZE = 8 * 1024;
 
     protected HttpClient(Builder builder) {
         this.defaultReadTimeout = builder.readTimeout;
@@ -242,12 +243,16 @@ public class HttpClient extends EzyLoggable {
         if (responseContentType == null) {
             responseContentType = ContentTypes.APPLICATION_JSON;
         }
-        InputStream inputStream = decorateInputStream(
-            connection,
-            responseCode >= 400
-                ? connection.getErrorStream()
-                : connection.getInputStream()
-        );
+        InputStream inputStream = HttpMethod.HEAD.equalsValue(
+            connection.getRequestMethod()
+        )
+            ? null
+            : decorateInputStream(
+                connection,
+                responseCode >= 400
+                    ? connection.getErrorStream()
+                    : connection.getInputStream()
+            );
         Object responseBody = null;
         if (inputStream != null) {
             try {
@@ -852,42 +857,67 @@ public class HttpClient extends EzyLoggable {
                 "upload required a file path or in input stream"
             );
         }
+        Path path = requestInputStream == null
+            ? Paths.get(filePath)
+            : null;
         HttpURLConnection connection = connect(request.getURL());
         try {
             connection.setDoOutput(true);
             connection.setRequestMethod(request.getMethod().toString());
             decorateUploadConnection(connection, request);
-            String boundary = Long.toHexString(System.currentTimeMillis());
-            connection.setRequestProperty(
-                "Content-Type",
-                "multipart/form-data; boundary=" + boundary
-            );
+            boolean multipart = request.isMultipart();
+            String boundary = null;
+            if (multipart) {
+                boundary = Long.toHexString(System.currentTimeMillis());
+                connection.setRequestProperty(
+                    "Content-Type",
+                    "multipart/form-data; boundary=" + boundary
+                );
+            } else {
+                if (connection.getRequestProperty(Headers.CONTENT_TYPE) == null) {
+                    connection.setRequestProperty(
+                        Headers.CONTENT_TYPE,
+                        ContentTypes.APPLICATION_OCTET_STREAM
+                    );
+                }
+                long contentLength = request.getContentLength();
+                if (contentLength < 0 && requestInputStream == null) {
+                    contentLength = Files.size(path);
+                }
+                if (contentLength >= 0) {
+                    connection.setFixedLengthStreamingMode(contentLength);
+                } else {
+                    connection.setChunkedStreamingMode(0);
+                }
+            }
             OutputStream outputStream = connection.getOutputStream();
             PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
                 true
             );
-            writer.append("--").append(boundary).append("\r\n");
-            String fileName = request.getFileName();
-            if (isBlank(fileName)) {
-                fileName = filePath != null
-                    ? EzyFileUtil.getFileName(filePath)
-                    : "unknown";
+            if (multipart) {
+                writer.append("--").append(boundary).append("\r\n");
+                String fileName = request.getFileName();
+                if (isBlank(fileName)) {
+                    fileName = filePath != null
+                        ? EzyFileUtil.getFileName(filePath)
+                        : "unknown";
+                }
+                writer
+                    .append("Content-Disposition: form-data; name=\"")
+                    .append(request.getFieldName())
+                    .append("\"; filename=\"")
+                    .append(fileName)
+                    .append("\"\r\n");
+                writer.append("Content-Type: application/octet-stream\r\n\r\n");
+                writer.flush();
             }
-            writer
-                .append("Content-Disposition: form-data; name=\"")
-                .append(request.getFieldName())
-                .append("\"; filename=\"")
-                .append(fileName)
-                .append("\"\r\n");
-            writer.append("Content-Type: application/octet-stream\r\n\r\n");
-            writer.flush();
             InputStream inputStream = requestInputStream;
             if (inputStream == null) {
-                inputStream = Files.newInputStream(Paths.get(filePath));
+                inputStream = Files.newInputStream(path);
             }
             try {
-                byte[] buffer = new byte[1204];
+                byte[] buffer = new byte[UPLOAD_BUFFER_SIZE];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     if (cancellationToken.isCancelled()) {
@@ -904,12 +934,14 @@ public class HttpClient extends EzyLoggable {
                     inputStream.close();
                 }
             }
-            writer
-                .append("\r\n")
-                .append("--")
-                .append(boundary)
-                .append("--")
-                .append("\r\n");
+            if (multipart) {
+                writer
+                    .append("\r\n")
+                    .append("--")
+                    .append(boundary)
+                    .append("--")
+                    .append("\r\n");
+            }
             writer.flush();
             writer.close();
             return processConnectionResponse(

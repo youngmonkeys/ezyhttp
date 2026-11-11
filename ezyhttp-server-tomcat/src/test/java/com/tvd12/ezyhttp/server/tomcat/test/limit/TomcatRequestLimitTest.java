@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.tomcat.test.limit;
 
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.ApplicationContextBuilder;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.tomcat.TomcatApplicationBootstrap;
 import com.tvd12.ezyhttp.server.tomcat.test.limit.HttpCall.Response;
 import org.testng.Assert;
@@ -37,6 +38,9 @@ public class TomcatRequestLimitTest {
             .scan(getClass().getPackage().getName())
             .build();
         bootstrap = new TomcatApplicationBootstrap();
+        bootstrap.setComponentManager(
+            applicationContext.getSingleton(ComponentManager.class)
+        );
         bootstrap.setHost("127.0.0.1");
         bootstrap.setPort(port);
         bootstrap.setManagementEnable(false);

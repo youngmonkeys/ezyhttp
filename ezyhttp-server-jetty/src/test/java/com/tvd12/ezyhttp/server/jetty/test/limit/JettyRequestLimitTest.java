@@ -2,6 +2,7 @@ package com.tvd12.ezyhttp.server.jetty.test.limit;
 
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.ApplicationContextBuilder;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.jetty.JettyApplicationBootstrap;
 import com.tvd12.ezyhttp.server.jetty.test.limit.HttpCall.Response;
 import org.testng.Assert;
@@ -37,6 +38,9 @@ public class JettyRequestLimitTest {
             .scan(getClass().getPackage().getName())
             .build();
         bootstrap = new JettyApplicationBootstrap();
+        bootstrap.setComponentManager(
+            applicationContext.getSingleton(ComponentManager.class)
+        );
         bootstrap.setHost("127.0.0.1");
         bootstrap.setPort(port);
         bootstrap.setManagementEnable(false);

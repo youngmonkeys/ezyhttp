@@ -23,6 +23,7 @@ import com.tvd12.ezyhttp.core.exception.DeserializeParameterException;
 import com.tvd12.ezyhttp.core.exception.DeserializePathVariableException;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.server.core.handler.AbstractRequestHandler;
+import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.reflect.MethodInvoker;
@@ -605,6 +606,10 @@ public class AbstractRequestHandlerTest {
     }
 
     public static class ExRequestHandler extends AbstractRequestHandler {
+
+        public ExRequestHandler() {
+            this.dataConverters = new ComponentManager().getDataConverters();
+        }
 
         @Override
         public HttpMethod getMethod() {

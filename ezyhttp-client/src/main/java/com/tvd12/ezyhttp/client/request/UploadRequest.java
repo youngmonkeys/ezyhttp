@@ -24,10 +24,14 @@ public class UploadRequest {
     protected int connectTimeout;
     protected MultiValueMap headers;
     protected Map<Integer, Class<?>> responseTypes;
+    protected boolean multipart;
+    protected long contentLength;
 
     public UploadRequest() {
         this.method = HttpMethod.POST;
         this.fieldName = "file";
+        this.multipart = true;
+        this.contentLength = -1;
         this.responseTypes = new HashMap<>();
     }
 
@@ -91,6 +95,16 @@ public class UploadRequest {
 
     public UploadRequest setHeaders(MultiValueMap headers) {
         this.headers = headers;
+        return this;
+    }
+
+    public UploadRequest setMultipart(boolean multipart) {
+        this.multipart = multipart;
+        return this;
+    }
+
+    public UploadRequest setContentLength(long contentLength) {
+        this.contentLength = contentLength;
         return this;
     }
 

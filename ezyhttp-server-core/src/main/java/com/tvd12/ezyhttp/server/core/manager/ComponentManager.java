@@ -40,9 +40,7 @@ public final class ComponentManager implements EzyDestroyable {
     private final ExceptionHandlerManager exceptionHandlerManager;
     private final List<RequestResponseWatcher> requestResponseWatchers;
 
-    private static final ComponentManager INSTANCE = new ComponentManager();
-
-    private ComponentManager() {
+    public ComponentManager() {
         this.objectMapper = new ObjectMapperBuilder().build();
         this.dataConverters = new DataConverters(objectMapper);
         this.requestResponseWatchers = new ArrayList<>();
@@ -50,10 +48,6 @@ public final class ComponentManager implements EzyDestroyable {
         this.interceptorManager = new InterceptorManager();
         this.requestHandlerManager = new RequestHandlerManager();
         this.exceptionHandlerManager = new ExceptionHandlerManager();
-    }
-
-    public static ComponentManager getInstance() {
-        return INSTANCE;
     }
 
     public void setUnhandledErrorHandler(List<UnhandledErrorHandler> handlers) {
