@@ -108,7 +108,41 @@ public class BlockingServlet extends HttpServlet {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws IOException {
-        doHandleRequest(HttpMethod.GET, request, response);
+        HttpMethod method = hasHeadRequestHandler(request)
+            ? HttpMethod.HEAD
+            : HttpMethod.GET;
+        doHandleRequest(method, request, response);
+    }
+
+    private boolean hasHeadRequestHandler(
+        HttpServletRequest request
+    ) throws IOException {
+        if (!HttpMethod.HEAD.name().equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+        String requestURI = request.getRequestURI();
+        String matchedURI = requestHandlerManager.getMatchedURI(
+            HttpMethod.HEAD,
+            requestURI
+        );
+        if (matchedURI == null) {
+            matchedURI = requestHandlerManager.getMatchedURI(
+                HttpMethod.HEAD,
+                URLDecoder.decode(requestURI, EzyStrings.UTF_8)
+            );
+        }
+        if (matchedURI == null) {
+            return false;
+        }
+        boolean isManagementURI = requestURIManager.isManagementURI(
+            HttpMethod.HEAD,
+            matchedURI
+        );
+        return requestHandlerManager.getHandler(
+            HttpMethod.HEAD,
+            matchedURI,
+            isManagementURI
+        ) != RequestHandler.EMPTY;
     }
 
     @Override
