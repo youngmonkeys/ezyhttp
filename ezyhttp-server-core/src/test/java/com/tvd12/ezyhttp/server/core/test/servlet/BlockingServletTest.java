@@ -1,9 +1,11 @@
 package com.tvd12.ezyhttp.server.core.test.servlet;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,6 +49,7 @@ import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.RequestURI;
 import com.tvd12.ezyhttp.server.core.request.RequestURIMeta;
+import com.tvd12.ezyhttp.server.core.response.NoBodyHttpServletResponse;
 import com.tvd12.ezyhttp.server.core.servlet.BlockingServlet;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
@@ -1758,6 +1761,237 @@ public class BlockingServletTest {
         componentManager.destroy();
     }
 
+    @Test
+    public void doHeadTest() throws Exception {
+        // given
+        ComponentManager componentManager = new ComponentManager();
+        componentManager.setServerPort(PORT);
+
+        RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+        componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
+
+        BlockingServlet sut = new BlockingServlet(componentManager);
+        sut.init();
+
+        String requestURI = "/head";
+        HttpServletRequest request = newHeadRequest(requestURI, PORT);
+
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        HeadRequestHandler requestHandler = new HeadRequestHandler(requestURI);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.HEAD, requestURI, false), requestHandler);
+
+        RequestInterceptor interceptor = mock(RequestInterceptor.class);
+        when(interceptor.preHandle(any(), any())).thenReturn(true);
+        componentManager.getInterceptorManager().addRequestInterceptors(Collections.singletonList(interceptor));
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        Asserts.assertTrue(requestHandler.handledResponse instanceof NoBodyHttpServletResponse);
+
+        verify(request, times(1)).getMethod();
+        verify(request, times(2)).getRequestURI();
+
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(1)).addHeader("X-Total", "10");
+        verify(response, never()).getOutputStream();
+        verify(outputStream, never()).write(any(byte[].class));
+
+        verify(interceptor, times(1)).preHandle(any(), any());
+        verify(interceptor, times(1)).postHandle(any(), any());
+        verify(watcher, times(1)).watchRequest(HttpMethod.HEAD, request);
+        verify(watcher, times(1)).watchResponse(
+            eq(HttpMethod.HEAD),
+            eq(request),
+            any(NoBodyHttpServletResponse.class)
+        );
+        verify(watcher, never()).watchRequest(HttpMethod.GET, request);
+
+        componentManager.destroy();
+    }
+
+    @Test
+    public void doHeadWithEncodedURITest() throws Exception {
+        // given
+        ComponentManager componentManager = new ComponentManager();
+        componentManager.setServerPort(PORT);
+
+        BlockingServlet sut = new BlockingServlet(componentManager);
+        sut.init();
+
+        String handlerURI = "/head/hello world";
+        HttpServletRequest request = newHeadRequest("/head/hello%20world", PORT);
+
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        HeadRequestHandler requestHandler = new HeadRequestHandler(handlerURI);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.HEAD, handlerURI, false), requestHandler);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        Asserts.assertTrue(requestHandler.handledResponse instanceof NoBodyHttpServletResponse);
+
+        verify(request, times(2)).getRequestURI();
+
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(1)).addHeader("X-Total", "10");
+        verify(response, never()).getOutputStream();
+        verify(outputStream, never()).write(any(byte[].class));
+
+        componentManager.destroy();
+    }
+
+    @Test
+    public void doHeadManagementTest() throws Exception {
+        // given
+        ComponentManager componentManager = new ComponentManager();
+        componentManager.setServerPort(PORT);
+        componentManager.setManagementPort(MANAGEMENT_POR);
+
+        BlockingServlet sut = new BlockingServlet(componentManager);
+        sut.init();
+
+        String requestURI = "/head";
+        HttpServletRequest request = newHeadRequest(requestURI, MANAGEMENT_POR);
+
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        HeadRequestHandler requestHandler = new HeadRequestHandler(requestURI);
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.HEAD, requestURI, true), requestHandler);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        Asserts.assertTrue(requestHandler.handledResponse instanceof NoBodyHttpServletResponse);
+
+        verify(request, times(1)).getServerPort();
+
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(1)).addHeader("X-Total", "10");
+        verify(response, never()).getOutputStream();
+        verify(outputStream, never()).write(any(byte[].class));
+
+        componentManager.destroy();
+    }
+
+    @Test
+    public void doHeadFallbackToGetHandlerTest() throws Exception {
+        // given
+        ComponentManager componentManager = new ComponentManager();
+        componentManager.setServerPort(PORT);
+
+        RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+        componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
+
+        BlockingServlet sut = new BlockingServlet(componentManager);
+        sut.init();
+
+        String requestURI = "/get";
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.HEAD.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(PORT);
+        when(request.getParameterNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("param"))
+        );
+        when(request.getParameter("param")).thenReturn("ParameterValue");
+        when(request.getParameterValues("param")).thenReturn(new String[]{"ParameterValue"});
+
+        when(request.getHeaderNames()).thenReturn(
+            Collections.enumeration(Collections.singletonList("header"))
+        );
+        when(request.getHeader("header")).thenReturn("HeaderValue");
+
+        when(request.getCookies()).thenReturn(
+            new Cookie[]{new Cookie("cookie", "CookieValue")}
+        );
+
+        RequestHandlerManager requestHandlerManager = componentManager.getRequestHandlerManager();
+        GetRequestHandler requestHandler = new GetRequestHandler();
+        requestHandlerManager.addHandler(new RequestURI(HttpMethod.GET, requestURI, false), requestHandler);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getContentType()).thenReturn(ContentTypes.APPLICATION_JSON);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, never()).getOutputStream();
+        verify(outputStream, never()).write(any(byte[].class));
+
+        verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
+        verify(watcher, never()).watchRequest(HttpMethod.HEAD, request);
+
+        componentManager.destroy();
+    }
+
+    @Test
+    public void doHeadNotFoundTest() throws Exception {
+        // given
+        ComponentManager componentManager = new ComponentManager();
+        componentManager.setServerPort(PORT);
+
+        RequestResponseWatcher watcher = mock(RequestResponseWatcher.class);
+        componentManager.addRequestResponseWatchers(Collections.singletonList(watcher));
+
+        BlockingServlet sut = new BlockingServlet(componentManager);
+        sut.init();
+
+        HttpServletRequest request = newHeadRequest("/not%20found", PORT);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        // when
+        sut.service(request, response);
+
+        // then
+        verify(response, times(1)).setStatus(StatusCodes.NOT_FOUND);
+        verify(response, never()).getOutputStream();
+        verify(outputStream, never()).write(any(byte[].class));
+
+        verify(watcher, times(1)).watchRequest(HttpMethod.GET, request);
+        verify(watcher, never()).watchRequest(HttpMethod.HEAD, request);
+
+        componentManager.destroy();
+    }
+
+    private static HttpServletRequest newHeadRequest(String requestURI, int port) {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(HttpMethod.HEAD.toString());
+        when(request.getRequestURI()).thenReturn(requestURI);
+        when(request.getServerPort()).thenReturn(port);
+        when(request.getCookies()).thenReturn(new Cookie[0]);
+        return request;
+    }
+
     @AllArgsConstructor
     public static class ExExceptionHandler implements UncaughtExceptionHandler {
 
@@ -2076,6 +2310,41 @@ public class BlockingServletTest {
         @Override
         public String getRequestURI() {
             return "/delete";
+        }
+
+        @Override
+        public String getResponseContentType() {
+            return ContentTypes.APPLICATION_JSON;
+        }
+    }
+
+    public static class HeadRequestHandler implements RequestHandler {
+
+        private final String requestURI;
+        private HttpServletResponse handledResponse;
+
+        public HeadRequestHandler(String requestURI) {
+            this.requestURI = requestURI;
+        }
+
+        @Override
+        public Object handle(RequestArguments arguments) {
+            handledResponse = arguments.getResponse();
+            return ResponseEntity.builder()
+                .status(StatusCodes.OK)
+                .header("X-Total", "10")
+                .body(new ExResponse("Hello"))
+                .build();
+        }
+
+        @Override
+        public HttpMethod getMethod() {
+            return HttpMethod.HEAD;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return requestURI;
         }
 
         @Override

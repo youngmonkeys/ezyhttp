@@ -17,6 +17,7 @@ public final class Annotations {
         set.add(DoPost.class);
         set.add(DoPut.class);
         set.add(DoDelete.class);
+        set.add(DoHead.class);
         return Collections.unmodifiableSet(set);
     }
 }

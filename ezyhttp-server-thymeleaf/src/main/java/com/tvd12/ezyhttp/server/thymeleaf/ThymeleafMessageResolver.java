@@ -1,6 +1,7 @@
 package com.tvd12.ezyhttp.server.thymeleaf;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.view.AbsentMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.I18nMessageResolver;
 import com.tvd12.ezyhttp.server.core.view.MessageProvider;
@@ -25,9 +26,9 @@ import static com.tvd12.ezyhttp.core.constant.Constants.EMPTY_STRING;
 import static com.tvd12.ezyhttp.core.util.Locales.getLocaleFromLanguage;
 import static com.tvd12.properties.file.util.PropertiesUtil.toProperties;
 
-public class ThymeleafMessageResolver implements
-    I18nMessageResolver,
-    IMessageResolver {
+public class ThymeleafMessageResolver
+    extends EzyLoggable
+    implements I18nMessageResolver, IMessageResolver {
 
     @Getter
     private final String name = NAME;
@@ -58,7 +59,15 @@ public class ThymeleafMessageResolver implements
         Map<String, Properties> answer = new HashMap<>();
         mergeAnswerMessages(answer, readMessages());
         for (MessageProvider provider : messageProviders) {
-            mergeAnswerMessages(answer, provider.provide());
+            try {
+                mergeAnswerMessages(answer, provider.provide());
+            } catch (Throwable e) {
+                logger.error(
+                    "collect messages from provider: {} error",
+                    provider.getClass().getName(),
+                    e
+                );
+            }
         }
         return answer;
     }

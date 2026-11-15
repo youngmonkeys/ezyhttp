@@ -73,6 +73,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected final Map<String, Object> singletonByName;
     protected final Map<EzyBeanKey, Object> singletonByKey;
 
+    private static final List<HttpMethod> RESOURCE_METHODS =
+        Arrays.asList(
+            HttpMethod.GET,
+            HttpMethod.HEAD
+        );
+
     public ApplicationContextBuilder() {
         this.properties = defaultProperties();
         this.packageToScans = new HashSet<>();
@@ -439,21 +445,23 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
         Map<String, Resource> resources = resourceResolver.getResources();
         for (String resourceURI : resources.keySet()) {
             Resource resource = resources.get(resourceURI);
-            RequestURI requestURI = new RequestURI(
-                HttpMethod.GET,
-                resourceURI,
-                false,
-                true,
-                true,
-                resource.getFullPath()
-            );
             RequestHandler requestHandler = new ResourceRequestHandler(
                 resource.getPath(),
                 resource.getUri(),
                 resource.getExtension(),
                 downloadManager
             );
-            requestHandlerManager.addHandler(requestURI, requestHandler);
+            for (HttpMethod method : RESOURCE_METHODS) {
+                RequestURI requestURI = new RequestURI(
+                    method,
+                    resourceURI,
+                    false,
+                    true,
+                    true,
+                    resource.getFullPath()
+                );
+                requestHandlerManager.addHandler(requestURI, requestHandler);
+            }
         }
     }
 

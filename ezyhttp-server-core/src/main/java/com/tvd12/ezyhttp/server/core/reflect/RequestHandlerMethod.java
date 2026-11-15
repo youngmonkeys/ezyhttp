@@ -9,6 +9,7 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.util.DoDeleteAnnotations;
 import com.tvd12.ezyhttp.server.core.util.DoGetAnnotations;
+import com.tvd12.ezyhttp.server.core.util.DoHeadAnnotations;
 import com.tvd12.ezyhttp.server.core.util.DoPostAnnotations;
 import com.tvd12.ezyhttp.server.core.util.DoPutAnnotations;
 import lombok.Getter;
@@ -75,7 +76,11 @@ public class RequestHandlerMethod extends HandlerMethod {
             return DoPutAnnotations.getURI(doPut);
         }
         DoDelete doDelete = method.getAnnotation(DoDelete.class);
-        return DoDeleteAnnotations.getURI(doDelete);
+        if (doDelete != null) {
+            return DoDeleteAnnotations.getURI(doDelete);
+        }
+        DoHead doHead = method.getAnnotation(DoHead.class);
+        return DoHeadAnnotations.getURI(doHead);
     }
 
     protected HttpMethod fetchHttpMethod() {
@@ -91,7 +96,11 @@ public class RequestHandlerMethod extends HandlerMethod {
         if (doPut != null) {
             return HttpMethod.PUT;
         }
-        return HttpMethod.DELETE;
+        DoDelete doDelete = method.getAnnotation(DoDelete.class);
+        if (doDelete != null) {
+            return HttpMethod.DELETE;
+        }
+        return HttpMethod.HEAD;
     }
 
     protected String fetchResponseType() {
@@ -108,7 +117,11 @@ public class RequestHandlerMethod extends HandlerMethod {
             return DoPutAnnotations.getResponseType(doPut);
         }
         DoDelete doDelete = method.getAnnotation(DoDelete.class);
-        return DoDeleteAnnotations.getResponseType(doDelete);
+        if (doDelete != null) {
+            return DoDeleteAnnotations.getResponseType(doDelete);
+        }
+        DoHead doHead = method.getAnnotation(DoHead.class);
+        return DoHeadAnnotations.getResponseType(doHead);
     }
 
     protected Set<String> fetchAccept() {
@@ -125,7 +138,11 @@ public class RequestHandlerMethod extends HandlerMethod {
             return DoPutAnnotations.getAccept(doPut);
         }
         DoDelete doDelete = method.getAnnotation(DoDelete.class);
-        return DoDeleteAnnotations.getAccept(doDelete);
+        if (doDelete != null) {
+            return DoDeleteAnnotations.getAccept(doDelete);
+        }
+        DoHead doHead = method.getAnnotation(DoHead.class);
+        return DoHeadAnnotations.getAccept(doHead);
     }
 
     public List<RequestHandlerMethod> duplicatedToOtherRequestHandlerMethods() {
@@ -143,12 +160,18 @@ public class RequestHandlerMethod extends HandlerMethod {
     }
 
     protected Set<String> fetchOtherRequestURIs() {
+        String[] otherUris;
         DoGet doGet = method.getAnnotation(DoGet.class);
-        if (doGet == null) {
+        DoHead doHead = method.getAnnotation(DoHead.class);
+        if (doGet != null) {
+            otherUris = doGet.otherUris();
+        } else if (doHead != null) {
+            otherUris = doHead.otherUris();
+        } else {
             return Collections.emptySet();
         }
         return Stream
-            .of(doGet.otherUris())
+            .of(otherUris)
             .filter(EzyStrings::isNotBlank)
             .collect(Collectors.toSet());
     }

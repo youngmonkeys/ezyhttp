@@ -28,6 +28,7 @@ import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.DeferredMultipartHttpServletRequest;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.request.SimpleRequestArguments;
+import com.tvd12.ezyhttp.server.core.response.NoBodyHttpServletResponse;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewContext;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -109,6 +111,50 @@ public class BlockingServlet extends HttpServlet {
         HttpServletResponse response
     ) throws IOException {
         doHandleRequest(HttpMethod.GET, request, response);
+    }
+
+    @Override
+    protected void doHead(
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws ServletException, IOException {
+        if (hasHeadRequestHandler(request)) {
+            doHandleRequest(
+                HttpMethod.HEAD,
+                request,
+                new NoBodyHttpServletResponse(response)
+            );
+        } else {
+            super.doHead(request, response);
+        }
+    }
+
+    private boolean hasHeadRequestHandler(
+        HttpServletRequest request
+    ) throws IOException {
+        String requestURI = request.getRequestURI();
+        String matchedURI = requestHandlerManager.getMatchedURI(
+            HttpMethod.HEAD,
+            requestURI
+        );
+        if (matchedURI == null) {
+            matchedURI = requestHandlerManager.getMatchedURI(
+                HttpMethod.HEAD,
+                URLDecoder.decode(requestURI, EzyStrings.UTF_8)
+            );
+        }
+        if (matchedURI == null) {
+            return false;
+        }
+        boolean isManagementURI = requestURIManager.isManagementURI(
+            HttpMethod.HEAD,
+            matchedURI
+        );
+        return requestHandlerManager.getHandler(
+            HttpMethod.HEAD,
+            matchedURI,
+            isManagementURI
+        ) != RequestHandler.EMPTY;
     }
 
     @Override
