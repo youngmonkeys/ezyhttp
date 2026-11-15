@@ -5,12 +5,15 @@ import java.util.List;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.util.EzyDestroyable;
+import com.tvd12.ezyfox.util.EzyLoggable;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @SuppressWarnings("unchecked")
-public class SimpleApplicationContext implements ApplicationContext {
+public class SimpleApplicationContext
+    extends EzyLoggable
+    implements ApplicationContext {
 
     @Setter
     @Getter
@@ -46,7 +49,15 @@ public class SimpleApplicationContext implements ApplicationContext {
     public void destroy() {
         List destroyableComponents = beanContext.getSingletonsOf(EzyDestroyable.class);
         for (Object component : destroyableComponents) {
-            ((EzyDestroyable) component).destroy();
+            try {
+                ((EzyDestroyable) component).destroy();
+            } catch (Throwable e) {
+                logger.error(
+                    "destroy component: {} error",
+                    component.getClass().getName(),
+                    e
+                );
+            }
         }
     }
 }

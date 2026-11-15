@@ -11,6 +11,7 @@ import com.tvd12.test.reflect.MethodUtil;
 import org.testng.annotations.Test;
 import org.thymeleaf.context.ITemplateContext;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -19,9 +20,39 @@ import java.util.Properties;
 
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ThymeleafMessageResolverTest {
+
+    @Test
+    public void collectMessagesWithErrorProviderTest() {
+        // given
+        MessageProvider failedProvider = mock(MessageProvider.class);
+        when(failedProvider.provide())
+            .thenThrow(new IllegalStateException("test"));
+
+        MessageProvider succeededProvider = mock(MessageProvider.class);
+        Properties exmessages = new Properties();
+        exmessages.setProperty("ex.hello", "Ex Hello");
+        when(succeededProvider.provide())
+            .thenReturn(Collections.singletonMap("en", exmessages));
+
+        // when
+        ThymeleafMessageResolver sut = ThymeleafMessageResolver.builder()
+            .messageLocation("messages")
+            .messageProviders(Arrays.asList(failedProvider, succeededProvider))
+            .build();
+
+        // then
+        Asserts.assertEquals(
+            "Ex Hello",
+            sut.getMessagesByLanguage("en").getProperty("ex.hello")
+        );
+        verify(failedProvider, times(1)).provide();
+        verify(succeededProvider, times(1)).provide();
+    }
 
     @Test
     public void resolveMessageEn() {
