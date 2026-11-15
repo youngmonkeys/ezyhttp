@@ -59,11 +59,6 @@ import com.tvd12.ezyhttp.server.core.view.*;
 @SuppressWarnings({"rawtypes", "unchecked", "MethodCount"})
 public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext> {
 
-    private static final List<HttpMethod> RESOURCE_METHODS = Arrays.asList(
-        HttpMethod.GET,
-        HttpMethod.HEAD
-    );
-
     protected final Properties properties;
     protected final Set<String> packageToScans;
     protected final Set<Class> componentClasses;
@@ -77,6 +72,12 @@ public class ApplicationContextBuilder implements EzyBuilder<ApplicationContext>
     protected final ExceptionHandlerManager exceptionHandlerManager;
     protected final Map<String, Object> singletonByName;
     protected final Map<EzyBeanKey, Object> singletonByKey;
+
+    private static final List<HttpMethod> RESOURCE_METHODS =
+        Arrays.asList(
+            HttpMethod.GET,
+            HttpMethod.HEAD
+        );
 
     public ApplicationContextBuilder() {
         this.properties = defaultProperties();
