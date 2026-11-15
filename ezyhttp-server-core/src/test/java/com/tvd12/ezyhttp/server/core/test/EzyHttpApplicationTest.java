@@ -12,6 +12,8 @@ import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.ApplicationContext;
 import com.tvd12.ezyhttp.server.core.EzyHttpApplication;
+import com.tvd12.ezyhttp.server.core.afterready.FailedAfterReadyConfig;
+import com.tvd12.ezyhttp.server.core.afterready.SucceededAfterReadyConfig;
 import com.tvd12.ezyhttp.server.core.annotation.ApplicationBootstrap;
 import com.tvd12.ezyhttp.server.core.resources.ResourceResolver;
 import com.tvd12.ezyhttp.server.core.test.service.UserService;
@@ -72,6 +74,28 @@ public class EzyHttpApplicationTest {
         Asserts.assertNotNull(resourceDownloadManager);
         Asserts.assertEquals(5, resourceResolver.getResources().size());
         Asserts.assertFalse(bootstraps.isEmpty());
+        sut.stop();
+    }
+
+    @Test
+    public void configurationAfterApplicationReadyErrorTest() throws Exception {
+        // given
+        EzyHttpApplication sut = EzyHttpApplication.start(
+            EzyHttpApplicationTest.class,
+            FailedAfterReadyConfig.class,
+            SucceededAfterReadyConfig.class
+        );
+        ApplicationContext applicationContext = sut.getApplicationContext();
+
+        // when
+        SucceededAfterReadyConfig succeededConfig = applicationContext
+            .getSingleton(SucceededAfterReadyConfig.class);
+
+        // then
+        Asserts.assertNotNull(
+            applicationContext.getSingleton(FailedAfterReadyConfig.class)
+        );
+        Asserts.assertTrue(succeededConfig.isConfigured());
         sut.stop();
     }
 

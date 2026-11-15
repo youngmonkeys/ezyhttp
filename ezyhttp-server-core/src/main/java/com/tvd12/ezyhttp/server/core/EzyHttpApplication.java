@@ -60,7 +60,9 @@ public class EzyHttpApplication
         List configurationAfterApplicationObjects = beanContext.getSingletons(
             EzyConfigurationAfterApplicationReady.class
         );
-        runConfigurationAfterApplicationObjects(configurationAfterApplicationObjects);
+        application.runConfigurationAfterApplicationObjects(
+            configurationAfterApplicationObjects
+        );
         return application;
     }
 
@@ -103,7 +105,7 @@ public class EzyHttpApplication
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void runConfigurationAfterApplicationObjects(
+    private void runConfigurationAfterApplicationObjects(
         List configurationAfterApplicationObjects
     ) {
         List<Object> objects = sortConfigurationAfterApplicationReadyObjects(
@@ -111,7 +113,15 @@ public class EzyHttpApplication
         );
         for (Object obj : objects) {
             if (obj instanceof EzyBeanConfig) {
-                ((EzyBeanConfig) obj).config();
+                try {
+                    ((EzyBeanConfig) obj).config();
+                } catch (Throwable e) {
+                    logger.error(
+                        "run configuration after application: {} error",
+                        obj.getClass().getName(),
+                        e
+                    );
+                }
             }
         }
     }
