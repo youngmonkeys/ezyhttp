@@ -6,7 +6,9 @@ import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyhttp.core.constant.*;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.io.AnywayFileLoader;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
+import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.test.assertion.Asserts;
@@ -15,8 +17,11 @@ import org.testng.annotations.Test;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -401,8 +406,11 @@ public class ResourceRequestHandlerTest {
         Thread.sleep(300);
         downloadManager.stop();
         verify(arguments, times(1)).getAsyncContext();
+        verify(arguments, times(1)).getMethod();
+        verify(arguments, times(1)).getRequest();
         verify(response, times(1)).getOutputStream();
         verify(arguments, times(1)).getHeader("Range");
+        verify(response, times(1)).setHeader(Headers.ACCEPT_RANGES, "bytes");
         verify(response, times(1)).setStatus(StatusCodes.INTERNAL_SERVER_ERROR);
         verify(response, times(1)).setContentType("text/html; charset=utf-8");
         verify(asyncContext, times(1)).getResponse();
@@ -598,6 +606,251 @@ public class ResourceRequestHandlerTest {
         downloadManager.stop();
         verify(arguments, times(1)).getAsyncContext();
         verify(asyncContext, times(1)).getResponse();
+        verify(asyncContext, times(1)).complete();
+    }
+
+    @Test
+    public void handleHeadRequestTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
+        EzyResultCallback<Boolean> callback = mock(EzyResultCallback.class);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            new EzyAnywayInputStreamLoader(),
+            downloadManager,
+            0,
+            callback
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.HEAD);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        long fileLength = AnywayFileLoader
+            .getDefault()
+            .load(resourcePath)
+            .length();
+
+        // when
+        Object actual = sut.handle(arguments);
+
+        // then
+        Asserts.assertEquals(ResponseEntity.ASYNC, actual);
+        verify(response, times(1)).setHeader(Headers.ACCEPT_RANGES, "bytes");
+        verify(response, times(1)).setContentLengthLong(fileLength);
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(0)).getOutputStream();
+        verify(asyncContext, times(1)).complete();
+        verify(arguments, times(0)).getHeader("Range");
+        verifyNoMoreInteractions(downloadManager, callback);
+    }
+
+    @Test
+    public void handleHeadRequestByServletMethodTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.GET);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("HEAD");
+        when(arguments.getRequest()).thenReturn(request);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(0)).getOutputStream();
+        verify(asyncContext, times(1)).complete();
+        verifyNoMoreInteractions(downloadManager);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void handleHeadRequestWithCustomLoaderTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
+        EzyInputStreamLoader inputStreamLoader = mock(EzyInputStreamLoader.class);
+        InputStream inputStream = mock(InputStream.class);
+        when(inputStreamLoader.load(resourcePath)).thenReturn(inputStream);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            inputStreamLoader,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.HEAD);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        verify(inputStreamLoader, times(1)).load(resourcePath);
+        verify(inputStream, times(1)).close();
+        verify(inputStream, times(0)).read(any());
+        verify(response, times(0)).setContentLengthLong(anyLong());
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(asyncContext, times(1)).complete();
+        verifyNoMoreInteractions(downloadManager);
+    }
+
+    @Test
+    public void handleHeadRequestWithCustomFileLoaderTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        File file = AnywayFileLoader
+            .getDefault()
+            .load(resourcePath);
+        ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
+        EzyInputStreamLoader inputStreamLoader = path -> {
+            try {
+                return new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
+        };
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            inputStreamLoader,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.HEAD);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        verify(response, times(1)).setContentLengthLong(file.length());
+        verify(response, times(1)).setStatus(StatusCodes.OK);
+        verify(response, times(0)).getOutputStream();
+        verify(asyncContext, times(1)).complete();
+        verifyNoMoreInteractions(downloadManager);
+    }
+
+    @Test
+    public void handleHeadRequestNotFoundTest() throws Exception {
+        // given
+        String resourcePath = "not found.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = mock(ResourceDownloadManager.class);
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.HEAD);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        // when
+        Throwable e = Asserts.assertThrows(() -> sut.handle(arguments));
+
+        // then
+        Asserts.assertEqualsType(e, HttpNotFoundException.class);
+        verify(response, times(0)).setHeader(Headers.ACCEPT_RANGES, "bytes");
+        verify(response, times(0)).setStatus(StatusCodes.OK);
+        verify(asyncContext, times(1)).complete();
+        verifyNoMoreInteractions(downloadManager);
+    }
+
+    @Test
+    public void handleGetWithoutRangeSetContentLengthTest() throws Exception {
+        // given
+        String resourcePath = "static/index.html";
+        String resourceURI = "/index.html";
+        String resourceExtension = "html";
+        ResourceDownloadManager downloadManager = new ResourceDownloadManager();
+        ResourceRequestHandler sut = new ResourceRequestHandler(
+            resourcePath,
+            resourceURI,
+            resourceExtension,
+            downloadManager
+        );
+
+        RequestArguments arguments = mock(RequestArguments.class);
+        when(arguments.getMethod()).thenReturn(HttpMethod.GET);
+
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        when(arguments.getAsyncContext()).thenReturn(asyncContext);
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(asyncContext.getResponse()).thenReturn(response);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+
+        long fileLength = AnywayFileLoader
+            .getDefault()
+            .load(resourcePath)
+            .length();
+
+        // when
+        sut.handle(arguments);
+
+        // then
+        Thread.sleep(300);
+        downloadManager.stop();
+        verify(response, times(1)).setHeader(Headers.ACCEPT_RANGES, "bytes");
+        verify(response, times(1)).setContentLengthLong(fileLength);
+        verify(response, times(1)).getOutputStream();
         verify(asyncContext, times(1)).complete();
     }
 }

@@ -6,6 +6,7 @@ import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyhttp.core.constant.*;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
+import com.tvd12.ezyhttp.core.io.AnywayFileLoader;
 import com.tvd12.ezyhttp.core.io.BytesRangeFileInputStream;
 import com.tvd12.ezyhttp.core.resources.ActualContentTypeDetector;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
@@ -14,8 +15,12 @@ import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -141,13 +146,41 @@ public class ResourceRequestHandler implements RequestHandler {
                 contentEncoding.getValue()
             );
         }
+        final File resourceFile = AnywayFileLoader
+            .getDefault()
+            .load(resourcePath);
+        if (resourceFile != null) {
+            servletResponse.setHeader(
+                Headers.ACCEPT_RANGES,
+                "bytes"
+            );
+        }
+        if (isHeadRequest(arguments)) {
+            return doHandleHead(
+                asyncContext,
+                servletResponse,
+                resourceFile
+            );
+        }
         final InputStream inputStream;
         int statusCode = StatusCodes.OK;
         final String range = arguments.getHeader("Range");
         if (isBlank(range)) {
             inputStream = inputStreamLoader.load(resourcePath);
             if (inputStream == null) {
-                throw new FileNotFoundException(resourcePath + " file not found");
+                throw new FileNotFoundException(
+                    resourcePath + " file not found"
+                );
+            }
+            try {
+                setContentLengthIfKnown(
+                    servletResponse,
+                    inputStream,
+                    resourceFile
+                );
+            } catch (Exception e) {
+                inputStream.close();
+                throw e;
             }
         } else {
             BytesRangeFileInputStream is = null;
@@ -155,10 +188,6 @@ public class ResourceRequestHandler implements RequestHandler {
                 is = new BytesRangeFileInputStream(
                     resourcePath,
                     range
-                );
-                servletResponse.setHeader(
-                    Headers.ACCEPT_RANGES,
-                    "bytes"
                 );
                 servletResponse.setHeader(
                     Headers.CONTENT_RANGE,
@@ -179,7 +208,8 @@ public class ResourceRequestHandler implements RequestHandler {
             }
         }
         final int statusCodeFinal = statusCode;
-        final OutputStream outputStream = servletResponse.getOutputStream();
+        final OutputStream outputStream = servletResponse
+            .getOutputStream();
         try {
             downloadManager.drainAsync(
                 inputStream,
@@ -212,6 +242,61 @@ public class ResourceRequestHandler implements RequestHandler {
             asyncContext.complete();
         }
         return ResponseEntity.ASYNC;
+    }
+
+    protected Object doHandleHead(
+        AsyncContext asyncContext,
+        HttpServletResponse servletResponse,
+        File resourceFile
+    ) throws Exception {
+        try (InputStream inputStream = inputStreamLoader
+            .load(resourcePath)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException(
+                    resourcePath + " file not found"
+                );
+            }
+            setContentLengthIfKnown(
+                servletResponse,
+                inputStream,
+                resourceFile
+            );
+        }
+        servletResponse.setStatus(StatusCodes.OK);
+        asyncContext.complete();
+        return ResponseEntity.ASYNC;
+    }
+
+    private static boolean isHeadRequest(
+        RequestArguments arguments
+    ) {
+        if (arguments.getMethod() == HttpMethod.HEAD) {
+            return true;
+        }
+        HttpServletRequest request = arguments.getRequest();
+        return request != null
+            && HttpMethod
+            .HEAD
+            .name()
+            .equalsIgnoreCase(request.getMethod());
+    }
+
+    private void setContentLengthIfKnown(
+        HttpServletResponse servletResponse,
+        InputStream inputStream,
+        File resourceFile
+    ) throws IOException {
+        if (inputStream instanceof FileInputStream) {
+            servletResponse.setContentLengthLong(
+                ((FileInputStream) inputStream).getChannel().size()
+            );
+        } else if (resourceFile != null && isDefaultInputStreamLoader()) {
+            servletResponse.setContentLengthLong(resourceFile.length());
+        }
+    }
+
+    private boolean isDefaultInputStreamLoader() {
+        return inputStreamLoader.getClass() == EzyAnywayInputStreamLoader.class;
     }
 
     @Override
